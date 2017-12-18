@@ -3,7 +3,7 @@ object Form1: TForm1
   Height = 575
   Top = 130
   Width = 561
-  Caption = ' Request Expeditor'
+  Caption = 'HTTP request inspector'
   ClientHeight = 553
   ClientWidth = 561
   Icon.Data = {
@@ -215,31 +215,39 @@ object Form1: TForm1
         Caption = 'Headers'
         ClientHeight = 125
         ClientWidth = 535
-        object requestHeaders: TValueListEditor
+        object requestHeaders: TStringGrid
           Left = 0
           Height = 125
           Top = 0
           Width = 535
           Align = alClient
           BorderStyle = bsNone
+          ColCount = 3
+          ColumnClickSorts = True
+          Columns = <          
+            item
+              ButtonStyle = cbsButtonColumn
+              Title.Caption = ''
+              Width = 32
+            end          
+            item
+              Title.Caption = 'Header'
+              Width = 178
+            end          
+            item
+              Title.Caption = 'Value'
+              Width = 179
+            end>
           FixedCols = 0
-          Flat = True
-          PopupMenu = popupReqHeaders
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goSmoothScroll]
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
-          KeyOptions = [keyEdit, keyAdd, keyDelete]
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goAlwaysShowEditor, goThumbTracking, goRowHighlight]
-          Strings.Strings = (
-            ''
-          )
-          TitleCaptions.Strings = (
-            'Header'
-            'Value'
-          )
+          OnButtonClick = requestHeadersButtonClick
           ColWidths = (
-            269
-            266
+            32
+            178
+            179
           )
         end
       end
@@ -326,7 +334,6 @@ object Form1: TForm1
               Width = 274
             end>
           FixedCols = 0
-          Flat = True
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goSmoothScroll]
           RowCount = 1
           TabOrder = 0
@@ -345,7 +352,7 @@ object Form1: TForm1
         ClientWidth = 547
         object responseRaw: TMemo
           Left = 0
-          Height = 280
+          Height = 258
           Top = 0
           Width = 547
           Align = alClient
@@ -393,29 +400,6 @@ object Form1: TForm1
         Caption = 'About...'
         OnClick = MenuItem4Click
       end
-    end
-  end
-  object popupReqHeaders: TPopupMenu
-    left = 304
-    top = 163
-    object MenuItem5: TMenuItem
-      Caption = 'Content-Type: application/json'
-    end
-    object MenuItem6: TMenuItem
-      Caption = 'Content-Type: text/html'
-    end
-    object MenuItem7: TMenuItem
-      Caption = 'User-Agent: ...'
-    end
-    object MenuItem8: TMenuItem
-      Caption = 'X-Requested-With: XMLHttpRequest'
-    end
-    object MenuItem9: TMenuItem
-      Caption = '-'
-    end
-    object MenuItem10: TMenuItem
-      Caption = 'Toggle'
-      ShortCut = 16452
     end
   end
 end

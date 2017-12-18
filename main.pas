@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, ActnList;
+  fphttpclient, fpjson, Controls;
 
 type
 
@@ -22,16 +22,9 @@ type
     boxResponse: TGroupBox;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
-    MenuItem10: TMenuItem;
     MenuItem2: TMenuItem;
     MenuItem3: TMenuItem;
     MenuItem4: TMenuItem;
-    MenuItem5: TMenuItem;
-    MenuItem6: TMenuItem;
-    MenuItem7: TMenuItem;
-    MenuItem8: TMenuItem;
-    MenuItem9: TMenuItem;
-    popupReqHeaders: TPopupMenu;
     responseRaw: TMemo;
     PostText: TMemo;
     OpenDialog1: TOpenDialog;
@@ -39,6 +32,7 @@ type
     PageControl2: TPageControl;
     Splitter1: TSplitter;
     responseHeaders: TStringGrid;
+    requestHeaders: TStringGrid;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
@@ -46,13 +40,13 @@ type
     TabSheet5: TTabSheet;
     TabSheet6: TTabSheet;
     JsonTree: TTreeView;
-    requestHeaders: TValueListEditor;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
+    procedure requestHeadersButtonClick(Sender: TObject; aCol, aRow: Integer);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -62,8 +56,6 @@ type
     procedure JsonDocument(json: string);
     procedure ShowJsonDocument;
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
-    procedure MenuItemsClickHandler(SomeMenu: TMenu; ItemClick: TNotifyEvent);
-    procedure MenuItemRequestHeader(Sender: TObject);
     function ParseHeaderLine(line: string): TKeyValuePair;
   public
 
@@ -74,7 +66,7 @@ var
 
 implementation
 
-uses sysutils, jsonparser, about;
+uses sysutils, jsonparser, about, headers_editor;
 
 {$R *.lfm}
 
@@ -101,11 +93,11 @@ begin
   httpClient.OnHeaders := @HttpClientOnHeaders;
   try
     btnSubmit.Enabled := False;
-    for i:=1 to requestHeaders.Strings.Count do
+    for i:=1 to requestHeaders.RowCount do
     begin
-      key := trim(requestHeaders.Keys[i]);
+      key := trim(requestHeaders.Cells[1, i]);
       if key = '' then continue;
-      httpClient.AddHeader(key, requestHeaders.Values[key]);
+      httpClient.AddHeader(key, trim(requestHeaders.Cells[2, i]));
     end;
     SS := TStringStream.Create('');
     httpClient.HTTPMethod(method, url, SS, []);
@@ -130,7 +122,7 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  MenuItemsClickHandler(popupReqHeaders, @MenuItemRequestHeader);
+  Caption := ApplicationName;
 end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -157,6 +149,15 @@ end;
 procedure TForm1.MenuItem4Click(Sender: TObject);
 begin
   AboutForm.ShowModal;
+end;
+
+procedure TForm1.requestHeadersButtonClick(Sender: TObject; aCol, aRow: Integer
+  );
+begin
+  if aCol = 0 then
+  begin
+    HeadersEditorForm.ShowModal;
+  end;
 end;
 
 procedure TForm1.HttpClientOnHeaders(Sender: TObject);
@@ -297,27 +298,6 @@ begin
     //N.SelectedIndex := ImageTypeMap[Data.JSONType];
     N.Data := Data;
     end;
-end;
-
-procedure TForm1.MenuItemsClickHandler(SomeMenu: TMenu; ItemClick: TNotifyEvent);
-var
-  i: integer;
-begin
-  for i := 0 to SomeMenu.Items.Count - 1 do
-  begin
-    if SomeMenu.Items[i].Caption = '-' then Exit; // =>
-    SomeMenu.Items[i].OnClick := ItemClick;
-  end;
-end;
-
-procedure TForm1.MenuItemRequestHeader(Sender: TObject);
-var
-  item: TMenuItem;
-  kv: TKeyValuePair;
-begin
-  item := TMenuItem(Sender);
-  kv := ParseHeaderLine(item.Caption);
-  requestHeaders.InsertRow(kv.Key, kv.Value, True);
 end;
 
 function TForm1.ParseHeaderLine(line: string): TKeyValuePair;
