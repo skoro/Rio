@@ -221,38 +221,41 @@ object Form1: TForm1
           Top = 0
           Width = 535
           Align = alClient
+          AutoEdit = False
           BorderStyle = bsNone
-          ColCount = 3
-          ColumnClickSorts = True
+          ColCount = 2
           Columns = <          
             item
-              ButtonStyle = cbsButtonColumn
-              Title.Caption = ''
-              Width = 32
-            end          
-            item
+              ButtonStyle = cbsPickList
+              PickList.Strings = (
+                'Content-Type'
+                'User-Agent'
+                'X-Requested-With'
+              )
+              Title.Font.Style = [fsBold]
               Title.Caption = 'Header'
-              Width = 178
+              Width = 267
             end          
             item
+              ButtonStyle = cbsPickList
+              Title.Font.Style = [fsBold]
               Title.Caption = 'Value'
-              Width = 179
+              Width = 268
             end>
           FixedCols = 0
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goSmoothScroll]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
-          OnButtonClick = requestHeadersButtonClick
+          OnBeforeSelection = requestHeadersBeforeSelection
           ColWidths = (
-            32
-            178
-            179
+            267
+            268
           )
         end
       end
       object TabSheet2: TTabSheet
-        Caption = 'POST'
+        Caption = 'Body'
         ClientHeight = 125
         ClientWidth = 535
         object PostText: TMemo
@@ -297,28 +300,30 @@ object Form1: TForm1
     Width = 557
     Align = alClient
     BorderSpacing.Around = 2
+    BorderSpacing.InnerBorder = 2
     Caption = 'Response'
     ClientHeight = 294
     ClientWidth = 553
     TabOrder = 2
     object PageControl2: TPageControl
-      Left = 0
-      Height = 294
-      Top = 0
-      Width = 553
+      Left = 4
+      Height = 286
+      Top = 4
+      Width = 545
       ActivePage = TabSheet4
       Align = alClient
+      BorderSpacing.Around = 4
       TabIndex = 0
       TabOrder = 0
       object TabSheet4: TTabSheet
         Caption = 'Response'
-        ClientHeight = 258
-        ClientWidth = 547
+        ClientHeight = 250
+        ClientWidth = 539
         object responseHeaders: TStringGrid
           Left = 0
-          Height = 258
+          Height = 250
           Top = 0
-          Width = 547
+          Width = 539
           Align = alClient
           AutoEdit = False
           BorderStyle = bsNone
@@ -326,14 +331,17 @@ object Form1: TForm1
           ColumnClickSorts = True
           Columns = <          
             item
+              Title.Font.Style = [fsBold]
               Title.Caption = 'Header'
               Width = 273
             end          
             item
+              Title.Font.Style = [fsBold]
               Title.Caption = 'Value'
               Width = 274
             end>
           FixedCols = 0
+          MouseWheelOption = mwGrid
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goSmoothScroll]
           RowCount = 1
           TabOrder = 0
@@ -348,8 +356,8 @@ object Form1: TForm1
       end
       object TabSheet5: TTabSheet
         Caption = 'Content'
-        ClientHeight = 258
-        ClientWidth = 547
+        ClientHeight = 250
+        ClientWidth = 539
         object responseRaw: TMemo
           Left = 0
           Height = 258
@@ -364,8 +372,8 @@ object Form1: TForm1
       end
       object TabSheet6: TTabSheet
         Caption = 'JSON'
-        ClientHeight = 258
-        ClientWidth = 547
+        ClientHeight = 250
+        ClientWidth = 539
         object JsonTree: TTreeView
           Left = 0
           Height = 258

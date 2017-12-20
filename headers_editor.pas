@@ -21,7 +21,7 @@ type
   private
 
   public
-
+    procedure FillHeaderValues(header: string; Buf: TStrings);
   end;
 
 var
@@ -30,6 +30,20 @@ var
 implementation
 
 {$R *.lfm}
+
+{ THeadersEditorForm }
+
+procedure THeadersEditorForm.FillHeaderValues(header: string; Buf: TStrings);
+var
+  i: integer;
+begin
+  header := LowerCase(header);
+  Buf.Clear;
+  for i := 1 to StringGrid1.RowCount - 1 do
+  begin
+    if LowerCase(StringGrid1.Cells[0, i]) = header then Buf.Add(StringGrid1.Cells[1, i]);
+  end;
+end;
 
 end.
 

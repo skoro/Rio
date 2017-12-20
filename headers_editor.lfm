@@ -42,7 +42,6 @@ object HeadersEditorForm: THeadersEditorForm
           ButtonStyle = cbsButtonColumn
           MinSize = 32
           MaxSize = 32
-          SizePriority = 1
           Title.Caption = ''
           Width = 136
         end>

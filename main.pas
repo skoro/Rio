@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls;
+  fphttpclient, fpjson, Controls, Buttons;
 
 type
 
@@ -46,7 +46,9 @@ type
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure MenuItem3Click(Sender: TObject);
     procedure MenuItem4Click(Sender: TObject);
-    procedure requestHeadersButtonClick(Sender: TObject; aCol, aRow: Integer);
+    procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
+      );
+    procedure requestHeadersPickListSelect(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -76,7 +78,7 @@ procedure TForm1.btnSubmitClick(Sender: TObject);
 var
   url, method, key: string;
   httpClient: TFPHTTPClient;
-  SS: TStringStream;
+  SS, Body: TStringStream;
   i: integer;
 begin
   url := Trim(cbUrl.Text);
@@ -85,19 +87,21 @@ begin
     cbUrl.SetFocus;
     exit;
   end;
-  method := trim(cbMethod.Text);
+  method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
   if Pos('http', url) = 0 then url := 'http://' + url;
   FContentType := '';
   httpClient := TFPHTTPClient.Create(nil);
   httpClient.OnHeaders := @HttpClientOnHeaders;
+  if (method = 'POST') or (method = 'PUT') then
+    httpClient.RequestBody := TStringStream.Create(PostText.Text);
   try
     btnSubmit.Enabled := False;
-    for i:=1 to requestHeaders.RowCount do
+    for i:=1 to requestHeaders.RowCount-1 do
     begin
-      key := trim(requestHeaders.Cells[1, i]);
+      key := trim(requestHeaders.Cells[0, i]);
       if key = '' then continue;
-      httpClient.AddHeader(key, trim(requestHeaders.Cells[2, i]));
+      httpClient.AddHeader(key, trim(requestHeaders.Cells[1, i]));
     end;
     SS := TStringStream.Create('');
     httpClient.HTTPMethod(method, url, SS, []);
@@ -110,6 +114,7 @@ begin
     on E: Exception do
       ShowMessage(E.Message);
   end;
+  httpClient.RequestBody.Free;
   FreeAndNil(httpClient);
   FreeAndNil(SS);
   btnSubmit.Enabled := True;
@@ -151,13 +156,20 @@ begin
   AboutForm.ShowModal;
 end;
 
-procedure TForm1.requestHeadersButtonClick(Sender: TObject; aCol, aRow: Integer
-  );
+procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
+  aRow: Integer);
+var
+  header: string;
 begin
-  if aCol = 0 then
+  header := Trim(requestHeaders.Cells[0, aRow]);
+  if header <> '' then
   begin
-    HeadersEditorForm.ShowModal;
+    HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
   end;
+end;
+
+procedure TForm1.requestHeadersPickListSelect(Sender: TObject);
+begin
 end;
 
 procedure TForm1.HttpClientOnHeaders(Sender: TObject);
