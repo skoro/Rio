@@ -6,22 +6,29 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  ExtCtrls, Grids;
+  ExtCtrls, Grids, ComCtrls;
 
 type
 
   { THeadersEditorForm }
 
   THeadersEditorForm = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
+    BtnClose: TButton;
+    ImageList1: TImageList;
     Panel1: TPanel;
     Panel2: TPanel;
     StringGrid1: TStringGrid;
+    ToolBar1: TToolBar;
+    ToolButton1: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton3: TToolButton;
+    ToolButton4: TToolButton;
+    ToolButton5: TToolButton;
   private
 
   public
     procedure FillHeaderValues(header: string; Buf: TStrings);
+    procedure FillHeaders(Buf: TStrings);
   end;
 
 var
@@ -42,6 +49,20 @@ begin
   for i := 1 to StringGrid1.RowCount - 1 do
   begin
     if LowerCase(StringGrid1.Cells[0, i]) = header then Buf.Add(StringGrid1.Cells[1, i]);
+  end;
+end;
+
+procedure THeadersEditorForm.FillHeaders(Buf: TStrings);
+var
+  i: integer;
+  s: string;
+begin
+  Buf.Clear;
+  for i := 1 to StringGrid1.RowCount - 1 do
+  begin
+    s := Trim(StringGrid1.Cells[0, i]);
+    if Length(s) = 0 then continue;
+    if Buf.IndexOf(s) = -1 then Buf.Add(s);
   end;
 end;
 

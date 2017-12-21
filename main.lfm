@@ -227,11 +227,6 @@ object Form1: TForm1
           Columns = <          
             item
               ButtonStyle = cbsPickList
-              PickList.Strings = (
-                'Content-Type'
-                'User-Agent'
-                'X-Requested-With'
-              )
               Title.Font.Style = [fsBold]
               Title.Caption = 'Header'
               Width = 267
@@ -376,9 +371,9 @@ object Form1: TForm1
         ClientWidth = 539
         object JsonTree: TTreeView
           Left = 0
-          Height = 258
+          Height = 250
           Top = 0
-          Width = 547
+          Width = 539
           Align = alClient
           BorderStyle = bsNone
           ScrollBars = ssAutoBoth
@@ -396,17 +391,24 @@ object Form1: TForm1
     top = 163
     object MenuItem1: TMenuItem
       Caption = 'File'
-      object MenuItem3: TMenuItem
+      object miHeaders: TMenuItem
+        Caption = 'Headers...'
+        OnClick = miHeadersClick
+      end
+      object MenuItem6: TMenuItem
+        Caption = '-'
+      end
+      object miQuit: TMenuItem
         Caption = 'Quit'
         ShortCut = 16465
-        OnClick = MenuItem3Click
+        OnClick = miQuitClick
       end
     end
     object MenuItem2: TMenuItem
       Caption = 'Help'
-      object MenuItem4: TMenuItem
+      object miAbout: TMenuItem
         Caption = 'About...'
-        OnClick = MenuItem4Click
+        OnClick = miAboutClick
       end
     end
   end

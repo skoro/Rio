@@ -1,3 +1,10 @@
+{ TODO : Удаление строки из таблицы заголовков. }
+{ TODO : Дерево json: сделать меньшую вложенность, простые типы показывать
+сразу без разворачивания в дочерний элемент.}
+{ TODO : Дерево json: добавить popup меню (?) в выбором разворачивания/свертывания дочерних элементов. }
+{ TODO : Дерево json: добавить иконки узловых элементов (объект, массив) }
+{ TODO : Добавить новую вкладку на запросе Form с таблицей Name = Value для передачи формы в Post запросе. }
+
 unit main;
 
 {$mode objfpc}{$H+}
@@ -23,8 +30,10 @@ type
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
+    miQuit: TMenuItem;
+    miAbout: TMenuItem;
+    miHeaders: TMenuItem;
+    MenuItem6: TMenuItem;
     responseRaw: TMemo;
     PostText: TMemo;
     OpenDialog1: TOpenDialog;
@@ -44,8 +53,9 @@ type
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure MenuItem3Click(Sender: TObject);
-    procedure MenuItem4Click(Sender: TObject);
+    procedure miQuitClick(Sender: TObject);
+    procedure miAboutClick(Sender: TObject);
+    procedure miHeadersClick(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure requestHeadersPickListSelect(Sender: TObject);
@@ -59,6 +69,7 @@ type
     procedure ShowJsonDocument;
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     function ParseHeaderLine(line: string): TKeyValuePair;
+    procedure UpdateHeadersPickList;
   public
 
   end;
@@ -128,6 +139,8 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Caption := ApplicationName;
+  HeadersEditorForm := THeadersEditorForm.Create(Self);
+  UpdateHeadersPickList;
 end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -146,14 +159,23 @@ begin
   end;
 end;
 
-procedure TForm1.MenuItem3Click(Sender: TObject);
+procedure TForm1.miQuitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TForm1.MenuItem4Click(Sender: TObject);
+procedure TForm1.miAboutClick(Sender: TObject);
 begin
-  AboutForm.ShowModal;
+  with TAboutForm.Create(Self) do
+  begin
+    ShowModal;
+    Free;
+  end;
+end;
+
+procedure TForm1.miHeadersClick(Sender: TObject);
+begin
+  if HeadersEditorForm.ShowModal = mrClose then UpdateHeadersPickList;
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -163,9 +185,7 @@ var
 begin
   header := Trim(requestHeaders.Cells[0, aRow]);
   if header <> '' then
-  begin
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
-  end;
 end;
 
 procedure TForm1.requestHeadersPickListSelect(Sender: TObject);
@@ -327,6 +347,11 @@ begin
   Result.Value := Trim(RightStr(line, Length(line) - p));
   p := Pos(';', Result.Value);
   if p <> 0 then Result.Value := Trim(LeftStr(Result.Value, p - 1));
+end;
+
+procedure TForm1.UpdateHeadersPickList;
+begin
+  HeadersEditorForm.FillHeaders(requestHeaders.Columns.Items[0].PickList);
 end;
 
 end.
