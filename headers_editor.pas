@@ -28,6 +28,7 @@ type
     procedure btnMoveDownClick(Sender: TObject);
     procedure btnMoveUpClick(Sender: TObject);
     procedure btnRemoveRowClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
 
   public
@@ -66,6 +67,11 @@ procedure THeadersEditorForm.btnRemoveRowClick(Sender: TObject);
 begin
   with gridHeaders do
     DeleteRow(Row);
+end;
+
+procedure THeadersEditorForm.FormShow(Sender: TObject);
+begin
+  gridHeaders.SetFocus;
 end;
 
 procedure THeadersEditorForm.FillHeaderValues(header: string; Buf: TStrings);
