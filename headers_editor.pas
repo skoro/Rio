@@ -5,7 +5,7 @@ unit headers_editor;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Classes, SysUtils, Forms, Controls, StdCtrls,
   ExtCtrls, Grids, ComCtrls;
 
 type
@@ -28,6 +28,7 @@ type
     procedure btnMoveDownClick(Sender: TObject);
     procedure btnMoveUpClick(Sender: TObject);
     procedure btnRemoveRowClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
   private
 
@@ -67,6 +68,18 @@ procedure THeadersEditorForm.btnRemoveRowClick(Sender: TObject);
 begin
   with gridHeaders do
     DeleteRow(Row);
+end;
+
+procedure THeadersEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Shift = [ssCtrl] then
+    case Key of
+      87: Close; // Control-W
+      68: btnRemoveRowClick(Sender); // Control-D
+      38: btnMoveUpClick(Sender); // Control-Up
+      40: btnMoveDownClick(Sender); // Control-Down
+    end;
 end;
 
 procedure THeadersEditorForm.FormShow(Sender: TObject);

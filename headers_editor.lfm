@@ -7,6 +7,8 @@ object HeadersEditorForm: THeadersEditorForm
   Caption = 'Headers editor'
   ClientHeight = 299
   ClientWidth = 416
+  KeyPreview = True
+  OnKeyDown = FormKeyDown
   OnShow = FormShow
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
@@ -41,7 +43,7 @@ object HeadersEditorForm: THeadersEditorForm
           Width = 204
         end>
       FixedCols = 0
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
       TabOrder = 0
       TitleStyle = tsNative
       ColWidths = (
