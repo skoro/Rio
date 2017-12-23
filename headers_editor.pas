@@ -17,7 +17,7 @@ type
     ImageList1: TImageList;
     Panel1: TPanel;
     Panel2: TPanel;
-    StringGrid1: TStringGrid;
+    gridHeaders: TStringGrid;
     ToolBar1: TToolBar;
     ToolButton1: TToolButton;
     ToolButton2: TToolButton;
@@ -46,9 +46,9 @@ var
 begin
   header := LowerCase(header);
   Buf.Clear;
-  for i := 1 to StringGrid1.RowCount - 1 do
+  for i := 1 to gridHeaders.RowCount - 1 do
   begin
-    if LowerCase(StringGrid1.Cells[0, i]) = header then Buf.Add(StringGrid1.Cells[1, i]);
+    if LowerCase(gridHeaders.Cells[0, i]) = header then Buf.Add(gridHeaders.Cells[1, i]);
   end;
 end;
 
@@ -58,9 +58,9 @@ var
   s: string;
 begin
   Buf.Clear;
-  for i := 1 to StringGrid1.RowCount - 1 do
+  for i := 1 to gridHeaders.RowCount - 1 do
   begin
-    s := Trim(StringGrid1.Cells[0, i]);
+    s := Trim(gridHeaders.Cells[0, i]);
     if Length(s) = 0 then continue;
     if Buf.IndexOf(s) = -1 then Buf.Add(s);
   end;
