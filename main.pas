@@ -1,8 +1,8 @@
-{ TODO+ : Удаление строки из таблицы заголовков. }
+{ TODO+: Удаление строки из таблицы заголовков. }
 { TODO : Дерево json: сделать меньшую вложенность, простые типы показывать
 сразу без разворачивания в дочерний элемент.}
 { TODO : Дерево json: добавить popup меню (?) в выбором разворачивания/свертывания дочерних элементов. }
-{ TODO : Дерево json: добавить иконки узловых элементов (объект, массив) }
+{ TODO+: Дерево json: добавить иконки узловых элементов (объект, массив) }
 { TODO : Добавить новую вкладку на запросе Form с таблицей Name = Value для передачи формы в Post запросе. }
 
 unit main;
@@ -59,7 +59,6 @@ type
     procedure miHeadersClick(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
-    procedure requestHeadersPickListSelect(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -195,10 +194,6 @@ begin
   header := Trim(requestHeaders.Cells[0, aRow]);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
-end;
-
-procedure TForm1.requestHeadersPickListSelect(Sender: TObject);
-begin
 end;
 
 procedure TForm1.HttpClientOnHeaders(Sender: TObject);
