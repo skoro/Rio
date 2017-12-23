@@ -1,4 +1,4 @@
-{ TODO : Удаление строки из таблицы заголовков. }
+{ TODO+ : Удаление строки из таблицы заголовков. }
 { TODO : Дерево json: сделать меньшую вложенность, простые типы показывать
 сразу без разворачивания в дочерний элемент.}
 { TODO : Дерево json: добавить popup меню (?) в выбором разворачивания/свертывания дочерних элементов. }
@@ -27,6 +27,7 @@ type
     cbUrl: TComboBox;
     GroupBox1: TGroupBox;
     boxResponse: TGroupBox;
+    jsImages: TImageList;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -80,6 +81,14 @@ var
 implementation
 
 uses sysutils, jsonparser, about, headers_editor;
+
+const
+  ImageTypeMap: array[TJSONtype] of Integer =
+  // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
+  (-1, 3, 2, 4, 5, 0, 1);
+
+  JSONTypeNames: array[TJSONtype] of string =
+  ('Unknown', 'Number', 'String', 'Boolean', 'Null', 'Array', 'Object');
 
 {$R *.lfm}
 
@@ -290,10 +299,10 @@ begin
     jtObject:
       begin
       If (Data.JSONType = jtArray) then
-        C := 'Array (%d elements)'
+        C := '%s (%d elements)'
       else
-        C := 'Object (%d members)';
-      C := Format(C, [Data.Count]);
+        C := '%s (%d members)';
+      C := Format(C, [JSONTypeNames[Data.JSONType], Data.Count]);
       S := TstringList.Create;
       try
         For I:=0 to Data.Count-1 do
@@ -305,8 +314,8 @@ begin
           begin
           N2 := JsonTree.Items.AddChild(N, S[i]);
           D := TJSONData(S.Objects[i]);
-          //N2.ImageIndex := ImageTypeMap[D.JSONType];
-          //N2.SelectedIndex := ImageTypeMap[D.JSONType];
+          N2.ImageIndex := ImageTypeMap[D.JSONType];
+          N2.SelectedIndex := ImageTypeMap[D.JSONType];
           ShowJSONData(N2,D);
           end
       finally
