@@ -19,11 +19,15 @@ type
     Panel2: TPanel;
     gridHeaders: TStringGrid;
     ToolBar1: TToolBar;
-    ToolButton1: TToolButton;
-    ToolButton2: TToolButton;
+    btnAddRow: TToolButton;
+    btnRemoveRow: TToolButton;
     ToolButton3: TToolButton;
-    ToolButton4: TToolButton;
-    ToolButton5: TToolButton;
+    btnMoveUp: TToolButton;
+    btnMoveDown: TToolButton;
+    procedure btnAddRowClick(Sender: TObject);
+    procedure btnMoveDownClick(Sender: TObject);
+    procedure btnMoveUpClick(Sender: TObject);
+    procedure btnRemoveRowClick(Sender: TObject);
   private
 
   public
@@ -39,6 +43,30 @@ implementation
 {$R *.lfm}
 
 { THeadersEditorForm }
+
+procedure THeadersEditorForm.btnAddRowClick(Sender: TObject);
+begin
+  with gridHeaders do
+    InsertRowWithValues(RowCount, ['', '']);
+end;
+
+procedure THeadersEditorForm.btnMoveDownClick(Sender: TObject);
+begin
+  with gridHeaders do
+    if Row < RowCount - 1 then MoveColRow(False, Row, Row + 1);
+end;
+
+procedure THeadersEditorForm.btnMoveUpClick(Sender: TObject);
+begin
+  with gridHeaders do
+    if Row > 1 then MoveColRow(False, Row, Row - 1);
+end;
+
+procedure THeadersEditorForm.btnRemoveRowClick(Sender: TObject);
+begin
+  with gridHeaders do
+    DeleteRow(Row);
+end;
 
 procedure THeadersEditorForm.FillHeaderValues(header: string; Buf: TStrings);
 var

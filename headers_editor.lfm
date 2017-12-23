@@ -28,7 +28,6 @@ object HeadersEditorForm: THeadersEditorForm
       Align = alClient
       BorderStyle = bsNone
       ColCount = 2
-      ColumnClickSorts = True
       Columns = <      
         item
           Title.Font.Style = [fsBold]
@@ -41,7 +40,7 @@ object HeadersEditorForm: THeadersEditorForm
           Width = 204
         end>
       FixedCols = 0
-      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
       TabOrder = 0
       TitleStyle = tsNative
       ColWidths = (
@@ -84,19 +83,21 @@ object HeadersEditorForm: THeadersEditorForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
-      object ToolButton1: TToolButton
+      object btnAddRow: TToolButton
         Left = 1
         Hint = 'Insert new row'
         Top = 0
-        Caption = 'ToolButton1'
+        Caption = 'btnAddRow'
         ImageIndex = 0
+        OnClick = btnAddRowClick
       end
-      object ToolButton2: TToolButton
+      object btnRemoveRow: TToolButton
         Left = 24
         Hint = 'Delete selected row'
         Top = 0
-        Caption = 'ToolButton2'
+        Caption = 'btnRemoveRow'
         ImageIndex = 1
+        OnClick = btnRemoveRowClick
       end
       object ToolButton3: TToolButton
         Left = 47
@@ -105,19 +106,21 @@ object HeadersEditorForm: THeadersEditorForm
         Caption = 'ToolButton3'
         Style = tbsSeparator
       end
-      object ToolButton4: TToolButton
+      object btnMoveUp: TToolButton
         Left = 55
         Hint = 'Move row up'
         Top = 0
-        Caption = 'ToolButton4'
+        Caption = 'btnMoveUp'
         ImageIndex = 2
+        OnClick = btnMoveUpClick
       end
-      object ToolButton5: TToolButton
+      object btnMoveDown: TToolButton
         Left = 78
         Hint = 'Move row down'
         Top = 0
-        Caption = 'ToolButton5'
+        Caption = 'btnMoveDown'
         ImageIndex = 3
+        OnClick = btnMoveDownClick
       end
     end
   end
