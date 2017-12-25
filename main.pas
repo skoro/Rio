@@ -287,31 +287,35 @@ begin
   if Not Assigned(Data) then
     exit;
 
-  N := JsonTree.Items.AddChild(AParent,'');
+  if not Assigned(AParent) then
+  begin
+    AParent := JsonTree.Items.AddChild(nil, '');
+    AParent.ImageIndex := ImageTypeMap[Data.JSONType];
+    AParent.SelectedIndex := ImageTypeMap[Data.JSONType];
+  end;
 
   Case Data.JSONType of
     jtArray,
     jtObject:
       begin
       If (Data.JSONType = jtArray) then
-        C := '%s (%d elements)'
-      else
-        C := '%s (%d members)';
-      C := Format(C, [JSONTypeNames[Data.JSONType], Data.Count]);
+        AParent.Text := AParent.Text + Format('[%d]', [Data.Count])
+      else if (Data.JSONType = jtObject) and (AParent.Text = '') then
+        AParent.Text := 'Object';
       S := TstringList.Create;
       try
         For I:=0 to Data.Count-1 do
-          If Data.JSONtype=jtArray then
+          If Data.JSONtype = jtArray then
             S.AddObject(IntToStr(I), Data.items[i])
           else
             S.AddObject(TJSONObject(Data).Names[i], Data.items[i]);
         For I:=0 to S.Count-1 do
           begin
-          N2 := JsonTree.Items.AddChild(N, S[i]);
+          N2 := JsonTree.Items.AddChild(AParent, S[i]);
           D := TJSONData(S.Objects[i]);
           N2.ImageIndex := ImageTypeMap[D.JSONType];
           N2.SelectedIndex := ImageTypeMap[D.JSONType];
-          ShowJSONData(N2,D);
+          ShowJSONData(N2, D);
           end
       finally
         S.Free;
@@ -323,17 +327,9 @@ begin
     C := Data.AsString;
     if (Data.JSONType = jtString) then
       C := '"'+C+'"';
+    AParent.Text := AParent.Text + ': ' + C;
+    AParent.Data := Data;
   end;
-  If Assigned(N) then
-    begin
-    If N.Text = '' then
-      N.Text := C
-    else
-      N.Text := N.Text + ': ' + C;
-    //N.ImageIndex := ImageTypeMap[Data.JSONType];
-    //N.SelectedIndex := ImageTypeMap[Data.JSONType];
-    N.Data := Data;
-    end;
 end;
 
 function TForm1.ParseHeaderLine(line: string): TKeyValuePair;
