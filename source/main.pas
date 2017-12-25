@@ -31,6 +31,8 @@ type
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    miTreeExpand: TMenuItem;
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     miHeaders: TMenuItem;
@@ -54,9 +56,11 @@ type
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure JsonTreeClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miHeadersClick(Sender: TObject);
+    procedure miTreeExpandClick(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
   private
@@ -97,7 +101,7 @@ procedure TForm1.btnSubmitClick(Sender: TObject);
 var
   url, method, key: string;
   httpClient: TFPHTTPClient;
-  SS, Body: TStringStream;
+  SS: TStringStream;
   i: integer;
 begin
   url := Trim(cbUrl.Text);
@@ -116,6 +120,7 @@ begin
     httpClient.RequestBody := TStringStream.Create(PostText.Text);
   try
     btnSubmit.Enabled := False;
+    miTreeExpand.Enabled := False;
     for i:=1 to requestHeaders.RowCount-1 do
     begin
       key := trim(requestHeaders.Cells[0, i]);
@@ -167,6 +172,14 @@ begin
   end;
 end;
 
+procedure TForm1.JsonTreeClick(Sender: TObject);
+var
+  Node: TTreeNode;
+begin
+  Node := TTreeView(Sender).Selected;
+  if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
+end;
+
 procedure TForm1.miQuitClick(Sender: TObject);
 begin
   Close;
@@ -184,6 +197,18 @@ end;
 procedure TForm1.miHeadersClick(Sender: TObject);
 begin
   if HeadersEditorForm.ShowModal = mrClose then UpdateHeadersPickList;
+end;
+
+procedure TForm1.miTreeExpandClick(Sender: TObject);
+var
+  Node: TTreeNode;
+begin
+  Node := JsonTree.Selected;
+  if Assigned(Node) then
+  begin
+    Node.Expanded := not Node.Expanded;
+    if Node.Expanded then Node.Expand(True) else Node.Collapse(True);
+  end;
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
