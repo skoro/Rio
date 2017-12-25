@@ -1,4 +1,4 @@
-program expeditor;
+program http_inspector;
 
 {$mode objfpc}{$H+}
 

@@ -5,7 +5,7 @@
     <BuildModes Active="Debug"/>
     <Units Count="25">
       <Unit0>
-        <Filename Value="expeditor.lpr"/>
+        <Filename Value="http_inspector.lpr"/>
         <IsPartOfProject Value="True"/>
         <CursorPos X="41" Y="19"/>
         <UsageCount Value="68"/>
@@ -19,7 +19,7 @@
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="275"/>
+        <TopLine Value="305"/>
         <CursorPos Y="333"/>
         <FoldState Value=" T3j90iA pickI0F022G"/>
         <UsageCount Value="68"/>
