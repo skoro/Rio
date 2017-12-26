@@ -305,12 +305,12 @@ object Form1: TForm1
       Height = 286
       Top = 4
       Width = 545
-      ActivePage = TabSheet6
+      ActivePage = tabJson
       Align = alClient
       BorderSpacing.Around = 4
       TabIndex = 2
       TabOrder = 0
-      object TabSheet4: TTabSheet
+      object tabResponse: TTabSheet
         Caption = 'Response'
         ClientHeight = 250
         ClientWidth = 539
@@ -349,15 +349,15 @@ object Form1: TForm1
           )
         end
       end
-      object TabSheet5: TTabSheet
+      object tabContent: TTabSheet
         Caption = 'Content'
         ClientHeight = 250
         ClientWidth = 539
         object responseRaw: TMemo
           Left = 0
-          Height = 258
+          Height = 250
           Top = 0
-          Width = 547
+          Width = 539
           Align = alClient
           BorderStyle = bsNone
           ReadOnly = True
@@ -365,7 +365,7 @@ object Form1: TForm1
           TabOrder = 0
         end
       end
-      object TabSheet6: TTabSheet
+      object tabJson: TTabSheet
         Caption = 'JSON'
         ClientHeight = 250
         ClientWidth = 539

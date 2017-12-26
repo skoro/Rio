@@ -48,9 +48,9 @@ type
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
     TabSheet3: TTabSheet;
-    TabSheet4: TTabSheet;
-    TabSheet5: TTabSheet;
-    TabSheet6: TTabSheet;
+    tabResponse: TTabSheet;
+    tabContent: TTabSheet;
+    tabJson: TTabSheet;
     JsonTree: TTreeView;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
