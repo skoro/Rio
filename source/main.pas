@@ -121,6 +121,7 @@ begin
   try
     btnSubmit.Enabled := False;
     miTreeExpand.Enabled := False;
+    tabJson.TabVisible := False;
     for i:=1 to requestHeaders.RowCount-1 do
     begin
       key := trim(requestHeaders.Cells[0, i]);
@@ -275,6 +276,7 @@ begin
   P := TJSONParser.Create(S);
   D := P.Parse;
   FJsonRoot := D;
+  tabJson.TabVisible := True;
   ShowJsonDocument;
   FreeAndNil(P);
   FreeAndNil(S);
