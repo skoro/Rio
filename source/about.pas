@@ -15,10 +15,11 @@ type
   TAboutForm = class(TForm)
     Button1: TButton;
     Image1: TImage;
-    Label1: TLabel;
+    LabelVersion: TLabel;
     Panel1: TPanel;
     StaticText1: TStaticText;
     procedure Button1Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
 
   public
@@ -31,12 +32,18 @@ var
 implementation
 
 {$R *.lfm}
+{$I version.inc}
 
 { TAboutForm }
 
 procedure TAboutForm.Button1Click(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TAboutForm.FormCreate(Sender: TObject);
+begin
+  LabelVersion.Caption := 'Version: ' + APP_VER;
 end;
 
 end.

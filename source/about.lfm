@@ -8,6 +8,7 @@ object AboutForm: TAboutForm
   Caption = 'About'
   ClientHeight = 159
   ClientWidth = 239
+  OnCreate = FormCreate
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel
@@ -16,9 +17,8 @@ object AboutForm: TAboutForm
     Top = 0
     Width = 239
     Align = alClient
-    BevelInner = bvRaised
-    BevelOuter = bvNone
-    BorderWidth = 4
+    BevelInner = bvLowered
+    BorderWidth = 2
     ClientHeight = 159
     ClientWidth = 239
     TabOrder = 0
@@ -2210,23 +2210,23 @@ object AboutForm: TAboutForm
     end
     object StaticText1: TStaticText
       Left = 120
-      Height = 64
+      Height = 88
       Top = 8
       Width = 112
       Alignment = taCenter
       BorderStyle = sbsSunken
-      Caption = 'Request'#10'Expeditor'
+      Caption = 'HTTP'#10'Request'#10'Expeditor'
       Font.Height = -19
       Font.Style = [fsBold, fsItalic]
       ParentFont = False
       TabOrder = 1
     end
-    object Label1: TLabel
-      Left = 122
+    object LabelVersion: TLabel
+      Left = 120
       Height = 18
-      Top = 78
-      Width = 69
-      Caption = 'Ver. 0.1-dev'
+      Top = 104
+      Width = 48
+      Caption = 'Version:'
       ParentColor = False
     end
   end
