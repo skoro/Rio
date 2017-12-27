@@ -147,6 +147,7 @@ object Form1: TForm1
   Menu = MainMenu1
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  SessionProperties = 'cbUrl.Items;Height;Left;Top;Width;cbUrl.Text;cbMethod.Text;cbMethod.Items'
   LCLVersion = '1.8.0.6'
   object GroupBox1: TGroupBox
     Left = 2
@@ -654,5 +655,11 @@ object Form1: TForm1
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000
     }
+  end
+  object PSMAIN: TJSONPropStorage
+    StoredValues = <>
+    Formatted = True
+    left = 302
+    top = 166
   end
 end

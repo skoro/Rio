@@ -14,7 +14,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, Buttons;
+  fphttpclient, fpjson, Controls, Buttons, JSONPropStorage;
 
 type
 
@@ -28,6 +28,7 @@ type
     GroupBox1: TGroupBox;
     boxResponse: TGroupBox;
     jsImages: TImageList;
+    PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
     MenuItem2: TMenuItem;
@@ -93,6 +94,8 @@ const
   JSONTypeNames: array[TJSONtype] of string =
   ('Unknown', 'Number', 'String', 'Boolean', 'Null', 'Array', 'Object');
 
+  MAX_URLS = 15; // How much urls we can store in url dropdown history.
+
 {$R *.lfm}
 
 { TForm1 }
@@ -134,7 +137,12 @@ begin
     responseRaw.Append(SS.DataString);
     responseRaw.CaretPos := Point(0, 0);
     DoneResponse(httpClient, SS);
-    if cbUrl.Items.IndexOf(url) = -1 then cbUrl.Items.Add(url);
+    // Store url in history.
+    if (cbUrl.Items.IndexOf(url) = -1) and (httpClient.ResponseStatusCode <> 404) then
+    begin
+      if cbUrl.Items.Count >= MAX_URLS then cbUrl.Items.Delete(cbUrl.Items.Count - 1);
+      cbUrl.Items.Insert(0, url);
+    end;
   except
     on E: Exception do
       ShowMessage(E.Message);
@@ -151,9 +159,16 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
+var
+  C: string;
 begin
   Caption := ApplicationName;
   HeadersEditorForm := THeadersEditorForm.Create(Self);
+  C := GetAppConfigFile(False, True);
+  PSMAIN.JSONFileName := C;
+  C := ExtractFilePath(C);
+  if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
+  PSMAIN.Active := True;
   UpdateHeadersPickList;
 end;
 
