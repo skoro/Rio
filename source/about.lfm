@@ -1,25 +1,25 @@
 object AboutForm: TAboutForm
   Left = 424
-  Height = 159
+  Height = 163
   Top = 206
   Width = 239
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'About'
-  ClientHeight = 159
+  ClientHeight = 163
   ClientWidth = 239
   OnCreate = FormCreate
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel
     Left = 0
-    Height = 159
+    Height = 163
     Top = 0
     Width = 239
     Align = alClient
     BevelInner = bvLowered
     BorderWidth = 2
-    ClientHeight = 159
+    ClientHeight = 163
     ClientWidth = 239
     TabOrder = 0
     object Image1: TImage
@@ -2202,8 +2202,9 @@ object AboutForm: TAboutForm
     object Button1: TButton
       Left = 8
       Height = 25
-      Top = 122
+      Top = 129
       Width = 75
+      Cancel = True
       Caption = 'OK'
       OnClick = Button1Click
       TabOrder = 0
@@ -2215,7 +2216,7 @@ object AboutForm: TAboutForm
       Width = 112
       Alignment = taCenter
       BorderStyle = sbsSunken
-      Caption = 'HTTP'#10'Request'#10'Expeditor'
+      Caption = 'HTTP'#10'Request'#10'Inspector'
       Font.Height = -19
       Font.Style = [fsBold, fsItalic]
       ParentFont = False
@@ -2224,10 +2225,23 @@ object AboutForm: TAboutForm
     object LabelVersion: TLabel
       Left = 120
       Height = 18
-      Top = 104
+      Top = 128
       Width = 48
       Caption = 'Version:'
       ParentColor = False
+    end
+    object Edit1: TEdit
+      Left = 8
+      Height = 19
+      Top = 104
+      Width = 224
+      BorderStyle = bsNone
+      Color = clWindow
+      Font.Height = -11
+      ParentFont = False
+      ReadOnly = True
+      TabOrder = 2
+      Text = 'https://github.com/skoro/http_inspector'
     end
   end
 end

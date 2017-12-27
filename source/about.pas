@@ -14,6 +14,7 @@ type
 
   TAboutForm = class(TForm)
     Button1: TButton;
+    Edit1: TEdit;
     Image1: TImage;
     LabelVersion: TLabel;
     Panel1: TPanel;
