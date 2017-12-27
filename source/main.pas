@@ -163,12 +163,12 @@ var
   C: string;
 begin
   Caption := ApplicationName;
-  HeadersEditorForm := THeadersEditorForm.Create(Self);
   C := GetAppConfigFile(False, True);
   PSMAIN.JSONFileName := C;
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
+  HeadersEditorForm := THeadersEditorForm.Create(Self);
   UpdateHeadersPickList;
 end;
 
