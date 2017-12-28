@@ -111,16 +111,19 @@ var
   h: string;
 begin
   S := TStringList.Create;
-  Props.ReadStrings('Rows', S);
-  gridHeaders.RowCount := S.Count + 1;
-  for i := 0 to S.Count - 1 do
-  begin
-    p := Pos(':', S.Strings[i]);
-    h := LeftStr(S.Strings[i], p - 1); // minus colon
-    gridHeaders.Cells[0, i + 1] := h;
-    gridHeaders.Cells[1, i + 1] := RightStr(S.Strings[i], Length(S.Strings[i]) - p);
+  try
+    Props.ReadStrings('Rows', S);
+    gridHeaders.RowCount := S.Count + 1;
+    for i := 0 to S.Count - 1 do
+    begin
+      p := Pos(':', S.Strings[i]);
+      h := LeftStr(S.Strings[i], p - 1); // minus colon
+      gridHeaders.Cells[0, i + 1] := h;
+      gridHeaders.Cells[1, i + 1] := RightStr(S.Strings[i], Length(S.Strings[i]) - p);
+    end;
+  finally
+    FreeAndNil(S);
   end;
-  FreeAndNil(S);
 end;
 
 procedure THeadersEditorForm.PropsSavingProperties(Sender: TObject);
