@@ -127,6 +127,10 @@ begin
   S := TStringList.Create;
   try
     Props.ReadStrings('Rows', S);
+    if S.Count = 0 then begin
+      FreeAndNil(S);
+      Exit; // =>
+    end;
     gridHeaders.RowCount := S.Count + 1;
     for i := 0 to S.Count - 1 do
     begin
