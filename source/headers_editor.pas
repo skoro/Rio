@@ -89,13 +89,27 @@ end;
 
 procedure THeadersEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
+var
+  oldRow: Integer;
 begin
   if Shift = [ssCtrl] then
     case Key of
-      87: Close; // Control-W
-      68: btnRemoveRowClick(Sender); // Control-D
-      38: btnMoveUpClick(Sender); // Control-Up
-      40: btnMoveDownClick(Sender); // Control-Down
+      // Control-W
+      87: Close;
+      // Control-D
+      68: btnRemoveRowClick(Sender);
+      // Control-Up
+      38: begin
+        oldRow := gridHeaders.Row; // restore selected row after moving.
+        btnMoveUpClick(Sender);
+        gridHeaders.Row := oldRow;
+      end;
+      // Control-Down
+      40: begin
+        oldRow := gridHeaders.Row;
+        btnMoveDownClick(Sender);
+        gridHeaders.Row := oldRow;
+      end;
     end;
 end;
 
