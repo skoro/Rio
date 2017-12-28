@@ -121,6 +121,10 @@ begin
       gridHeaders.Cells[0, i + 1] := h;
       gridHeaders.Cells[1, i + 1] := RightStr(S.Strings[i], Length(S.Strings[i]) - p);
     end;
+    p := Props.ReadInteger('Width_Col1', 0);
+    if p <> 0 then gridHeaders.Columns.Items[0].Width := p;
+    p := Props.ReadInteger('Width_Col2', 0);
+    if p <> 0 then gridHeaders.Columns.Items[1].Width := p;
   finally
     FreeAndNil(S);
   end;
