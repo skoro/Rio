@@ -659,6 +659,8 @@ object Form1: TForm1
   object PSMAIN: TJSONPropStorage
     StoredValues = <>
     Formatted = True
+    OnSavingProperties = PSMAINSavingProperties
+    OnRestoringProperties = PSMAINRestoringProperties
     left = 302
     top = 166
   end

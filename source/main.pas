@@ -62,6 +62,8 @@ type
     procedure miAboutClick(Sender: TObject);
     procedure miHeadersClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
+    procedure PSMAINRestoringProperties(Sender: TObject);
+    procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
   private
@@ -225,6 +227,29 @@ begin
     Node.Expanded := not Node.Expanded;
     if Node.Expanded then Node.Expand(True) else Node.Collapse(True);
   end;
+end;
+
+procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
+  procedure SetColumn(grid: TStringGrid; col: Integer);
+  var
+    Val: Integer;
+  begin
+    Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
+    if Val <> 0 then grid.Columns.Items[col - 1].Width := Val;
+  end;
+begin
+  SetColumn(requestHeaders, 1);
+  SetColumn(requestHeaders, 2);
+  SetColumn(responseHeaders, 1);
+  SetColumn(responseHeaders, 2);
+end;
+
+procedure TForm1.PSMAINSavingProperties(Sender: TObject);
+begin
+  PSMAIN.WriteInteger(requestHeaders.Name + 'Col1', requestHeaders.Columns.Items[0].Width);
+  PSMAIN.WriteInteger(requestHeaders.Name + 'Col2', requestHeaders.Columns.Items[1].Width);
+  PSMAIN.WriteInteger(responseHeaders.Name + 'Col1', responseHeaders.Columns.Items[0].Width);
+  PSMAIN.WriteInteger(responseHeaders.Name + 'Col2', responseHeaders.Columns.Items[1].Width);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
