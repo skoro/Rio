@@ -8,8 +8,10 @@ object HeadersEditorForm: THeadersEditorForm
   ClientHeight = 299
   ClientWidth = 416
   KeyPreview = True
+  OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  SessionProperties = 'Left;Top;Width;Height'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel
@@ -285,5 +287,14 @@ object HeadersEditorForm: THeadersEditorForm
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000
     }
+  end
+  object Props: TJSONPropStorage
+    StoredValues = <>
+    Formatted = True
+    Active = False
+    OnSavingProperties = PropsSavingProperties
+    OnRestoringProperties = PropsRestoringProperties
+    left = 288
+    top = 176
   end
 end

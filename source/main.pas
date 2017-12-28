@@ -168,7 +168,7 @@ begin
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
-  HeadersEditorForm := THeadersEditorForm.Create(Self);
+  HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
 end;
 
