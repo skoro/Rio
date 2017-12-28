@@ -235,7 +235,7 @@ procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
     Val: Integer;
   begin
     Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
-    if Val <> 0 then grid.Columns.Items[col - 1].Width := Val;
+    if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
   end;
 begin
   SetColumn(requestHeaders, 1);
