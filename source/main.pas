@@ -14,7 +14,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, Buttons, JSONPropStorage;
+  fphttpclient, fpjson, Controls, JSONPropStorage;
 
 type
 
