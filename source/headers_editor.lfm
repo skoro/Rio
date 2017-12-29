@@ -98,7 +98,7 @@ object HeadersEditorForm: THeadersEditorForm
       end
       object btnRemoveRow: TToolButton
         Left = 24
-        Hint = 'Delete selected row'
+        Hint = 'Delete selected row (Ctrl-D)'
         Top = 0
         Caption = 'btnRemoveRow'
         ImageIndex = 1
@@ -113,7 +113,7 @@ object HeadersEditorForm: THeadersEditorForm
       end
       object btnMoveUp: TToolButton
         Left = 55
-        Hint = 'Move row up'
+        Hint = 'Move row up (Ctrl-Up)'
         Top = 0
         Caption = 'btnMoveUp'
         ImageIndex = 2
@@ -121,7 +121,7 @@ object HeadersEditorForm: THeadersEditorForm
       end
       object btnMoveDown: TToolButton
         Left = 78
-        Hint = 'Move row down'
+        Hint = 'Move row down (Ctrl-Down)'
         Top = 0
         Caption = 'btnMoveDown'
         ImageIndex = 3
@@ -143,6 +143,7 @@ object HeadersEditorForm: THeadersEditorForm
     object BtnClose: TButton
       Left = 2
       Height = 38
+      Hint = 'Close window (Ctrl-W)'
       Top = 2
       Width = 58
       Align = alLeft
@@ -150,6 +151,8 @@ object HeadersEditorForm: THeadersEditorForm
       BorderSpacing.InnerBorder = 8
       Caption = 'Close'
       ModalResult = 11
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
     end
   end
