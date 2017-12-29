@@ -79,7 +79,7 @@ var
   C: string;
 begin
   C := GetAppConfigDir(False);
-  if DirectoryExists(C) then
+  if DirectoryExists(C) then // the directory should be created in main form
     begin
       C := C + DirectorySeparator + 'HeadersEditor' + ConfigExtension;
       Props.JSONFileName := C;
@@ -131,6 +131,7 @@ begin
       FreeAndNil(S);
       Exit; // =>
     end;
+    // Restore rows of headers and values.
     gridHeaders.RowCount := S.Count + 1;
     for i := 0 to S.Count - 1 do
     begin
@@ -139,6 +140,7 @@ begin
       gridHeaders.Cells[0, i + 1] := h;
       gridHeaders.Cells[1, i + 1] := RightStr(S.Strings[i], Length(S.Strings[i]) - p);
     end;
+    // Restore grid column widths
     p := Props.ReadInteger('Width_Col1', 0);
     if p > 0 then gridHeaders.Columns.Items[0].Width := p;
     p := Props.ReadInteger('Width_Col2', 0);
@@ -154,8 +156,10 @@ var
   i: Integer;
   h: string;
 begin
+  // Save column widths.
   Props.WriteInteger('Width_Col1', gridHeaders.Columns.Items[0].Width);
   Props.WriteInteger('Width_Col2', gridHeaders.Columns.Items[1].Width);
+  // Save rows of headers and values.
   S := TStringList.Create;
   for i := 1 to gridHeaders.RowCount - 1 do
   begin
@@ -166,6 +170,7 @@ begin
   FreeAndNil(S);
 end;
 
+// Fill a string buffer by header values.
 procedure THeadersEditorForm.FillHeaderValues(header: string; Buf: TStrings);
 var
   i: integer;
@@ -178,6 +183,7 @@ begin
   end;
 end;
 
+// Fill a string buffer by header names.
 procedure THeadersEditorForm.FillHeaders(Buf: TStrings);
 var
   i: integer;
