@@ -28,6 +28,9 @@ type
     GroupBox1: TGroupBox;
     boxResponse: TGroupBox;
     jsImages: TImageList;
+    miReqHDelete: TMenuItem;
+    MenuItem5: TMenuItem;
+    popupHeaders: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -61,6 +64,7 @@ type
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure miHeadersClick(Sender: TObject);
+    procedure miReqHDeleteClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
@@ -215,6 +219,11 @@ end;
 procedure TForm1.miHeadersClick(Sender: TObject);
 begin
   if HeadersEditorForm.ShowModal = mrClose then UpdateHeadersPickList;
+end;
+
+procedure TForm1.miReqHDeleteClick(Sender: TObject);
+begin
+  with requestHeaders do if RowCount > 2 then DeleteRow(Row);
 end;
 
 procedure TForm1.miTreeExpandClick(Sender: TObject);
