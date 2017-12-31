@@ -139,7 +139,10 @@ begin
     // Store url in history.
     if (cbUrl.Items.IndexOf(url) = -1) and (httpClient.ResponseStatusCode <> 404) then
     begin
-      if cbUrl.Items.Count >= MAX_URLS then cbUrl.Items.Delete(cbUrl.Items.Count - 1);
+      if cbUrl.Items.Count >= MAX_URLS then begin
+        cbUrl.Items.Delete(cbUrl.Items.Count - 1);
+        cbUrl.Text := url; // FIXME: delete last item also delete and text ?
+      end;
       cbUrl.Items.Insert(0, url);
     end;
   except
