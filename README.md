@@ -12,4 +12,6 @@ Keyboard:
 * `Control-P` moves focus to the request methods dropdown list.
 * `Control-E` collapses or expands tree node and its children recursively (
   in case of json response only).
+* `Control-I` inserts a request header and value from the predefined headers
+  list.
 * `Control-Q` exits application.
