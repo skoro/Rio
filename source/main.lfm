@@ -396,10 +396,6 @@ object Form1: TForm1
     top = 163
     object MenuItem1: TMenuItem
       Caption = 'File'
-      object miHeaders: TMenuItem
-        Caption = 'Headers...'
-        OnClick = miHeadersClick
-      end
       object MenuItem6: TMenuItem
         Caption = '-'
       end
@@ -407,6 +403,14 @@ object Form1: TForm1
         Caption = 'Quit'
         ShortCut = 16465
         OnClick = miQuitClick
+      end
+    end
+    object MenuItem4: TMenuItem
+      Caption = 'Edit'
+      object miInsertHeader: TMenuItem
+        Caption = 'Insert header...'
+        ShortCut = 16457
+        OnClick = miInsertHeaderClick
       end
     end
     object MenuItem3: TMenuItem
@@ -672,10 +676,6 @@ object Form1: TForm1
       Caption = 'Delete'
       ShortCut = 16452
       OnClick = miReqHDeleteClick
-    end
-    object MenuItem5: TMenuItem
-      Caption = 'Manage headers...'
-      OnClick = miHeadersClick
     end
   end
 end

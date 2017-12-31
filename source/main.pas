@@ -28,8 +28,9 @@ type
     GroupBox1: TGroupBox;
     boxResponse: TGroupBox;
     jsImages: TImageList;
+    MenuItem4: TMenuItem;
+    miInsertHeader: TMenuItem;
     miReqHDelete: TMenuItem;
-    MenuItem5: TMenuItem;
     popupHeaders: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
@@ -39,7 +40,6 @@ type
     miTreeExpand: TMenuItem;
     miQuit: TMenuItem;
     miAbout: TMenuItem;
-    miHeaders: TMenuItem;
     MenuItem6: TMenuItem;
     responseRaw: TMemo;
     PostText: TMemo;
@@ -61,9 +61,9 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure JsonTreeClick(Sender: TObject);
+    procedure miInsertHeaderClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
-    procedure miHeadersClick(Sender: TObject);
     procedure miReqHDeleteClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
@@ -202,6 +202,29 @@ begin
   if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
 end;
 
+procedure TForm1.miInsertHeaderClick(Sender: TObject);
+var
+  i, row: integer;
+  gridHeaders: TStringGrid;
+begin
+  gridHeaders := HeadersEditorForm.gridHeaders;
+  // Button "Insert" pressed.
+  if (HeadersEditorForm.ShowModal = mrOK) and
+     (gridHeaders.SelectedRangeCount > 0) then
+  begin
+    for i := 0 to gridHeaders.SelectedRangeCount - 1 do
+    begin
+      Row := gridHeaders.SelectedRange[i].Top;
+      requestHeaders.InsertRowWithValues(requestHeaders.Row, [
+        gridHeaders.Cells[0, Row],
+        gridHeaders.Cells[1, Row]
+      ]);
+    end;
+    requestHeaders.SetFocus;
+  end;
+  UpdateHeadersPickList;
+end;
+
 procedure TForm1.miQuitClick(Sender: TObject);
 begin
   Close;
@@ -216,14 +239,15 @@ begin
   end;
 end;
 
-procedure TForm1.miHeadersClick(Sender: TObject);
-begin
-  if HeadersEditorForm.ShowModal = mrClose then UpdateHeadersPickList;
-end;
-
 procedure TForm1.miReqHDeleteClick(Sender: TObject);
 begin
-  with requestHeaders do if RowCount > 2 then DeleteRow(Row);
+  with requestHeaders do
+    if RowCount > 2 then DeleteRow(Row)
+    else begin
+      // Don't delete last row (user cannot add one) just empty it.
+      Cells[0, 1] := '';
+      Cells[1, 1] := '';
+    end;
 end;
 
 procedure TForm1.miTreeExpandClick(Sender: TObject);

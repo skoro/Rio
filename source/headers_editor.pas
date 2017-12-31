@@ -14,6 +14,7 @@ type
 
   THeadersEditorForm = class(TForm)
     BtnClose: TButton;
+    btnInsert: TButton;
     ImageList1: TImageList;
     Props: TJSONPropStorage;
     Panel1: TPanel;
@@ -94,6 +95,8 @@ var
 begin
   if Shift = [ssCtrl] then
     case Key of
+      // Control-Return
+      13: ModalResult := mrOK;
       // Control-W
       87: Close;
       // Control-D

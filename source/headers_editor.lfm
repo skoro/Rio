@@ -46,6 +46,7 @@ object HeadersEditorForm: THeadersEditorForm
         end>
       FixedCols = 0
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+      RangeSelectMode = rsmMulti
       TabOrder = 0
       TitleStyle = tsNative
       ColWidths = (
@@ -141,7 +142,7 @@ object HeadersEditorForm: THeadersEditorForm
     ClientWidth = 416
     TabOrder = 1
     object BtnClose: TButton
-      Left = 2
+      Left = 63
       Height = 38
       Hint = 'Close window (Ctrl-W)'
       Top = 2
@@ -154,6 +155,21 @@ object HeadersEditorForm: THeadersEditorForm
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
+    end
+    object btnInsert: TButton
+      Left = 2
+      Height = 38
+      Hint = 'Insert selected row to request headers (Ctrl-Enter)'
+      Top = 2
+      Width = 61
+      Align = alLeft
+      AutoSize = True
+      BorderSpacing.InnerBorder = 8
+      Caption = 'Insert'
+      ModalResult = 1
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 1
     end
   end
   object ImageList1: TImageList
