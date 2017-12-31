@@ -395,35 +395,35 @@ object Form1: TForm1
     left = 105
     top = 163
     object MenuItem1: TMenuItem
-      Caption = 'File'
+      Caption = '&File'
       object MenuItem6: TMenuItem
         Caption = '-'
       end
       object miQuit: TMenuItem
-        Caption = 'Quit'
+        Caption = '&Quit'
         ShortCut = 16465
         OnClick = miQuitClick
       end
     end
     object MenuItem4: TMenuItem
-      Caption = 'Edit'
+      Caption = '&Edit'
       object miInsertHeader: TMenuItem
-        Caption = 'Insert header...'
+        Caption = '&Insert header...'
         ShortCut = 16457
         OnClick = miInsertHeaderClick
       end
     end
     object MenuItem3: TMenuItem
-      Caption = 'View'
+      Caption = '&View'
       object miTreeExpand: TMenuItem
-        Caption = 'Collapse/Expand tree'
+        Caption = 'Collapse/&Expand tree'
         Enabled = False
         ShortCut = 16453
         OnClick = miTreeExpandClick
       end
     end
     object MenuItem2: TMenuItem
-      Caption = 'Help'
+      Caption = '&Help'
       object miAbout: TMenuItem
         Caption = 'About...'
         OnClick = miAboutClick
