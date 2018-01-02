@@ -15,6 +15,7 @@ type
   THeadersEditorForm = class(TForm)
     BtnClose: TButton;
     btnInsert: TButton;
+    btnRestore: TButton;
     ImageList1: TImageList;
     Props: TJSONPropStorage;
     Panel1: TPanel;
@@ -30,13 +31,14 @@ type
     procedure btnMoveDownClick(Sender: TObject);
     procedure btnMoveUpClick(Sender: TObject);
     procedure btnRemoveRowClick(Sender: TObject);
+    procedure btnRestoreClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure PropsRestoringProperties(Sender: TObject);
     procedure PropsSavingProperties(Sender: TObject);
   private
-
+    procedure RestoreDefaults;
   public
     procedure FillHeaderValues(header: string; Buf: TStrings);
     procedure FillHeaders(Buf: TStrings);
@@ -47,9 +49,17 @@ var
 
 implementation
 
+uses Dialogs, LCLType;
+
 {$R *.lfm}
 
 { THeadersEditorForm }
+
+const DEFAULT_HEADERS : array [1..3, 1..2] of string = (
+      ('Content-Type', 'text/html'),
+      ('Content-Type', 'application/json'),
+      ('X-Requested-With', 'XMLHttpRequest')
+);
 
 procedure THeadersEditorForm.btnAddRowClick(Sender: TObject);
 begin
@@ -75,6 +85,14 @@ begin
     DeleteRow(Row);
 end;
 
+procedure THeadersEditorForm.btnRestoreClick(Sender: TObject);
+var
+  answer: integer;
+begin
+  answer := Application.MessageBox('Are you sure to restore defaults headers ?', 'Restore headers', MB_ICONQUESTION + MB_YESNO);
+  if answer = IDYES then RestoreDefaults;
+end;
+
 procedure THeadersEditorForm.FormCreate(Sender: TObject);
 var
   C: string;
@@ -85,7 +103,8 @@ begin
       C := C + DirectorySeparator + 'HeadersEditor' + ConfigExtension;
       Props.JSONFileName := C;
       Props.Active := True;
-    end;
+    end
+  else RestoreDefaults;
 end;
 
 procedure THeadersEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
@@ -171,6 +190,18 @@ begin
   end;
   Props.WriteStrings('Rows', S);
   FreeAndNil(S);
+end;
+
+procedure THeadersEditorForm.RestoreDefaults;
+var
+  I: integer;
+begin
+  gridHeaders.RowCount := Length(DEFAULT_HEADERS) + 1;
+  for i := 1 to Length(DEFAULT_HEADERS) do
+  begin
+    gridHeaders.Cells[0, i] := DEFAULT_HEADERS[i, 1];
+    gridHeaders.Cells[1, i] := DEFAULT_HEADERS[i, 2];
+  end;
 end;
 
 // Fill a string buffer by header values.

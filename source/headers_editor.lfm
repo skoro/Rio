@@ -171,6 +171,17 @@ object HeadersEditorForm: THeadersEditorForm
       ShowHint = True
       TabOrder = 1
     end
+    object btnRestore: TButton
+      Left = 307
+      Height = 38
+      Top = 2
+      Width = 107
+      Align = alRight
+      AutoSize = True
+      Caption = 'Restore defaults'
+      OnClick = btnRestoreClick
+      TabOrder = 2
+    end
   end
   object ImageList1: TImageList
     left = 184
