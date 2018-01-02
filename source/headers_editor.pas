@@ -49,7 +49,7 @@ var
 
 implementation
 
-uses Dialogs, LCLType;
+uses LCLType;
 
 {$R *.lfm}
 
