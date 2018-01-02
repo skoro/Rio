@@ -82,7 +82,7 @@ end;
 procedure THeadersEditorForm.btnRemoveRowClick(Sender: TObject);
 begin
   with gridHeaders do
-    DeleteRow(Row);
+    if RowCount > 1 then DeleteRow(Row);
 end;
 
 procedure THeadersEditorForm.btnRestoreClick(Sender: TObject);
