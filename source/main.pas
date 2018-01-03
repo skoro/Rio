@@ -15,7 +15,6 @@ type
 
   TForm1 = class(TForm)
     btnSubmit: TButton;
-    Button2: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
     GroupBox1: TGroupBox;
@@ -36,15 +35,15 @@ type
     MenuItem6: TMenuItem;
     responseRaw: TMemo;
     PostText: TMemo;
-    OpenDialog1: TOpenDialog;
     PageControl1: TPageControl;
     PageControl2: TPageControl;
     Splitter1: TSplitter;
     responseHeaders: TStringGrid;
     requestHeaders: TStringGrid;
+    gridForm: TStringGrid;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    TabSheet3: TTabSheet;
+    tabForm: TTabSheet;
     tabResponse: TTabSheet;
     tabContent: TTabSheet;
     tabJson: TTabSheet;

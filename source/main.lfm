@@ -266,17 +266,38 @@ object Form1: TForm1
           TabOrder = 0
         end
       end
-      object TabSheet3: TTabSheet
-        Caption = 'Upload'
+      object tabForm: TTabSheet
+        Caption = 'Form'
         ClientHeight = 125
         ClientWidth = 535
-        object Button2: TButton
-          Left = 8
-          Height = 25
-          Top = 8
-          Width = 75
-          Caption = 'Select...'
+        object gridForm: TStringGrid
+          Left = 0
+          Height = 125
+          Top = 0
+          Width = 535
+          Align = alClient
+          BorderStyle = bsNone
+          ColCount = 2
+          Columns = <          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Name'
+              Width = 259
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Value'
+              Width = 259
+            end>
+          FixedCols = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
+          RowCount = 2
           TabOrder = 0
+          TitleStyle = tsNative
+          ColWidths = (
+            259
+            259
+          )
         end
       end
     end
@@ -386,10 +407,6 @@ object Form1: TForm1
         end
       end
     end
-  end
-  object OpenDialog1: TOpenDialog
-    left = 192
-    top = 112
   end
   object MainMenu1: TMainMenu
     left = 105
