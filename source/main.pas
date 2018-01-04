@@ -21,9 +21,10 @@ type
     boxResponse: TGroupBox;
     jsImages: TImageList;
     MenuItem4: TMenuItem;
+    gaClearRows: TMenuItem;
     miInsertHeader: TMenuItem;
-    miReqHDelete: TMenuItem;
-    popupHeaders: TPopupMenu;
+    gaDeleteRow: TMenuItem;
+    popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
     MenuItem1: TMenuItem;
@@ -52,11 +53,12 @@ type
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure gaClearRowsClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
-    procedure miReqHDeleteClick(Sender: TObject);
+    procedure gaDeleteRowClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
@@ -82,7 +84,7 @@ var
 
 implementation
 
-uses sysutils, jsonparser, about, headers_editor;
+uses lcltype, sysutils, jsonparser, about, headers_editor;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -189,6 +191,22 @@ begin
   end;
 end;
 
+procedure TForm1.gaClearRowsClick(Sender: TObject);
+var
+  Component: TComponent;
+  Answer: Integer;
+begin
+  Answer := Application.MessageBox('Are you sure to clear content ?', 'Clear rows', MB_ICONQUESTION + MB_YESNO);
+  if Answer = IDNO then Exit; // =>
+  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  if Component is TStringGrid then
+    with TStringGrid(Component) do begin
+      RowCount := 2;
+      Cells[0, 1] := '';
+      Cells[1, 1] := '';
+    end;
+end;
+
 procedure TForm1.JsonTreeClick(Sender: TObject);
 var
   Node: TTreeNode;
@@ -234,15 +252,19 @@ begin
   end;
 end;
 
-procedure TForm1.miReqHDeleteClick(Sender: TObject);
+procedure TForm1.gaDeleteRowClick(Sender: TObject);
+var
+  Component: TComponent;
 begin
-  with requestHeaders do
-    if RowCount > 2 then DeleteRow(Row)
-    else begin
-      // Don't delete last row (user cannot add one) just empty it.
-      Cells[0, 1] := '';
-      Cells[1, 1] := '';
-    end;
+  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  if Component is TStringGrid then
+    with TStringGrid(Component) do
+      if RowCount > 2 then DeleteRow(Row)
+      else begin
+        // Don't delete last row (user cannot add one) just empty it.
+        Cells[0, 1] := '';
+        Cells[1, 1] := '';
+      end;
 end;
 
 procedure TForm1.miTreeExpandClick(Sender: TObject);

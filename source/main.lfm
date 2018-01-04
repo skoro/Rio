@@ -208,9 +208,9 @@ object Form1: TForm1
       Height = 161
       Top = 40
       Width = 541
-      ActivePage = TabSheet1
+      ActivePage = tabForm
       Anchors = [akTop, akLeft, akRight, akBottom]
-      TabIndex = 0
+      TabIndex = 2
       TabOrder = 3
       object TabSheet1: TTabSheet
         Caption = 'Headers'
@@ -240,7 +240,7 @@ object Form1: TForm1
             end>
           FixedCols = 0
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
-          PopupMenu = popupHeaders
+          PopupMenu = popupGridActions
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
@@ -291,6 +291,7 @@ object Form1: TForm1
             end>
           FixedCols = 0
           Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
+          PopupMenu = popupGridActions
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
@@ -686,13 +687,17 @@ object Form1: TForm1
     left = 302
     top = 166
   end
-  object popupHeaders: TPopupMenu
+  object popupGridActions: TPopupMenu
     left = 416
     top = 166
-    object miReqHDelete: TMenuItem
+    object gaDeleteRow: TMenuItem
       Caption = 'Delete'
       ShortCut = 16452
-      OnClick = miReqHDeleteClick
+      OnClick = gaDeleteRowClick
+    end
+    object gaClearRows: TMenuItem
+      Caption = 'Clear...'
+      OnClick = gaClearRowsClick
     end
   end
 end
