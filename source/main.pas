@@ -75,6 +75,7 @@ type
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     function ParseHeaderLine(line: string): TKeyValuePair;
     procedure UpdateHeadersPickList;
+    function EncodeFormData: string;
   public
 
   end;
@@ -102,10 +103,12 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 var
-  url, method, key: string;
+  url, method, key, value, formData: string;
   httpClient: TFPHTTPClient;
   SS: TStringStream;
   i: integer;
+  isForm: boolean; // is it form submit request
+  ctForm: boolean; // append form content type
 begin
   url := Trim(cbUrl.Text);
   if url = '' then
@@ -117,19 +120,54 @@ begin
   if method = '' then method := 'GET';
   if Pos('http', url) = 0 then url := 'http://' + url;
   FContentType := '';
+  isForm := False;
+  ctForm := False;
   httpClient := TFPHTTPClient.Create(nil);
   httpClient.OnHeaders := @HttpClientOnHeaders;
-  if (method = 'POST') or (method = 'PUT') then
-    httpClient.RequestBody := TStringStream.Create(PostText.Text);
+  if (method = 'POST') or (method = 'PUT') then begin
+    formData := EncodeFormData;
+    // form and body filled, what to submit ?
+    if (Length(formData) <> 0) and (Length(Trim(PostText.Text)) <> 0) then
+    begin
+      i := QuestionDlg(
+        'Choose what to submit',
+        'Do you want to submit form data or body ?',
+        mtCustom,
+        [mrYes, 'Form', mrNo, 'Body'],
+        ''
+      );
+      if i = mrNo then formData := PostText.Text else isForm := True;
+    end
+    else if Length(formData) > 0 then isForm := True;
+    httpClient.RequestBody := TStringStream.Create(formData);
+  end;
   try
     btnSubmit.Enabled := False;
     miTreeExpand.Enabled := False;
     tabJson.TabVisible := False;
+    // Assign request headers to the client.
     for i:=1 to requestHeaders.RowCount-1 do
     begin
       key := trim(requestHeaders.Cells[0, i]);
       if key = '' then continue;
-      httpClient.AddHeader(key, trim(requestHeaders.Cells[1, i]));
+      value := trim(requestHeaders.Cells[1, i]);
+      if isForm and (LowerCase(key) = 'content-type') then
+        if LowerCase(value) <> 'application/x-www-form-urlencoded' then
+        begin
+          value := 'application/x-www-form-urlencoded';
+          requestHeaders.Cells[1, i] := value;
+          ctForm := True
+        end;
+      httpClient.AddHeader(key, value);
+    end;
+    if isForm and not ctForm then
+    begin
+      key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
+      httpClient.AddHeader(key, value);
+      with requestHeaders do begin
+        Cells[0, RowCount - 1] := key;
+        Cells[1, RowCount - 1] := value;
+      end;
     end;
     SS := TStringStream.Create('');
     httpClient.HTTPMethod(method, url, SS, []);
@@ -469,6 +507,22 @@ end;
 procedure TForm1.UpdateHeadersPickList;
 begin
   HeadersEditorForm.FillHeaders(requestHeaders.Columns.Items[0].PickList);
+end;
+
+function TForm1.EncodeFormData: string;
+var
+  i: integer;
+  n, v: string;
+begin
+  Result := '';
+  for i:=0 to gridForm.RowCount-1 do
+  begin
+    n := Trim(gridForm.Cells[0, i]); // Name
+    v := Trim(gridForm.Cells[1, i]); // Value
+    if n = '' then continue; // Skip empty names
+    if Result <> '' then Result := Result + '&';
+    Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
+  end;
 end;
 
 end.
