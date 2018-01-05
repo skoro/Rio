@@ -105,10 +105,10 @@ procedure TForm1.btnSubmitClick(Sender: TObject);
 var
   url, method, key, value, formData: string;
   httpClient: TFPHTTPClient;
-  SS: TStringStream;
+  SS: TStringStream; // response buffer
   i: integer;
   isForm: boolean; // is it form submit request
-  ctForm: boolean; // append form content type
+  ctForm: boolean; // append form content type to headers grid
 begin
   url := Trim(cbUrl.Text);
   if url = '' then
@@ -160,6 +160,8 @@ begin
         end;
       httpClient.AddHeader(key, value);
     end;
+    // It's a form submit request but there is no form content type in the
+    // headers grid. Append one to the grid.
     if isForm and not ctForm then
     begin
       key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
@@ -171,9 +173,11 @@ begin
     end;
     SS := TStringStream.Create('');
     httpClient.HTTPMethod(method, url, SS, []);
+    // Response content.
     responseRaw.Clear;
     responseRaw.Append(SS.DataString);
     responseRaw.CaretPos := Point(0, 0);
+    // Do final tasks.
     DoneResponse(httpClient, SS);
     // Store url in history.
     if (cbUrl.Items.IndexOf(url) = -1) and (httpClient.ResponseStatusCode <> 404) then
