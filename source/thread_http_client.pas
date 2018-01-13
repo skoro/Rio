@@ -24,6 +24,7 @@ type
 
   TOnRequestComplete = procedure (ResponseInfo: TResponseInfo) of object;
   TOnHeaders = procedure (Headers: TStrings) of object;
+  TOnException = procedure (Url, Method: string; E: Exception) of object;
 
   { TThreadHttpClient }
 
@@ -35,11 +36,14 @@ type
     FUrl: string;
     FOnRequestComplete: TOnRequestComplete;
     FResponseData: TStringStream;
+    FOnClientException: TOnException;
+    FException: Exception;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
     procedure SetRequestBody(AValue: TStream);
     procedure SetUrl(AValue: string);
     procedure RequestComplete;
+    procedure OnClientException;
     procedure InternalOnHeaders(Sender: TObject);
   protected
     procedure Execute; override;
@@ -52,6 +56,7 @@ type
     property RequestBody: TStream read GetRequestBody write SetRequestBody;
     property OnRequestComplete: TOnRequestComplete read FOnRequestComplete write FOnRequestComplete;
     property OnHeaders: TOnHeaders read FOnHeaders write FOnHeaders;
+    property OnException: TOnException read FOnClientException write FOnClientException;
   end;
 
 implementation
@@ -102,6 +107,11 @@ begin
   end;
 end;
 
+procedure TThreadHttpClient.OnClientException;
+begin
+  if Assigned(FOnClientException) then FOnClientException(Url, Method, FException);
+end;
+
 procedure TThreadHttpClient.InternalOnHeaders(Sender: TObject);
 begin
   if Assigned(FOnHeaders) then
@@ -112,8 +122,16 @@ end;
 
 procedure TThreadHttpClient.Execute;
 begin
-  FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
-  Synchronize(@RequestComplete);
+  try
+    FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
+    Synchronize(@RequestComplete);
+  except
+    on E: Exception do
+    begin
+      FException := E;
+      Synchronize(@OnClientException);
+    end;
+  end;
 end;
 
 constructor TThreadHttpClient.Create(CreateSuspened: Boolean);
