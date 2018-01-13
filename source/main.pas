@@ -7,7 +7,8 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage, thread_http_client;
+  fphttpclient, fpjson, Controls, JSONPropStorage, thread_http_client,
+  SysUtils;
 
 type
 
@@ -70,6 +71,7 @@ type
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
     procedure OnHttpClientHeaders(Headers: TStrings);
+    procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
     procedure ShowJsonDocument;
@@ -87,7 +89,7 @@ var
 
 implementation
 
-uses lcltype, sysutils, jsonparser, about, headers_editor;
+uses lcltype, jsonparser, about, headers_editor;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -126,6 +128,7 @@ begin
   FHttpClient := TThreadHttpClient.Create(true);
   FHttpClient.OnHeaders := @OnHttpClientHeaders;
   FHttpClient.OnRequestComplete := @OnRequestComplete;
+  FHttpClient.OnException := @OnHttpException;
 
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
@@ -148,45 +151,39 @@ begin
     FHttpClient.RequestBody := TStringStream.Create(formData);
   end;
 
-  try
-    btnSubmit.Enabled := False;
-    miTreeExpand.Enabled := False;
-    tabJson.TabVisible := False;
-    // Assign request headers to the client.
-    for i:=1 to requestHeaders.RowCount-1 do
-    begin
-      key := trim(requestHeaders.Cells[0, i]);
-      if key = '' then continue;
-      value := trim(requestHeaders.Cells[1, i]);
-      if isForm and (LowerCase(key) = 'content-type') then
-        if LowerCase(value) <> 'application/x-www-form-urlencoded' then
-        begin
-          value := 'application/x-www-form-urlencoded';
-          requestHeaders.Cells[1, i] := value;
-          ctForm := True
-        end;
-      FHttpClient.AddHeader(key, value);
-    end;
-    // It's a form submit request but there is no form content type in the
-    // headers grid. Append one to the grid.
-    if isForm and not ctForm then
-    begin
-      key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
-      FHttpClient.AddHeader(key, value);
-      with requestHeaders do begin
-        Cells[0, RowCount - 1] := key;
-        Cells[1, RowCount - 1] := value;
+  btnSubmit.Enabled := False;
+  miTreeExpand.Enabled := False;
+  tabJson.TabVisible := False;
+  // Assign request headers to the client.
+  for i:=1 to requestHeaders.RowCount-1 do
+  begin
+    key := trim(requestHeaders.Cells[0, i]);
+    if key = '' then continue;
+    value := trim(requestHeaders.Cells[1, i]);
+    if isForm and (LowerCase(key) = 'content-type') then
+      if LowerCase(value) <> 'application/x-www-form-urlencoded' then
+      begin
+        value := 'application/x-www-form-urlencoded';
+        requestHeaders.Cells[1, i] := value;
+        ctForm := True
       end;
-    end;
-
-    FHttpClient.Url := url;
-    FHttpClient.Method := method;
-    FHttpClient.Start;
-
-  except
-    on E: Exception do
-      ShowMessage(E.Message);
+    FHttpClient.AddHeader(key, value);
   end;
+  // It's a form submit request but there is no form content type in the
+  // headers grid. Append one to the grid.
+  if isForm and not ctForm then
+  begin
+    key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
+    FHttpClient.AddHeader(key, value);
+    with requestHeaders do begin
+      Cells[0, RowCount - 1] := key;
+      Cells[1, RowCount - 1] := value;
+    end;
+  end;
+
+  FHttpClient.Url := url;
+  FHttpClient.Method := method;
+  FHttpClient.Start;
 end;
 
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -366,6 +363,12 @@ begin
     responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
   end;
   ParseContentType(Headers);
+end;
+
+procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
+begin
+  ShowMessage(E.Message);
+  btnSubmit.Enabled := True;
 end;
 
 procedure TForm1.ParseContentType(Headers: TStrings);
