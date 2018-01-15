@@ -141,6 +141,9 @@ begin
   FHttpClient := TFPHTTPClient.Create(nil);
   FHttpClient.OnHeaders := @InternalOnHeaders;
   FResponseData := TStringStream.Create('');
+  FOnClientException:=nil;
+  FOnHeaders:=nil;
+  FOnRequestComplete:=nil;
 end;
 
 destructor TThreadHttpClient.Destroy;
