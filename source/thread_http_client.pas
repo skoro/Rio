@@ -23,7 +23,6 @@ type
   end;
 
   TOnRequestComplete = procedure (ResponseInfo: TResponseInfo) of object;
-  TOnHeaders = procedure (Headers: TStrings) of object;
   TOnException = procedure (Url, Method: string; E: Exception) of object;
 
   { TThreadHttpClient }
@@ -32,7 +31,6 @@ type
   private
     FHttpClient: TFPHTTPClient;
     FHttpMethod: string;
-    FOnHeaders: TOnHeaders;
     FUrl: string;
     FOnRequestComplete: TOnRequestComplete;
     FResponseData: TStringStream;
@@ -44,7 +42,6 @@ type
     procedure SetUrl(AValue: string);
     procedure RequestComplete;
     procedure OnClientException;
-    procedure InternalOnHeaders(Sender: TObject);
   protected
     procedure Execute; override;
   public
@@ -55,7 +52,6 @@ type
     property Url: string read FUrl write SetUrl;
     property RequestBody: TStream read GetRequestBody write SetRequestBody;
     property OnRequestComplete: TOnRequestComplete read FOnRequestComplete write FOnRequestComplete;
-    property OnHeaders: TOnHeaders read FOnHeaders write FOnHeaders;
     property OnException: TOnException read FOnClientException write FOnClientException;
   end;
 
@@ -112,14 +108,6 @@ begin
   if Assigned(FOnClientException) then FOnClientException(Url, Method, FException);
 end;
 
-procedure TThreadHttpClient.InternalOnHeaders(Sender: TObject);
-begin
-  if Assigned(FOnHeaders) then
-  begin
-    FOnHeaders(FHttpClient.ResponseHeaders);
-  end;
-end;
-
 procedure TThreadHttpClient.Execute;
 begin
   try
@@ -139,10 +127,8 @@ begin
   inherited Create(CreateSuspened);
   FreeOnTerminate := True;
   FHttpClient := TFPHTTPClient.Create(nil);
-  FHttpClient.OnHeaders := @InternalOnHeaders;
   FResponseData := TStringStream.Create('');
   FOnClientException:=nil;
-  FOnHeaders:=nil;
   FOnRequestComplete:=nil;
 end;
 

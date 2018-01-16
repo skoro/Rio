@@ -70,7 +70,6 @@ type
     FContentType: string;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
-    procedure OnHttpClientHeaders(Headers: TStrings);
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
@@ -126,7 +125,6 @@ begin
   ctForm := False;
 
   FHttpClient := TThreadHttpClient.Create(true);
-  FHttpClient.OnHeaders := @OnHttpClientHeaders;
   FHttpClient.OnRequestComplete := @OnRequestComplete;
   FHttpClient.OnException := @OnHttpException;
 
@@ -349,22 +347,6 @@ begin
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
 end;
 
-procedure TForm1.OnHttpClientHeaders(Headers: TStrings);
-var
-  i, p: integer;
-  h: string;
-begin
-  responseHeaders.RowCount := Headers.Count + 1;
-  for i := 0 to Headers.Count - 1 do
-  begin
-    h := Headers.Strings[i];
-    p := Pos(':', h);
-    responseHeaders.Cells[0, i + 1] := LeftStr(h, p - 1);
-    responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
-  end;
-  ParseContentType(Headers);
-end;
-
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
   ShowMessage(E.Message);
@@ -519,7 +501,23 @@ begin
 end;
 
 procedure TForm1.OnRequestComplete(Info: TResponseInfo);
+var
+  i, p: integer;
+  h: string;
 begin
+  btnSubmit.Enabled := True;
+
+  //OnHttpClientHeaders(Info.ResponseHeaders);
+  responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
+  for i := 0 to Info.ResponseHeaders.Count - 1 do
+  begin
+    h := Info.ResponseHeaders.Strings[i];
+    p := Pos(':', h);
+    responseHeaders.Cells[0, i + 1] := LeftStr(h, p - 1);
+    responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
+  end;
+  ParseContentType(Info.ResponseHeaders);
+
   responseRaw.Clear;
   responseRaw.Append(Info.Content.DataString);
   responseRaw.CaretPos := Point(0, 0);
@@ -529,8 +527,6 @@ begin
     Info.StatusCode,
     Info.StatusText
   ]);
-
-  btnSubmit.Enabled := True;
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
   begin
