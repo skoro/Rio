@@ -20,6 +20,7 @@ type
     RequestHeaders: TStrings;
     ResponseHeaders: TStrings;
     Content: TStringStream;
+    Time: Int64; // time of request execution
   end;
 
   TOnRequestComplete = procedure (ResponseInfo: TResponseInfo) of object;
@@ -36,6 +37,8 @@ type
     FResponseData: TStringStream;
     FOnClientException: TOnException;
     FException: Exception;
+    FStartTime: TDateTime;
+    FFinishTime: TDateTime;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
     procedure SetRequestBody(AValue: TStream);
@@ -56,6 +59,8 @@ type
   end;
 
 implementation
+
+uses dateutils;
 
 { TThreadHttpClient }
 
@@ -99,6 +104,7 @@ begin
     info.StatusText:=FHttpClient.ResponseStatusText;
     info.HttpVersion:=FHttpClient.ServerHTTPVersion;
     info.Content:=FResponseData;
+    info.Time:=MilliSecondsBetween(FFinishTime, FStartTime);
     FOnRequestComplete(info);
   end;
 end;
@@ -111,7 +117,9 @@ end;
 procedure TThreadHttpClient.Execute;
 begin
   try
+    FStartTime := Now;
     FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
+    FFinishTime := Now;
     Synchronize(@RequestComplete);
   except
     on E: Exception do
