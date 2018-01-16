@@ -21,10 +21,13 @@ type
     GroupBox1: TGroupBox;
     boxResponse: TGroupBox;
     jsImages: TImageList;
+    Label1: TLabel;
+    Label2: TLabel;
     MenuItem4: TMenuItem;
     gaClearRows: TMenuItem;
     miInsertHeader: TMenuItem;
     gaDeleteRow: TMenuItem;
+    Panel1: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
@@ -208,7 +211,7 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  FHttpClient.Terminate;
+  if Assigned(FHttpClient) then FHttpClient.Terminate;
   inherited;
 end;
 
