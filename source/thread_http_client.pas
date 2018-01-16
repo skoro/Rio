@@ -20,7 +20,7 @@ type
     RequestHeaders: TStrings;
     ResponseHeaders: TStrings;
     Content: TStringStream;
-    Time: Int64; // time of request execution
+    Time: Int64; // time of request execution in milliseconds
   end;
 
   TOnRequestComplete = procedure (ResponseInfo: TResponseInfo) of object;
