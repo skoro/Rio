@@ -179,6 +179,8 @@ begin
     end;
   end;
 
+  boxResponse.Caption := '...';
+
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
@@ -507,7 +509,6 @@ var
 begin
   btnSubmit.Enabled := True;
 
-  //OnHttpClientHeaders(Info.ResponseHeaders);
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
   for i := 0 to Info.ResponseHeaders.Count - 1 do
   begin
@@ -522,10 +523,11 @@ begin
   responseRaw.Append(Info.Content.DataString);
   responseRaw.CaretPos := Point(0, 0);
 
-  boxResponse.Caption := Format('Response: HTTP/%s %d %s', [
+  boxResponse.Caption := Format('Response: HTTP/%s %d %s  Time: %d ms', [
     Info.HttpVersion,
     Info.StatusCode,
-    Info.StatusText
+    Info.StatusText,
+    Info.Time
   ]);
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
