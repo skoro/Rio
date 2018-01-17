@@ -18,16 +18,24 @@ type
     btnSubmit: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
-    GroupBox1: TGroupBox;
-    boxResponse: TGroupBox;
+    gridForm: TStringGrid;
+    Panel1: TPanel;
+    PageControl1: TPageControl;
+    PostText: TMemo;
+    requestHeaders: TStringGrid;
+    Splitter1: TSplitter;
+    StatusImage1: TImage;
     jsImages: TImageList;
-    Label1: TLabel;
-    Label2: TLabel;
+    JsonTree: TTreeView;
+    StatusText1: TLabel;
+    StatusText2: TLabel;
     MenuItem4: TMenuItem;
     gaClearRows: TMenuItem;
     miInsertHeader: TMenuItem;
     gaDeleteRow: TMenuItem;
-    Panel1: TPanel;
+    PageControl2: TPageControl;
+    StatusPanel: TPanel;
+    Panel2: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
@@ -38,21 +46,14 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
-    responseRaw: TMemo;
-    PostText: TMemo;
-    PageControl1: TPageControl;
-    PageControl2: TPageControl;
-    Splitter1: TSplitter;
     responseHeaders: TStringGrid;
-    requestHeaders: TStringGrid;
-    gridForm: TStringGrid;
+    responseRaw: TMemo;
+    tabContent: TTabSheet;
+    tabForm: TTabSheet;
+    tabJson: TTabSheet;
+    tabResponse: TTabSheet;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    tabForm: TTabSheet;
-    tabResponse: TTabSheet;
-    tabContent: TTabSheet;
-    tabJson: TTabSheet;
-    JsonTree: TTreeView;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
@@ -82,6 +83,7 @@ type
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
     procedure OnRequestComplete(Info: TResponseInfo);
+    procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
   public
 
   end;
@@ -182,7 +184,7 @@ begin
     end;
   end;
 
-  boxResponse.Caption := '...';
+  UpdateStatusLine('Waiting for the response...');
 
   FHttpClient.Url := url;
   FHttpClient.Method := method;
@@ -205,6 +207,7 @@ begin
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
+  StatusText2.Caption := '';
   HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
 end;
@@ -526,12 +529,10 @@ begin
   responseRaw.Append(Info.Content.DataString);
   responseRaw.CaretPos := Point(0, 0);
 
-  boxResponse.Caption := Format('Response: HTTP/%s %d %s  Time: %d ms', [
-    Info.HttpVersion,
-    Info.StatusCode,
-    Info.StatusText,
-    Info.Time
-  ]);
+  UpdateStatusLine(
+    Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
+    Format('%d ms', [Info.Time])
+  );
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
   begin
@@ -545,6 +546,21 @@ begin
   end;
 
   if FContentType = 'application/json' then JsonDocument(responseRaw.Text);
+end;
+
+procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
+begin
+  StatusText1.Caption := Text1;
+  if Text2 = '' then
+  begin
+    StatusText2.Visible := False;
+    StatusImage1.Visible := False;
+  end
+  else begin
+    StatusImage1.Visible := True; // Must be first otherwise will be after label
+    StatusText2.Caption := Text2;
+    StatusText2.Visible := True;
+  end;
 end;
 
 end.
