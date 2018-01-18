@@ -52,8 +52,8 @@ type
     tabForm: TTabSheet;
     tabJson: TTabSheet;
     tabResponse: TTabSheet;
-    TabSheet1: TTabSheet;
-    TabSheet2: TTabSheet;
+    tabHeaders: TTabSheet;
+    tabBody: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);

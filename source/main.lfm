@@ -362,19 +362,19 @@ object Form1: TForm1
       Height = 181
       Top = 40
       Width = 545
-      ActivePage = tabForm
+      ActivePage = tabHeaders
       Anchors = [akTop, akLeft, akRight, akBottom]
-      TabIndex = 2
+      TabIndex = 0
       TabOrder = 3
-      object TabSheet1: TTabSheet
+      object tabHeaders: TTabSheet
         Caption = 'Headers'
         ClientHeight = 145
         ClientWidth = 539
         object requestHeaders: TStringGrid
           Left = 0
-          Height = 125
+          Height = 145
           Top = 0
-          Width = 535
+          Width = 539
           Align = alClient
           AutoEdit = False
           BorderStyle = bsNone
@@ -405,15 +405,15 @@ object Form1: TForm1
           )
         end
       end
-      object TabSheet2: TTabSheet
+      object tabBody: TTabSheet
         Caption = 'Body'
         ClientHeight = 145
         ClientWidth = 539
         object PostText: TMemo
           Left = 0
-          Height = 125
+          Height = 145
           Top = 0
-          Width = 535
+          Width = 539
           Align = alClient
           BorderStyle = bsNone
           ScrollBars = ssAutoBoth
