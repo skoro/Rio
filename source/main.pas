@@ -145,10 +145,15 @@ begin
         'Choose what to submit',
         'Do you want to submit form data or body ?',
         mtCustom,
-        [mrYes, 'Form', mrNo, 'Body'],
+        [mrYes, 'Form', mrNo, 'Body', mrCancel, 'Cancel'],
         ''
       );
-      if i = mrNo then formData := PostText.Text else isForm := True;
+      if i = mrNo then formData := PostText.Text
+      else if i = mrYes then isForm := True
+      else begin
+        FreeAndNil(FHttpClient);
+        Exit; // =>
+      end;
     end
     else if Length(formData) > 0 then isForm := True;
     FHttpClient.RequestBody := TStringStream.Create(formData);
