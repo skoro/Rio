@@ -3,12 +3,10 @@ program http_inspector;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
+  {$IFDEF UNIX}
   cthreads,
-  {$ENDIF}{$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms, main, about, headers_editor
-  { you can add units after this };
+  {$ENDIF}
+  Forms, Interfaces, main;
 
 {$R *.res}
 

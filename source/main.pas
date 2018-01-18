@@ -7,7 +7,8 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage;
+  fphttpclient, fpjson, Controls, JSONPropStorage, thread_http_client,
+  SysUtils;
 
 type
 
@@ -17,13 +18,24 @@ type
     btnSubmit: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
-    GroupBox1: TGroupBox;
-    boxResponse: TGroupBox;
+    gridForm: TStringGrid;
+    Panel1: TPanel;
+    PageControl1: TPageControl;
+    PostText: TMemo;
+    requestHeaders: TStringGrid;
+    Splitter1: TSplitter;
+    StatusImage1: TImage;
     jsImages: TImageList;
+    JsonTree: TTreeView;
+    StatusText1: TLabel;
+    StatusText2: TLabel;
     MenuItem4: TMenuItem;
     gaClearRows: TMenuItem;
     miInsertHeader: TMenuItem;
     gaDeleteRow: TMenuItem;
+    PageControl2: TPageControl;
+    StatusPanel: TPanel;
+    Panel2: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     MainMenu1: TMainMenu;
@@ -34,24 +46,18 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
-    responseRaw: TMemo;
-    PostText: TMemo;
-    PageControl1: TPageControl;
-    PageControl2: TPageControl;
-    Splitter1: TSplitter;
     responseHeaders: TStringGrid;
-    requestHeaders: TStringGrid;
-    gridForm: TStringGrid;
+    responseRaw: TMemo;
+    tabContent: TTabSheet;
+    tabForm: TTabSheet;
+    tabJson: TTabSheet;
+    tabResponse: TTabSheet;
     TabSheet1: TTabSheet;
     TabSheet2: TTabSheet;
-    tabForm: TTabSheet;
-    tabResponse: TTabSheet;
-    tabContent: TTabSheet;
-    tabJson: TTabSheet;
-    JsonTree: TTreeView;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gaClearRowsClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
@@ -67,8 +73,8 @@ type
   private
     FContentType: string;
     FJsonRoot: TJSONData;
-    procedure HttpClientOnHeaders(Sender: TObject);
-    procedure DoneResponse(httpClient: TFPHTTPClient; S: TStream);
+    FHttpClient: TThreadHttpClient;
+    procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
     procedure ShowJsonDocument;
@@ -76,6 +82,8 @@ type
     function ParseHeaderLine(line: string): TKeyValuePair;
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
+    procedure OnRequestComplete(Info: TResponseInfo);
+    procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
   public
 
   end;
@@ -85,7 +93,7 @@ var
 
 implementation
 
-uses lcltype, sysutils, jsonparser, about, headers_editor;
+uses lcltype, jsonparser, about, headers_editor;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -104,8 +112,6 @@ const
 procedure TForm1.btnSubmitClick(Sender: TObject);
 var
   url, method, key, value, formData: string;
-  httpClient: TFPHTTPClient;
-  SS: TStringStream; // response buffer
   i: integer;
   isForm: boolean; // is it form submit request
   ctForm: boolean; // append form content type to headers grid
@@ -116,15 +122,21 @@ begin
     cbUrl.SetFocus;
     exit;
   end;
-  method := UpperCase(Trim(cbMethod.Text));
-  if method = '' then method := 'GET';
+
   if Pos('http', url) = 0 then url := 'http://' + url;
+
   FContentType := '';
   isForm := False;
   ctForm := False;
-  httpClient := TFPHTTPClient.Create(nil);
-  httpClient.OnHeaders := @HttpClientOnHeaders;
-  if (method = 'POST') or (method = 'PUT') then begin
+
+  FHttpClient := TThreadHttpClient.Create(true);
+  FHttpClient.OnRequestComplete := @OnRequestComplete;
+  FHttpClient.OnException := @OnHttpException;
+
+  method := UpperCase(Trim(cbMethod.Text));
+  if method = '' then method := 'GET';
+  if (method = 'POST') or (method = 'PUT') then
+  begin
     formData := EncodeFormData;
     // form and body filled, what to submit ?
     if (Length(formData) <> 0) and (Length(Trim(PostText.Text)) <> 0) then
@@ -139,63 +151,44 @@ begin
       if i = mrNo then formData := PostText.Text else isForm := True;
     end
     else if Length(formData) > 0 then isForm := True;
-    httpClient.RequestBody := TStringStream.Create(formData);
+    FHttpClient.RequestBody := TStringStream.Create(formData);
   end;
-  try
-    btnSubmit.Enabled := False;
-    miTreeExpand.Enabled := False;
-    tabJson.TabVisible := False;
-    // Assign request headers to the client.
-    for i:=1 to requestHeaders.RowCount-1 do
-    begin
-      key := trim(requestHeaders.Cells[0, i]);
-      if key = '' then continue;
-      value := trim(requestHeaders.Cells[1, i]);
-      if isForm and (LowerCase(key) = 'content-type') then
-        if LowerCase(value) <> 'application/x-www-form-urlencoded' then
-        begin
-          value := 'application/x-www-form-urlencoded';
-          requestHeaders.Cells[1, i] := value;
-          ctForm := True
-        end;
-      httpClient.AddHeader(key, value);
-    end;
-    // It's a form submit request but there is no form content type in the
-    // headers grid. Append one to the grid.
-    if isForm and not ctForm then
-    begin
-      key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
-      httpClient.AddHeader(key, value);
-      with requestHeaders do begin
-        Cells[0, RowCount - 1] := key;
-        Cells[1, RowCount - 1] := value;
+
+  btnSubmit.Enabled := False;
+  miTreeExpand.Enabled := False;
+  tabJson.TabVisible := False;
+  // Assign request headers to the client.
+  for i:=1 to requestHeaders.RowCount-1 do
+  begin
+    key := trim(requestHeaders.Cells[0, i]);
+    if key = '' then continue;
+    value := trim(requestHeaders.Cells[1, i]);
+    if isForm and (LowerCase(key) = 'content-type') then
+      if LowerCase(value) <> 'application/x-www-form-urlencoded' then
+      begin
+        value := 'application/x-www-form-urlencoded';
+        requestHeaders.Cells[1, i] := value;
+        ctForm := True
       end;
-    end;
-    SS := TStringStream.Create('');
-    httpClient.HTTPMethod(method, url, SS, []);
-    // Response content.
-    responseRaw.Clear;
-    responseRaw.Append(SS.DataString);
-    responseRaw.CaretPos := Point(0, 0);
-    // Do final tasks.
-    DoneResponse(httpClient, SS);
-    // Store url in history.
-    if (cbUrl.Items.IndexOf(url) = -1) and (httpClient.ResponseStatusCode <> 404) then
-    begin
-      if cbUrl.Items.Count >= MAX_URLS then begin
-        cbUrl.Items.Delete(cbUrl.Items.Count - 1);
-        cbUrl.Text := url; // FIXME: delete last item also delete and text ?
-      end;
-      cbUrl.Items.Insert(0, url);
-    end;
-  except
-    on E: Exception do
-      ShowMessage(E.Message);
+    FHttpClient.AddHeader(key, value);
   end;
-  httpClient.RequestBody.Free;
-  FreeAndNil(httpClient);
-  FreeAndNil(SS);
-  btnSubmit.Enabled := True;
+  // It's a form submit request but there is no form content type in the
+  // headers grid. Append one to the grid.
+  if isForm and not ctForm then
+  begin
+    key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
+    FHttpClient.AddHeader(key, value);
+    with requestHeaders do begin
+      Cells[0, RowCount - 1] := key;
+      Cells[1, RowCount - 1] := value;
+    end;
+  end;
+
+  UpdateStatusLine('Waiting for the response...');
+
+  FHttpClient.Url := url;
+  FHttpClient.Method := method;
+  FHttpClient.Start;
 end;
 
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -207,14 +200,22 @@ procedure TForm1.FormCreate(Sender: TObject);
 var
   C: string;
 begin
+  inherited;
   Caption := ApplicationName;
   C := GetAppConfigFile(False, True);
   PSMAIN.JSONFileName := C;
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
+  StatusText2.Caption := '';
   HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
+end;
+
+procedure TForm1.FormDestroy(Sender: TObject);
+begin
+  if Assigned(FHttpClient) then FHttpClient.Terminate;
+  inherited;
 end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -354,32 +355,10 @@ begin
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
 end;
 
-procedure TForm1.HttpClientOnHeaders(Sender: TObject);
-var
-  client: TFPHTTPClient;
-  i, p: integer;
-  h: string;
+procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
-  client := TFPHTTPClient(Sender);
-  responseHeaders.RowCount := client.ResponseHeaders.Count + 1;
-  for i:=0 to client.ResponseHeaders.Count-1 do
-  begin
-    h := client.ResponseHeaders.Strings[i];
-    p := Pos(':', h);
-    responseHeaders.Cells[0, i + 1] := LeftStr(h, p - 1);
-    responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
-  end;
-  ParseContentType(client.ResponseHeaders);
-end;
-
-procedure TForm1.DoneResponse(httpClient: TFPHTTPClient; S: TStream);
-begin
-  boxResponse.Caption := Format('Response: HTTP/%s %d %s', [
-    httpClient.ServerHTTPVersion,
-    httpClient.ResponseStatusCode,
-    httpClient.ResponseStatusText
-  ]);
-  if FContentType = 'application/json' then JsonDocument(responseRaw.Text);
+  ShowMessage(E.Message);
+  btnSubmit.Enabled := True;
 end;
 
 procedure TForm1.ParseContentType(Headers: TStrings);
@@ -526,6 +505,61 @@ begin
     if n = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
     Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
+  end;
+end;
+
+procedure TForm1.OnRequestComplete(Info: TResponseInfo);
+var
+  i, p: integer;
+  h: string;
+begin
+  btnSubmit.Enabled := True;
+
+  responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
+  for i := 0 to Info.ResponseHeaders.Count - 1 do
+  begin
+    h := Info.ResponseHeaders.Strings[i];
+    p := Pos(':', h);
+    responseHeaders.Cells[0, i + 1] := LeftStr(h, p - 1);
+    responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
+  end;
+  ParseContentType(Info.ResponseHeaders);
+
+  responseRaw.Clear;
+  responseRaw.Append(Info.Content.DataString);
+  responseRaw.CaretPos := Point(0, 0);
+
+  UpdateStatusLine(
+    Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
+    Format('%d ms', [Info.Time])
+  );
+
+  if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
+  begin
+    if cbUrl.Items.Count >= MAX_URLS then
+    begin
+      cbUrl.Items.Delete(cbUrl.Items.Count - 1);
+      // FIXME: delete last item also deletes and text ?
+      cbUrl.Text := Info.Url;
+    end;
+    cbUrl.Items.Insert(0, Info.Url);
+  end;
+
+  if FContentType = 'application/json' then JsonDocument(responseRaw.Text);
+end;
+
+procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
+begin
+  StatusText1.Caption := Text1;
+  if Text2 = '' then
+  begin
+    StatusText2.Visible := False;
+    StatusImage1.Visible := False;
+  end
+  else begin
+    StatusImage1.Visible := True; // Must be first otherwise will be after label
+    StatusText2.Caption := Text2;
+    StatusText2.Visible := True;
   end;
 end;
 

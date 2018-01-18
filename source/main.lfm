@@ -1,5 +1,5 @@
 object Form1: TForm1
-  Left = 322
+  Left = 282
   Height = 575
   Top = 130
   Width = 561
@@ -146,10 +146,164 @@ object Form1: TForm1
   KeyPreview = True
   Menu = MainMenu1
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   SessionProperties = 'cbUrl.Items;Height;Left;Top;Width;cbUrl.Text;cbMethod.Text;cbMethod.Items'
   LCLVersion = '1.8.0.6'
-  object GroupBox1: TGroupBox
+  object Panel2: TPanel
+    Left = 0
+    Height = 318
+    Top = 235
+    Width = 561
+    Align = alClient
+    BevelOuter = bvNone
+    ClientHeight = 318
+    ClientWidth = 561
+    TabOrder = 0
+    object PageControl2: TPageControl
+      Left = 4
+      Height = 280
+      Top = 4
+      Width = 553
+      ActivePage = tabResponse
+      Align = alClient
+      BorderSpacing.Around = 4
+      TabIndex = 0
+      TabOrder = 0
+      object tabResponse: TTabSheet
+        Caption = 'Response'
+        ClientHeight = 244
+        ClientWidth = 547
+        object responseHeaders: TStringGrid
+          Left = 0
+          Height = 244
+          Top = 0
+          Width = 547
+          Align = alClient
+          AutoEdit = False
+          BorderStyle = bsNone
+          ColCount = 2
+          ColumnClickSorts = True
+          Columns = <          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Header'
+              Width = 273
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Value'
+              Width = 274
+            end>
+          FixedCols = 0
+          MouseWheelOption = mwGrid
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goSmoothScroll]
+          RowCount = 1
+          TabOrder = 0
+          TitleFont.Height = -13
+          TitleFont.Name = 'Sans'
+          TitleStyle = tsNative
+          ColWidths = (
+            273
+            274
+          )
+        end
+      end
+      object tabContent: TTabSheet
+        Caption = 'Content'
+        ClientHeight = 244
+        ClientWidth = 547
+        object responseRaw: TMemo
+          Left = 0
+          Height = 250
+          Top = 0
+          Width = 539
+          Align = alClient
+          BorderStyle = bsNone
+          ReadOnly = True
+          ScrollBars = ssAutoBoth
+          TabOrder = 0
+        end
+      end
+      object tabJson: TTabSheet
+        Caption = 'JSON'
+        ClientHeight = 244
+        ClientWidth = 547
+        TabVisible = False
+        object JsonTree: TTreeView
+          Left = 0
+          Height = 250
+          Top = 0
+          Width = 539
+          Align = alClient
+          BorderStyle = bsNone
+          Images = jsImages
+          ScrollBars = ssAutoBoth
+          TabOrder = 0
+          OnClick = JsonTreeClick
+        end
+      end
+    end
+    object StatusPanel: TPanel
+      Left = 4
+      Height = 30
+      Top = 288
+      Width = 553
+      Align = alBottom
+      BorderSpacing.Left = 4
+      BorderSpacing.Right = 4
+      BevelColor = clNone
+      BevelOuter = bvNone
+      ClientHeight = 30
+      ClientWidth = 553
+      ParentColor = False
+      TabOrder = 1
+      object StatusText1: TLabel
+        Left = 0
+        Height = 30
+        Top = 0
+        Width = 140
+        Align = alLeft
+        Caption = 'HTTP request inspector'
+        Layout = tlCenter
+        ParentColor = False
+      end
+      object StatusImage1: TImage
+        Left = 156
+        Height = 30
+        Top = 0
+        Width = 16
+        Align = alLeft
+        AutoSize = True
+        BorderSpacing.Left = 16
+        Center = True
+        Picture.Data = {
+          1754506F727461626C654E6574776F726B47726170686963F300000089504E47
+          0D0A1A0A0000000D49484452000000100000001008060000001FF3FF61000000
+          1974455874536F6674776172650041646F626520496D616765526561647971C9
+          653C000000954944415478DA6260A0017000E2F540FC1F0DAF87CAE105F39134
+          DC07E2FD507C1F49BC1F97E67EA882F7386C7280CA6135C40149B300544C012A
+          860C04900C41B1643D36412C06205BB61E5DE17D2C8AFFE3F02E2C4C18989004
+          1F90105370B52C442846760523BA24B2010A583433E23014432DAE4064203610
+          B145233680331A9153215909093D35929594A9929948060001060041D94209FD
+          817FCC0000000049454E44AE426082
+        }
+        Visible = False
+      end
+      object StatusText2: TLabel
+        Left = 176
+        Height = 30
+        Top = 0
+        Width = 71
+        Align = alLeft
+        BorderSpacing.Left = 4
+        Caption = 'StatusText2'
+        Layout = tlCenter
+        ParentColor = False
+      end
+    end
+  end
+  object Panel1: TPanel
     Left = 2
     Height = 226
     Top = 2
@@ -157,10 +311,10 @@ object Form1: TForm1
     Align = alTop
     BorderSpacing.Around = 2
     BorderSpacing.InnerBorder = 2
-    Caption = 'Request'
-    ClientHeight = 206
-    ClientWidth = 553
-    TabOrder = 0
+    BevelOuter = bvNone
+    ClientHeight = 226
+    ClientWidth = 557
+    TabOrder = 1
     object cbMethod: TComboBox
       Left = 8
       Height = 28
@@ -184,7 +338,7 @@ object Form1: TForm1
       Left = 109
       Height = 28
       Top = 8
-      Width = 361
+      Width = 365
       Anchors = [akTop, akLeft, akRight]
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
@@ -194,7 +348,7 @@ object Form1: TForm1
       Text = 'biny.cf/wp-json'
     end
     object btnSubmit: TButton
-      Left = 472
+      Left = 476
       Height = 29
       Top = 8
       Width = 75
@@ -205,17 +359,17 @@ object Form1: TForm1
     end
     object PageControl1: TPageControl
       Left = 8
-      Height = 161
+      Height = 181
       Top = 40
-      Width = 541
+      Width = 545
       ActivePage = tabForm
       Anchors = [akTop, akLeft, akRight, akBottom]
       TabIndex = 2
       TabOrder = 3
       object TabSheet1: TTabSheet
         Caption = 'Headers'
-        ClientHeight = 125
-        ClientWidth = 535
+        ClientHeight = 145
+        ClientWidth = 539
         object requestHeaders: TStringGrid
           Left = 0
           Height = 125
@@ -253,8 +407,8 @@ object Form1: TForm1
       end
       object TabSheet2: TTabSheet
         Caption = 'Body'
-        ClientHeight = 125
-        ClientWidth = 535
+        ClientHeight = 145
+        ClientWidth = 539
         object PostText: TMemo
           Left = 0
           Height = 125
@@ -268,13 +422,13 @@ object Form1: TForm1
       end
       object tabForm: TTabSheet
         Caption = 'Form'
-        ClientHeight = 125
-        ClientWidth = 535
+        ClientHeight = 145
+        ClientWidth = 539
         object gridForm: TStringGrid
           Left = 0
-          Height = 125
+          Height = 145
           Top = 0
-          Width = 535
+          Width = 539
           Align = alClient
           BorderStyle = bsNone
           ColCount = 2
@@ -311,103 +465,6 @@ object Form1: TForm1
     Width = 561
     Align = alTop
     ResizeAnchor = akTop
-  end
-  object boxResponse: TGroupBox
-    Left = 2
-    Height = 314
-    Top = 237
-    Width = 557
-    Align = alClient
-    BorderSpacing.Around = 2
-    BorderSpacing.InnerBorder = 2
-    Caption = 'Response'
-    ClientHeight = 294
-    ClientWidth = 553
-    TabOrder = 2
-    object PageControl2: TPageControl
-      Left = 4
-      Height = 286
-      Top = 4
-      Width = 545
-      ActivePage = tabResponse
-      Align = alClient
-      BorderSpacing.Around = 4
-      TabIndex = 0
-      TabOrder = 0
-      object tabResponse: TTabSheet
-        Caption = 'Response'
-        ClientHeight = 250
-        ClientWidth = 539
-        object responseHeaders: TStringGrid
-          Left = 0
-          Height = 250
-          Top = 0
-          Width = 539
-          Align = alClient
-          AutoEdit = False
-          BorderStyle = bsNone
-          ColCount = 2
-          ColumnClickSorts = True
-          Columns = <          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Header'
-              Width = 273
-            end          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Value'
-              Width = 274
-            end>
-          FixedCols = 0
-          MouseWheelOption = mwGrid
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing, goSmoothScroll]
-          RowCount = 1
-          TabOrder = 0
-          TitleFont.Height = -13
-          TitleFont.Name = 'Sans'
-          TitleStyle = tsNative
-          ColWidths = (
-            273
-            274
-          )
-        end
-      end
-      object tabContent: TTabSheet
-        Caption = 'Content'
-        ClientHeight = 250
-        ClientWidth = 539
-        object responseRaw: TMemo
-          Left = 0
-          Height = 250
-          Top = 0
-          Width = 539
-          Align = alClient
-          BorderStyle = bsNone
-          ReadOnly = True
-          ScrollBars = ssAutoBoth
-          TabOrder = 0
-        end
-      end
-      object tabJson: TTabSheet
-        Caption = 'JSON'
-        ClientHeight = 250
-        ClientWidth = 539
-        TabVisible = False
-        object JsonTree: TTreeView
-          Left = 0
-          Height = 250
-          Top = 0
-          Width = 539
-          Align = alClient
-          BorderStyle = bsNone
-          Images = jsImages
-          ScrollBars = ssAutoBoth
-          TabOrder = 0
-          OnClick = JsonTreeClick
-        end
-      end
-    end
   end
   object MainMenu1: TMainMenu
     left = 105
