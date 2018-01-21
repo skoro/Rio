@@ -97,16 +97,12 @@ end;
 
 procedure THeadersEditorForm.FormCreate(Sender: TObject);
 var
-  C: string;
+  CF: string;
 begin
-  C := GetAppConfigDir(False);
-  if DirectoryExists(C) then // the directory should be created in main form
-    begin
-      C := C + DirectorySeparator + 'HeadersEditor' + ConfigExtension;
-      Props.JSONFileName := C;
-      Props.Active := True;
-    end
-  else RestoreDefaults;
+  CF := GetAppConfigDir(False) + DirectorySeparator + 'HeadersEditor' + ConfigExtension;
+  Props.JSONFileName := CF;
+  Props.Active := True;
+  if not FileExists(CF) then RestoreDefaults;
 end;
 
 procedure THeadersEditorForm.FormKeyDown(Sender: TObject; var Key: Word;
