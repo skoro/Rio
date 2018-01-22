@@ -15,3 +15,10 @@ Keyboard:
 * `Control-I` inserts a request header and value from the predefined headers
   list.
 * `Control-Q` exits application.
+
+### Notes
+
+On Windows for HTTPS requests you need the OpenSSL library. Get it
+from https://indy.fulgan.com/SSL/ (i386 or x64_86 depending of your
+host architecture) and unpack to the directory where the application
+binary resides.
