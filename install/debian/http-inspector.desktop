@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Http Inspector
+Comment=Send http requests and analyze its responses
+Icon=http-inspector.png
+Exec=http-inspector
+Terminal=false
+Type=Application
+Categories=Development;Network
+GenericName=Http Inspector
