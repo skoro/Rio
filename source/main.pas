@@ -161,7 +161,6 @@ begin
 
   btnSubmit.Enabled := False;
   miTreeExpand.Enabled := False;
-  tabJson.TabVisible := False;
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
@@ -371,6 +370,7 @@ var
   i: integer;
   kv: TKeyValuePair;
 begin
+  FContentType := '';
   for i := 0 to headers.count - 1 do
   begin
     kv := ParseHeaderLine(Headers.Strings[i]);
@@ -388,6 +388,7 @@ var
   P: TJSONParser;
   S: TStringStream;
 begin
+  tabJson.Visible := True;
   S := TStringStream.Create(json);
   P := TJSONParser.Create(S);
   D := P.Parse;
@@ -550,7 +551,10 @@ begin
     cbUrl.Items.Insert(0, Info.Url);
   end;
 
-  if FContentType = 'application/json' then JsonDocument(responseRaw.Text);
+  if FContentType = 'application/json' then JsonDocument(responseRaw.Text)
+  else begin
+    tabJson.TabVisible := False;
+  end;
 end;
 
 procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
