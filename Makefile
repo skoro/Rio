@@ -1,7 +1,7 @@
 
 PROJECT=source/http_inspector.lpr
 VER=$(shell grep APP_VER source/version.inc|grep -o "'.*'"|sed "s/'//g")
-BIN=http_inspector
+BIN=http-inspector
 LINUX64_BIN=bin/x86_64-linux/$(BIN)
 LINUX64_DIST_BIN=$(BIN)_$(VER)_linux64
 

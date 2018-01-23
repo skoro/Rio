@@ -21,7 +21,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="../bin/$(TargetCPU)-$(TargetOS)/http_inspector"/>
+            <Filename Value="../bin/$(TargetCPU)-$(TargetOS)/http-inspector"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
@@ -60,7 +60,7 @@
         <CompilerOptions>
           <Version Value="11"/>
           <Target>
-            <Filename Value="../bin/$(TargetCPU)-$(TargetOS)/http_inspector"/>
+            <Filename Value="../bin/$(TargetCPU)-$(TargetOS)/http-inspector"/>
           </Target>
           <SearchPaths>
             <IncludeFiles Value="$(ProjOutDir)"/>
