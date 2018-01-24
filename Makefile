@@ -20,10 +20,12 @@ $(LINUX64_BIN):
 linux64-debug:
 	lazbuild --os=linux --cpu=x86_64 --build-mode=Debug $(PROJECT)
 
-dist-linux64: linux64-release
+dist-linux64-bin: linux64-release
 	mkdir -p dist
 	rm -f dist/$(LINUX64_DIST_BIN).gz
 	cp bin/x86_64-linux/$(BIN) dist/$(LINUX64_DIST_BIN)
 	chmod +x dist/$(LINUX64_DIST_BIN)
 	gzip dist/$(LINUX64_DIST_BIN)
-	
+
+dist-linux64-deb:
+	( cd install/debian && ./create-deb.sh amd64 )
