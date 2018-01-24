@@ -15,8 +15,8 @@ mkdir -p $TMP/usr/share/pixmaps
 mkdir -p $TMP/DEBIAN
 
 cp control $TMP/DEBIAN
-cp http-inspector.desktop $TMP/usr/share/applications
-cp http-inspector.png $TMP/usr/share/pixmaps
+cp ../resources/http-inspector.desktop $TMP/usr/share/applications
+cp ../resources/http-inspector.png $TMP/usr/share/pixmaps
 cp ../../bin/x86_64-linux/http-inspector $TMP/usr/bin
 
 dpkg-deb --build $TMP ../../dist/$DEB
