@@ -6,6 +6,6 @@ Description: The application is for sending and analyzing HTTP requests.
  It's like curl but with GUI.
 Section: net
 Priority: optional
-Architecture: amd64
+Architecture: @arch@
 Homepage: https://github.com/skoro/http_inspector
 
