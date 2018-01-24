@@ -2,8 +2,7 @@
 
 # Script for creating Debian package.
 
-( cd ../../ && make linux64-release )
-[ $? != 0 ] && exit
+( cd ../../ && make linux64-release ) || exit
 
 TMP=$(mktemp -d)
 VER=$(grep APP_VER ../../source/version.inc|grep -o "'.*'"|sed "s/'//g")
