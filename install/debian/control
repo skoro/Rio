@@ -7,5 +7,6 @@ Description: The application is for sending and analyzing HTTP requests.
 Section: net
 Priority: optional
 Architecture: @arch@
+Installed-Size: @size@
 Homepage: https://github.com/skoro/http_inspector
 

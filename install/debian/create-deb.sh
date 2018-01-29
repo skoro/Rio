@@ -36,10 +36,17 @@ mkdir -p $TMP/usr/share/applications
 mkdir -p $TMP/usr/share/pixmaps
 mkdir -p $TMP/DEBIAN
 
-sed "s/@arch@/$ARCH/" control > $TMP/DEBIAN/control
 cp ../resources/http-inspector.desktop $TMP/usr/share/applications
 cp ../resources/http-inspector.png $TMP/usr/share/pixmaps
 cp ../../bin/x86_64-linux/http-inspector $TMP/usr/bin
+
+SIZE=$(du -ks $TMP | sed 's/[^0-9]*//g')
+[ -z "$SIZE" ] && { echo "Error. Cannot get size of $TMP"; exit; }
+
+cat control |               \
+    sed "s/@size@/$SIZE/" | \
+    sed "s/@arch@/$ARCH/"   \
+    > $TMP/DEBIAN/control
 
 dpkg-deb --build $TMP ../../dist/$DEB
 
