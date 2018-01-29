@@ -45,8 +45,8 @@ SIZE=$(du -ks $TMP | sed 's/[^0-9]*//g')
 
 cat control |               \
     sed "s/@size@/$SIZE/" | \
-    sed "s/@arch@/$ARCH/"   \
-    > $TMP/DEBIAN/control
+    sed "s/@arch@/$ARCH/" | \
+    sed "s/@version@/$VER/" > $TMP/DEBIAN/control
 
 dpkg-deb --build $TMP ../../dist/$DEB
 

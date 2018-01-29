@@ -1,5 +1,5 @@
 Package: http-inspector
-Version: 0.1-dev
+Version: @version@
 Maintainer: Skorobogatko Alexei <skorobogatko.alexei@gmail.com>
 Description: The application is for sending and analyzing HTTP requests.
  This application allows you to send an http request and view the response.
