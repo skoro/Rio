@@ -40,7 +40,7 @@ cp ../resources/http-inspector.desktop $TMP/usr/share/applications
 cp ../resources/http-inspector.png $TMP/usr/share/pixmaps
 cp ../../bin/x86_64-linux/http-inspector $TMP/usr/bin
 
-SIZE=$(du -ks $TMP | sed 's/[^0-9]*//g')
+SIZE=$(du -ks $TMP | awk '{ print $1 }')
 [ -z "$SIZE" ] && { echo "Error. Cannot get size of $TMP"; exit; }
 
 cat control |               \
