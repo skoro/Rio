@@ -436,7 +436,6 @@ var
   P: TJSONParser;
   S: TStringStream;
 begin
-  tabJson.Visible := True;
   S := TStringStream.Create(json);
   P := TJSONParser.Create(S);
   D := P.Parse;
