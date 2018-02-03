@@ -614,13 +614,16 @@ begin
   StatusText1.Caption := Text1;
   if Text2 = '' then
   begin
-    StatusText2.Visible := False;
+    StatusText2.Caption := '';
     StatusImage1.Visible := False;
+    StatusText2.Visible := False;
+    StatusText2.Align := alNone;
   end
   else begin
     StatusImage1.Visible := True; // Must be first otherwise will be after label
-    StatusText2.Caption := Text2;
     StatusText2.Visible := True;
+    StatusText2.Caption := Text2;
+    StatusText2.Align := alLeft;
   end;
 end;
 
