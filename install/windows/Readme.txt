@@ -7,11 +7,19 @@ https://sourceforge.net/projects/lazarus/files/Lazarus%20Windows%2064%20bits/Laz
 Install Inno Setup (5.5.9):
 http://www.jrsoftware.org/isdl.php#stable
 
-Build releases:
+Build releases (assuming that Lazarus installed as C:\lazarus):
+```
 cd install\windows
 build-release.bat 64
 build-release.bat 32
+```
 
-Open Inno Setup and compile files: install32.iss and install64.iss
+Open Inno Setup and compile the following files:
+install32.iss and install64.iss
+
 Setups will be in the root project "dist" directory.
 
+TODO:
+-----
+- one install.iss for both platforms
+- expose application version to the install.iss (avoid manual editing)

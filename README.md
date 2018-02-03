@@ -16,9 +16,16 @@ Keyboard:
   list.
 * `Control-Q` exits application.
 
-### Notes
+### Compile from sources
 
-On Windows for HTTPS requests you need the OpenSSL library. Get it
-from https://indy.fulgan.com/SSL/ (i386 or x64_86 depending of your
-host architecture) and unpack to the directory where the application
-binary resides.
+Requirements:
+- Lazarus 1.8
+- FreePascal 3.0.4
+
+### Notes for Windows
+
+The HTTPS requests require the OpenSSL DLLs to be on the system. These DLLs
+you can get from https://indy.fulgan.com/SSL/ or from "install/windows"
+directory. Put these DLLs along compiled exe binary.
+
+Setup distributions already has these OpenSSL DLLs.

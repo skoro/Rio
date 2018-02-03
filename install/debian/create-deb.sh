@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Script for creating Debian package.
+# Script is for creating Debian package.
 #
 # ./create-deb.sh [arch]
 # Where arch is one of "amd64", "x86_64", "i386".
