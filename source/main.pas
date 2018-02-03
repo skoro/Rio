@@ -303,6 +303,7 @@ var
       if (Trim(grid.Cells[0, I]) <> '') or (Trim(grid.Cells[1, I]) <> '') then Exit(True);
   end;
 begin
+  // Is confirmation needed ?
   NeedConfirm := False;
   // Check body post data.
   if Trim(PostText.Text) <> '' then NeedConfirm := True;
@@ -334,7 +335,7 @@ begin
     JsonTree.Items.Clear;
     tabJson.TabVisible := False;
   end;
-  //pagesResponse.ActivePage := tabHeaders;
+  pagesResponse.ActivePage := tabResponse;
 end;
 
 procedure TForm1.miQuitClick(Sender: TObject);
