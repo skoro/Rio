@@ -220,6 +220,10 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
+  // Если не освободить, то когда активна вкладка JSON при выходе
+  // из приложения возникают исключения что память не освобождена.
+  jsImages.Free;
+
   if Assigned(FHttpClient) then FHttpClient.Terminate;
   inherited;
 end;
