@@ -344,7 +344,6 @@ object Form1: TForm1
       ItemHeight = 0
       OnKeyPress = cbUrlKeyPress
       TabOrder = 1
-      Text = 'biny.cf/wp-json'
     end
     object btnSubmit: TButton
       Left = 476
@@ -377,8 +376,15 @@ object Form1: TForm1
           Align = alClient
           AutoEdit = False
           BorderStyle = bsNone
-          ColCount = 2
+          ColCount = 3
           Columns = <          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              MaxSize = 32
+              SizePriority = 1
+              Title.Caption = ''
+              Width = 32
+            end          
             item
               ButtonStyle = cbsPickList
               Title.Font.Style = [fsBold]
@@ -398,7 +404,9 @@ object Form1: TForm1
           TabOrder = 0
           TitleStyle = tsNative
           OnBeforeSelection = requestHeadersBeforeSelection
+          OnColRowInserted = gridColRowInserted
           ColWidths = (
+            32
             267
             268
           )
