@@ -218,6 +218,7 @@ begin
   StatusText2.Caption := '';
   HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
+  gridForm.Cells[0, 1] := '1';
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -573,8 +574,9 @@ begin
   Result := '';
   for i:=0 to gridForm.RowCount-1 do
   begin
-    n := Trim(gridForm.Cells[0, i]); // Name
-    v := Trim(gridForm.Cells[1, i]); // Value
+    if gridForm.Cells[0, i] = '0' then continue;
+    n := Trim(gridForm.Cells[1, i]); // Name
+    v := Trim(gridForm.Cells[2, i]); // Value
     if n = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
     Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
