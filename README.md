@@ -1,13 +1,15 @@
 ## HTTP request inspector
 
-The desktop tool for inspecting http requests. The application allows you
-to send http requests GET, POST, PUT, etc and analyse its responses.
+The crossplatform desktop tool for inspecting http requests.
+The application allows you to send http requests GET, POST, PUT, etc and
+analyse its responses.
 
 ### Usage
 
 Keyboard:
 
 * `F9` submits a request.
+* `Control-N` starts a new request.
 * `Control-L` moves focus to the url text field.
 * `Control-P` moves focus to the request methods dropdown list.
 * `Control-E` collapses or expands tree node and its children recursively (
@@ -18,9 +20,13 @@ Keyboard:
 
 ### Compile from sources
 
-Requirements:
+For compiling from sources you need the following requirements:
 - Lazarus 1.8
 - FreePascal 3.0.4
+
+In Linux you can compile and create the install package (deb) by Makefile.
+- `make linux64-release` for compiling release binary
+- `make dist-linux64-deb` for creating the deb package
 
 ### Notes for Windows
 
