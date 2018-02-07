@@ -405,14 +405,18 @@ procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
 begin
   SetColumn(requestHeaders, 1);
   SetColumn(requestHeaders, 2);
+  SetColumn(requestHeaders, 3);
   SetColumn(responseHeaders, 1);
   SetColumn(responseHeaders, 2);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
+var
+  I: Integer;
 begin
   PSMAIN.WriteInteger(requestHeaders.Name + 'Col1', requestHeaders.Columns.Items[0].Width);
   PSMAIN.WriteInteger(requestHeaders.Name + 'Col2', requestHeaders.Columns.Items[1].Width);
+  PSMAIN.WriteInteger(requestHeaders.Name + 'Col3', requestHeaders.Columns.Items[2].Width);
   PSMAIN.WriteInteger(responseHeaders.Name + 'Col1', responseHeaders.Columns.Items[0].Width);
   PSMAIN.WriteInteger(responseHeaders.Name + 'Col2', responseHeaders.Columns.Items[1].Width);
 end;
