@@ -408,17 +408,23 @@ begin
   SetColumn(requestHeaders, 3);
   SetColumn(responseHeaders, 1);
   SetColumn(responseHeaders, 2);
+  SetColumn(gridForm, 1);
+  SetColumn(gridForm, 2);
+  SetColumn(gridForm, 3);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
-var
-  I: Integer;
+  procedure SaveColumns(grid: TStringGrid);
+  var
+    I: Integer;
+  begin
+    for I := 0 to grid.Columns.Count - 1 do
+      PSMAIN.WriteInteger(grid.Name + 'Col' + IntToStr(I + 1), grid.Columns.Items[I].Width);
+  end;
 begin
-  PSMAIN.WriteInteger(requestHeaders.Name + 'Col1', requestHeaders.Columns.Items[0].Width);
-  PSMAIN.WriteInteger(requestHeaders.Name + 'Col2', requestHeaders.Columns.Items[1].Width);
-  PSMAIN.WriteInteger(requestHeaders.Name + 'Col3', requestHeaders.Columns.Items[2].Width);
-  PSMAIN.WriteInteger(responseHeaders.Name + 'Col1', responseHeaders.Columns.Items[0].Width);
-  PSMAIN.WriteInteger(responseHeaders.Name + 'Col2', responseHeaders.Columns.Items[1].Width);
+  SaveColumns(requestHeaders);
+  SaveColumns(gridForm);
+  SaveColumns(responseHeaders);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
