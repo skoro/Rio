@@ -61,6 +61,8 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gaClearRowsClick(Sender: TObject);
+    procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
+      tIndex: Integer);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
@@ -166,14 +168,16 @@ begin
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
-    key := trim(requestHeaders.Cells[0, i]);
+    if requestHeaders.Cells[0, i] = '0' then continue; // Skip disabled headers.
+    key := trim(requestHeaders.Cells[1, i]);
     if key = '' then continue;
-    value := trim(requestHeaders.Cells[1, i]);
+    value := trim(requestHeaders.Cells[2, i]);
     if isForm and (LowerCase(key) = 'content-type') then
-      if LowerCase(value) <> 'application/x-www-form-urlencoded' then
-      begin
+      // Forms must be with appropriate content type.
+      if LowerCase(value) = 'application/x-www-form-urlencoded' then ctForm := True
+      else begin
         value := 'application/x-www-form-urlencoded';
-        requestHeaders.Cells[1, i] := value;
+        requestHeaders.Cells[2, i] := value;
         ctForm := True
       end;
     FHttpClient.AddHeader(key, value);
@@ -182,12 +186,10 @@ begin
   // headers grid. Append one to the grid.
   if isForm and not ctForm then
   begin
-    key := 'Content-Type'; value := 'application/x-www-form-urlencoded';
+    key := 'Content-Type';
+    value := 'application/x-www-form-urlencoded';
     FHttpClient.AddHeader(key, value);
-    with requestHeaders do begin
-      Cells[0, RowCount - 1] := key;
-      Cells[1, RowCount - 1] := value;
-    end;
+    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', key, value]);
   end;
 
   UpdateStatusLine('Waiting for the response...');
@@ -216,6 +218,7 @@ begin
   StatusText2.Caption := '';
   HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
+  gridForm.Cells[0, 1] := '1';
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -255,9 +258,16 @@ begin
   if Component is TStringGrid then
     with TStringGrid(Component) do begin
       RowCount := 2;
-      Cells[0, 1] := '';
       Cells[1, 1] := '';
+      Cells[2, 1] := '';
     end;
+end;
+
+procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
+  tIndex: Integer);
+begin
+  // New inserted columns with "On" checked by default.
+  (Sender as TStringGrid).Cells[0, sIndex] := '1';
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);
@@ -282,6 +292,7 @@ begin
     begin
       Row := gridHeaders.SelectedRange[i].Top;
       requestHeaders.InsertRowWithValues(requestHeaders.Row, [
+        '1', // Checked by default
         gridHeaders.Cells[0, Row],
         gridHeaders.Cells[1, Row]
       ]);
@@ -300,7 +311,7 @@ var
   begin
     Result := False;
     for I := 1 to grid.RowCount - 1 do
-      if (Trim(grid.Cells[0, I]) <> '') or (Trim(grid.Cells[1, I]) <> '') then Exit(True);
+      if (Trim(grid.Cells[1, I]) <> '') or (Trim(grid.Cells[2, I]) <> '') then Exit(True);
   end;
 begin
   // Is confirmation needed ?
@@ -323,9 +334,13 @@ begin
   cbMethod.Text := 'GET';
   PostText.Text := '';
   requestHeaders.RowCount := 2;
-  requestHeaders.Cells[0, 1] := ''; requestHeaders.Cells[1, 1] := '';
+  requestHeaders.Cells[0, 1] := '1';
+  requestHeaders.Cells[1, 1] := '';
+  requestHeaders.Cells[2, 1] := '';
   gridForm.RowCount := 2;
-  gridForm.Cells[0, 1] := ''; gridForm.Cells[1, 1] := '';
+  gridForm.Cells[0, 1] := '1';
+  gridForm.Cells[1, 1] := '';
+  gridForm.Cells[2, 1] := '';
 
   // Response fields.
   responseHeaders.RowCount := 1;
@@ -362,8 +377,9 @@ begin
       if RowCount > 2 then DeleteRow(Row)
       else begin
         // Don't delete last row (user cannot add one) just empty it.
-        Cells[0, 1] := '';
+        Cells[0, 1] := '1';
         Cells[1, 1] := '';
+        Cells[2, 1] := '';
       end;
 end;
 
@@ -390,16 +406,26 @@ procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
 begin
   SetColumn(requestHeaders, 1);
   SetColumn(requestHeaders, 2);
+  SetColumn(requestHeaders, 3);
   SetColumn(responseHeaders, 1);
   SetColumn(responseHeaders, 2);
+  SetColumn(gridForm, 1);
+  SetColumn(gridForm, 2);
+  SetColumn(gridForm, 3);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
+  procedure SaveColumns(grid: TStringGrid);
+  var
+    I: Integer;
+  begin
+    for I := 0 to grid.Columns.Count - 1 do
+      PSMAIN.WriteInteger(grid.Name + 'Col' + IntToStr(I + 1), grid.Columns.Items[I].Width);
+  end;
 begin
-  PSMAIN.WriteInteger(requestHeaders.Name + 'Col1', requestHeaders.Columns.Items[0].Width);
-  PSMAIN.WriteInteger(requestHeaders.Name + 'Col2', requestHeaders.Columns.Items[1].Width);
-  PSMAIN.WriteInteger(responseHeaders.Name + 'Col1', responseHeaders.Columns.Items[0].Width);
-  PSMAIN.WriteInteger(responseHeaders.Name + 'Col2', responseHeaders.Columns.Items[1].Width);
+  SaveColumns(requestHeaders);
+  SaveColumns(gridForm);
+  SaveColumns(responseHeaders);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -407,9 +433,9 @@ procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
 var
   header: string;
 begin
-  header := Trim(requestHeaders.Cells[0, aRow]);
+  header := Trim(requestHeaders.Cells[1, aRow]);
   if header <> '' then
-    HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[1].PickList);
+    HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
@@ -547,7 +573,8 @@ end;
 
 procedure TForm1.UpdateHeadersPickList;
 begin
-  HeadersEditorForm.FillHeaders(requestHeaders.Columns.Items[0].PickList);
+  HeadersEditorForm.FillHeaders(requestHeaders.Columns.Items[1].PickList);
+  requestHeaders.Cells[0, 1] := '1';
 end;
 
 function TForm1.EncodeFormData: string;
@@ -558,8 +585,9 @@ begin
   Result := '';
   for i:=0 to gridForm.RowCount-1 do
   begin
-    n := Trim(gridForm.Cells[0, i]); // Name
-    v := Trim(gridForm.Cells[1, i]); // Value
+    if gridForm.Cells[0, i] = '0' then continue;
+    n := Trim(gridForm.Cells[1, i]); // Name
+    v := Trim(gridForm.Cells[2, i]); // Value
     if n = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
     Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
