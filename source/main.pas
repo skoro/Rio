@@ -258,6 +258,7 @@ begin
   if Component is TStringGrid then
     with TStringGrid(Component) do begin
       RowCount := 2;
+      Cells[0, 1] := '1';
       Cells[1, 1] := '';
       Cells[2, 1] := '';
     end;

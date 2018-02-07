@@ -381,7 +381,6 @@ object Form1: TForm1
             item
               ButtonStyle = cbsCheckboxColumn
               MaxSize = 32
-              SizePriority = 1
               Title.Caption = ''
               Width = 32
             end          
