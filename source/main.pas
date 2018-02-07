@@ -377,8 +377,9 @@ begin
       if RowCount > 2 then DeleteRow(Row)
       else begin
         // Don't delete last row (user cannot add one) just empty it.
-        Cells[0, 1] := '';
+        Cells[0, 1] := '1';
         Cells[1, 1] := '';
+        Cells[2, 1] := '';
       end;
 end;
 
