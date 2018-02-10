@@ -716,7 +716,7 @@ begin
     tokens.Free;
   end;
 
-  if gridRespCookie.RowCount > 1 then tabRespCookie.TabVisible := True
+  if Row > 1 then tabRespCookie.TabVisible := True
     else tabRespCookie.TabVisible := False;
 end;
 
