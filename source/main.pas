@@ -441,6 +441,7 @@ end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
+  UpdateStatusLine;
   ShowMessage(E.Message);
   btnSubmit.Enabled := True;
 end;
