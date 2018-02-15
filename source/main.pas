@@ -50,6 +50,7 @@ type
     responseHeaders: TStringGrid;
     responseRaw: TMemo;
     gridRespCookie: TStringGrid;
+    gridReqCookie: TStringGrid;
     tabContent: TTabSheet;
     tabForm: TTabSheet;
     tabJson: TTabSheet;
@@ -57,6 +58,7 @@ type
     tabHeaders: TTabSheet;
     tabBody: TTabSheet;
     tabRespCookie: TTabSheet;
+    tabReqCookie: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
