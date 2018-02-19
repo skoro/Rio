@@ -268,6 +268,7 @@ object Form1: TForm1
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
+          OnDblClick = gridRespCookieDblClick
         end
       end
       object tabContent: TTabSheet
@@ -909,6 +910,10 @@ object Form1: TForm1
   object popupGridActions: TPopupMenu
     left = 416
     top = 166
+    object gaInsertRow: TMenuItem
+      Caption = 'Insert'
+      OnClick = gaInsertRowClick
+    end
     object gaDeleteRow: TMenuItem
       Caption = 'Delete'
       ShortCut = 16452

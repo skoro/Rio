@@ -19,6 +19,7 @@ type
     cbMethod: TComboBox;
     cbUrl: TComboBox;
     gridForm: TStringGrid;
+    gaInsertRow: TMenuItem;
     miNew: TMenuItem;
     Panel1: TPanel;
     pagesRequest: TPageControl;
@@ -65,8 +66,10 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gaClearRowsClick(Sender: TObject);
+    procedure gaInsertRowClick(Sender: TObject);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
+    procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
@@ -102,7 +105,7 @@ var
 
 implementation
 
-uses lcltype, jsonparser, about, headers_editor;
+uses lcltype, jsonparser, about, headers_editor, cookie_form;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -269,11 +272,30 @@ begin
     end;
 end;
 
+procedure TForm1.gaInsertRowClick(Sender: TObject);
+var
+  Component: TComponent;
+  Grid: TStringGrid;
+begin
+  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  if not (Component is TStringGrid) then Exit; // =>
+  Grid := (Component as TStringGrid);
+  if Grid = requestHeaders then miInsertHeaderClick(Grid)
+  else if Grid = gridForm then Grid.InsertRowWithValues(Grid.RowCount, ['1', '', ''])
+  else if Grid = gridReqCookie then CookieForm.Show;
+end;
+
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
   tIndex: Integer);
 begin
   // New inserted columns with "On" checked by default.
   (Sender as TStringGrid).Cells[0, sIndex] := '1';
+end;
+
+procedure TForm1.gridRespCookieDblClick(Sender: TObject);
+begin
+  with (Sender as TStringGrid) do
+    CookieForm.Edit(Columns, Rows[Row]);
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);

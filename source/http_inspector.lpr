@@ -6,7 +6,7 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Forms, Interfaces, main;
+  Forms, datetimectrls, Interfaces, main, cookie_form;
 
 {$R *.res}
 
@@ -15,6 +15,7 @@ begin
   RequireDerivedFormResource:=True;
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TCookieForm, CookieForm);
   Application.Run;
 end.
 
