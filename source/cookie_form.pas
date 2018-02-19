@@ -29,6 +29,7 @@ type
 
   public
     procedure Edit(Columns: TGridColumns; Cookie: TStrings);
+    procedure Insert;
   end;
 
 var
@@ -56,6 +57,19 @@ begin
       'http'  : if Cookie[I] = '1' then cbHttp.Checked := True;
       'secure': if Cookie[I] = '1' then cbSecure.Checked := True;
     end;
+
+  Show;
+end;
+
+procedure TCookieForm.Insert;
+begin
+  cbHttp.Checked := False;
+  cbSecure.Checked := False;
+  editName.Text := '';
+  editDomain.Text := '';
+  editPath.Text := '';
+  memoValue.Text := '';
+  //dateExpires.DateTime := Now;
 
   Show;
 end;

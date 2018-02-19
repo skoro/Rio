@@ -282,7 +282,7 @@ begin
   Grid := (Component as TStringGrid);
   if Grid = requestHeaders then miInsertHeaderClick(Grid)
   else if Grid = gridForm then Grid.InsertRowWithValues(Grid.RowCount, ['1', '', ''])
-  else if Grid = gridReqCookie then CookieForm.Show;
+  else if Grid = gridReqCookie then CookieForm.Insert;
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
