@@ -167,6 +167,7 @@
         <Filename Value="cookie_form.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="CookieForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit5>
     </Units>

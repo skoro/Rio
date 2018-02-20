@@ -295,7 +295,7 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   with (Sender as TStringGrid) do
-    CookieForm.Edit(Columns, Rows[Row]);
+    CookieForm.View(Columns, Rows[Row]);
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);

@@ -28,8 +28,9 @@ type
   private
 
   public
-    procedure Edit(Columns: TGridColumns; Cookie: TStrings);
+    procedure View(Columns: TGridColumns; Cookie: TStrings);
     procedure Insert;
+    procedure Edit;
     procedure SetExpiresDateTime(const value: String);
   end;
 
@@ -44,7 +45,7 @@ uses DateUtils, SysUtils, RegExpr, httpprotocol;
 
 { TCookieForm }
 
-procedure TCookieForm.Edit(Columns: TGridColumns; Cookie: TStrings);
+procedure TCookieForm.View(Columns: TGridColumns; Cookie: TStrings);
 var
   I: Integer;
 begin
@@ -62,6 +63,14 @@ begin
       'expires': SetExpiresDateTime(Cookie[I]);
     end;
 
+  editName.ReadOnly := True;
+  editDomain.ReadOnly := True;
+  editPath.ReadOnly := True;
+  memoValue.ReadOnly := True;
+  cbHttp.Enabled := False;
+  cbSecure.Enabled := False;
+  dateExpires.ReadOnly := True;
+
   Show;
 end;
 
@@ -74,6 +83,19 @@ begin
   editPath.Text := '';
   memoValue.Text := '';
   dateExpires.DateTime := IncHour(Now, 1);
+
+  Edit;
+end;
+
+procedure TCookieForm.Edit;
+begin
+  editName.ReadOnly := False;
+  editDomain.ReadOnly := False;
+  editPath.ReadOnly := False;
+  memoValue.ReadOnly := False;
+  cbHttp.Enabled := True;
+  cbSecure.Enabled := True;
+  dateExpires.ReadOnly := False;
 
   Show;
 end;
