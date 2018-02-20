@@ -224,40 +224,49 @@ object Form1: TForm1
           ColumnClickSorts = True
           Columns = <          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Name'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Value'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Domain'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Path'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Expires'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Size'
             end          
             item
               ButtonStyle = cbsCheckboxColumn
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Http'
             end          
             item
               ButtonStyle = cbsCheckboxColumn
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'Secure'
             end          
             item
+              ReadOnly = True
               Title.Font.Style = [fsBold]
               Title.Caption = 'SameSite'
             end>
