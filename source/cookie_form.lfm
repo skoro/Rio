@@ -1,161 +1,184 @@
 object CookieForm: TCookieForm
-  Left = 309
-  Height = 437
-  Top = 181
-  Width = 309
+  Left = 365
+  Height = 409
+  Top = 173
+  Width = 296
   BorderIcons = [biSystemMenu]
   Caption = 'Cookie'
-  ClientHeight = 437
-  ClientWidth = 309
+  ClientHeight = 409
+  ClientWidth = 296
   Constraints.MinHeight = 360
   Constraints.MinWidth = 280
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel
     Left = 0
-    Height = 391
+    Height = 363
     Top = 0
-    Width = 309
+    Width = 296
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 391
-    ClientWidth = 309
+    ClientHeight = 363
+    ClientWidth = 296
     TabOrder = 0
-    object editName: TLabeledEdit
-      Left = 8
-      Height = 28
-      Top = 24
+    object PanelTop: TPanel
+      Left = 0
+      Height = 264
+      Top = 0
       Width = 296
-      Anchors = [akTop, akLeft, akRight]
-      EditLabel.AnchorSideLeft.Control = editName
-      EditLabel.AnchorSideRight.Control = editName
-      EditLabel.AnchorSideRight.Side = asrBottom
-      EditLabel.AnchorSideBottom.Control = editName
-      EditLabel.Left = 8
-      EditLabel.Height = 18
-      EditLabel.Top = 3
-      EditLabel.Width = 296
-      EditLabel.Caption = 'Name'
-      EditLabel.ParentColor = False
+      Align = alTop
+      ClientHeight = 264
+      ClientWidth = 296
       TabOrder = 0
+      object editName: TLabeledEdit
+        Left = 8
+        Height = 28
+        Top = 32
+        Width = 281
+        Anchors = [akTop, akLeft, akRight]
+        EditLabel.AnchorSideLeft.Control = editName
+        EditLabel.AnchorSideRight.Control = editName
+        EditLabel.AnchorSideRight.Side = asrBottom
+        EditLabel.AnchorSideBottom.Control = editName
+        EditLabel.Left = 8
+        EditLabel.Height = 18
+        EditLabel.Top = 11
+        EditLabel.Width = 281
+        EditLabel.Caption = 'Name'
+        EditLabel.ParentColor = False
+        TabOrder = 0
+      end
+      object editDomain: TLabeledEdit
+        Left = 8
+        Height = 28
+        Top = 88
+        Width = 281
+        Anchors = [akTop, akLeft, akRight]
+        EditLabel.AnchorSideLeft.Control = editDomain
+        EditLabel.AnchorSideRight.Control = editDomain
+        EditLabel.AnchorSideRight.Side = asrBottom
+        EditLabel.AnchorSideBottom.Control = editDomain
+        EditLabel.Left = 8
+        EditLabel.Height = 18
+        EditLabel.Top = 67
+        EditLabel.Width = 281
+        EditLabel.Caption = 'Domain'
+        EditLabel.ParentColor = False
+        TabOrder = 1
+      end
+      object editPath: TLabeledEdit
+        Left = 8
+        Height = 28
+        Top = 144
+        Width = 281
+        Anchors = [akTop, akLeft, akRight]
+        EditLabel.AnchorSideLeft.Control = editPath
+        EditLabel.AnchorSideRight.Control = editPath
+        EditLabel.AnchorSideRight.Side = asrBottom
+        EditLabel.AnchorSideBottom.Control = editPath
+        EditLabel.Left = 8
+        EditLabel.Height = 18
+        EditLabel.Top = 123
+        EditLabel.Width = 281
+        EditLabel.Caption = 'Path'
+        EditLabel.ParentColor = False
+        TabOrder = 2
+      end
+      object dateExpires: TDateTimePicker
+        Left = 8
+        Height = 24
+        Top = 232
+        Width = 281
+        CenturyFrom = 1941
+        MaxDate = 2958465
+        MinDate = -53780
+        AutoSize = False
+        TabOrder = 3
+        TrailingSeparator = False
+        TextForNullDate = 'NULL'
+        LeadingZeros = True
+        Anchors = [akTop, akLeft, akRight]
+        Kind = dtkDateTime
+        TimeFormat = tf24
+        TimeDisplay = tdHMS
+        DateMode = dmComboBox
+        Date = 43150
+        Time = 0.883612245372206
+        UseDefaultSeparators = True
+        HideDateTimeParts = []
+        MonthNames = 'Long'
+        Options = [dtpoFlatButton]
+      end
+      object labelExpires: TLabel
+        Left = 8
+        Height = 18
+        Top = 208
+        Width = 43
+        Caption = 'Expires'
+        ParentColor = False
+      end
+      object cbSecure: TCheckBox
+        Left = 96
+        Height = 21
+        Top = 176
+        Width = 63
+        Caption = 'Secure'
+        TabOrder = 4
+      end
+      object cbHttp: TCheckBox
+        Left = 8
+        Height = 21
+        Top = 176
+        Width = 51
+        Caption = 'Http'
+        TabOrder = 5
+      end
     end
-    object memoValue: TMemo
-      Left = 8
-      Height = 119
-      Top = 272
-      Width = 296
-      Anchors = [akTop, akLeft, akRight, akBottom]
+    object PanelClient: TPanel
+      Left = 2
+      Height = 95
+      Top = 266
+      Width = 292
+      Align = alClient
+      BorderSpacing.Around = 2
+      BevelOuter = bvNone
+      ClientHeight = 95
+      ClientWidth = 292
       TabOrder = 1
-    end
-    object Label1: TLabel
-      Left = 8
-      Height = 18
-      Top = 248
-      Width = 33
-      Caption = 'Value'
-      ParentColor = False
-    end
-    object editDomain: TLabeledEdit
-      Left = 8
-      Height = 28
-      Top = 76
-      Width = 296
-      Anchors = [akTop, akLeft, akRight]
-      EditLabel.AnchorSideLeft.Control = editDomain
-      EditLabel.AnchorSideRight.Control = editDomain
-      EditLabel.AnchorSideRight.Side = asrBottom
-      EditLabel.AnchorSideBottom.Control = editDomain
-      EditLabel.Left = 8
-      EditLabel.Height = 18
-      EditLabel.Top = 55
-      EditLabel.Width = 296
-      EditLabel.Caption = 'Domain'
-      EditLabel.ParentColor = False
-      TabOrder = 2
-    end
-    object editPath: TLabeledEdit
-      Left = 8
-      Height = 28
-      Top = 128
-      Width = 296
-      Anchors = [akTop, akLeft, akRight]
-      EditLabel.AnchorSideLeft.Control = editPath
-      EditLabel.AnchorSideRight.Control = editPath
-      EditLabel.AnchorSideRight.Side = asrBottom
-      EditLabel.AnchorSideBottom.Control = editPath
-      EditLabel.Left = 8
-      EditLabel.Height = 18
-      EditLabel.Top = 107
-      EditLabel.Width = 296
-      EditLabel.Caption = 'Path'
-      EditLabel.ParentColor = False
-      TabOrder = 3
-    end
-    object dateExpires: TDateTimePicker
-      Left = 8
-      Height = 24
-      Top = 184
-      Width = 296
-      CenturyFrom = 1941
-      MaxDate = 2958465
-      MinDate = -53780
-      AutoSize = False
-      TabOrder = 4
-      TrailingSeparator = False
-      TextForNullDate = 'NULL'
-      LeadingZeros = True
-      Anchors = [akTop, akLeft, akRight]
-      Kind = dtkDateTime
-      TimeFormat = tf24
-      TimeDisplay = tdHMS
-      DateMode = dmComboBox
-      Date = 43150
-      Time = 0.883612245372206
-      UseDefaultSeparators = True
-      HideDateTimeParts = []
-      MonthNames = 'Long'
-      Options = [dtpoFlatButton]
-    end
-    object Label2: TLabel
-      Left = 8
-      Height = 18
-      Top = 164
-      Width = 43
-      Caption = 'Expires'
-      ParentColor = False
-    end
-    object cbHttp: TCheckBox
-      Left = 8
-      Height = 21
-      Top = 216
-      Width = 51
-      Caption = 'Http'
-      TabOrder = 5
-    end
-    object cbSecure: TCheckBox
-      Left = 96
-      Height = 21
-      Top = 216
-      Width = 63
-      Caption = 'Secure'
-      TabOrder = 6
+      object memoValue: TMemo
+        Left = 0
+        Height = 77
+        Top = 18
+        Width = 292
+        Align = alClient
+        TabOrder = 0
+      end
+      object Label1: TLabel
+        Left = 0
+        Height = 18
+        Top = 0
+        Width = 292
+        Align = alTop
+        Caption = 'Value'
+        ParentColor = False
+      end
     end
   end
   object Panel2: TPanel
     Left = 0
     Height = 46
-    Top = 391
-    Width = 309
+    Top = 363
+    Width = 296
     Align = alBottom
     BevelOuter = bvNone
-    BorderWidth = 2
+    BorderWidth = 1
     ClientHeight = 46
-    ClientWidth = 309
+    ClientWidth = 296
     TabOrder = 1
     object Button1: TButton
-      Left = 2
-      Height = 42
-      Top = 2
+      Left = 1
+      Height = 44
+      Top = 1
       Width = 59
       Align = alLeft
       AutoSize = True

@@ -17,15 +17,18 @@ type
     cbHttp: TCheckBox;
     cbSecure: TCheckBox;
     dateExpires: TDateTimePicker;
-    Label1: TLabel;
-    Label2: TLabel;
-    editName: TLabeledEdit;
     editDomain: TLabeledEdit;
+    editName: TLabeledEdit;
     editPath: TLabeledEdit;
+    Label1: TLabel;
+    labelExpires: TLabel;
     memoValue: TMemo;
     Panel1: TPanel;
     Panel2: TPanel;
+    PanelTop: TPanel;
+    PanelClient: TPanel;
   private
+    procedure ShowExpires(AVisible: Boolean = True);
 
   public
     procedure View(Columns: TGridColumns; Cookie: TStrings);
@@ -44,6 +47,18 @@ uses DateUtils, SysUtils, RegExpr, httpprotocol;
 {$R *.lfm}
 
 { TCookieForm }
+
+procedure TCookieForm.ShowExpires(AVisible: Boolean);
+begin
+  if dateExpires.Visible = AVisible then Exit; //=>
+  dateExpires.Visible := AVisible;
+  labelExpires.Visible := AVisible;
+  // Adjust panel size depends of expires components
+  if AVisible then
+    PanelTop.Height := PanelTop.Height + dateExpires.Height + labelExpires.Height
+  else
+    PanelTop.Height := PanelTop.Height - dateExpires.Height - labelExpires.Height
+end;
 
 procedure TCookieForm.View(Columns: TGridColumns; Cookie: TStrings);
 var
@@ -95,13 +110,17 @@ begin
   memoValue.ReadOnly := False;
   cbHttp.Enabled := True;
   cbSecure.Enabled := True;
+
+  ShowExpires;
   dateExpires.ReadOnly := False;
 
   Show;
 end;
 
 {
-https://tools.ietf.org/html/rfc2616#section-3.3.1
+  https://tools.ietf.org/html/rfc2616#section-3.3.1
+  Date parser.
+  ScanDateTime from DateUtils cannot parse those dates.
 }
 procedure TCookieForm.SetExpiresDateTime(const value: String);
 var
@@ -124,10 +143,10 @@ begin
       end;
     date := EncodeDateTime(year, month, day, hour, minute, second, 0);
     dateExpires.DateTime := date;
-    dateExpires.Enabled := True;
+    ShowExpires;
   end
   else
-    dateExpires.Enabled := False;
+    ShowExpires(False);
   Reg.Free;
 end;
 
