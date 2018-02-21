@@ -10,10 +10,15 @@ uses
 
 type
 
+  { TViewState }
+
+  TViewState = (vsView, vsEdit, vsNew);
+
   { TCookieForm }
 
   TCookieForm = class(TForm)
-    Button1: TButton;
+    btnOK: TButton;
+    btnSave: TButton;
     cbHttp: TCheckBox;
     cbSecure: TCheckBox;
     dateExpires: TDateTimePicker;
@@ -27,10 +32,13 @@ type
     Panel2: TPanel;
     PanelTop: TPanel;
     PanelClient: TPanel;
+    procedure btnOKClick(Sender: TObject);
   private
+    FViewState: TViewState;
     procedure ShowExpires(AVisible: Boolean = True);
-
+    procedure SetViewState(AState: TViewState);
   public
+    property ViewState: TViewState read FViewState write SetViewState;
     procedure View(Columns: TGridColumns; Cookie: TStrings);
     procedure Insert;
     procedure Edit;
@@ -42,11 +50,16 @@ var
 
 implementation
 
-uses DateUtils, SysUtils, RegExpr, httpprotocol;
+uses DateUtils, SysUtils, RegExpr, httpprotocol, Controls;
 
 {$R *.lfm}
 
 { TCookieForm }
+
+procedure TCookieForm.btnOKClick(Sender: TObject);
+begin
+  Close;
+end;
 
 procedure TCookieForm.ShowExpires(AVisible: Boolean);
 begin
@@ -58,6 +71,33 @@ begin
     PanelTop.Height := PanelTop.Height + dateExpires.Height + labelExpires.Height
   else
     PanelTop.Height := PanelTop.Height - dateExpires.Height - labelExpires.Height
+end;
+
+procedure TCookieForm.SetViewState(AState: TViewState);
+begin
+  FViewState := AState;
+  if AState = vsView then begin
+    editName.ReadOnly := True;
+    editDomain.ReadOnly := True;
+    editPath.ReadOnly := True;
+    memoValue.ReadOnly := True;
+    cbHttp.Enabled := False;
+    cbSecure.Enabled := False;
+    dateExpires.ReadOnly := True;
+    btnSave.Visible := False;
+  end
+  else if (AState = vsNew) or (AState = vsEdit) then begin
+    editName.ReadOnly := False;
+    editDomain.ReadOnly := False;
+    editPath.ReadOnly := False;
+    memoValue.ReadOnly := False;
+    cbHttp.Enabled := True;
+    cbSecure.Enabled := True;
+    dateExpires.ReadOnly := False;
+    btnSave.Visible := True;
+    ShowExpires;
+    if Visible then Close;
+  end;
 end;
 
 procedure TCookieForm.View(Columns: TGridColumns; Cookie: TStrings);
@@ -78,14 +118,7 @@ begin
       'expires': SetExpiresDateTime(Cookie[I]);
     end;
 
-  editName.ReadOnly := True;
-  editDomain.ReadOnly := True;
-  editPath.ReadOnly := True;
-  memoValue.ReadOnly := True;
-  cbHttp.Enabled := False;
-  cbSecure.Enabled := False;
-  dateExpires.ReadOnly := True;
-
+  SetViewState(vsView);
   Show;
 end;
 
@@ -99,22 +132,14 @@ begin
   memoValue.Text := '';
   dateExpires.DateTime := IncHour(Now, 1);
 
-  Edit;
+  SetViewState(vsNew);
+  ShowModal;
 end;
 
 procedure TCookieForm.Edit;
 begin
-  editName.ReadOnly := False;
-  editDomain.ReadOnly := False;
-  editPath.ReadOnly := False;
-  memoValue.ReadOnly := False;
-  cbHttp.Enabled := True;
-  cbSecure.Enabled := True;
-
-  ShowExpires;
-  dateExpires.ReadOnly := False;
-
-  Show;
+  SetViewState(vsEdit);
+  ShowModal;
 end;
 
 {
