@@ -193,6 +193,7 @@ object CookieForm: TCookieForm
       Width = 75
       Align = alLeft
       Caption = 'Save'
+      OnClick = btnSaveClick
       TabOrder = 1
     end
   end

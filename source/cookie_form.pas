@@ -33,16 +33,19 @@ type
     PanelTop: TPanel;
     PanelClient: TPanel;
     procedure btnOKClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
   private
     FViewState: TViewState;
     procedure ShowExpires(AVisible: Boolean = True);
     procedure SetViewState(AState: TViewState);
+    function FormatExpiresDate: string;
   public
     property ViewState: TViewState read FViewState write SetViewState;
     procedure View(Columns: TGridColumns; Cookie: TStrings);
-    procedure Insert;
-    procedure Edit;
+    function Insert: Integer;
+    function Edit: Integer;
     procedure SetExpiresDateTime(const value: String);
+    procedure InsertIntoGrid(grid: TStringGrid);
   end;
 
 var
@@ -50,7 +53,7 @@ var
 
 implementation
 
-uses DateUtils, SysUtils, RegExpr, httpprotocol, Controls;
+uses DateUtils, SysUtils, RegExpr, httpprotocol, Controls, strutils;
 
 {$R *.lfm}
 
@@ -59,6 +62,17 @@ uses DateUtils, SysUtils, RegExpr, httpprotocol, Controls;
 procedure TCookieForm.btnOKClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TCookieForm.btnSaveClick(Sender: TObject);
+begin
+  // Don't save the cookie without name.
+  if Trim(editName.Text) = '' then begin
+    editName.SetFocus;
+    Exit;
+  end;
+
+  ModalResult := mrOK;
 end;
 
 procedure TCookieForm.ShowExpires(AVisible: Boolean);
@@ -100,6 +114,16 @@ begin
   end;
 end;
 
+function TCookieForm.FormatExpiresDate: string;
+var
+  day, month: string;
+begin
+  day := HTTPDays[DayOfWeek(dateExpires.DateTime)];
+  month := HTTPMonths[MonthOf(dateExpires.DateTime)];
+  Result := day + FormatDateTime('"," dd"-mm-"yyyy hh":"nn":"ss "GMT"', dateExpires.DateTime);
+  Result := ReplaceStr(Result, 'mm', month);
+end;
+
 procedure TCookieForm.View(Columns: TGridColumns; Cookie: TStrings);
 var
   I: Integer;
@@ -122,7 +146,7 @@ begin
   Show;
 end;
 
-procedure TCookieForm.Insert;
+function TCookieForm.Insert: Integer;
 begin
   cbHttp.Checked := False;
   cbSecure.Checked := False;
@@ -133,13 +157,13 @@ begin
   dateExpires.DateTime := IncHour(Now, 1);
 
   SetViewState(vsNew);
-  ShowModal;
+  Result := ShowModal;
 end;
 
-procedure TCookieForm.Edit;
+function TCookieForm.Edit: Integer;
 begin
   SetViewState(vsEdit);
-  ShowModal;
+  Result := ShowModal;
 end;
 
 {
@@ -173,6 +197,23 @@ begin
   else
     ShowExpires(False);
   Reg.Free;
+end;
+
+procedure TCookieForm.InsertIntoGrid(grid: TStringGrid);
+var
+  values: array of string;
+begin
+  // TODO: check grid's col count
+  SetLength(values, grid.ColCount);
+  values[0] := '1'; // Enabled
+  values[1] := editName.Text; // Name
+  values[2] := memoValue.Text; // Value
+  values[3] := editDomain.Text; // Domain
+  values[4] := editPath.Text; // Path
+  values[5] := FormatExpiresDate; // Expires
+  values[6] := IfThen(cbHttp.Checked, '1', '0'); // Http
+  values[7] := IfThen(cbSecure.Checked, '1', '0'); // Secure
+  grid.InsertRowWithValues(grid.Row, values);
 end;
 
 end.

@@ -279,10 +279,17 @@ var
 begin
   Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
   if not (Component is TStringGrid) then Exit; // =>
+
   Grid := (Component as TStringGrid);
-  if Grid = requestHeaders then miInsertHeaderClick(Grid)
-  else if Grid = gridForm then Grid.InsertRowWithValues(Grid.RowCount, ['1', '', ''])
-  else if Grid = gridReqCookie then CookieForm.Insert;
+  if Grid = requestHeaders then
+    miInsertHeaderClick(Grid)
+  else
+    if Grid = gridForm then
+      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', ''])
+  else
+    if Grid = gridReqCookie then begin
+      if CookieForm.Insert = mrOK then CookieForm.InsertIntoGrid(gridReqCookie);
+    end;
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
