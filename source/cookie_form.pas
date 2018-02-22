@@ -39,13 +39,14 @@ type
     procedure ShowExpires(AVisible: Boolean = True);
     procedure SetViewState(AState: TViewState);
     function FormatExpiresDate: string;
+    procedure InitValuesFromGrid(grid: TStringGrid);
   public
     property ViewState: TViewState read FViewState write SetViewState;
-    procedure View(Columns: TGridColumns; Cookie: TStrings);
+    procedure View(grid: TStringGrid);
     function Insert: Integer;
-    function Edit: Integer;
+    function Edit(grid: TStringGrid): Integer;
     procedure SetExpiresDateTime(const value: String);
-    procedure InsertIntoGrid(grid: TStringGrid);
+    procedure InsertIntoGrid(grid: TStringGrid; UpdateRow: Boolean = False);
   end;
 
 var
@@ -124,24 +125,30 @@ begin
   Result := ReplaceStr(Result, 'mm', month);
 end;
 
-procedure TCookieForm.View(Columns: TGridColumns; Cookie: TStrings);
+procedure TCookieForm.InitValuesFromGrid(grid: TStringGrid);
 var
   I: Integer;
+  data: TStrings;
 begin
   cbHttp.Checked := False;
   cbSecure.Checked := False;
+  data := grid.Rows[grid.Row];
 
-  for I := 0 to Columns.Count - 1 do
-    case LowerCase(Columns.Items[I].Title.Caption) of
-      'name'   : editName.Text := Cookie[I];
-      'domain' : editDomain.Text := Cookie[I];
-      'path'   : editPath.Text := Cookie[I];
-      'value'  : memoValue.Text := Cookie[I];
-      'http'   : if Cookie[I] = '1' then cbHttp.Checked := True;
-      'secure' : if Cookie[I] = '1' then cbSecure.Checked := True;
-      'expires': SetExpiresDateTime(Cookie[I]);
+  for I := 0 to grid.Columns.Count - 1 do
+    case LowerCase(grid.Columns.Items[I].Title.Caption) of
+      'name'   : editName.Text := data[I];
+      'domain' : editDomain.Text := data[I];
+      'path'   : editPath.Text := data[I];
+      'value'  : memoValue.Text := data[I];
+      'http'   : if data[I] = '1' then cbHttp.Checked := True;
+      'secure' : if data[I] = '1' then cbSecure.Checked := True;
+      'expires': SetExpiresDateTime(data[I]);
     end;
+end;
 
+procedure TCookieForm.View(grid: TStringGrid);
+begin
+  InitValuesFromGrid(grid);
   SetViewState(vsView);
   Show;
 end;
@@ -160,10 +167,14 @@ begin
   Result := ShowModal;
 end;
 
-function TCookieForm.Edit: Integer;
+function TCookieForm.Edit(grid: TStringGrid): Integer;
 begin
+  InitValuesFromGrid(grid);
   SetViewState(vsEdit);
   Result := ShowModal;
+  if Result = mrOK then begin
+    InsertIntoGrid(grid, True);
+  end;
 end;
 
 {
@@ -199,12 +210,15 @@ begin
   Reg.Free;
 end;
 
-procedure TCookieForm.InsertIntoGrid(grid: TStringGrid);
+procedure TCookieForm.InsertIntoGrid(grid: TStringGrid; UpdateRow: Boolean);
 var
   values: array of string;
+  row, i: Integer;
 begin
+  row := grid.Row;
+
   // TODO: check grid's col count
-  SetLength(values, grid.ColCount);
+  SetLength(values, 8);
   values[0] := '1'; // Enabled
   values[1] := editName.Text; // Name
   values[2] := memoValue.Text; // Value
@@ -213,7 +227,11 @@ begin
   values[5] := FormatExpiresDate; // Expires
   values[6] := IfThen(cbHttp.Checked, '1', '0'); // Http
   values[7] := IfThen(cbSecure.Checked, '1', '0'); // Secure
-  grid.InsertRowWithValues(grid.Row, values);
+  if UpdateRow then
+    for I := 1 to Length(values) - 1 do
+      grid.Cells[I, row] := values[I]
+  else
+    grid.InsertRowWithValues(row, values);
 end;
 
 end.

@@ -300,9 +300,14 @@ begin
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
+var
+  grid: TStringGrid;
 begin
-  with (Sender as TStringGrid) do
-    CookieForm.View(Columns, Rows[Row]);
+  grid := (Sender as TStringGrid);
+  if grid = gridRespCookie then CookieForm.View(grid)
+  else if grid = gridReqCookie then begin
+    CookieForm.Edit(grid);
+  end;
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);
