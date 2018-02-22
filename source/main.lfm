@@ -432,9 +432,9 @@ object Form1: TForm1
       Height = 181
       Top = 40
       Width = 545
-      ActivePage = tabReqCookie
+      ActivePage = tabHeaders
       Anchors = [akTop, akLeft, akRight, akBottom]
-      TabIndex = 3
+      TabIndex = 0
       TabOrder = 3
       object tabHeaders: TTabSheet
         Caption = 'Headers'
