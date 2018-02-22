@@ -215,7 +215,12 @@ var
   values: array of string;
   row, i: Integer;
 begin
-  row := grid.Row;
+  if grid.RowCount = 1 then begin
+    grid.RowCount := 2;
+    row := 1;
+  end
+  else
+    row := grid.Row;
 
   // TODO: check grid's col count
   SetLength(values, 8);
