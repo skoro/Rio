@@ -201,9 +201,18 @@ begin
     requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', key, value]);
   end;
 
+  // Set request cookies
+  for I := 1 to gridReqCookie.RowCount - 1 do
+  begin
+    if gridReqCookie.Cells[0, I] = '0' then continue;
+    key := Trim(gridReqCookie.Cells[1, I]);
+    if key = '' then continue;
+    value := gridReqCookie.Cells[2, I];
+    FHttpClient.AddCookie(key, value);
+  end;
+
   UpdateStatusLine('Waiting for the response...');
 
-  FHttpClient.SetCookies(GetRequestCookies);
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
@@ -286,12 +295,8 @@ begin
   if Grid = requestHeaders then
     miInsertHeaderClick(Grid)
   else
-    if Grid = gridForm then
-      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', ''])
-  else
-    if Grid = gridReqCookie then begin
-      if CookieForm.Insert = mrOK then CookieForm.InsertIntoGrid(gridReqCookie);
-    end;
+    if (Grid = gridForm) or (Grid = gridReqCookie) then
+      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
@@ -306,10 +311,7 @@ var
   grid: TStringGrid;
 begin
   grid := (Sender as TStringGrid);
-  if grid = gridRespCookie then CookieForm.View(grid)
-  else if grid = gridReqCookie then begin
-    CookieForm.Edit(grid);
-  end;
+  if grid = gridRespCookie then CookieForm.View(grid);
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);

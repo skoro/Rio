@@ -552,59 +552,27 @@ object Form1: TForm1
           Width = 539
           Align = alClient
           BorderStyle = bsNone
-          ColCount = 9
+          ColCount = 3
           ColumnClickSorts = True
           Columns = <          
             item
               ButtonStyle = cbsCheckboxColumn
-              MaxSize = 100
+              MaxSize = 32
               Title.Caption = ''
               Width = 32
             end          
             item
               Title.Font.Style = [fsBold]
               Title.Caption = 'Name'
-              Width = 67
+              Width = 179
             end          
             item
               Title.Font.Style = [fsBold]
               Title.Caption = 'Value'
-              Width = 67
-            end          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Domain'
-              Width = 67
-            end          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Path'
-              Width = 67
-            end          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Expires'
-              Width = 67
-            end          
-            item
-              ButtonStyle = cbsCheckboxColumn
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Http'
-              Width = 67
-            end          
-            item
-              ButtonStyle = cbsCheckboxColumn
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Secure'
-              Width = 67
-            end          
-            item
-              Title.Font.Style = [fsBold]
-              Title.Caption = 'Samesite'
-              Width = 70
+              Width = 181
             end>
           FixedCols = 0
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goTabs, goSmoothScroll, goRowHighlight]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
           PopupMenu = popupGridActions
           RowCount = 2
           TabOrder = 0
@@ -612,14 +580,8 @@ object Form1: TForm1
           OnDblClick = gridRespCookieDblClick
           ColWidths = (
             32
-            67
-            67
-            67
-            67
-            67
-            67
-            67
-            70
+            179
+            181
           )
         end
       end

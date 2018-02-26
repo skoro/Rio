@@ -177,7 +177,7 @@ object CookieForm: TCookieForm
     ClientWidth = 296
     TabOrder = 1
     object btnOK: TButton
-      Left = 76
+      Left = 1
       Height = 44
       Top = 1
       Width = 68
@@ -185,16 +185,6 @@ object CookieForm: TCookieForm
       Caption = 'Close'
       OnClick = btnOKClick
       TabOrder = 0
-    end
-    object btnSave: TButton
-      Left = 1
-      Height = 44
-      Top = 1
-      Width = 75
-      Align = alLeft
-      Caption = 'Save'
-      OnClick = btnSaveClick
-      TabOrder = 1
     end
   end
 end

@@ -52,7 +52,7 @@ type
     constructor Create(CreateSuspened: Boolean);
     destructor Destroy; override;
     procedure AddHeader(const AHeader,AValue : String);
-    procedure SetCookies(const AValue: TStrings);
+    procedure AddCookie(const AName, AValue : String);
     property Client: TFPHTTPClient read FHttpClient;
     property Method: string read FHttpMethod write SetHttpMethod;
     property Url: string read FUrl write SetUrl;
@@ -120,7 +120,7 @@ end;
 procedure TThreadHttpClient.Execute;
 begin
   try
-    FHttpClient.Cookies := FCookies;
+    if Assigned(FCookies) then FHttpClient.Cookies := FCookies;
     FStartTime := Now;
     FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
     FFinishTime := Now;
@@ -142,11 +142,12 @@ begin
   FResponseData := TStringStream.Create('');
   FOnClientException:=nil;
   FOnRequestComplete:=nil;
+  FCookies:=nil;
 end;
 
 destructor TThreadHttpClient.Destroy;
 begin
-  if Assigned(FCookies) then FreeAndNil(FCookies);
+  if Assigned(FCookies) then FCookies.Free;
   FHttpClient.RequestBody.Free;
   FreeAndNil(FHttpClient);
   FreeAndNil(FResponseData);
@@ -158,9 +159,10 @@ begin
   FHttpClient.AddHeader(AHeader, AValue);
 end;
 
-procedure TThreadHttpClient.SetCookies(const AValue: TStrings);
+procedure TThreadHttpClient.AddCookie(const AName, AValue: String);
 begin
-  FCookies := AValue;
+  if not Assigned(FCookies) then FCookies := TStringList.Create;
+  FCookies.Add(Format('%s=%s', [AName, AValue]));
 end;
 
 end.
