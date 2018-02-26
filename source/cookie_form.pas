@@ -5,7 +5,7 @@ unit cookie_form;
 interface
 
 uses
-  DateTimePicker, Forms,
+  Forms,
   ExtCtrls, StdCtrls, Classes, Grids;
 
 type
@@ -16,7 +16,7 @@ type
     btnOK: TButton;
     cbHttp: TCheckBox;
     cbSecure: TCheckBox;
-    dateExpires: TDateTimePicker;
+    expiresValue: TEdit;
     editDomain: TLabeledEdit;
     editName: TLabeledEdit;
     editPath: TLabeledEdit;
@@ -25,16 +25,12 @@ type
     memoValue: TMemo;
     Panel1: TPanel;
     Panel2: TPanel;
-    PanelTop: TPanel;
-    PanelClient: TPanel;
     procedure btnOKClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
-    procedure ShowExpires(AVisible: Boolean = True);
-    function FormatExpiresDate: string;
     procedure InitValuesFromGrid(grid: TStringGrid);
   public
     procedure View(grid: TStringGrid);
-    procedure SetExpiresDateTime(const value: String);
   end;
 
 var
@@ -42,7 +38,7 @@ var
 
 implementation
 
-uses DateUtils, SysUtils, RegExpr, httpprotocol, Controls, strutils;
+uses SysUtils, strutils;
 
 {$R *.lfm}
 
@@ -53,26 +49,15 @@ begin
   Close;
 end;
 
-procedure TCookieForm.ShowExpires(AVisible: Boolean);
+procedure TCookieForm.FormCreate(Sender: TObject);
 begin
-  if dateExpires.Visible = AVisible then Exit; //=>
-  dateExpires.Visible := AVisible;
-  labelExpires.Visible := AVisible;
-  // Adjust panel size depends of expires components
-  if AVisible then
-    PanelTop.Height := PanelTop.Height + dateExpires.Height + labelExpires.Height
-  else
-    PanelTop.Height := PanelTop.Height - dateExpires.Height - labelExpires.Height
-end;
-
-function TCookieForm.FormatExpiresDate: string;
-var
-  day, month: string;
-begin
-  day := HTTPDays[DayOfWeek(dateExpires.DateTime)];
-  month := HTTPMonths[MonthOf(dateExpires.DateTime)];
-  Result := day + FormatDateTime('"," dd"-mm-"yyyy hh":"nn":"ss "GMT"', dateExpires.DateTime);
-  Result := ReplaceStr(Result, 'mm', month);
+  editName.ReadOnly:=True;
+  editDomain.ReadOnly:=True;
+  editPath.ReadOnly:=True;
+  memoValue.ReadOnly:=True;
+  expiresValue.ReadOnly:=True;
+  cbHttp.Enabled:=False;
+  cbSecure.Enabled:=False;
 end;
 
 procedure TCookieForm.InitValuesFromGrid(grid: TStringGrid);
@@ -92,7 +77,10 @@ begin
       'value'  : memoValue.Text := data[I];
       'http'   : if data[I] = '1' then cbHttp.Checked := True;
       'secure' : if data[I] = '1' then cbSecure.Checked := True;
-      'expires': SetExpiresDateTime(data[I]);
+      'expires': begin
+        expiresValue.Text := IfThen(data[I] = '', '', data[I]);
+        expiresValue.Enabled := data[I] <> '';
+      end;
     end;
 end;
 
@@ -100,39 +88,6 @@ procedure TCookieForm.View(grid: TStringGrid);
 begin
   InitValuesFromGrid(grid);
   Show;
-end;
-
-{
-  https://tools.ietf.org/html/rfc2616#section-3.3.1
-  Date parser.
-  ScanDateTime from DateUtils cannot parse those dates.
-}
-procedure TCookieForm.SetExpiresDateTime(const value: String);
-var
-  date: tdatetime;
-  Reg: TRegExpr;
-  day, month, year, hour, minute, second, i: integer;
-begin
-  Reg := TRegExpr.Create;
-  Reg.Expression := '([A-Z][a-z]{2}), ([0-9]{2})-([A-Z][a-z]{2})-([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2}) GMT';
-  if Reg.Exec(value) then begin
-    day := StrToInt(Reg.Match[2]);
-    year := StrToInt(Reg.Match[4]);
-    hour := StrToInt(Reg.Match[5]);
-    minute := StrToInt(Reg.Match[6]);
-    second := StrToInt(Reg.Match[7]);
-    for I := 1 to Length(HTTPMonths) do
-      if HTTPMonths[I] = Reg.Match[3] then begin
-        month := I;
-        break;
-      end;
-    date := EncodeDateTime(year, month, day, hour, minute, second, 0);
-    dateExpires.DateTime := date;
-    ShowExpires;
-  end
-  else
-    ShowExpires(False);
-  Reg.Free;
 end;
 
 end.
