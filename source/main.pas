@@ -96,6 +96,7 @@ type
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
     procedure ShowResponseCookie(Headers: TStrings);
+    function GetRequestCookies: TStrings;
   public
 
   end;
@@ -202,6 +203,7 @@ begin
 
   UpdateStatusLine('Waiting for the response...');
 
+  FHttpClient.SetCookies(GetRequestCookies);
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
@@ -755,6 +757,36 @@ begin
 
   if Row > 1 then tabRespCookie.TabVisible := True
     else tabRespCookie.TabVisible := False;
+end;
+
+function TForm1.GetRequestCookies: TStrings;
+var
+  I: Integer;
+  CookieName, Value, Line: string;
+begin
+  Result := TStringList.Create;
+
+  for I := 1 to gridReqCookie.RowCount - 1 do
+  begin
+    if gridReqCookie.Cells[0, i] = '0' then Continue; // Skip disabled cookie.
+    CookieName := Trim(gridReqCookie.Cells[1, I]);
+    if CookieName = '' then Continue;
+    Value := Trim(gridReqCookie.Cells[2, I]);
+    if Value = '' then Continue;
+    Line := Format('%s=%s', [CookieName, Value]);
+    if Trim(gridReqCookie.Cells[3, I]) <> '' then
+      Line := Line + '; domain=' + Trim(gridReqCookie.Cells[3, I]);
+    if Trim(gridReqCookie.Cells[4, I]) <> '' then
+      Line := Line + '; path=' + Trim(gridReqCookie.Cells[4, I]);
+    if Trim(gridReqCookie.Cells[5, I]) <> '' then
+      Line := Line + '; expires=' + Trim(gridReqCookie.Cells[5, I]);
+    if gridReqCookie.Cells[6, I] = '1' then
+      Line := Line + '; HttpOnly';
+    if gridReqCookie.Cells[7, I] = '1' then
+      Line := Line + '; Secure';
+    Result.Add(Line);
+  end;
+
 end;
 
 end.
