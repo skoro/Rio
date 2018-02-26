@@ -238,6 +238,7 @@ begin
   HeadersEditorForm := THeadersEditorForm.Create(Application);
   UpdateHeadersPickList;
   gridForm.Cells[0, 1] := '1';
+  gridReqCookie.Cells[0, 1] := '1';
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
