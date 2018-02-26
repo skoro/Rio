@@ -457,6 +457,9 @@ begin
   SetColumn(gridForm, 1);
   SetColumn(gridForm, 2);
   SetColumn(gridForm, 3);
+  SetColumn(gridReqCookie, 1);
+  SetColumn(gridReqCookie, 2);
+  SetColumn(gridReqCookie, 3);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -471,6 +474,7 @@ begin
   SaveColumns(requestHeaders);
   SaveColumns(gridForm);
   SaveColumns(responseHeaders);
+  SaveColumns(gridReqCookie);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
