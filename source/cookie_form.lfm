@@ -140,10 +140,10 @@ object CookieForm: TCookieForm
     ClientWidth = 280
     TabOrder = 1
     object btnOK: TButton
-      Left = 211
+      Left = 223
       Height = 44
       Top = 1
-      Width = 68
+      Width = 56
       Align = alRight
       Caption = 'Close'
       OnClick = btnOKClick
@@ -430,6 +430,17 @@ object CookieForm: TCookieForm
         0000000000000000000000000000000000000000000000000000
       }
       OnClick = btnNextClick
+    end
+    object btnAdd: TButton
+      Left = 167
+      Height = 44
+      Hint = 'Add this cookie to request'
+      Top = 1
+      Width = 56
+      Align = alRight
+      Caption = 'Add'
+      OnClick = btnAddClick
+      TabOrder = 1
     end
   end
 end

@@ -14,6 +14,7 @@ type
 
   TCookieForm = class(TForm)
     btnOK: TButton;
+    btnAdd: TButton;
     cbHttp: TCheckBox;
     cbSecure: TCheckBox;
     expiresValue: TEdit;
@@ -27,6 +28,7 @@ type
     Panel2: TPanel;
     btnPrev: TSpeedButton;
     btnNext: TSpeedButton;
+    procedure btnAddClick(Sender: TObject);
     procedure btnNextClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -68,6 +70,17 @@ begin
   else
     if btn = btnPrev then FResponseGrid.Row := FResponseGrid.Row - 1;
   InitValuesFromGrid;
+end;
+
+procedure TCookieForm.btnAddClick(Sender: TObject);
+var
+  CName: string;
+  I: Integer;
+begin
+  CName := editName.Text;
+  for I := 1 to FRequestGrid.RowCount - 1 do
+    if FRequestGrid.Cells[1, I] = CName then Exit; // Already exists.
+  FRequestGrid.InsertRowWithValues(FRequestGrid.Row, ['1', CName, memoValue.Text]);
 end;
 
 procedure TCookieForm.FormCreate(Sender: TObject);
