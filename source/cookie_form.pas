@@ -6,7 +6,7 @@ interface
 
 uses
   Forms,
-  ExtCtrls, StdCtrls, Classes, Grids;
+  ExtCtrls, StdCtrls, Classes, Grids, Buttons;
 
 type
 
@@ -25,12 +25,16 @@ type
     memoValue: TMemo;
     Panel1: TPanel;
     Panel2: TPanel;
+    btnPrev: TSpeedButton;
+    btnNext: TSpeedButton;
+    procedure btnNextClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     FResponseGrid: TStringGrid;
     FRequestGrid: TStringGrid;
     procedure InitValuesFromGrid;
+    procedure EnableNextPrevButtons;
   public
     property ResponseGrid: TStringGrid read FResponseGrid write FResponseGrid;
     property RequestGrid: TStringGrid read FRequestGrid write FRequestGrid;
@@ -51,6 +55,18 @@ uses SysUtils, strutils;
 procedure TCookieForm.btnOKClick(Sender: TObject);
 begin
   Close;
+end;
+
+procedure TCookieForm.btnNextClick(Sender: TObject);
+var
+  btn: TSpeedButton;
+begin
+  btn := (Sender as TSpeedButton);
+  if btn = btnNext then
+    FResponseGrid.Row := FResponseGrid.Row + 1
+  else
+    if btn = btnPrev then FResponseGrid.Row := FResponseGrid.Row - 1;
+  InitValuesFromGrid;
 end;
 
 procedure TCookieForm.FormCreate(Sender: TObject);
@@ -86,6 +102,18 @@ begin
         expiresValue.Enabled := data[I] <> '';
       end;
     end;
+
+  EnableNextPrevButtons;
+end;
+
+procedure TCookieForm.EnableNextPrevButtons;
+begin
+  btnPrev.Enabled := True;
+  btnNext.Enabled := True;
+  if FResponseGrid.Row <= 1 then
+    btnPrev.Enabled := False;
+  if FResponseGrid.Row >= FResponseGrid.RowCount - 1 then
+    btnNext.Enabled := False;
 end;
 
 procedure TCookieForm.View;
