@@ -28,9 +28,13 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
-    procedure InitValuesFromGrid(grid: TStringGrid);
+    FResponseGrid: TStringGrid;
+    FRequestGrid: TStringGrid;
+    procedure InitValuesFromGrid;
   public
-    procedure View(grid: TStringGrid);
+    property ResponseGrid: TStringGrid read FResponseGrid write FResponseGrid;
+    property RequestGrid: TStringGrid read FRequestGrid write FRequestGrid;
+    procedure View;
   end;
 
 var
@@ -60,17 +64,17 @@ begin
   cbSecure.Enabled:=False;
 end;
 
-procedure TCookieForm.InitValuesFromGrid(grid: TStringGrid);
+procedure TCookieForm.InitValuesFromGrid;
 var
   I: Integer;
   data: TStrings;
 begin
   cbHttp.Checked := False;
   cbSecure.Checked := False;
-  data := grid.Rows[grid.Row];
+  data := FResponseGrid.Rows[FResponseGrid.Row];
 
-  for I := 0 to grid.Columns.Count - 1 do
-    case LowerCase(grid.Columns.Items[I].Title.Caption) of
+  for I := 0 to FResponseGrid.Columns.Count - 1 do
+    case LowerCase(FResponseGrid.Columns.Items[I].Title.Caption) of
       'name'   : editName.Text := data[I];
       'domain' : editDomain.Text := data[I];
       'path'   : editPath.Text := data[I];
@@ -84,9 +88,9 @@ begin
     end;
 end;
 
-procedure TCookieForm.View(grid: TStringGrid);
+procedure TCookieForm.View;
 begin
-  InitValuesFromGrid(grid);
+  InitValuesFromGrid;
   Show;
 end;
 

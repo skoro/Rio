@@ -229,16 +229,27 @@ var
 begin
   inherited;
   Caption := ApplicationName;
+
+  // Init app configuration.
   C := GetAppConfigFile(False, True);
   PSMAIN.JSONFileName := C;
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
+
   StatusText2.Caption := '';
+
   HeadersEditorForm := THeadersEditorForm.Create(Application);
+
   UpdateHeadersPickList;
+
   gridForm.Cells[0, 1] := '1';
   gridReqCookie.Cells[0, 1] := '1';
+
+  // Init cookie form.
+  CookieForm := TCookieForm.Create(Application);
+  CookieForm.ResponseGrid := gridRespCookie;
+  CookieForm.RequestGrid := gridReqCookie;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -308,11 +319,8 @@ begin
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
-var
-  grid: TStringGrid;
 begin
-  grid := (Sender as TStringGrid);
-  if grid = gridRespCookie then CookieForm.View(grid);
+  CookieForm.View;
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);
