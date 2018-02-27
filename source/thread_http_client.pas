@@ -52,7 +52,7 @@ type
     constructor Create(CreateSuspened: Boolean);
     destructor Destroy; override;
     procedure AddHeader(const AHeader,AValue : String);
-    procedure AddCookie(const AName, AValue : String);
+    procedure AddCookie(const AName, AValue : String; EncodeValue: Boolean = True);
     property Client: TFPHTTPClient read FHttpClient;
     property Method: string read FHttpMethod write SetHttpMethod;
     property Url: string read FUrl write SetUrl;
@@ -63,7 +63,7 @@ type
 
 implementation
 
-uses dateutils;
+uses dateutils, strutils;
 
 { TThreadHttpClient }
 
@@ -159,10 +159,12 @@ begin
   FHttpClient.AddHeader(AHeader, AValue);
 end;
 
-procedure TThreadHttpClient.AddCookie(const AName, AValue: String);
+procedure TThreadHttpClient.AddCookie(const AName, AValue: String; EncodeValue: Boolean = True);
 begin
   if not Assigned(FCookies) then FCookies := TStringList.Create;
-  FCookies.Add(Format('%s=%s', [AName, AValue]));
+  FCookies.Add(Format('%s=%s', [
+    AName, IfThen(EncodeValue, EncodeURLElement(AValue), AValue)
+  ]));
 end;
 
 end.
