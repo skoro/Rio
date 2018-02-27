@@ -208,6 +208,78 @@ object Form1: TForm1
           )
         end
       end
+      object tabRespCookie: TTabSheet
+        Caption = 'Cookie'
+        ClientHeight = 244
+        ClientWidth = 547
+        TabVisible = False
+        object gridRespCookie: TStringGrid
+          Left = 0
+          Height = 244
+          Top = 0
+          Width = 547
+          Align = alClient
+          BorderStyle = bsNone
+          ColCount = 9
+          ColumnClickSorts = True
+          Columns = <          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Name'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Value'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Domain'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Path'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Expires'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Size'
+            end          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Http'
+            end          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Secure'
+            end          
+            item
+              ReadOnly = True
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'SameSite'
+            end>
+          ExtendedSelect = False
+          FixedCols = 0
+          MouseWheelOption = mwGrid
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goSmoothScroll, goRowHighlight]
+          RowCount = 2
+          TabOrder = 0
+          TitleStyle = tsNative
+          OnDblClick = gridRespCookieDblClick
+        end
+      end
       object tabContent: TTabSheet
         Caption = 'Content'
         ClientHeight = 244
@@ -466,6 +538,50 @@ object Form1: TForm1
             32
             259
             259
+          )
+        end
+      end
+      object tabReqCookie: TTabSheet
+        Caption = 'Cookie'
+        ClientHeight = 145
+        ClientWidth = 539
+        object gridReqCookie: TStringGrid
+          Left = 0
+          Height = 145
+          Top = 0
+          Width = 539
+          Align = alClient
+          BorderStyle = bsNone
+          ColCount = 3
+          ColumnClickSorts = True
+          Columns = <          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              MaxSize = 32
+              Title.Caption = ''
+              Width = 32
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Name'
+              Width = 179
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Value'
+              Width = 181
+            end>
+          FixedCols = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
+          PopupMenu = popupGridActions
+          RowCount = 2
+          TabOrder = 0
+          TitleStyle = tsNative
+          OnDblClick = gridRespCookieDblClick
+          ColWidths = (
+            32
+            179
+            181
           )
         end
       end
@@ -766,6 +882,10 @@ object Form1: TForm1
   object popupGridActions: TPopupMenu
     left = 416
     top = 166
+    object gaInsertRow: TMenuItem
+      Caption = 'Insert'
+      OnClick = gaInsertRowClick
+    end
     object gaDeleteRow: TMenuItem
       Caption = 'Delete'
       ShortCut = 16452

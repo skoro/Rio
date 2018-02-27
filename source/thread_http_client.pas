@@ -39,6 +39,7 @@ type
     FException: Exception;
     FStartTime: TDateTime;
     FFinishTime: TDateTime;
+    FCookies: TStrings;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
     procedure SetRequestBody(AValue: TStream);
@@ -51,6 +52,8 @@ type
     constructor Create(CreateSuspened: Boolean);
     destructor Destroy; override;
     procedure AddHeader(const AHeader,AValue : String);
+    procedure AddCookie(const AName, AValue : String; EncodeValue: Boolean = True);
+    property Client: TFPHTTPClient read FHttpClient;
     property Method: string read FHttpMethod write SetHttpMethod;
     property Url: string read FUrl write SetUrl;
     property RequestBody: TStream read GetRequestBody write SetRequestBody;
@@ -60,7 +63,7 @@ type
 
 implementation
 
-uses dateutils;
+uses dateutils, strutils;
 
 { TThreadHttpClient }
 
@@ -117,6 +120,7 @@ end;
 procedure TThreadHttpClient.Execute;
 begin
   try
+    if Assigned(FCookies) then FHttpClient.Cookies := FCookies;
     FStartTime := Now;
     FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
     FFinishTime := Now;
@@ -138,10 +142,12 @@ begin
   FResponseData := TStringStream.Create('');
   FOnClientException:=nil;
   FOnRequestComplete:=nil;
+  FCookies:=nil;
 end;
 
 destructor TThreadHttpClient.Destroy;
 begin
+  if Assigned(FCookies) then FCookies.Free;
   FHttpClient.RequestBody.Free;
   FreeAndNil(FHttpClient);
   FreeAndNil(FResponseData);
@@ -151,6 +157,14 @@ end;
 procedure TThreadHttpClient.AddHeader(const AHeader, AValue: String);
 begin
   FHttpClient.AddHeader(AHeader, AValue);
+end;
+
+procedure TThreadHttpClient.AddCookie(const AName, AValue: String; EncodeValue: Boolean = True);
+begin
+  if not Assigned(FCookies) then FCookies := TStringList.Create;
+  FCookies.Add(Format('%s=%s', [
+    AName, IfThen(EncodeValue, EncodeURLElement(AValue), AValue)
+  ]));
 end;
 
 end.

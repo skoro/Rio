@@ -19,6 +19,7 @@ type
     cbMethod: TComboBox;
     cbUrl: TComboBox;
     gridForm: TStringGrid;
+    gaInsertRow: TMenuItem;
     miNew: TMenuItem;
     Panel1: TPanel;
     pagesRequest: TPageControl;
@@ -49,20 +50,26 @@ type
     MenuItem6: TMenuItem;
     responseHeaders: TStringGrid;
     responseRaw: TMemo;
+    gridRespCookie: TStringGrid;
+    gridReqCookie: TStringGrid;
     tabContent: TTabSheet;
     tabForm: TTabSheet;
     tabJson: TTabSheet;
     tabResponse: TTabSheet;
     tabHeaders: TTabSheet;
     tabBody: TTabSheet;
+    tabRespCookie: TTabSheet;
+    tabReqCookie: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gaClearRowsClick(Sender: TObject);
+    procedure gaInsertRowClick(Sender: TObject);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
+    procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
@@ -83,11 +90,13 @@ type
     procedure JsonDocument(json: string);
     procedure ShowJsonDocument;
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
-    function ParseHeaderLine(line: string): TKeyValuePair;
+    function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
+    procedure ShowResponseCookie(Headers: TStrings);
+    function GetRequestCookies: TStrings;
   public
 
   end;
@@ -97,7 +106,7 @@ var
 
 implementation
 
-uses lcltype, jsonparser, about, headers_editor;
+uses lcltype, jsonparser, about, headers_editor, cookie_form;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -192,6 +201,16 @@ begin
     requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', key, value]);
   end;
 
+  // Set request cookies
+  for I := 1 to gridReqCookie.RowCount - 1 do
+  begin
+    if gridReqCookie.Cells[0, I] = '0' then continue;
+    key := Trim(gridReqCookie.Cells[1, I]);
+    if key = '' then continue;
+    value := gridReqCookie.Cells[2, I];
+    FHttpClient.AddCookie(key, value);
+  end;
+
   UpdateStatusLine('Waiting for the response...');
 
   FHttpClient.Url := url;
@@ -210,15 +229,27 @@ var
 begin
   inherited;
   Caption := ApplicationName;
+
+  // Init app configuration.
   C := GetAppConfigFile(False, True);
   PSMAIN.JSONFileName := C;
   C := ExtractFilePath(C);
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
+
   StatusText2.Caption := '';
+
   HeadersEditorForm := THeadersEditorForm.Create(Application);
+
   UpdateHeadersPickList;
+
   gridForm.Cells[0, 1] := '1';
+  gridReqCookie.Cells[0, 1] := '1';
+
+  // Init cookie form.
+  CookieForm := TCookieForm.Create(Application);
+  CookieForm.ResponseGrid := gridRespCookie;
+  CookieForm.RequestGrid := gridReqCookie;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -264,11 +295,32 @@ begin
     end;
 end;
 
+procedure TForm1.gaInsertRowClick(Sender: TObject);
+var
+  Component: TComponent;
+  Grid: TStringGrid;
+begin
+  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  if not (Component is TStringGrid) then Exit; // =>
+
+  Grid := (Component as TStringGrid);
+  if Grid = requestHeaders then
+    miInsertHeaderClick(Grid)
+  else
+    if (Grid = gridForm) or (Grid = gridReqCookie) then
+      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
+end;
+
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
   tIndex: Integer);
 begin
   // New inserted columns with "On" checked by default.
   (Sender as TStringGrid).Cells[0, sIndex] := '1';
+end;
+
+procedure TForm1.gridRespCookieDblClick(Sender: TObject);
+begin
+  CookieForm.View;
 end;
 
 procedure TForm1.JsonTreeClick(Sender: TObject);
@@ -413,6 +465,9 @@ begin
   SetColumn(gridForm, 1);
   SetColumn(gridForm, 2);
   SetColumn(gridForm, 3);
+  SetColumn(gridReqCookie, 1);
+  SetColumn(gridReqCookie, 2);
+  SetColumn(gridReqCookie, 3);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -427,6 +482,7 @@ begin
   SaveColumns(requestHeaders);
   SaveColumns(gridForm);
   SaveColumns(responseHeaders);
+  SaveColumns(gridReqCookie);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -556,11 +612,11 @@ begin
   end;
 end;
 
-function TForm1.ParseHeaderLine(line: string): TKeyValuePair;
+function TForm1.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
 var
   p: integer;
 begin
-  p := Pos(':', line);
+  p := Pos(delim, line);
   if p = 0 then
   begin
     Result.Key := line;
@@ -570,7 +626,7 @@ begin
   Result.Key := LeftStr(line, p - 1);
   Result.Value := Trim(RightStr(line, Length(line) - p));
   p := Pos(';', Result.Value);
-  if p <> 0 then Result.Value := Trim(LeftStr(Result.Value, p - 1));
+  if (not all) and (p <> 0) then Result.Value := Trim(LeftStr(Result.Value, p - 1));
 end;
 
 procedure TForm1.UpdateHeadersPickList;
@@ -633,6 +689,9 @@ begin
     cbUrl.Items.Insert(0, Info.Url);
   end;
 
+  // Fill response cookie grid or hide it.
+  ShowResponseCookie(Info.ResponseHeaders);
+
   if FContentType = 'application/json' then JsonDocument(responseRaw.Text)
   else begin
     tabJson.TabVisible := False;
@@ -660,6 +719,94 @@ begin
     StatusText2.Visible := True;
     StatusText2.Caption := Text2;
   end;
+end;
+
+procedure TForm1.ShowResponseCookie(Headers: TStrings);
+var
+  I, J, Row, Size: Integer;
+  kv: TKeyValuePair;
+  tokens: TStringList;
+  tok: String;
+begin
+  Row := 1;
+  tokens := TStringList.Create;
+  tokens.Delimiter := ';';
+  tokens.StrictDelimiter := True;
+
+  try
+    for I := 0 to Headers.Count - 1 do begin
+      kv := ParseHeaderLine(Headers.Strings[I], ':', True);
+      if LowerCase(kv.Key) = 'set-cookie' then begin
+        gridRespCookie.RowCount := Row + 1;
+        tokens.DelimitedText := kv.Value;
+        Size := 0;
+        // Reset grid.
+        for J := 0 to gridRespCookie.ColCount - 1 do
+          if (J = 6) or (J = 7) then
+            gridRespCookie.Cells[J, Row] := '0'
+          else
+            gridRespCookie.Cells[J, Row] := '';
+        // Fill grid.
+        for J := 0 to tokens.Count - 1 do begin
+          tok := Trim(tokens.Strings[J]);
+          kv := ParseHeaderLine(tok, '=');
+          // Cookie name and value
+          if J = 0 then begin
+            gridRespCookie.Cells[0, Row] := kv.Key;
+            gridRespCookie.Cells[1, Row] := kv.Value;
+            Size := Length(kv.Value); // Cookie size
+          end
+          else
+            case LowerCase(kv.Key) of
+              'domain'  : gridRespCookie.Cells[2, Row] := kv.Value;
+              'path'    : gridRespCookie.Cells[3, Row] := kv.Value;
+              'expires' : gridRespCookie.Cells[4, Row] := kv.Value;
+              'httponly': gridRespCookie.Cells[6, Row] := '1';
+              'secure'  : gridRespCookie.Cells[7, Row] := '1';
+              'samesite': gridRespCookie.Cells[8, Row] := kv.Value;
+            end;
+        end; // for
+        // Cookie size
+        gridRespCookie.Cells[5, Row] := IntToStr(Size);
+        Inc(Row);
+      end;
+    end; // for
+  finally
+    tokens.Free;
+  end;
+
+  if Row > 1 then tabRespCookie.TabVisible := True
+    else tabRespCookie.TabVisible := False;
+end;
+
+function TForm1.GetRequestCookies: TStrings;
+var
+  I: Integer;
+  CookieName, Value, Line: string;
+begin
+  Result := TStringList.Create;
+
+  for I := 1 to gridReqCookie.RowCount - 1 do
+  begin
+    if gridReqCookie.Cells[0, i] = '0' then Continue; // Skip disabled cookie.
+    CookieName := Trim(gridReqCookie.Cells[1, I]);
+    if CookieName = '' then Continue;
+    Value := Trim(gridReqCookie.Cells[2, I]);
+    if Value = '' then Continue;
+    Line := Format('%s=%s', [CookieName, Value]);
+    if Trim(gridReqCookie.Cells[3, I]) <> '' then
+      Line := Line + '; domain=' + Trim(gridReqCookie.Cells[3, I]);
+    if Trim(gridReqCookie.Cells[4, I]) <> '' then
+      Line := Line + '; path=' + Trim(gridReqCookie.Cells[4, I]);
+    if Trim(gridReqCookie.Cells[5, I]) <> '' then
+      Line := Line + '; expires=' + Trim(gridReqCookie.Cells[5, I]);
+    if gridReqCookie.Cells[6, I] = '1' then
+      Line := Line + '; HttpOnly';
+    if gridReqCookie.Cells[7, I] = '1' then
+      Line := Line + '; Secure';
+    Result.Add(Line);
+  end;
+
 end;
 
 end.
