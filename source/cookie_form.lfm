@@ -9,7 +9,9 @@ object CookieForm: TCookieForm
   ClientWidth = 280
   Constraints.MinHeight = 360
   Constraints.MinWidth = 280
+  KeyPreview = True
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
   ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel

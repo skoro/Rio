@@ -6,7 +6,7 @@ interface
 
 uses
   Forms,
-  ExtCtrls, StdCtrls, Classes, Grids, Buttons;
+  ExtCtrls, StdCtrls, Classes, Grids, Buttons, Controls;
 
 type
 
@@ -30,6 +30,7 @@ type
     procedure btnNextClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FResponseGrid: TStringGrid;
     FRequestGrid: TStringGrid;
@@ -46,7 +47,7 @@ var
 
 implementation
 
-uses SysUtils, strutils;
+uses SysUtils, strutils, dialogs;
 
 {$R *.lfm}
 
@@ -78,6 +79,17 @@ begin
   expiresValue.ReadOnly:=True;
   cbHttp.Enabled:=False;
   cbSecure.Enabled:=False;
+end;
+
+procedure TCookieForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if key = 27 then // Escape
+    Close
+  else // Alt - Left
+    if (Shift = [ssAlt]) and (key = 37) then btnNextClick(btnPrev)
+  else // Alt - Right
+  if (Shift = [ssAlt]) and (key = 39) then btnNextClick(btnNext);
 end;
 
 procedure TCookieForm.InitValuesFromGrid;
