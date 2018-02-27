@@ -30,6 +30,7 @@ object CookieForm: TCookieForm
       Top = 256
       Width = 265
       Anchors = [akTop, akLeft, akRight, akBottom]
+      ScrollBars = ssAutoBoth
       TabOrder = 0
     end
     object editName: TLabeledEdit
