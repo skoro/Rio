@@ -112,6 +112,12 @@ var
 begin
   cbHttp.Checked := False;
   cbSecure.Checked := False;
+  editName.Text := '';
+  editDomain.Text := '';
+  editPath.Text := '';
+  memoValue.Text := '';
+  expiresValue.Text := '';
+
   data := FResponseGrid.Rows[FResponseGrid.Row];
 
   for I := 0 to FResponseGrid.Columns.Count - 1 do
