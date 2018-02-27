@@ -740,8 +740,13 @@ begin
         gridRespCookie.RowCount := Row + 1;
         tokens.DelimitedText := kv.Value;
         Size := 0;
-        gridRespCookie.Cells[6, Row] := '0';
-        gridRespCookie.Cells[7, Row] := '0';
+        // Reset grid.
+        for J := 0 to gridRespCookie.ColCount - 1 do
+          if (J = 6) or (J = 7) then
+            gridRespCookie.Cells[J, Row] := '0'
+          else
+            gridRespCookie.Cells[J, Row] := '';
+        // Fill grid.
         for J := 0 to tokens.Count - 1 do begin
           tok := Trim(tokens.Strings[J]);
           kv := ParseHeaderLine(tok, '=');
