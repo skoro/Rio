@@ -900,4 +900,8 @@ object Form1: TForm1
       OnClick = gaClearRowsClick
     end
   end
+  object dlgSave: TSaveDialog
+    left = 203
+    top = 163
+  end
 end

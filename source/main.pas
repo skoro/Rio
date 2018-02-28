@@ -26,6 +26,7 @@ type
     pagesRequest: TPageControl;
     PostText: TMemo;
     requestHeaders: TStringGrid;
+    dlgSave: TSaveDialog;
     Splitter1: TSplitter;
     StatusImage1: TImage;
     jsImages: TImageList;
@@ -107,7 +108,7 @@ var
 
 implementation
 
-uses lcltype, jsonparser, about, headers_editor, cookie_form;
+uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -441,8 +442,23 @@ begin
 end;
 
 procedure TForm1.miSaveResponseClick(Sender: TObject);
+var
+  uri: TURI;
+  ext: string;
 begin
+  ext := '';
 
+  case FContentType of
+    'text/html': ext := '.html';
+    'application/json': ext := '.json';
+  end;
+
+  uri := ParseURI(cbUrl.Text);
+  dlgSave.FileName := uri.Host + ext;
+
+  if dlgSave.Execute then begin
+    responseRaw.Lines.SaveToFile(dlgSave.FileName);
+  end;
 end;
 
 procedure TForm1.miTreeExpandClick(Sender: TObject);
