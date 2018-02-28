@@ -20,6 +20,7 @@ type
     cbUrl: TComboBox;
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
+    miSaveResponse: TMenuItem;
     miNew: TMenuItem;
     Panel1: TPanel;
     pagesRequest: TPageControl;
@@ -76,6 +77,7 @@ type
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure gaDeleteRowClick(Sender: TObject);
+    procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
@@ -236,7 +238,9 @@ begin
   if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
 
+  // Form components defaults.
   StatusText2.Caption := '';
+  miSaveResponse.Enabled := False;
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
 
@@ -403,6 +407,7 @@ begin
     tabJson.TabVisible := False;
   end;
   pagesResponse.ActivePage := tabResponse;
+  miSaveResponse.Enabled := False;
 end;
 
 procedure TForm1.miQuitClick(Sender: TObject);
@@ -433,6 +438,11 @@ begin
         Cells[1, 1] := '';
         Cells[2, 1] := '';
       end;
+end;
+
+procedure TForm1.miSaveResponseClick(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.miTreeExpandClick(Sender: TObject);
@@ -690,6 +700,9 @@ begin
 
   // Fill response cookie grid or hide it.
   ShowResponseCookie(Info.ResponseHeaders);
+
+  // Get the response content - enable menu item.
+  miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
 
   if FContentType = 'application/json' then JsonDocument(responseRaw.Text)
   else begin
