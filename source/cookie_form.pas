@@ -6,7 +6,7 @@ interface
 
 uses
   Forms,
-  ExtCtrls, StdCtrls, Classes, Grids, Buttons, Controls;
+  ExtCtrls, StdCtrls, Classes, Grids, Buttons;
 
 type
 
@@ -49,7 +49,7 @@ var
 
 implementation
 
-uses SysUtils, strutils, dialogs;
+uses SysUtils, strutils;
 
 {$R *.lfm}
 
