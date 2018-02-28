@@ -753,7 +753,7 @@ begin
           // Cookie name and value
           if J = 0 then begin
             gridRespCookie.Cells[0, Row] := kv.Key;
-            gridRespCookie.Cells[1, Row] := kv.Value;
+            gridRespCookie.Cells[1, Row] := DecodeURL(kv.Value);
             Size := Length(kv.Value); // Cookie size
           end
           else

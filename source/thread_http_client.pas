@@ -61,9 +61,17 @@ type
     property OnException: TOnException read FOnClientException write FOnClientException;
   end;
 
+  function DecodeUrl(const url: string): string;
+
 implementation
 
 uses dateutils, strutils;
+
+function DecodeUrl(const url: string): string;
+begin
+  Result := ReplaceStr(url, '+', ' ');
+  Result := DecodeURLElement(Result);
+end;
 
 { TThreadHttpClient }
 
