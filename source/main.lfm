@@ -605,6 +605,11 @@ object Form1: TForm1
         ShortCut = 16462
         OnClick = miNewClick
       end
+      object miSaveRequest: TMenuItem
+        Caption = 'Save request...'
+        ShortCut = 16467
+        OnClick = miSaveRequestClick
+      end
       object miSaveResponse: TMenuItem
         Caption = 'Save response...'
         ShortCut = 113

@@ -20,6 +20,7 @@ type
     cbUrl: TComboBox;
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
+    miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
     miNew: TMenuItem;
     Panel1: TPanel;
@@ -78,6 +79,7 @@ type
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure gaDeleteRowClick(Sender: TObject);
+    procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
@@ -440,6 +442,11 @@ begin
         Cells[1, 1] := '';
         Cells[2, 1] := '';
       end;
+end;
+
+procedure TForm1.miSaveRequestClick(Sender: TObject);
+begin
+
 end;
 
 procedure TForm1.miSaveResponseClick(Sender: TObject);
