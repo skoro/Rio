@@ -55,11 +55,16 @@ uses LCLType;
 
 { THeadersEditorForm }
 
-const DEFAULT_HEADERS : array [1..5, 1..2] of string = (
+const DEFAULT_HEADERS : array [1..10, 1..2] of string = (
       ('Content-Type', 'text/html'),
       ('Content-Type', 'application/json'),
       ('Content-Type', 'application/x-www-form-urlencoded'),
       ('Content-Type', 'multipart/form-data'),
+      ('Cache-Control', 'no-cache'),
+      ('Pragma', 'no-cache'),
+      ('Referer', ''),
+      ('User-Agent', ''),
+      ('Accept', 'text/html'),
       ('X-Requested-With', 'XMLHttpRequest')
 );
 
