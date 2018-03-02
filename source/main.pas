@@ -101,7 +101,7 @@ type
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
     procedure ShowResponseCookie(Headers: TStrings);
-    function GetRequestFilename: string;
+    function GetRequestFilename(ext: string = ''): string;
   public
 
   end;
@@ -111,7 +111,8 @@ var
 
 implementation
 
-uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser;
+uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
+  request_object, fpjsonrtti;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -445,8 +446,30 @@ begin
 end;
 
 procedure TForm1.miSaveRequestClick(Sender: TObject);
+var
+  obj: TRequestObject;
+  streamer: TJSONStreamer;
+  json: string;
 begin
+  obj := TRequestObject.Create;
+  streamer := TJSONStreamer.Create(nil);
 
+  try
+    obj.Url := cbUrl.Text;
+    obj.Method := cbMethod.Text;
+    obj.Body := PostText.Text;
+    json := streamer.ObjectToJSONString(obj);
+    ShowMessage(json);
+  finally
+    obj.Free;
+    streamer.Free;
+  end;
+
+  dlgSave.FileName := GetRequestFilename('req');
+
+  if dlgSave.Execute then begin
+
+  end;
 end;
 
 procedure TForm1.miSaveResponseClick(Sender: TObject);
@@ -804,23 +827,22 @@ begin
     else tabRespCookie.TabVisible := False;
 end;
 
-function TForm1.GetRequestFilename: string;
+function TForm1.GetRequestFilename(ext: string): string;
 var
   uri: TURI;
-  ext: string;
 begin
   if Trim(cbUrl.Text) = '' then
     raise Exception.Create('Url is missing. Cannot create filename.');
 
-  ext := '.response';
-
-  case FContentType of
-    'text/html': ext := 'html';
-    'text/plain': ext := 'txt';
-    'application/json': ext := 'json';
-    'application/javascript': ext := 'js';
-    'application/xml': ext := 'xml';
-  end;
+  if ext = '' then
+    case FContentType of
+      'text/html': ext := 'html';
+      'text/plain': ext := 'txt';
+      'application/json': ext := 'json';
+      'application/javascript': ext := 'js';
+      'application/xml': ext := 'xml';
+      else ext := 'response';
+    end;
 
   uri := ParseURI(cbUrl.Text);
   Result := Format('%s.%s', [uri.Host, ext]);
