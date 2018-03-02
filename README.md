@@ -9,6 +9,7 @@ analyse its responses.
 Keyboard:
 
 * `F9` submits a request.
+* `F2` saves a request content to a file.
 * `Control-N` starts a new request.
 * `Control-L` moves focus to the url text field.
 * `Control-P` moves focus to the request methods dropdown list.
