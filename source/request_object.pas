@@ -5,7 +5,7 @@ unit request_object;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Grids;
 
 type
 
@@ -35,10 +35,13 @@ type
     FForm: TCollection;
     FCookies: TCollection;
   protected
-
+    procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
   public
     constructor Create;
     destructor Destroy; override;
+    procedure SetHeadersFromGrid(grid: TStringGrid);
+    procedure SetFormFromGrid(grid: TStringGrid);
+    procedure SetCookiesFromGrid(grid: TStringGrid);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
@@ -54,6 +57,23 @@ implementation
 
 { TRequestObject }
 
+procedure TRequestObject.SetCollectionFromGrid(Grid: TStringGrid;
+  coll: TCollection);
+var
+  I: Integer;
+  name: string;
+  item: TRequestParamItem;
+begin
+  for I := 1 to grid.RowCount - 1 do begin
+    name := trim(grid.Cells[1, I]);
+    if name = '' then continue;
+    item := TRequestParamItem(coll.Add);
+    item.Enabled := grid.cells[0, i] = '1';
+    item.Name := grid.cells[1, i];
+    item.Value := grid.cells[2, i];
+  end;
+end;
+
 constructor TRequestObject.Create;
 begin
   inherited Create;
@@ -68,6 +88,21 @@ begin
   FForm.Free;
   FCookies.Free;
   inherited Destroy;
+end;
+
+procedure TRequestObject.SetHeadersFromGrid(grid: TStringGrid);
+begin
+  SetCollectionFromGrid(grid, FHeaders);
+end;
+
+procedure TRequestObject.SetFormFromGrid(grid: TStringGrid);
+begin
+  SetCollectionFromGrid(grid, FForm);
+end;
+
+procedure TRequestObject.SetCookiesFromGrid(grid: TStringGrid);
+begin
+  SetCollectionFromGrid(grid, FCookies);
 end;
 
 end.

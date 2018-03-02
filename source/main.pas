@@ -450,6 +450,7 @@ var
   obj: TRequestObject;
   streamer: TJSONStreamer;
   json: string;
+  output: TFileStream;
 begin
   obj := TRequestObject.Create;
   streamer := TJSONStreamer.Create(nil);
@@ -458,17 +459,24 @@ begin
     obj.Url := cbUrl.Text;
     obj.Method := cbMethod.Text;
     obj.Body := PostText.Text;
+    obj.SetHeadersFromGrid(requestHeaders);
+    obj.SetFormFromGrid(gridForm);
+    obj.SetCookiesFromGrid(gridReqCookie);
     json := streamer.ObjectToJSONString(obj);
-    ShowMessage(json);
+    dlgSave.FileName := GetRequestFilename('request.json');
+    if dlgSave.Execute then begin
+      try
+        output := TFileStream.Create(dlgSave.FileName, fmCreate);
+        output.WriteAnsiString(Utf8ToAnsi(json));
+        output.Free;
+      except
+        on E: Exception do
+          ShowMessage(Format('Cannot create "%s": %s', [dlgSave.FileName, E.Message]));
+      end;
+    end;
   finally
     obj.Free;
     streamer.Free;
-  end;
-
-  dlgSave.FileName := GetRequestFilename('req');
-
-  if dlgSave.Execute then begin
-
   end;
 end;
 
