@@ -99,6 +99,7 @@ type
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
     procedure ShowResponseCookie(Headers: TStrings);
+    function GetRequestFilename: string;
   public
 
   end;
@@ -442,19 +443,8 @@ begin
 end;
 
 procedure TForm1.miSaveResponseClick(Sender: TObject);
-var
-  uri: TURI;
-  ext: string;
 begin
-  ext := '';
-
-  case FContentType of
-    'text/html': ext := '.html';
-    'application/json': ext := '.json';
-  end;
-
-  uri := ParseURI(cbUrl.Text);
-  dlgSave.FileName := uri.Host + ext;
+  dlgSave.FileName := GetRequestFilename;
 
   if dlgSave.Execute then begin
     responseRaw.Lines.SaveToFile(dlgSave.FileName);
@@ -805,6 +795,28 @@ begin
 
   if Row > 1 then tabRespCookie.TabVisible := True
     else tabRespCookie.TabVisible := False;
+end;
+
+function TForm1.GetRequestFilename: string;
+var
+  uri: TURI;
+  ext: string;
+begin
+  if Trim(cbUrl.Text) = '' then
+    raise Exception.Create('Url is missing. Cannot create filename.');
+
+  ext := '.response';
+
+  case FContentType of
+    'text/html': ext := 'html';
+    'text/plain': ext := 'txt';
+    'application/json': ext := 'json';
+    'application/javascript': ext := 'js';
+    'application/xml': ext := 'xml';
+  end;
+
+  uri := ParseURI(cbUrl.Text);
+  Result := Format('%s.%s', [uri.Host, ext]);
 end;
 
 end.
