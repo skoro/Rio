@@ -6,7 +6,7 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Forms, datetimectrls, Interfaces, main, cookie_form;
+  Forms, Interfaces, main;
 
 {$R *.res}
 
