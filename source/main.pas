@@ -375,9 +375,33 @@ begin
 end;
 
 procedure TForm1.miOpenRequestClick(Sender: TObject);
+var
+  jsonStr: string;
+  streamer: TJSONDeStreamer;
+  obj: TRequestObject;
 begin
   if not PromptNewRequest('Do you want to open request file ?', 'Open request file') then Exit;
+
   if dlgOpen.Execute then begin
+
+    if not FileGetContents(dlgOpen.FileName, jsonStr) then begin
+      ShowMessage('Cannot read file ' + dlgOpen.FileName);
+      Exit;
+    end;
+
+    StartNewRequest;
+    streamer := TJSONDeStreamer.Create(nil);
+    obj := TRequestObject.Create;
+
+    try
+      streamer.JSONToObject(jsonStr, obj);
+      cbUrl.Text := obj.Url;
+      cbMethod.Text := obj.Method;
+      PostText.Text := obj.Body;
+    finally
+      streamer.Free;
+      obj.Free;
+    end;
 
   end;
 end;
