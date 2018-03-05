@@ -906,6 +906,7 @@ object Form1: TForm1
     end
   end
   object dlgSave: TSaveDialog
+    Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
     left = 203
     top = 163
   end
