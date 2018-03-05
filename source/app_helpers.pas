@@ -10,10 +10,10 @@ interface
 uses
   Classes, SysUtils;
 
-{
-  Save string contents to a file.
-}
+{ Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
+{ Load string contents from a file }
+function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
 
 implementation
 
@@ -28,6 +28,21 @@ begin
     Result := True;
   finally
     fs.Free;
+  end;
+end;
+
+function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
+var
+  str: TStringList;
+begin
+  Result := False;
+  try
+    str := TStringList.Create;
+    str.LoadFromFile(filename);
+    buffer := str.Text;
+    Result := True;
+  finally
+    str.Free;
   end;
 end;
 
