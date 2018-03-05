@@ -20,9 +20,11 @@ type
     cbUrl: TComboBox;
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
+    miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
     miNew: TMenuItem;
+    dlgOpen: TOpenDialog;
     Panel1: TPanel;
     pagesRequest: TPageControl;
     PostText: TMemo;
@@ -34,7 +36,7 @@ type
     JsonTree: TTreeView;
     StatusText1: TLabel;
     StatusText2: TLabel;
-    MenuItem4: TMenuItem;
+    miEdit: TMenuItem;
     gaClearRows: TMenuItem;
     miInsertHeader: TMenuItem;
     gaDeleteRow: TMenuItem;
@@ -43,10 +45,10 @@ type
     Panel2: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
-    MainMenu1: TMainMenu;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
+    AppMenu: TMainMenu;
+    miFile: TMenuItem;
+    miHelp: TMenuItem;
+    miView: TMenuItem;
     miTreeExpand: TMenuItem;
     miQuit: TMenuItem;
     miAbout: TMenuItem;
@@ -76,6 +78,7 @@ type
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
+    procedure miOpenRequestClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure gaDeleteRowClick(Sender: TObject);
@@ -102,6 +105,8 @@ type
     procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
     procedure ShowResponseCookie(Headers: TStrings);
     function GetRequestFilename(ext: string = ''): string;
+    function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
+    procedure StartNewRequest;
   public
 
   end;
@@ -364,55 +369,17 @@ begin
 end;
 
 procedure TForm1.miNewClick(Sender: TObject);
-var
-  NeedConfirm: Boolean;
-  I: Integer;
-  function IsGridFilled(grid: TStringGrid): Boolean;
-  var I: Integer;
-  begin
-    Result := False;
-    for I := 1 to grid.RowCount - 1 do
-      if (Trim(grid.Cells[1, I]) <> '') or (Trim(grid.Cells[2, I]) <> '') then Exit(True);
-  end;
 begin
-  // Is confirmation needed ?
-  NeedConfirm := False;
-  // Check body post data.
-  if Trim(PostText.Text) <> '' then NeedConfirm := True;
-  // Check grids.
-  if not NeedConfirm then NeedConfirm := IsGridFilled(requestHeaders);
-  if not NeedConfirm then NeedConfirm := IsGridFilled(gridForm);
+  if PromptNewRequest('Are you sure to start a new request ?') then
+    StartNewRequest;
+end;
 
-  if NeedConfirm then
-  begin
-    I := Application.MessageBox('Are you sure to start a new request ?', 'New', MB_ICONQUESTION + MB_YESNO);
-    if I = IDNO then Exit; // =>
+procedure TForm1.miOpenRequestClick(Sender: TObject);
+begin
+  if not PromptNewRequest('Do you want to open request file ?', 'Open request file') then Exit;
+  if dlgOpen.Execute then begin
+
   end;
-
-  // Reset fields to start a new request.
-  // Request fields.
-  cbUrl.Text := '';
-  cbMethod.Text := 'GET';
-  PostText.Text := '';
-  requestHeaders.RowCount := 2;
-  requestHeaders.Cells[0, 1] := '1';
-  requestHeaders.Cells[1, 1] := '';
-  requestHeaders.Cells[2, 1] := '';
-  gridForm.RowCount := 2;
-  gridForm.Cells[0, 1] := '1';
-  gridForm.Cells[1, 1] := '';
-  gridForm.Cells[2, 1] := '';
-
-  // Response fields.
-  responseHeaders.RowCount := 1;
-  responseRaw.Text := '';
-  if tabJson.TabVisible then
-  begin
-    JsonTree.Items.Clear;
-    tabJson.TabVisible := False;
-  end;
-  pagesResponse.ActivePage := tabResponse;
-  miSaveResponse.Enabled := False;
 end;
 
 procedure TForm1.miQuitClick(Sender: TObject);
@@ -846,6 +813,62 @@ begin
 
   uri := ParseURI(cbUrl.Text);
   Result := Format('%s.%s', [uri.Host, ext]);
+end;
+
+function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
+var
+  NeedConfirm: Boolean;
+  I: Integer;
+  function IsGridFilled(grid: TStringGrid): Boolean;
+  var I: Integer;
+  begin
+    Result := False;
+    for I := 1 to grid.RowCount - 1 do
+      if (Trim(grid.Cells[1, I]) <> '') or (Trim(grid.Cells[2, I]) <> '') then Exit(True);
+  end;
+begin
+  // Is confirmation needed ?
+  NeedConfirm := False;
+  // Check body post data.
+  if Trim(PostText.Text) <> '' then NeedConfirm := True;
+  // Check grids.
+  if not NeedConfirm then NeedConfirm := IsGridFilled(requestHeaders);
+  if not NeedConfirm then NeedConfirm := IsGridFilled(gridForm);
+
+  if NeedConfirm then
+  begin
+    I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
+    if I = IDNO then Exit(False); // =>
+  end;
+
+  Result := True;
+end;
+
+procedure TForm1.StartNewRequest;
+begin
+  // Request fields.
+  cbUrl.Text := '';
+  cbMethod.Text := 'GET';
+  PostText.Text := '';
+  requestHeaders.RowCount := 2;
+  requestHeaders.Cells[0, 1] := '1';
+  requestHeaders.Cells[1, 1] := '';
+  requestHeaders.Cells[2, 1] := '';
+  gridForm.RowCount := 2;
+  gridForm.Cells[0, 1] := '1';
+  gridForm.Cells[1, 1] := '';
+  gridForm.Cells[2, 1] := '';
+
+  // Response fields.
+  responseHeaders.RowCount := 1;
+  responseRaw.Text := '';
+  if tabJson.TabVisible then
+  begin
+    JsonTree.Items.Clear;
+    tabJson.TabVisible := False;
+  end;
+  pagesResponse.ActivePage := tabResponse;
+  miSaveResponse.Enabled := False;
 end;
 
 end.

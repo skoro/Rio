@@ -144,7 +144,7 @@ object Form1: TForm1
     0000
   }
   KeyPreview = True
-  Menu = MainMenu1
+  Menu = AppMenu
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
@@ -595,15 +595,20 @@ object Form1: TForm1
     Align = alTop
     ResizeAnchor = akTop
   end
-  object MainMenu1: TMainMenu
+  object AppMenu: TMainMenu
     left = 105
     top = 163
-    object MenuItem1: TMenuItem
+    object miFile: TMenuItem
       Caption = '&File'
       object miNew: TMenuItem
         Caption = 'New'
         ShortCut = 16462
         OnClick = miNewClick
+      end
+      object miOpenRequest: TMenuItem
+        Caption = 'Open request...'
+        ShortCut = 16463
+        OnClick = miOpenRequestClick
       end
       object miSaveRequest: TMenuItem
         Caption = 'Save request...'
@@ -624,7 +629,7 @@ object Form1: TForm1
         OnClick = miQuitClick
       end
     end
-    object MenuItem4: TMenuItem
+    object miEdit: TMenuItem
       Caption = '&Edit'
       object miInsertHeader: TMenuItem
         Caption = '&Insert header...'
@@ -632,7 +637,7 @@ object Form1: TForm1
         OnClick = miInsertHeaderClick
       end
     end
-    object MenuItem3: TMenuItem
+    object miView: TMenuItem
       Caption = '&View'
       object miTreeExpand: TMenuItem
         Caption = 'Collapse/&Expand tree'
@@ -641,7 +646,7 @@ object Form1: TForm1
         OnClick = miTreeExpandClick
       end
     end
-    object MenuItem2: TMenuItem
+    object miHelp: TMenuItem
       Caption = '&Help'
       object miAbout: TMenuItem
         Caption = 'About...'
@@ -885,12 +890,12 @@ object Form1: TForm1
     Formatted = True
     OnSavingProperties = PSMAINSavingProperties
     OnRestoringProperties = PSMAINRestoringProperties
-    left = 302
-    top = 166
+    left = 320
+    top = 163
   end
   object popupGridActions: TPopupMenu
     left = 416
-    top = 166
+    top = 163
     object gaInsertRow: TMenuItem
       Caption = 'Insert'
       OnClick = gaInsertRowClick
@@ -908,6 +913,10 @@ object Form1: TForm1
   object dlgSave: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
     left = 203
+    top = 163
+  end
+  object dlgOpen: TOpenDialog
+    left = 257
     top = 163
   end
 end
