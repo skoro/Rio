@@ -112,7 +112,7 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, fpjsonrtti;
+  request_object, app_helpers, fpjsonrtti;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -450,7 +450,6 @@ var
   obj: TRequestObject;
   streamer: TJSONStreamer;
   json: string;
-  output: TFileStream;
 begin
   obj := TRequestObject.Create;
   streamer := TJSONStreamer.Create(nil);
@@ -464,16 +463,9 @@ begin
     obj.SetCookiesFromGrid(gridReqCookie);
     json := streamer.ObjectToJSONString(obj);
     dlgSave.FileName := GetRequestFilename('request.json');
-    if dlgSave.Execute then begin
-      try
-        output := TFileStream.Create(dlgSave.FileName, fmCreate);
-        output.WriteAnsiString(Utf8ToAnsi(json));
-        output.Free;
-      except
-        on E: Exception do
-          ShowMessage(Format('Cannot create "%s": %s', [dlgSave.FileName, E.Message]));
-      end;
-    end;
+    if dlgSave.Execute then
+      if not FilePutContents(dlgSave.Filename, json) then
+        ShowMessage('Cannot create file ' + dlgSave.FileName);
   finally
     obj.Free;
     streamer.Free;
