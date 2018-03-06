@@ -452,9 +452,9 @@ begin
     obj.Url := cbUrl.Text;
     obj.Method := cbMethod.Text;
     obj.Body := PostText.Text;
-    obj.SetHeadersFromGrid(requestHeaders);
-    obj.SetFormFromGrid(gridForm);
-    obj.SetCookiesFromGrid(gridReqCookie);
+    obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
+    obj.SetCollectionFromGrid(gridForm, obj.Form);
+    obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
     json := streamer.ObjectToJSONString(obj);
     dlgSave.FileName := GetRequestFilename('request.json');
     if dlgSave.Execute then

@@ -35,13 +35,10 @@ type
     FForm: TCollection;
     FCookies: TCollection;
   protected
-    procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
   public
     constructor Create;
     destructor Destroy; override;
-    procedure SetHeadersFromGrid(grid: TStringGrid);
-    procedure SetFormFromGrid(grid: TStringGrid);
-    procedure SetCookiesFromGrid(grid: TStringGrid);
+    procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
   published
     property Method: string read FMethod write FMethod;
@@ -91,21 +88,6 @@ begin
   FForm.Free;
   FCookies.Free;
   inherited Destroy;
-end;
-
-procedure TRequestObject.SetHeadersFromGrid(grid: TStringGrid);
-begin
-  SetCollectionFromGrid(grid, FHeaders);
-end;
-
-procedure TRequestObject.SetFormFromGrid(grid: TStringGrid);
-begin
-  SetCollectionFromGrid(grid, FForm);
-end;
-
-procedure TRequestObject.SetCookiesFromGrid(grid: TStringGrid);
-begin
-  SetCollectionFromGrid(grid, FCookies);
 end;
 
 procedure TRequestObject.SetCollectionToGrid(coll: TCollection;
