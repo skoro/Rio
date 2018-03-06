@@ -390,23 +390,24 @@ begin
       Exit;
     end;
 
-    StartNewRequest;
     streamer := TJSONDeStreamer.Create(nil);
     obj := TRequestObject.Create;
 
     try
       streamer.JSONToObject(jsonStr, obj);
+      StartNewRequest;
       cbUrl.Text := obj.Url;
       cbMethod.Text := obj.Method;
       PostText.Text := obj.Body;
       obj.SetCollectionToGrid(obj.Headers, requestHeaders);
       obj.SetCollectionToGrid(obj.Form, gridForm);
       obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
-    finally
-      streamer.Free;
-      obj.Free;
+    except on E: Exception do
+        ShowMessage(E.Message);
     end;
 
+    streamer.Free;
+    obj.Free;
   end;
 end;
 
