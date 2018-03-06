@@ -180,6 +180,7 @@ begin
       end;
     end
     else if Length(formData) > 0 then isForm := True;
+    if not isForm then formData := PostText.Text;
     FHttpClient.RequestBody := TStringStream.Create(formData);
   end;
 
