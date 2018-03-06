@@ -42,6 +42,7 @@ type
     procedure SetHeadersFromGrid(grid: TStringGrid);
     procedure SetFormFromGrid(grid: TStringGrid);
     procedure SetCookiesFromGrid(grid: TStringGrid);
+    procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
@@ -52,6 +53,8 @@ type
   end;
 
 implementation
+
+uses strutils;
 
 { TRequestParamItem }
 
@@ -103,6 +106,21 @@ end;
 procedure TRequestObject.SetCookiesFromGrid(grid: TStringGrid);
 begin
   SetCollectionFromGrid(grid, FCookies);
+end;
+
+procedure TRequestObject.SetCollectionToGrid(coll: TCollection;
+  Grid: TStringGrid);
+var
+  item: TRequestParamItem;
+  I: Integer;
+begin
+  Grid.RowCount := coll.Count + 1;
+  for I := 0 to coll.Count - 1 do begin
+    item := TRequestParamItem(coll.Items[I]);
+    Grid.Cells[0, I + 1] := IfThen(item.Enabled, '1', '0');
+    Grid.Cells[1, I + 1] := item.Name;
+    Grid.Cells[2, I + 1] := item.Value;
+  end;
 end;
 
 end.

@@ -398,6 +398,9 @@ begin
       cbUrl.Text := obj.Url;
       cbMethod.Text := obj.Method;
       PostText.Text := obj.Body;
+      obj.SetCollectionToGrid(obj.Headers, requestHeaders);
+      obj.SetCollectionToGrid(obj.Form, gridForm);
+      obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
     finally
       streamer.Free;
       obj.Free;
