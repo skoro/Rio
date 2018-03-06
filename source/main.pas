@@ -382,6 +382,7 @@ var
 begin
   if not PromptNewRequest('Do you want to open request file ?', 'Open request file') then Exit;
 
+  dlgOpen.DefaultExt := 'json';
   if dlgOpen.Execute then begin
 
     if not FileGetContents(dlgOpen.FileName, jsonStr) then begin
@@ -885,6 +886,10 @@ begin
   gridForm.Cells[0, 1] := '1';
   gridForm.Cells[1, 1] := '';
   gridForm.Cells[2, 1] := '';
+  gridReqCookie.RowCount := 2;
+  gridReqCookie.Cells[0, 1] := '1';
+  gridReqCookie.Cells[1, 1] := '';
+  gridReqCookie.Cells[2, 1] := '';
 
   // Response fields.
   responseHeaders.RowCount := 1;
