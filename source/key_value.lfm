@@ -1,0 +1,90 @@
+object KeyValueForm: TKeyValueForm
+  Left = 453
+  Height = 215
+  Top = 236
+  Width = 268
+  Caption = 'KeyValueForm'
+  ClientHeight = 215
+  ClientWidth = 268
+  LCLVersion = '1.8.0.6'
+  object Panel1: TPanel
+    Left = 2
+    Height = 46
+    Top = 167
+    Width = 264
+    Align = alBottom
+    BorderSpacing.Around = 2
+    BevelOuter = bvNone
+    ClientHeight = 46
+    ClientWidth = 264
+    TabOrder = 0
+    object btnOK: TButton
+      Left = 0
+      Height = 46
+      Top = 0
+      Width = 67
+      Align = alLeft
+      Caption = 'OK'
+      TabOrder = 0
+    end
+    object btnCancel: TButton
+      Left = 189
+      Height = 46
+      Top = 0
+      Width = 75
+      Align = alRight
+      Cancel = True
+      Caption = 'Cancel'
+      TabOrder = 1
+    end
+  end
+  object Panel2: TPanel
+    Left = 2
+    Height = 163
+    Top = 2
+    Width = 264
+    Align = alClient
+    BorderSpacing.Around = 2
+    BevelOuter = bvNone
+    BorderWidth = 2
+    ClientHeight = 163
+    ClientWidth = 264
+    TabOrder = 1
+    object textValue: TMemo
+      Left = 2
+      Height = 91
+      Top = 70
+      Width = 260
+      Align = alClient
+      ScrollBars = ssAutoBoth
+      TabOrder = 0
+    end
+    object editName: TEdit
+      Left = 2
+      Height = 28
+      Top = 20
+      Width = 260
+      Align = alTop
+      TabOrder = 1
+    end
+    object Label1: TLabel
+      Left = 2
+      Height = 18
+      Top = 2
+      Width = 260
+      Align = alTop
+      Caption = 'Name'
+      ParentColor = False
+    end
+    object Label2: TLabel
+      Left = 2
+      Height = 18
+      Top = 52
+      Width = 260
+      Align = alTop
+      BorderSpacing.Top = 4
+      Caption = 'Value'
+      ParentColor = False
+    end
+  end
+end
