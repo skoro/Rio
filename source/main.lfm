@@ -394,11 +394,11 @@ object Form1: TForm1
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       ItemHeight = 0
-      ItemIndex = 0
       Items.Strings = (
         'GET'
         'POST'
         'PUT'
+        'OPTIONS'
         'DELETE'
         'PATCH'
       )
