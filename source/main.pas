@@ -302,44 +302,39 @@ end;
 procedure TForm1.gaClearRowsClick(Sender: TObject);
 var
   Answer: Integer;
+  Grid: TStringGrid;
 begin
   Answer := Application.MessageBox('Are you sure to clear content ?', 'Clear rows', MB_ICONQUESTION + MB_YESNO);
   if Answer = IDNO then Exit; // =>
-  try
-    with GetPopupSenderAsStringGrid(Sender) do begin
+  Grid := GetPopupSenderAsStringGrid(Sender);
+  if Grid <> nil then
+    with Grid do begin
       RowCount := 2;
       Cells[0, 1] := '1';
       Cells[1, 1] := '';
       Cells[2, 1] := '';
     end;
-  finally
-    // Silent
-  end;
 end;
 
 procedure TForm1.gaEditRowClick(Sender: TObject);
+var
+  Grid: TStringGrid;
 begin
-  try
-    EditGridRow(GetPopupSenderAsStringGrid(Sender));
-  finally
-    // Silent
-  end;
+  Grid := GetPopupSenderAsStringGrid(Sender);
+  if Grid <> nil then EditGridRow(Grid);
 end;
 
 procedure TForm1.gaInsertRowClick(Sender: TObject);
 var
   Grid: TStringGrid;
 begin
-  try
-    Grid := GetPopupSenderAsStringGrid(Sender);
-    if Grid = requestHeaders then
-      miInsertHeaderClick(Grid)
-    else
-      if (Grid = gridForm) or (Grid = gridReqCookie) then
-        Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
-  finally
-    // Silent
-  end;
+  Grid := GetPopupSenderAsStringGrid(Sender);
+  if Grid = nil then Exit;
+  if Grid = requestHeaders then
+    miInsertHeaderClick(Grid)
+  else
+    if (Grid = gridForm) or (Grid = gridReqCookie) then
+      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
@@ -351,7 +346,8 @@ end;
 
 procedure TForm1.gridEditDblClick(Sender: TObject);
 begin
-  EditGridRow(Sender as TStringGrid);
+  if Sender is TStringGrid then
+    EditGridRow(TStringGrid(Sender));
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
@@ -933,8 +929,9 @@ var
 begin
   Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
   if not (Component is TStringGrid) then
-    raise Exception.Create('Component is not TStringGrid');
-  Result := TStringGrid(Component);
+    Result := nil
+  else
+    Result := TStringGrid(Component);
 end;
 
 procedure TForm1.EditGridRow(Grid: TStringGrid);
