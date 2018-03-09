@@ -20,6 +20,7 @@ type
     cbUrl: TComboBox;
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
+    gaEditRow: TMenuItem;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
@@ -71,9 +72,11 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure gaClearRowsClick(Sender: TObject);
+    procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
+    procedure gridEditDblClick(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
@@ -107,6 +110,8 @@ type
     function GetRequestFilename(ext: string = ''): string;
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     procedure StartNewRequest;
+    function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
+    procedure EditGridRow(Grid: TStringGrid);
   public
 
   end;
@@ -117,7 +122,7 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti;
+  request_object, app_helpers, fpjsonrtti, key_value;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -264,6 +269,8 @@ begin
   CookieForm := TCookieForm.Create(Application);
   CookieForm.ResponseGrid := gridRespCookie;
   CookieForm.RequestGrid := gridReqCookie;
+
+  KeyValueForm := TKeyValueForm.Create(Application);
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -294,35 +301,45 @@ end;
 
 procedure TForm1.gaClearRowsClick(Sender: TObject);
 var
-  Component: TComponent;
   Answer: Integer;
 begin
   Answer := Application.MessageBox('Are you sure to clear content ?', 'Clear rows', MB_ICONQUESTION + MB_YESNO);
   if Answer = IDNO then Exit; // =>
-  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if Component is TStringGrid then
-    with TStringGrid(Component) do begin
+  try
+    with GetPopupSenderAsStringGrid(Sender) do begin
       RowCount := 2;
       Cells[0, 1] := '1';
       Cells[1, 1] := '';
       Cells[2, 1] := '';
     end;
+  finally
+    // Silent
+  end;
+end;
+
+procedure TForm1.gaEditRowClick(Sender: TObject);
+begin
+  try
+    EditGridRow(GetPopupSenderAsStringGrid(Sender));
+  finally
+    // Silent
+  end;
 end;
 
 procedure TForm1.gaInsertRowClick(Sender: TObject);
 var
-  Component: TComponent;
   Grid: TStringGrid;
 begin
-  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if not (Component is TStringGrid) then Exit; // =>
-
-  Grid := (Component as TStringGrid);
-  if Grid = requestHeaders then
-    miInsertHeaderClick(Grid)
-  else
-    if (Grid = gridForm) or (Grid = gridReqCookie) then
-      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
+  try
+    Grid := GetPopupSenderAsStringGrid(Sender);
+    if Grid = requestHeaders then
+      miInsertHeaderClick(Grid)
+    else
+      if (Grid = gridForm) or (Grid = gridReqCookie) then
+        Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
+  finally
+    // Silent
+  end;
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
@@ -330,6 +347,11 @@ procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
 begin
   // New inserted columns with "On" checked by default.
   (Sender as TStringGrid).Cells[0, sIndex] := '1';
+end;
+
+procedure TForm1.gridEditDblClick(Sender: TObject);
+begin
+  EditGridRow(Sender as TStringGrid);
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
@@ -903,6 +925,27 @@ begin
   end;
   pagesResponse.ActivePage := tabResponse;
   miSaveResponse.Enabled := False;
+end;
+
+function TForm1.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
+var
+  Component: TComponent;
+begin
+  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  if not (Component is TStringGrid) then
+    raise Exception.Create('Component is not TStringGrid');
+  Result := TStringGrid(Component);
+end;
+
+procedure TForm1.EditGridRow(Grid: TStringGrid);
+var
+  kv: TKeyValuePair;
+begin
+  with Grid do begin
+    kv := KeyValueForm.Edit(Cells[1, Row], Cells[2, Row], 'Edit...');
+    Cells[1, Row] := kv.Key;
+    Cells[2, Row] := kv.Value;
+  end;
 end;
 
 end.

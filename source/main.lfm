@@ -394,6 +394,7 @@ object Form1: TForm1
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       ItemHeight = 0
+      ItemIndex = 0
       Items.Strings = (
         'GET'
         'POST'
@@ -476,6 +477,7 @@ object Form1: TForm1
           TitleStyle = tsNative
           OnBeforeSelection = requestHeadersBeforeSelection
           OnColRowInserted = gridColRowInserted
+          OnDblClick = gridEditDblClick
           ColWidths = (
             32
             267
@@ -534,6 +536,7 @@ object Form1: TForm1
           TabOrder = 0
           TitleStyle = tsNative
           OnColRowInserted = gridColRowInserted
+          OnDblClick = gridEditDblClick
           ColWidths = (
             32
             259
@@ -577,6 +580,7 @@ object Form1: TForm1
           RowCount = 2
           TabOrder = 0
           TitleStyle = tsNative
+          OnDblClick = gaEditRowClick
           ColWidths = (
             32
             179
@@ -899,6 +903,10 @@ object Form1: TForm1
     object gaInsertRow: TMenuItem
       Caption = 'Insert'
       OnClick = gaInsertRowClick
+    end
+    object gaEditRow: TMenuItem
+      Caption = 'Edit...'
+      OnClick = gaEditRowClick
     end
     object gaDeleteRow: TMenuItem
       Caption = 'Delete'
