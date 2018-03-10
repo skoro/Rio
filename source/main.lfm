@@ -4,7 +4,7 @@ object Form1: TForm1
   Top = 130
   Width = 561
   Caption = 'HTTP request inspector'
-  ClientHeight = 553
+  ClientHeight = 552
   ClientWidth = 561
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
@@ -152,17 +152,17 @@ object Form1: TForm1
   LCLVersion = '1.8.0.6'
   object Panel2: TPanel
     Left = 0
-    Height = 318
+    Height = 317
     Top = 235
     Width = 561
     Align = alClient
     BevelOuter = bvNone
-    ClientHeight = 318
+    ClientHeight = 317
     ClientWidth = 561
     TabOrder = 0
     object pagesResponse: TPageControl
       Left = 4
-      Height = 280
+      Height = 279
       Top = 4
       Width = 553
       ActivePage = tabResponse
@@ -172,11 +172,11 @@ object Form1: TForm1
       TabOrder = 0
       object tabResponse: TTabSheet
         Caption = 'Response'
-        ClientHeight = 244
+        ClientHeight = 242
         ClientWidth = 547
         object responseHeaders: TStringGrid
           Left = 0
-          Height = 244
+          Height = 242
           Top = 0
           Width = 547
           Align = alClient
@@ -210,7 +210,7 @@ object Form1: TForm1
       end
       object tabRespCookie: TTabSheet
         Caption = 'Cookie'
-        ClientHeight = 244
+        ClientHeight = 242
         ClientWidth = 547
         TabVisible = False
         object gridRespCookie: TStringGrid
@@ -282,7 +282,7 @@ object Form1: TForm1
       end
       object tabContent: TTabSheet
         Caption = 'Content'
-        ClientHeight = 244
+        ClientHeight = 242
         ClientWidth = 547
         object responseRaw: TMemo
           Left = 0
@@ -298,7 +298,7 @@ object Form1: TForm1
       end
       object tabJson: TTabSheet
         Caption = 'JSON'
-        ClientHeight = 244
+        ClientHeight = 242
         ClientWidth = 547
         TabVisible = False
         object JsonTree: TTreeView
@@ -318,7 +318,7 @@ object Form1: TForm1
     object StatusPanel: TPanel
       Left = 4
       Height = 30
-      Top = 288
+      Top = 287
       Width = 553
       Align = alBottom
       BorderSpacing.Left = 4
@@ -388,7 +388,7 @@ object Form1: TForm1
     TabOrder = 1
     object cbMethod: TComboBox
       Left = 8
-      Height = 28
+      Height = 29
       Top = 8
       Width = 100
       AutoComplete = True
@@ -408,7 +408,7 @@ object Form1: TForm1
     end
     object cbUrl: TComboBox
       Left = 109
-      Height = 28
+      Height = 29
       Top = 8
       Width = 365
       Anchors = [akTop, akLeft, akRight]
@@ -439,11 +439,11 @@ object Form1: TForm1
       TabOrder = 3
       object tabHeaders: TTabSheet
         Caption = 'Headers'
-        ClientHeight = 145
+        ClientHeight = 144
         ClientWidth = 539
         object requestHeaders: TStringGrid
           Left = 0
-          Height = 145
+          Height = 144
           Top = 0
           Width = 539
           Align = alClient
@@ -487,7 +487,7 @@ object Form1: TForm1
       end
       object tabBody: TTabSheet
         Caption = 'Body'
-        ClientHeight = 145
+        ClientHeight = 144
         ClientWidth = 539
         object PostText: TMemo
           Left = 0
@@ -502,7 +502,7 @@ object Form1: TForm1
       end
       object tabForm: TTabSheet
         Caption = 'Form'
-        ClientHeight = 145
+        ClientHeight = 144
         ClientWidth = 539
         object gridForm: TStringGrid
           Left = 0
@@ -546,7 +546,7 @@ object Form1: TForm1
       end
       object tabReqCookie: TTabSheet
         Caption = 'Cookie'
-        ClientHeight = 145
+        ClientHeight = 144
         ClientWidth = 539
         object gridReqCookie: TStringGrid
           Left = 0

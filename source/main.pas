@@ -928,10 +928,12 @@ var
   Component: TComponent;
 begin
   Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if not (Component is TStringGrid) then
-    Result := nil
+  if Component is TStringGrid then
+    Result := TStringGrid(Component)
+  else if Component is TStringCellEditor then
+    Result := TStringCellEditor(Component).Parent as TStringGrid
   else
-    Result := TStringGrid(Component);
+    Result := nil;
 end;
 
 procedure TForm1.EditGridRow(Grid: TStringGrid);
