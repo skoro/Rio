@@ -382,7 +382,6 @@ begin
         gridHeaders.Cells[1, Row]
       ]);
     end;
-    requestHeaders.SetFocus;
   end;
   UpdateHeadersPickList;
 end;
