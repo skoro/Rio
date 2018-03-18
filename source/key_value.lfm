@@ -1,23 +1,27 @@
 object KeyValueForm: TKeyValueForm
-  Left = 453
-  Height = 215
-  Top = 236
-  Width = 268
+  Left = 454
+  Height = 245
+  Top = 224
+  Width = 246
+  BorderIcons = []
   Caption = 'KeyValueForm'
-  ClientHeight = 215
-  ClientWidth = 268
+  ClientHeight = 245
+  ClientWidth = 246
+  Constraints.MinHeight = 180
+  Constraints.MinWidth = 200
   OnShow = FormShow
+  ShowInTaskBar = stNever
   LCLVersion = '1.8.0.6'
   object Panel1: TPanel
     Left = 2
     Height = 46
-    Top = 167
-    Width = 264
+    Top = 197
+    Width = 242
     Align = alBottom
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     ClientHeight = 46
-    ClientWidth = 264
+    ClientWidth = 242
     TabOrder = 0
     object btnOK: TButton
       Left = 0
@@ -30,7 +34,7 @@ object KeyValueForm: TKeyValueForm
       TabOrder = 0
     end
     object btnCancel: TButton
-      Left = 189
+      Left = 167
       Height = 46
       Top = 0
       Width = 75
@@ -43,47 +47,47 @@ object KeyValueForm: TKeyValueForm
   end
   object Panel2: TPanel
     Left = 2
-    Height = 163
+    Height = 193
     Top = 2
-    Width = 264
+    Width = 242
     Align = alClient
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 163
-    ClientWidth = 264
+    ClientHeight = 193
+    ClientWidth = 242
     TabOrder = 1
     object textValue: TMemo
       Left = 2
-      Height = 91
-      Top = 70
-      Width = 260
+      Height = 118
+      Top = 73
+      Width = 238
       Align = alClient
       ScrollBars = ssAutoBoth
       TabOrder = 1
     end
     object editName: TEdit
       Left = 2
-      Height = 28
-      Top = 20
-      Width = 260
+      Height = 29
+      Top = 21
+      Width = 238
       Align = alTop
       TabOrder = 0
     end
     object Label1: TLabel
       Left = 2
-      Height = 18
+      Height = 19
       Top = 2
-      Width = 260
+      Width = 238
       Align = alTop
       Caption = 'Name'
       ParentColor = False
     end
     object Label2: TLabel
       Left = 2
-      Height = 18
-      Top = 52
-      Width = 260
+      Height = 19
+      Top = 54
+      Width = 238
       Align = alTop
       BorderSpacing.Top = 4
       Caption = 'Value'
