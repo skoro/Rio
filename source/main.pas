@@ -112,6 +112,7 @@ type
     procedure StartNewRequest;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     procedure EditGridRow(Grid: TStringGrid);
+    function NormalizeUrl: string;
   public
 
   end;
@@ -145,14 +146,14 @@ var
   isForm: boolean; // is it form submit request
   ctForm: boolean; // append form content type to headers grid
 begin
-  url := Trim(cbUrl.Text);
-  if url = '' then
-  begin
-    cbUrl.SetFocus;
-    exit;
+  try
+    url := NormalizeUrl;
+  except on E: Exception do
+    begin
+      cbUrl.SetFocus;
+      Exit;
+    end;
   end;
-
-  if Pos('http', url) = 0 then url := 'http://' + url;
 
   FContentType := '';
   isForm := False;
@@ -476,10 +477,14 @@ begin
     obj.SetCollectionFromGrid(gridForm, obj.Form);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
     json := streamer.ObjectToJSONString(obj);
-    dlgSave.FileName := GetRequestFilename('request.json');
-    if dlgSave.Execute then
-      if not FilePutContents(dlgSave.Filename, json) then
-        ShowMessage('Cannot create file ' + dlgSave.FileName);
+    try
+      dlgSave.FileName := GetRequestFilename('request.json');
+      if dlgSave.Execute then
+        if not FilePutContents(dlgSave.Filename, json) then
+          ShowMessage('Cannot create file ' + dlgSave.FileName);
+    except on E: Exception do
+      ShowMessage(E.Message);
+    end;
   finally
     obj.Free;
     streamer.Free;
@@ -488,10 +493,13 @@ end;
 
 procedure TForm1.miSaveResponseClick(Sender: TObject);
 begin
-  dlgSave.FileName := GetRequestFilename;
-
-  if dlgSave.Execute then begin
-    responseRaw.Lines.SaveToFile(dlgSave.FileName);
+  try
+    dlgSave.FileName := GetRequestFilename;
+    if dlgSave.Execute then begin
+      responseRaw.Lines.SaveToFile(dlgSave.FileName);
+    end;
+  except on E: Exception do
+    ShowMessage(E.Message);
   end;
 end;
 
@@ -845,9 +853,7 @@ function TForm1.GetRequestFilename(ext: string): string;
 var
   uri: TURI;
 begin
-  if Trim(cbUrl.Text) = '' then
-    raise Exception.Create('Url is missing. Cannot create filename.');
-
+  uri := ParseURI(NormalizeUrl);
   if ext = '' then
     case FContentType of
       'text/html': ext := 'html';
@@ -857,8 +863,6 @@ begin
       'application/xml': ext := 'xml';
       else ext := 'response';
     end;
-
-  uri := ParseURI(cbUrl.Text);
   Result := Format('%s.%s', [uri.Host, ext]);
 end;
 
@@ -944,6 +948,16 @@ begin
     Cells[1, Row] := kv.Key;
     Cells[2, Row] := kv.Value;
   end;
+end;
+
+function TForm1.NormalizeUrl: string;
+begin
+  Result := LowerCase(Trim(cbUrl.Text));
+  if Result = '' then
+    raise Exception.Create('Url is empty.');
+  if Pos('http://', Result) = 0 then
+    if Pos('https://', Result) = 0 then
+      Result := 'http://' + Result;
 end;
 
 end.
