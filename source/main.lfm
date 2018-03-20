@@ -605,7 +605,7 @@ object Form1: TForm1
     object miFile: TMenuItem
       Caption = '&File'
       object miNew: TMenuItem
-        Caption = 'New'
+        Caption = 'New request'
         ShortCut = 16462
         OnClick = miNewClick
       end
