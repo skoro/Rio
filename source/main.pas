@@ -123,7 +123,7 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value;
+  request_object, app_helpers, fpjsonrtti, key_value, strutils;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -852,6 +852,7 @@ end;
 function TForm1.GetRequestFilename(ext: string): string;
 var
   uri: TURI;
+  basename, trail: string;
 begin
   uri := ParseURI(NormalizeUrl);
   if ext = '' then
@@ -863,7 +864,12 @@ begin
       'application/xml': ext := 'xml';
       else ext := 'response';
     end;
-  Result := Format('%s.%s', [uri.Host, ext]);
+  trail := TrimSet(
+    StringReplace(TrimSet(uri.Path, ['/']) + '/' + TrimSet(uri.Document, ['/']), '/', '.', [rfReplaceAll]),
+    ['.'] // Remove separator between path and document if path is missing
+  );
+  basename := uri.Host + IfThen(trail <> '', '_' + trail);
+  Result := Format('%s.%s', [basename, ext]);
 end;
 
 function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
