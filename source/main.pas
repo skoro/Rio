@@ -516,25 +516,21 @@ begin
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
-  procedure SetColumn(grid: TStringGrid; col: Integer);
+  procedure SetColumns(grid: TStringGrid);
   var
-    Val: Integer;
+    Val, col: Integer;
   begin
-    Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
-    if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
+    for col := 1 to grid.ColCount do begin
+      Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
+      if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
+    end;
   end;
 begin
-  SetColumn(requestHeaders, 1);
-  SetColumn(requestHeaders, 2);
-  SetColumn(requestHeaders, 3);
-  SetColumn(responseHeaders, 1);
-  SetColumn(responseHeaders, 2);
-  SetColumn(gridForm, 1);
-  SetColumn(gridForm, 2);
-  SetColumn(gridForm, 3);
-  SetColumn(gridReqCookie, 1);
-  SetColumn(gridReqCookie, 2);
-  SetColumn(gridReqCookie, 3);
+  SetColumns(requestHeaders);
+  SetColumns(responseHeaders);
+  SetColumns(gridForm);
+  SetColumns(gridReqCookie);
+  SetColumns(gridRespCookie);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -550,6 +546,7 @@ begin
   SaveColumns(gridForm);
   SaveColumns(responseHeaders);
   SaveColumns(gridReqCookie);
+  SaveColumns(gridRespCookie);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
