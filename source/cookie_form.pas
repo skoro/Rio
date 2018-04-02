@@ -80,8 +80,8 @@ var
 begin
   CName := editName.Text;
 
+  // Check for already exist cookie.
   for I := 1 to FRequestGrid.RowCount - 1 do
-    // Already exists.
     if FRequestGrid.Cells[1, I] = CName then begin
       A := Application.MessageBox(PChar('Replace cookie ' + CName + ' ?'), 'Replace ?', MB_ICONQUESTION + MB_YESNO);
       if A = IDNO then Exit;
@@ -91,6 +91,8 @@ begin
 
   if not Replaced then
     FRequestGrid.InsertRowWithValues(FRequestGrid.Row, ['1', CName, memoValue.Text]);
+
+  btnNextClick(btnNext); // Advance to the next cookie.
 end;
 
 procedure TCookieForm.FormCreate(Sender: TObject);
