@@ -49,7 +49,7 @@ var
 
 implementation
 
-uses SysUtils, strutils;
+uses SysUtils, strutils, LCLType;
 
 {$R *.lfm}
 
@@ -75,12 +75,22 @@ end;
 procedure TCookieForm.btnAddClick(Sender: TObject);
 var
   CName: string;
-  I: Integer;
+  I, A: Integer;
+  Replaced: boolean = false;
 begin
   CName := editName.Text;
+
   for I := 1 to FRequestGrid.RowCount - 1 do
-    if FRequestGrid.Cells[1, I] = CName then Exit; // Already exists.
-  FRequestGrid.InsertRowWithValues(FRequestGrid.Row, ['1', CName, memoValue.Text]);
+    // Already exists.
+    if FRequestGrid.Cells[1, I] = CName then begin
+      A := Application.MessageBox(PChar('Replace cookie ' + CName + ' ?'), 'Replace ?', MB_ICONQUESTION + MB_YESNO);
+      if A = IDNO then Exit;
+      FRequestGrid.Cells[2, I] := memoValue.Text;
+      Replaced := True;
+    end;
+
+  if not Replaced then
+    FRequestGrid.InsertRowWithValues(FRequestGrid.Row, ['1', CName, memoValue.Text]);
 end;
 
 procedure TCookieForm.FormCreate(Sender: TObject);
