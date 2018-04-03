@@ -16,9 +16,12 @@ case $ARCH in
      x86_64|amd64)
           target=64
           ARCH=amd64
+          bin=x86_64
           ;;
      i386)
           target=32
+          ARCH=i386
+          bin=i386
           ;;
      *)
           echo "Unsupported architecture $ARCH"
@@ -38,7 +41,7 @@ mkdir -p $TMP/DEBIAN
 
 cp ../resources/http-inspector.desktop $TMP/usr/share/applications
 cp ../resources/http-inspector.png $TMP/usr/share/pixmaps
-cp ../../bin/x86_64-linux/http-inspector $TMP/usr/bin
+cp ../../bin/${bin}-linux/http-inspector $TMP/usr/bin
 
 SIZE=$(du -ks $TMP | awk '{ print $1 }')
 [ -z "$SIZE" ] && { echo "Error. Cannot get size of $TMP"; exit; }
