@@ -165,33 +165,21 @@ begin
 
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
-  if (method = 'POST') or (method = 'PUT') then
-  begin
-    formData := EncodeFormData;
-    // form and body filled, what to submit ?
-    if (Length(formData) <> 0) and (Length(Trim(PostText.Text)) <> 0) then
-    begin
-      i := QuestionDlg(
-        'Choose what to submit',
-        'Do you want to submit form data or body ?',
-        mtCustom,
-        [mrYes, 'Form', mrNo, 'Body', mrCancel, 'Cancel'],
-        ''
-      );
-      if i = mrNo then formData := PostText.Text
-      else if i = mrYes then isForm := True
-      else begin
-        FreeAndNil(FHttpClient);
-        Exit; // =>
-      end;
-    end
-    else if Length(formData) > 0 then isForm := True;
-    if not isForm then formData := PostText.Text;
+
+  // Do submit form ?
+  formData := EncodeFormData;
+  if (method = 'POST') and (Length(formData) > 0) then begin
+    isForm := True;
     FHttpClient.RequestBody := TStringStream.Create(formData);
+  end;
+
+  if (not isForm) and (Length(Trim(PostText.Text)) > 0) then begin
+    FHttpClient.RequestBody := TStringStream.Create(PostText.Text);
   end;
 
   btnSubmit.Enabled := False;
   miTreeExpand.Enabled := False;
+
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
