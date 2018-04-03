@@ -29,7 +29,7 @@ esac
 
 TMP=$(mktemp -d)
 VER=$(grep APP_VER ../../source/version.inc|grep -o "'.*'"|sed "s/'//g")
-DEB=http-inspector_${VER}_amd64.deb
+DEB=http-inspector_${VER}_${ARCH}.deb
 
 mkdir -p $TMP/usr/bin
 mkdir -p $TMP/usr/share/applications
