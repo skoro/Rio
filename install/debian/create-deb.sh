@@ -28,7 +28,10 @@ case $ARCH in
           exit
 esac
 
-( cd ../../ && make linux${target}-release ) || exit
+if [ ! -f ../../bin/${bin}-linux/http-inspector ]; then
+    echo "Please, build the project."
+    exit 1
+fi
 
 TMP=$(mktemp -d)
 VER=$(grep APP_VER ../../source/version.inc|grep -o "'.*'"|sed "s/'//g")
