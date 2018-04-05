@@ -12,10 +12,13 @@ all:
 	@echo "  linux32-debug    Compile for Linux i386 with debug info"
 	@echo "  linux64          Compile for Linux amd64"
 	@echo "  linux64-debug    Compile for Linux amd64 with debug info"
-	@echo "  deb-linux32	  Create a debian package for i386"
+	@echo "  linux-all        Compile for all the targets"
+	@echo "  deb-linux32      Create a debian package for i386"
 	@echo "  deb-linux64      Create a debian package for amd64"
+	@echo "  deb-all          Create debian package for all the archs"
 	@echo "  bin-linux32      Create a binary app archive for i386"
 	@echo "  bin-linux64      Create a binary app archive for amd64"
+	@echo "  bin-all          Create binary app archives for all the archs"
 	@echo ""
 
 clean: clean-build
@@ -29,7 +32,17 @@ clean-backup:
 .PHONY: linux32 linux64-debug deb-linux32 bin-linux32 linux-arch-32 \
 	linux64 linux64-debug deb-linux64 bin-linux64 linux-arch-64 \
 	os-linux release-mode debug-mode bin build \
-	deb-package
+	deb-package linux-all deb-all bin-all
+
+linux-all:
+	make linux32
+	make linux64
+deb-all:
+	make deb-linux32
+	make deb-linux64
+bin-all:
+	make bin-linux32
+	make bin-linux64
 
 linux32: linux-arch-32 release-mode build
 linux32-debug: linux-arch-32 debug-mode build
