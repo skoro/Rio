@@ -113,6 +113,7 @@ type
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     procedure EditGridRow(Grid: TStringGrid);
     function NormalizeUrl: string;
+    procedure SetAppCaption(const AValue: String = '');
   public
 
   end;
@@ -234,7 +235,7 @@ var
   C: string;
 begin
   inherited;
-  Caption := ApplicationName;
+  SetAppCaption;
 
   // Init app configuration.
   C := GetAppConfigFile(False, True);
@@ -720,6 +721,7 @@ var
   h: string;
 begin
   btnSubmit.Enabled := True;
+  SetAppCaption(cbUrl.Text);
 
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
   for i := 0 to Info.ResponseHeaders.Count - 1 do
@@ -925,6 +927,8 @@ begin
   end;
   pagesResponse.ActivePage := tabResponse;
   miSaveResponse.Enabled := False;
+
+  SetAppCaption;
 end;
 
 function TForm1.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
@@ -959,6 +963,12 @@ begin
   if Pos('http://', Result) = 0 then
     if Pos('https://', Result) = 0 then
       Result := 'http://' + Result;
+end;
+
+procedure TForm1.SetAppCaption(const AValue: String);
+begin
+  Caption := ApplicationName;
+  if AValue <> '' then Caption := Caption + ': ' + AValue;
 end;
 
 end.
