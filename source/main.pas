@@ -334,9 +334,19 @@ begin
 end;
 
 procedure TForm1.gridEditDblClick(Sender: TObject);
+var
+  grid: TStringGrid;
 begin
-  if Sender is TStringGrid then
-    EditGridRow(TStringGrid(Sender));
+  if Sender is TStringGrid then begin
+    grid := TStringGrid(Sender);
+    if grid = responseHeaders then
+    begin
+      if grid.RowCount > 1 then with grid do
+        KeyValueForm.View(Cells[0, Row], Cells[1, Row], 'View: ' + Cells[0, Row])
+    end
+    else
+      EditGridRow(grid);
+  end;
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
