@@ -25,9 +25,13 @@ For compiling from sources you need the following requirements:
 - Lazarus 1.8
 - FreePascal 3.0.4
 
-In Linux you can compile and create the install package (deb) by Makefile.
-- `make linux64-release` for compiling release binary
-- `make dist-linux64-deb` for creating the deb package
+On Linux you can compile and create the install package (deb) by Makefile.
+For example:
+- `make linux32` for compiling release binary for i386
+- `make linux64` or for amd64
+- `make deb-linux32` creates a deb package for i386
+
+For more targets see output of `make`.
 
 ### Notes for Windows
 
