@@ -14,14 +14,16 @@ else
 fi
 case $ARCH in
      x86_64|amd64)
-          target=64
           ARCH=amd64
           bin=x86_64
           ;;
      i386)
-          target=32
           ARCH=i386
           bin=i386
+          ;;
+     arm)
+          ARCH=armel
+          bin=arm
           ;;
      *)
           echo "Unsupported architecture $ARCH"
