@@ -1,2 +1,2 @@
 const
-  APP_VER = '0.2-dev';
+  APP_VER = '0.2';
