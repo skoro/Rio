@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Http Inspector"
-#define MyAppVersion "0.1"
+#define MyAppVersion "0.2"
 #define MyAppPublisher "Skorobogatko Alexei"
 #define MyAppURL "https://github.com/skoro/http_inspector"
 #define MyAppExeName "http-inspector.exe"
@@ -22,7 +22,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=..\..\dist
-OutputBaseFilename=http-inspector-setup-win64
+OutputBaseFilename=http-inspector-setup-{#MyAppVersion}-win64
 Compression=lzma
 SolidCompression=yes
 
