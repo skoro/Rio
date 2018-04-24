@@ -21,6 +21,7 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    respImg: TImage;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
@@ -31,6 +32,7 @@ type
     PostText: TMemo;
     requestHeaders: TStringGrid;
     dlgSave: TSaveDialog;
+    ScrollBox1: TScrollBox;
     Splitter1: TSplitter;
     StatusImage1: TImage;
     jsImages: TImageList;
@@ -66,6 +68,7 @@ type
     tabBody: TTabSheet;
     tabRespCookie: TTabSheet;
     tabReqCookie: TTabSheet;
+    tabImage: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
@@ -114,6 +117,7 @@ type
     procedure EditGridRow(Grid: TStringGrid);
     function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
+    procedure ShowHideResponseTabs(Info: TResponseInfo);
   public
 
   end;
@@ -733,10 +737,6 @@ begin
   end;
   ParseContentType(Info.ResponseHeaders);
 
-  responseRaw.Clear;
-  responseRaw.Append(Info.Content.DataString);
-  responseRaw.CaretPos := Point(0, 0);
-
   UpdateStatusLine(
     Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
     Format('%d ms', [Info.Time])
@@ -757,12 +757,10 @@ begin
   ShowResponseCookie(Info.ResponseHeaders);
 
   // Get the response content - enable menu item.
-  miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
+  //miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
+  miSaveResponse.Enabled := True;
 
-  if FContentType = 'application/json' then JsonDocument(responseRaw.Text)
-  else begin
-    tabJson.TabVisible := False;
-  end;
+  ShowHideResponseTabs(Info);
 end;
 
 procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
@@ -859,7 +857,9 @@ begin
       'application/json': ext := 'json';
       'application/javascript': ext := 'js';
       'application/xml': ext := 'xml';
-      else ext := 'response';
+      'image/png': ext := 'png';
+      'image/jpg', 'image/jpeg': ext := 'jpg';
+      else ext := 'data';
     end;
   trail := TrimSet(
     StringReplace(TrimSet(uri.Path, ['/']) + '/' + TrimSet(uri.Document, ['/']), '/', '.', [rfReplaceAll]),
@@ -969,6 +969,43 @@ procedure TForm1.SetAppCaption(const AValue: String);
 begin
   Caption := ApplicationName;
   if AValue <> '' then Caption := Caption + ': ' + AValue;
+end;
+
+procedure TForm1.ShowHideResponseTabs(Info: TResponseInfo);
+begin
+  Info.Content.Position := 0;
+
+  responseRaw.Clear;
+  respImg.Picture.Clear;
+
+  case FContentType of
+    'application/json':
+      begin
+        JsonDocument(Info.Content.DataString);
+        tabImage.TabVisible := False;
+      end;
+
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'image/gif':
+      begin
+        respImg.Picture.LoadFromStream(Info.Content);
+        tabContent.TabVisible := False;
+        tabJson.TabVisible := False;
+        tabImage.TabVisible := True;
+      end;
+    else
+      begin
+        tabImage.TabVisible := False;
+        tabJson.TabVisible := False;
+      end;
+  end;
+
+  if tabContent.TabVisible then begin
+    responseRaw.Append(Info.Content.DataString);
+    responseRaw.CaretPos := Point(0, 0);
+  end;
 end;
 
 end.
