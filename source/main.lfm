@@ -399,6 +399,16 @@ object Form1: TForm1
         Layout = tlCenter
         ParentColor = False
       end
+      object StatusText3: TLabel
+        Left = 482
+        Height = 30
+        Top = 0
+        Width = 71
+        Align = alRight
+        Caption = 'StatusText3'
+        Layout = tlCenter
+        ParentColor = False
+      end
     end
   end
   object Panel1: TPanel
