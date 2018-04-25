@@ -321,13 +321,13 @@ object Form1: TForm1
         ClientHeight = 242
         ClientWidth = 547
         TabVisible = False
-        object ScrollBox1: TScrollBox
+        object scrollImage: TScrollBox
           Left = 0
           Height = 242
           Top = 0
           Width = 547
-          HorzScrollBar.Page = 90
-          VertScrollBar.Page = 90
+          HorzScrollBar.Page = 321
+          VertScrollBar.Page = 240
           Align = alClient
           ClientHeight = 240
           ClientWidth = 545
@@ -336,8 +336,8 @@ object Form1: TForm1
             Left = 0
             Height = 240
             Top = 0
-            Width = 545
-            Align = alClient
+            Width = 321
+            OnDblClick = respImgDblClick
           end
         end
       end
