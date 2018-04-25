@@ -971,6 +971,7 @@ begin
   if AValue <> '' then Caption := Caption + ': ' + AValue;
 end;
 
+// Depending on content type - show/hide response tabs.
 procedure TForm1.ShowHideResponseTabs(Info: TResponseInfo);
 begin
   Info.Content.Position := 0;
