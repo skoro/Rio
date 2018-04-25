@@ -21,6 +21,7 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    StatusText3: TLabel;
     respImg: TImage;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
@@ -120,6 +121,7 @@ type
     procedure SetAppCaption(const AValue: String = '');
     procedure ShowHideResponseTabs(Info: TResponseInfo);
     procedure ImageResize(ToStretch: Boolean = True);
+    function GetContentSubtype: string;
   public
 
   end;
@@ -252,6 +254,7 @@ begin
 
   // Form components defaults.
   StatusText2.Caption := '';
+  StatusText3.Caption := '';
   miSaveResponse.Enabled := False;
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
@@ -983,11 +986,15 @@ end;
 
 // Depending on content type - show/hide response tabs.
 procedure TForm1.ShowHideResponseTabs(Info: TResponseInfo);
+var
+  subtype: string;
 begin
   Info.Content.Position := 0;
 
   responseRaw.Clear;
   respImg.Picture.Clear;
+  StatusText3.Caption := '';
+  subtype := UpperCase(GetContentSubtype);
 
   case FContentType of
     'application/json':
@@ -1006,7 +1013,10 @@ begin
         tabContent.TabVisible := False;
         tabJson.TabVisible := False;
         tabImage.TabVisible := True;
+        if subtype = 'JPEG' then subtype := 'JPG';
+        StatusText3.Caption := Format('%s %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);
       end;
+
     else
       begin
         tabImage.TabVisible := False;
@@ -1038,6 +1048,18 @@ begin
       Proportional := False;
       Stretch := False;
     end;
+end;
+
+// Returns subtype from content type property.
+// For example, for 'application/json' it returns 'json'.
+function TForm1.GetContentSubtype: string;
+var
+  p: integer;
+begin
+  if FContentType = '' then
+    raise Exception.Create('Cannot get subtype. Content type is empty');
+  p := Pos('/', FContentType);
+  Result := RightStr(FContentType, Length(FContentType) - p);
 end;
 
 end.
