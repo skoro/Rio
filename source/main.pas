@@ -499,7 +499,10 @@ begin
   try
     dlgSave.FileName := GetRequestFilename;
     if dlgSave.Execute then begin
-      responseRaw.Lines.SaveToFile(dlgSave.FileName);
+      if tabContent.TabVisible then
+        responseRaw.Lines.SaveToFile(dlgSave.FileName)
+      else if tabImage.TabVisible then
+        respImg.Picture.SaveToFile(dlgSave.FileName);
     end;
   except on E: Exception do
     ShowMessage(E.Message);
