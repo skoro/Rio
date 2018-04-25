@@ -32,7 +32,7 @@ type
     PostText: TMemo;
     requestHeaders: TStringGrid;
     dlgSave: TSaveDialog;
-    ScrollBox1: TScrollBox;
+    scrollImage: TScrollBox;
     Splitter1: TSplitter;
     StatusImage1: TImage;
     jsImages: TImageList;
@@ -95,6 +95,7 @@ type
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
+    procedure respImgDblClick(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -118,6 +119,7 @@ type
     function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
     procedure ShowHideResponseTabs(Info: TResponseInfo);
+    procedure ImageResize(ToStretch: Boolean = True);
   public
 
   end;
@@ -565,6 +567,11 @@ begin
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
 
+procedure TForm1.respImgDblClick(Sender: TObject);
+begin
+  ImageResize(not respImg.Stretch);
+end;
+
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
   UpdateStatusLine;
@@ -995,6 +1002,7 @@ begin
     'image/gif':
       begin
         respImg.Picture.LoadFromStream(Info.Content);
+        ImageResize(False);
         tabContent.TabVisible := False;
         tabJson.TabVisible := False;
         tabImage.TabVisible := True;
@@ -1010,6 +1018,26 @@ begin
     responseRaw.Append(Info.Content.DataString);
     responseRaw.CaretPos := Point(0, 0);
   end;
+end;
+
+// Resize response image.
+// ToStretch = True stretch image.
+// ToStretch = False set image original size.
+procedure TForm1.ImageResize(ToStretch: Boolean);
+begin
+  with respImg do
+    if ToStretch then begin
+      Width := scrollImage.ClientWidth;
+      Height := scrollImage.ClientHeight;
+      Proportional := True;
+      Stretch := True;
+    end
+    else begin
+      Width := Picture.Width;
+      Height := Picture.Height;
+      Proportional := False;
+      Stretch := False;
+    end;
 end;
 
 end.
