@@ -487,6 +487,7 @@ begin
     json := streamer.ObjectToJSONString(obj);
     try
       dlgSave.FileName := GetRequestFilename('request.json');
+      dlgSave.Title := 'Save the request to a file';
       if dlgSave.Execute then
         if not FilePutContents(dlgSave.Filename, json) then
           ShowMessage('Cannot create file ' + dlgSave.FileName);
@@ -503,6 +504,7 @@ procedure TForm1.miSaveResponseClick(Sender: TObject);
 begin
   try
     dlgSave.FileName := GetRequestFilename;
+    dlgSave.Title := 'Save the response to a file';
     if dlgSave.Execute then begin
       if tabContent.TabVisible then
         responseRaw.Lines.SaveToFile(dlgSave.FileName)
