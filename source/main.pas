@@ -857,10 +857,13 @@ begin
     else tabRespCookie.TabVisible := False;
 end;
 
+// Creates a filename based on a request.
+// If parameter 'ext' is empty then extension will be detected depending on
+// the document.
 function TForm1.GetRequestFilename(ext: string): string;
 var
   uri: TURI;
-  basename, trail: string;
+  basename: string;
 begin
   uri := ParseURI(NormalizeUrl);
   if ext = '' then
@@ -874,11 +877,12 @@ begin
       'image/jpg', 'image/jpeg': ext := 'jpg';
       else ext := 'data';
     end;
-  trail := TrimSet(
-    StringReplace(TrimSet(uri.Path, ['/']) + '/' + TrimSet(uri.Document, ['/']), '/', '.', [rfReplaceAll]),
-    ['.'] // Remove separator between path and document if path is missing
-  );
-  basename := uri.Host + IfThen(trail <> '', '_' + trail);
+  basename := TrimSet(uri.Document, ['/']);
+  if basename = '' then
+    basename := uri.Host;
+  // Strip extension from a document name (mainly for images).
+  if RightStr(basename, Length(ext) + 1) = '.' + ext then
+    basename := LeftStr(basename, Length(basename) - Length(ext) - 1);
   Result := Format('%s.%s', [basename, ext]);
 end;
 
