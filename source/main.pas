@@ -1014,7 +1014,7 @@ begin
         tabJson.TabVisible := False;
         tabImage.TabVisible := True;
         if subtype = 'JPEG' then subtype := 'JPG';
-        StatusText3.Caption := Format('%s %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);
+        StatusText3.Caption := Format('%s: %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);
       end;
 
     else
