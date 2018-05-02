@@ -149,7 +149,7 @@ object Form1: TForm1
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   SessionProperties = 'cbUrl.Items;Height;Left;Top;Width;cbUrl.Text;cbMethod.Text;cbMethod.Items'
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.2.0'
   object Panel2: TPanel
     Left = 0
     Height = 317
@@ -329,8 +329,8 @@ object Form1: TForm1
           HorzScrollBar.Page = 321
           VertScrollBar.Page = 240
           Align = alClient
-          ClientHeight = 240
-          ClientWidth = 545
+          ClientHeight = 238
+          ClientWidth = 543
           TabOrder = 0
           object respImg: TImage
             Left = 0
@@ -676,6 +676,11 @@ object Form1: TForm1
         Caption = '&Insert header...'
         ShortCut = 16457
         OnClick = miInsertHeaderClick
+      end
+      object miOptions: TMenuItem
+        Caption = 'Options...'
+        ShortCut = 16572
+        OnClick = miOptionsClick
       end
     end
     object miView: TMenuItem

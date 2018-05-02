@@ -6,7 +6,7 @@ uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
-  Forms, Interfaces, main;
+  Forms, Interfaces, main, options;
 
 {$R *.res}
 
@@ -15,6 +15,7 @@ begin
   RequireDerivedFormResource:=True;
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TOptionsForm, OptionsForm);
   Application.Run;
 end.
 

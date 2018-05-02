@@ -21,6 +21,7 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    miOptions: TMenuItem;
     StatusText3: TLabel;
     respImg: TImage;
     miOpenRequest: TMenuItem;
@@ -86,6 +87,7 @@ type
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
     procedure miOpenRequestClick(Sender: TObject);
+    procedure miOptionsClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
     procedure miAboutClick(Sender: TObject);
     procedure gaDeleteRowClick(Sender: TObject);
@@ -132,7 +134,7 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value, strutils;
+  request_object, app_helpers, fpjsonrtti, key_value, strutils, options;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -436,6 +438,11 @@ begin
     streamer.Free;
     obj.Free;
   end;
+end;
+
+procedure TForm1.miOptionsClick(Sender: TObject);
+begin
+  OptionsForm.ShowModal;
 end;
 
 procedure TForm1.miQuitClick(Sender: TObject);
