@@ -1007,6 +1007,7 @@ begin
       begin
         JsonDocument(Info.Content.DataString);
         tabImage.TabVisible := False;
+        tabContent.TabVisible := True;
       end;
 
     'image/jpeg',
@@ -1027,6 +1028,7 @@ begin
       begin
         tabImage.TabVisible := False;
         tabJson.TabVisible := False;
+        tabContent.TabVisible := True;
       end;
   end;
 
