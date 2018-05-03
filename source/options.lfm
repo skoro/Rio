@@ -3,9 +3,12 @@ object OptionsForm: TOptionsForm
   Height = 358
   Top = 220
   Width = 416
+  BorderIcons = [biSystemMenu]
   Caption = 'Options'
   ClientHeight = 358
   ClientWidth = 416
+  Constraints.MinHeight = 300
+  Constraints.MinWidth = 300
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 2
@@ -53,9 +56,9 @@ object OptionsForm: TOptionsForm
     TabOrder = 1
     object cbJsonExpanded: TCheckBox
       Left = 8
-      Height = 21
+      Height = 22
       Top = 8
-      Width = 144
+      Width = 150
       Caption = '&JSON tree expanded'
       TabOrder = 0
     end
