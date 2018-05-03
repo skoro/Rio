@@ -9,6 +9,9 @@ object OptionsForm: TOptionsForm
   ClientWidth = 416
   Constraints.MinHeight = 300
   Constraints.MinWidth = 300
+  OnCreate = FormCreate
+  SessionProperties = 'cbJsonExpanded.Checked;Left;Top;Width;Height'
+  ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 2
@@ -62,5 +65,13 @@ object OptionsForm: TOptionsForm
       Caption = '&JSON tree expanded'
       TabOrder = 0
     end
+  end
+  object Props: TJSONPropStorage
+    StoredValues = <>
+    JSONFileName = 'options.json'
+    Formatted = True
+    Active = False
+    left = 138
+    top = 155
   end
 end

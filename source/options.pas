@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
-  StdCtrls;
+  StdCtrls, JSONPropStorage;
 
 type
 
@@ -16,8 +16,10 @@ type
     Button1: TButton;
     Button2: TButton;
     cbJsonExpanded: TCheckBox;
+    Props: TJSONPropStorage;
     Panel1: TPanel;
     Panel2: TPanel;
+    procedure FormCreate(Sender: TObject);
   private
 
   public
@@ -30,6 +32,17 @@ var
 implementation
 
 {$R *.lfm}
+
+{ TOptionsForm }
+
+procedure TOptionsForm.FormCreate(Sender: TObject);
+var
+  CF: String;
+begin
+  CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
+  Props.JSONFileName := CF;
+  Props.Active := True;
+end;
 
 end.
 
