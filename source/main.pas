@@ -618,8 +618,8 @@ begin
   P := TJSONParser.Create(S);
   D := P.Parse;
   FJsonRoot := D;
-  tabJson.TabVisible := True;
   ShowJsonDocument;
+  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
   FreeAndNil(P);
   FreeAndNil(S);
   FreeAndNil(D);
@@ -1015,6 +1015,7 @@ begin
         JsonDocument(Info.Content.DataString);
         tabImage.TabVisible := False;
         tabContent.TabVisible := True;
+        tabJson.TabVisible := True;
       end;
 
     'image/jpeg',
