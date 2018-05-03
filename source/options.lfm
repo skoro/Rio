@@ -30,19 +30,9 @@ object OptionsForm: TOptionsForm
       Top = 0
       Width = 75
       Align = alLeft
-      Caption = '&OK'
+      Caption = '&Close'
       ModalResult = 1
       TabOrder = 0
-    end
-    object Button2: TButton
-      Left = 337
-      Height = 46
-      Top = 0
-      Width = 75
-      Align = alRight
-      Caption = '&Cancel'
-      ModalResult = 2
-      TabOrder = 1
     end
   end
   object Panel2: TPanel

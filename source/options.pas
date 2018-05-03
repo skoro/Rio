@@ -14,7 +14,6 @@ type
 
   TOptionsForm = class(TForm)
     Button1: TButton;
-    Button2: TButton;
     cbJsonExpanded: TCheckBox;
     Props: TJSONPropStorage;
     Panel1: TPanel;
