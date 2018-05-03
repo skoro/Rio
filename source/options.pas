@@ -21,9 +21,10 @@ type
     Panel2: TPanel;
     procedure FormCreate(Sender: TObject);
   private
+    function GetJsonExpanded: Boolean;
 
   public
-
+    property JsonExpanded: Boolean read GetJsonExpanded;
   end;
 
 var
@@ -42,6 +43,11 @@ begin
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
   Props.Active := True;
+end;
+
+function TOptionsForm.GetJsonExpanded: Boolean;
+begin
+  Result := cbJsonExpanded.Checked;
 end;
 
 end.
