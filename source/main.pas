@@ -21,6 +21,7 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    gaSaveHeader: TMenuItem;
     miOptions: TMenuItem;
     StatusText3: TLabel;
     respImg: TImage;
@@ -79,6 +80,7 @@ type
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
+    procedure gaSaveHeaderClick(Sender: TObject);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
@@ -94,6 +96,7 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
+    procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
@@ -338,6 +341,19 @@ begin
       Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
+procedure TForm1.gaSaveHeaderClick(Sender: TObject);
+var
+  Grid: TStringGrid;
+  Header: String;
+begin
+  Grid := GetPopupSenderAsStringGrid(Sender);
+  if Grid = requestHeaders then begin
+    Header := Trim(Grid.Cells[1, Grid.Row]);
+    if Header <> '' then
+      HeadersEditorForm.Add(Header, Grid.Cells[2, Grid.Row]);
+  end;
+end;
+
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
   tIndex: Integer);
 begin
@@ -533,6 +549,16 @@ begin
     Node.Expanded := not Node.Expanded;
     if Node.Expanded then Node.Expand(True) else Node.Collapse(True);
   end;
+end;
+
+// Show/hide some items in Grid's popup menu.
+// Depending on grid popup menu can show or hide some menu items for specific
+// grid.
+procedure TForm1.popupGridActionsPopup(Sender: TObject);
+begin
+  gaSaveHeader.Visible := False;
+  if GetPopupSenderAsStringGrid(Sender) = requestHeaders then
+    gaSaveHeader.Visible := True;
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
@@ -957,11 +983,23 @@ begin
   SetAppCaption;
 end;
 
+// Get StringGrid instance from Popup sender.
+// The sender can be a Popup menu or popup menu item.
+// Returns nil when popup doesn't belongs to grid.
+// Raises an exception when sender isn't popup or menu item.
 function TForm1.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
 var
   Component: TComponent;
 begin
-  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
+  // What the sender is: popup or menu item ?
+  if Sender is TMenuItem then
+    Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent
+  else
+    if Sender is TPopupMenu then
+      Component := TPopupMenu(Sender).PopupComponent
+  else
+    raise Exception.Create('Sender is not Popup or MenuItem.');
+
   if Component is TStringGrid then
     Result := TStringGrid(Component)
   else if Component is TStringCellEditor then

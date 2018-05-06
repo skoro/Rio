@@ -42,6 +42,7 @@ type
   public
     procedure FillHeaderValues(header: string; Buf: TStrings);
     procedure FillHeaders(Buf: TStrings);
+    procedure Add(const Header: string; const Value: String);
   end;
 
 var
@@ -228,6 +229,28 @@ begin
     s := Trim(gridHeaders.Cells[0, i]);
     if Length(s) = 0 then continue;
     if Buf.IndexOf(s) = -1 then Buf.Add(s);
+  end;
+end;
+
+// Adds Header - Value pair to the list.
+// No header - value will be added if they (header and value) already exists.
+procedure THeadersEditorForm.Add(const Header: string; const Value: String);
+var
+  i: integer;
+begin
+  // Does header-value pair already exist ?
+  with gridHeaders do begin
+    for i := 1 to RowCount - 1 do
+      if (Cells[0, i] = Header) and (Cells[1, i] = Value) then
+        Exit;
+    // Always fill last empty row.
+    if (Cells[0, RowCount - 1] = '') and (Cells[1, RowCount - 1] = '') then begin
+      Cells[0, RowCount - 1] := Header;
+      Cells[1, RowCount - 1] := Value;
+    end
+    else
+      InsertRowWithValues(RowCount, [Header, Value]);
+    RowCount := RowCount + 1;
   end;
 end;
 
