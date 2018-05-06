@@ -934,11 +934,16 @@ object Form1: TForm1
     top = 163
   end
   object popupGridActions: TPopupMenu
+    OnPopup = popupGridActionsPopup
     left = 416
     top = 163
     object gaInsertRow: TMenuItem
       Caption = 'Insert'
       OnClick = gaInsertRowClick
+    end
+    object gaSaveHeader: TMenuItem
+      Caption = 'Save'
+      OnClick = gaSaveHeaderClick
     end
     object gaEditRow: TMenuItem
       Caption = 'Edit...'

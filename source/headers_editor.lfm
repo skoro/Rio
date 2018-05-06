@@ -13,7 +13,7 @@ object HeadersEditorForm: THeadersEditorForm
   OnShow = FormShow
   SessionProperties = 'Left;Top;Width;Height'
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 0
     Height = 257
@@ -122,15 +122,15 @@ object HeadersEditorForm: THeadersEditorForm
     ClientWidth = 416
     TabOrder = 1
     object BtnClose: TButton
-      Left = 63
+      Left = 66
       Height = 38
       Hint = 'Close window (Ctrl-W)'
       Top = 2
-      Width = 58
+      Width = 59
       Align = alLeft
       AutoSize = True
       BorderSpacing.InnerBorder = 8
-      Caption = 'Close'
+      Caption = '&Close'
       ModalResult = 11
       ParentShowHint = False
       ShowHint = True
@@ -141,24 +141,24 @@ object HeadersEditorForm: THeadersEditorForm
       Height = 38
       Hint = 'Insert selected row to request headers (Ctrl-Enter)'
       Top = 2
-      Width = 61
+      Width = 64
       Align = alLeft
       AutoSize = True
       BorderSpacing.InnerBorder = 8
-      Caption = 'Insert'
+      Caption = '&Insert'
       ModalResult = 1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 1
     end
     object btnRestore: TButton
-      Left = 307
+      Left = 302
       Height = 38
       Top = 2
-      Width = 107
+      Width = 112
       Align = alRight
       AutoSize = True
-      Caption = 'Restore defaults'
+      Caption = '&Restore defaults'
       OnClick = btnRestoreClick
       TabOrder = 2
     end
