@@ -978,14 +978,17 @@ object Form1: TForm1
     top = 374
     object miJsonCopyValue: TMenuItem
       Caption = 'Copy value'
+      ShortCut = 16451
       OnClick = JsonTreePopupMenuClick
     end
     object miJsonCopyKey: TMenuItem
       Caption = 'Copy key'
+      ShortCut = 32835
       OnClick = JsonTreePopupMenuClick
     end
     object miJsonCopyValueKey: TMenuItem
       Caption = 'Copy key + value'
+      ShortCut = 24643
       OnClick = JsonTreePopupMenuClick
     end
   end
