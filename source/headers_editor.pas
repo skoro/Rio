@@ -117,10 +117,6 @@ var
 begin
   if Shift = [ssCtrl] then
     case Key of
-      // Control-Return
-      13: ModalResult := mrOK;
-      // Control-W
-      87: Close;
       // Control-D
       68: btnRemoveRowClick(Sender);
       // Control-Up

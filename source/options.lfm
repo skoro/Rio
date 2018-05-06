@@ -15,18 +15,18 @@ object OptionsForm: TOptionsForm
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 2
-    Height = 46
-    Top = 310
+    Height = 42
+    Top = 314
     Width = 412
     Align = alBottom
     BorderSpacing.Around = 2
     BevelOuter = bvNone
-    ClientHeight = 46
+    ClientHeight = 42
     ClientWidth = 412
     TabOrder = 0
     object Button1: TButton
       Left = 0
-      Height = 46
+      Height = 42
       Top = 0
       Width = 75
       Align = alLeft
@@ -37,14 +37,14 @@ object OptionsForm: TOptionsForm
   end
   object Panel2: TPanel
     Left = 2
-    Height = 306
+    Height = 310
     Top = 2
     Width = 412
     Align = alClient
     BorderSpacing.Around = 2
     BevelInner = bvRaised
     BevelOuter = bvLowered
-    ClientHeight = 306
+    ClientHeight = 310
     ClientWidth = 412
     TabOrder = 1
     object cbJsonExpanded: TCheckBox
