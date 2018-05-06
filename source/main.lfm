@@ -316,7 +316,6 @@ object Form1: TForm1
           ScrollBars = ssAutoBoth
           TabOrder = 0
           ToolTips = False
-          OnClick = JsonTreeClick
           Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoThemedDraw]
         end
       end
@@ -685,15 +684,6 @@ object Form1: TForm1
         Caption = 'Options...'
         ShortCut = 16572
         OnClick = miOptionsClick
-      end
-    end
-    object miView: TMenuItem
-      Caption = '&View'
-      object miTreeExpand: TMenuItem
-        Caption = 'Collapse/&Expand tree'
-        Enabled = False
-        ShortCut = 16453
-        OnClick = miTreeExpandClick
       end
     end
     object miHelp: TMenuItem

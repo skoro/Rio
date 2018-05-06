@@ -57,8 +57,6 @@ type
     AppMenu: TMainMenu;
     miFile: TMenuItem;
     miHelp: TMenuItem;
-    miView: TMenuItem;
-    miTreeExpand: TMenuItem;
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
@@ -87,7 +85,6 @@ type
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
-    procedure JsonTreeClick(Sender: TObject);
     procedure JsonTreePopupMenuClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
@@ -149,9 +146,6 @@ const
   // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
   (-1, 3, 2, 4, 5, 0, 1);
 
-  JSONTypeNames: array[TJSONtype] of string =
-  ('Unknown', 'Number', 'String', 'Boolean', 'Null', 'Array', 'Object');
-
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
 
 {$R *.lfm}
@@ -197,7 +191,6 @@ begin
   end;
 
   btnSubmit.Enabled := False;
-  miTreeExpand.Enabled := False;
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -373,14 +366,6 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
-end;
-
-procedure TForm1.JsonTreeClick(Sender: TObject);
-var
-  Node: TTreeNode;
-begin
-  Node := TTreeView(Sender).Selected;
-  if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
 end;
 
 // Various copy operations on Json tree node.
@@ -717,7 +702,7 @@ end;
 
 procedure TForm1.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
 var
-  N,N2: TTreeNode;
+  N2: TTreeNode;
   I: Integer;
   D: TJSONData;
   C: String;
