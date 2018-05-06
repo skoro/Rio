@@ -383,12 +383,17 @@ begin
   if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
 end;
 
+// Various copy operations on Json tree node.
+// Popup menu handler for the following operations:
+// 1. Copy node value. For root values (object, array) it will copy the whole
+//    child tree.
+// 2. Copy node key.
+// 3. Copy node key + value.
 procedure TForm1.JsonTreePopupMenuClick(Sender: TObject);
 var
   Node, ParentNode: TTreeNode;
   MenuItem: TMenuItem;
   JsonData, ParentData: TJSONData;
-  JsonObject: TJSONObject;
   I: Integer;
   Value, Key: String;
 begin
