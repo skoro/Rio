@@ -944,7 +944,7 @@ begin
   if NeedConfirm then
   begin
     I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
-    if I = IDNO then Exit(False); // =>
+    if I <> IDYES then Exit(False); // =>
   end;
 
   Result := True;
