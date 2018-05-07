@@ -415,7 +415,7 @@ end;
 
 procedure TForm1.miNewClick(Sender: TObject);
 begin
-  if PromptNewRequest('Are you sure to start a new request ?') then
+  if PromptNewRequest('Are you sure you want to start a new request ?') then
     StartNewRequest;
 end;
 
