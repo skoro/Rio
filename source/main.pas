@@ -284,8 +284,10 @@ begin
   // из приложения возникают исключения что память не освобождена.
   jsImages.Free;
 
-  if Assigned(FHttpClient) then FHttpClient.Terminate;
   FreeJsonTree;
+  {if Assigned(FHttpClient) then begin
+    FHttpClient.Terminate;
+  end;}
   inherited;
 end;
 
@@ -1182,7 +1184,6 @@ begin
     end;
     FreeAndNil(FJsonRoot);
   end;
-  //JsonTree.Items.FreeAllNodeData;
   JsonTree.Items.Clear;
   if Assigned(FJsonParser) then FreeAndNil(FJsonParser);
 end;
