@@ -1,12 +1,14 @@
 object HeadersEditorForm: THeadersEditorForm
   Left = 350
-  Height = 299
+  Height = 300
   Top = 189
   Width = 416
-  BorderIcons = [biMaximize]
+  BorderIcons = []
   Caption = 'Headers editor'
-  ClientHeight = 299
+  ClientHeight = 300
   ClientWidth = 416
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 300
   KeyPreview = True
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
@@ -16,18 +18,18 @@ object HeadersEditorForm: THeadersEditorForm
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 0
-    Height = 257
+    Height = 258
     Top = 0
     Width = 416
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 4
-    ClientHeight = 257
+    ClientHeight = 258
     ClientWidth = 416
     TabOrder = 0
     object gridHeaders: TStringGrid
       Left = 4
-      Height = 223
+      Height = 224
       Top = 30
       Width = 408
       Align = alClient
@@ -113,7 +115,7 @@ object HeadersEditorForm: THeadersEditorForm
   object Panel2: TPanel
     Left = 0
     Height = 42
-    Top = 257
+    Top = 258
     Width = 416
     Align = alBottom
     BevelOuter = bvNone
