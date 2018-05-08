@@ -641,6 +641,11 @@ object Form1: TForm1
     top = 163
     object miFile: TMenuItem
       Caption = '&File'
+      object miNewWindow: TMenuItem
+        Caption = 'New window...'
+        ShortCut = 24654
+        OnClick = miNewWindowClick
+      end
       object miNew: TMenuItem
         Caption = 'New request'
         ShortCut = 16462
