@@ -425,7 +425,7 @@ var
   streamer: TJSONDeStreamer;
   obj: TRequestObject;
 begin
-  if not PromptNewRequest('Do you want to open request file ?', 'Open request file') then Exit;
+  if not PromptNewRequest('Do you want to open a request file ?', 'Open request file') then Exit;
 
   dlgOpen.DefaultExt := 'json';
   if dlgOpen.Execute then begin
@@ -923,30 +923,11 @@ end;
 
 function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
 var
-  NeedConfirm: Boolean;
   I: Integer;
-  function IsGridFilled(grid: TStringGrid): Boolean;
-  var I: Integer;
-  begin
-    Result := False;
-    for I := 1 to grid.RowCount - 1 do
-      if (Trim(grid.Cells[1, I]) <> '') or (Trim(grid.Cells[2, I]) <> '') then Exit(True);
-  end;
 begin
-  // Is confirmation needed ?
-  NeedConfirm := False;
-  // Check body post data.
-  if Trim(PostText.Text) <> '' then NeedConfirm := True;
-  // Check grids.
-  if not NeedConfirm then NeedConfirm := IsGridFilled(requestHeaders);
-  if not NeedConfirm then NeedConfirm := IsGridFilled(gridForm);
-
-  if NeedConfirm then
-  begin
-    I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
-    if I <> IDYES then Exit(False); // =>
-  end;
-
+  if Trim(cbUrl.Text) = '' then Exit(True);
+  I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
+  if I <> IDYES then Exit(False); // =>
   Result := True;
 end;
 
