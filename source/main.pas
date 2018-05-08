@@ -952,12 +952,14 @@ begin
 
   // Response fields.
   responseHeaders.RowCount := 1;
+  gridRespCookie.Clear;
   responseRaw.Text := '';
-  if tabJson.TabVisible then
-  begin
-    JsonTree.Items.Clear;
-    tabJson.TabVisible := False;
-  end;
+  FContentType := '';
+  tabContent.TabVisible := False;
+  tabImage.TabVisible := False;
+  tabRespCookie.TabVisible := False;
+  { TODO : Free json tree items ? }
+  tabJson.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
   miSaveResponse.Enabled := False;
 
@@ -1026,7 +1028,6 @@ begin
   responseRaw.Clear;
   respImg.Picture.Clear;
   StatusText3.Caption := '';
-  subtype := UpperCase(GetContentSubtype);
 
   case FContentType of
     'application/json':
@@ -1047,6 +1048,7 @@ begin
         tabContent.TabVisible := False;
         tabJson.TabVisible := False;
         tabImage.TabVisible := True;
+        subtype := UpperCase(GetContentSubtype);
         if subtype = 'JPEG' then subtype := 'JPG';
         StatusText3.Caption := Format('%s: %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);
       end;
