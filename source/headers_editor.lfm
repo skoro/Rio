@@ -126,7 +126,6 @@ object HeadersEditorForm: THeadersEditorForm
     object BtnClose: TButton
       Left = 66
       Height = 38
-      Hint = 'Close window (Ctrl-W)'
       Top = 2
       Width = 59
       Align = alLeft
@@ -141,7 +140,6 @@ object HeadersEditorForm: THeadersEditorForm
     object btnInsert: TButton
       Left = 2
       Height = 38
-      Hint = 'Insert selected row to request headers (Ctrl-Enter)'
       Top = 2
       Width = 64
       Align = alLeft
