@@ -583,10 +583,15 @@ begin
     dlgSave.FileName := GetRequestFilename;
     dlgSave.Title := 'Save the response to a file';
     if dlgSave.Execute then begin
-      if tabContent.TabVisible then
-        responseRaw.Lines.SaveToFile(dlgSave.FileName)
-      else if tabImage.TabVisible then
-        respImg.Picture.SaveToFile(dlgSave.FileName);
+      if tabContent.TabVisible then begin
+        if (tabJson.TabVisible and OptionsForm.JsonSaveFormatted) then
+          FilePutContents(dlgSave.FileName, FJsonRoot.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize))
+        else
+          responseRaw.Lines.SaveToFile(dlgSave.FileName)
+      end
+      else
+        if tabImage.TabVisible then
+          respImg.Picture.SaveToFile(dlgSave.FileName);
     end;
   except on E: Exception do
     ShowMessage(E.Message);
