@@ -274,6 +274,7 @@ begin
 
   gridForm.Cells[0, 1] := '1';
   gridReqCookie.Cells[0, 1] := '1';
+  gridParams.Cells[0, 1] := '1';
 
   // Init cookie form.
   CookieForm := TCookieForm.Create(Application);
@@ -592,6 +593,7 @@ begin
   SetColumns(gridForm);
   SetColumns(gridReqCookie);
   SetColumns(gridRespCookie);
+  SetColumns(gridParams);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -608,6 +610,7 @@ begin
   SaveColumns(responseHeaders);
   SaveColumns(gridReqCookie);
   SaveColumns(gridRespCookie);
+  SaveColumns(gridParams);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -947,27 +950,26 @@ begin
 end;
 
 procedure TForm1.StartNewRequest;
+  procedure ResetGrid(grid: TStringGrid);
+  begin
+    grid.RowCount := 2;
+    grid.Cells[0, 1] := '1';
+    grid.Cells[1, 1] := '';
+    grid.Cells[2, 1] := '';
+  end;
+
 begin
   // Request fields.
   cbUrl.Text := '';
   cbMethod.Text := 'GET';
   PostText.Text := '';
-  requestHeaders.RowCount := 2;
-  requestHeaders.Cells[0, 1] := '1';
-  requestHeaders.Cells[1, 1] := '';
-  requestHeaders.Cells[2, 1] := '';
-  gridForm.RowCount := 2;
-  gridForm.Cells[0, 1] := '1';
-  gridForm.Cells[1, 1] := '';
-  gridForm.Cells[2, 1] := '';
-  gridReqCookie.RowCount := 2;
-  gridReqCookie.Cells[0, 1] := '1';
-  gridReqCookie.Cells[1, 1] := '';
-  gridReqCookie.Cells[2, 1] := '';
+  ResetGrid(requestHeaders);
+  ResetGrid(gridForm);
+  ResetGrid(gridReqCookie);
+  ResetGrid(gridParams);
 
   // Response fields.
   responseHeaders.RowCount := 1;
-  gridRespCookie.Clear;
   responseRaw.Text := '';
   FContentType := '';
   tabContent.TabVisible := False;
