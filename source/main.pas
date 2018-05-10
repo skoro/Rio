@@ -22,6 +22,7 @@ type
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
     gaSaveHeader: TMenuItem;
+    miNewWindow: TMenuItem;
     miOptions: TMenuItem;
     StatusText3: TLabel;
     respImg: TImage;
@@ -88,6 +89,7 @@ type
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
+    procedure miNewWindowClick(Sender: TObject);
     procedure miOpenRequestClick(Sender: TObject);
     procedure miOptionsClick(Sender: TObject);
     procedure miQuitClick(Sender: TObject);
@@ -106,6 +108,7 @@ type
     FContentType: string;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
+    FIsChildForm: Boolean;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
@@ -137,7 +140,8 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value, strutils, options;
+  request_object, app_helpers, fpjsonrtti, key_value, strutils, options,
+  Process;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -417,6 +421,15 @@ procedure TForm1.miNewClick(Sender: TObject);
 begin
   if PromptNewRequest('Are you sure you want to start a new request ?') then
     StartNewRequest;
+end;
+
+procedure TForm1.miNewWindowClick(Sender: TObject);
+var
+  ChildProc: TProcess;
+begin
+  ChildProc := TProcess.Create(Self);
+  ChildProc.Executable := Application.ExeName;
+  ChildProc.Execute;
 end;
 
 procedure TForm1.miOpenRequestClick(Sender: TObject);
