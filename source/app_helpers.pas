@@ -1,5 +1,7 @@
 {
+=============================================================================
 Global application helpers.
+=============================================================================
 }
 unit app_helpers;
 
@@ -14,6 +16,8 @@ uses
 function FilePutContents(const filename, contents: ansistring): Boolean;
 { Load string contents from a file }
 function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
+{ Split input string to list of strings delimited by character }
+procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
 
 implementation
 
@@ -44,6 +48,14 @@ begin
   finally
     str.Free;
   end;
+end;
+
+procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
+begin
+  Strings.Clear;
+  Strings.Delimiter := Delim;
+  Strings.StrictDelimiter := True;
+  Strings.DelimitedText := Input;
 end;
 
 end.
