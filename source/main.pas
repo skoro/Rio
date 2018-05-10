@@ -64,6 +64,7 @@ type
     responseRaw: TMemo;
     gridRespCookie: TStringGrid;
     gridReqCookie: TStringGrid;
+    gridParams: TStringGrid;
     tabContent: TTabSheet;
     tabForm: TTabSheet;
     tabJson: TTabSheet;
@@ -73,6 +74,7 @@ type
     tabRespCookie: TTabSheet;
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
+    tabQuery: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
