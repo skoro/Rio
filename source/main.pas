@@ -75,6 +75,9 @@ type
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
     tabQuery: TTabSheet;
+    tbParams: TToolBar;
+    tbtnImportParams: TToolButton;
+    tbtnPreviewUrl: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
@@ -106,11 +109,11 @@ type
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure respImgDblClick(Sender: TObject);
+    procedure tbtnImportParamsClick(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
-    FIsChildForm: Boolean;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
@@ -626,6 +629,43 @@ end;
 procedure TForm1.respImgDblClick(Sender: TObject);
 begin
   ImageResize(not respImg.Stretch);
+end;
+
+procedure TForm1.tbtnImportParamsClick(Sender: TObject);
+var
+  Uri: TURI;
+  I, Idx: Integer;
+  Params, KV: TStringList;
+begin
+  Params := TStringList.Create;
+  KV := TStringList.Create;
+  try
+    uri := ParseURI(cbUrl.Text);
+    SplitStrings(Uri.Params, '&', Params);
+    gridParams.RowCount := 1;
+    for I := 0 to Params.Count - 1 do begin
+      SplitStrings(Params[I], '=', KV);
+      if KV.Count = 0 then Continue;
+      Idx := gridParams.Cols[1].IndexOf(KV[0]);
+      case Idx of
+        -1, 0:
+          if KV.Count = 1 then gridParams.InsertRowWithValues(1, ['1', KV[0], ''])
+          else gridParams.InsertRowWithValues(1, ['1', KV[0], KV[1]]);
+         else begin
+           gridParams.Cells[1, Idx] := KV[0];
+           if KV.Count = 1 then
+             gridParams.Cells[2, Idx] := ''
+           else
+             gridParams.Cells[2, Idx] := KV[1];
+         end;
+      end;
+    end;
+    uri.Params := '';
+    cbUrl.Text := EncodeURI(uri);
+  finally
+    Params.Free;
+    KV.Free;
+  end;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
