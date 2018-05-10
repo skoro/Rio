@@ -938,7 +938,6 @@ function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string
 var
   I: Integer;
 begin
-  if Trim(cbUrl.Text) = '' then Exit(True);
   I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
   if I <> IDYES then Exit(False); // =>
   Result := True;
