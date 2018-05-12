@@ -140,8 +140,7 @@ var
 implementation
 
 uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value, strutils, options,
-  Process;
+  request_object, app_helpers, fpjsonrtti, key_value, strutils, options;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -424,12 +423,8 @@ begin
 end;
 
 procedure TForm1.miNewWindowClick(Sender: TObject);
-var
-  ChildProc: TProcess;
 begin
-  ChildProc := TProcess.Create(Self);
-  ChildProc.Executable := Application.ExeName;
-  ChildProc.Execute;
+  AppExec(Application.ExeName);
 end;
 
 procedure TForm1.miOpenRequestClick(Sender: TObject);
