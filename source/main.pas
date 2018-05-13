@@ -137,6 +137,8 @@ type
     procedure ImageResize(ToStretch: Boolean = True);
     function GetContentSubtype: string;
     procedure SyncQueryParams;
+    function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
+    function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
   public
 
   end;
@@ -166,8 +168,9 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 var
-  url, method, key, value, formData: string;
+  url, method, formData: string;
   i: integer;
+  KV: TKeyValuePair;
   isForm: boolean; // is it form submit request
   ctForm: boolean; // append form content type to headers grid
 begin
@@ -208,38 +211,37 @@ begin
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
-    if requestHeaders.Cells[0, i] = '0' then continue; // Skip disabled headers.
-    key := trim(requestHeaders.Cells[1, i]);
-    if key = '' then continue;
-    value := trim(requestHeaders.Cells[2, i]);
-    if isForm and (LowerCase(key) = 'content-type') then
+    if not IsRowEnabled(requestHeaders, i) then continue; // Skip disabled headers.
+    KV := GetRowKV(requestHeaders, i);
+    if KV.key = '' then continue;
+    if isForm and (LowerCase(KV.key) = 'content-type') then
+      KV.value := trim(kv.value);
       // Forms must be with appropriate content type.
-      if LowerCase(value) = 'application/x-www-form-urlencoded' then ctForm := True
+      if LowerCase(KV.value) = 'application/x-www-form-urlencoded' then ctForm := True
       else begin
-        value := 'application/x-www-form-urlencoded';
-        requestHeaders.Cells[2, i] := value;
+        KV.value := 'application/x-www-form-urlencoded';
+        requestHeaders.Cells[2, i] := KV.value;
         ctForm := True
       end;
-    FHttpClient.AddHeader(key, value);
+    FHttpClient.AddHeader(KV.key, KV.value);
   end;
   // It's a form submit request but there is no form content type in the
   // headers grid. Append one to the grid.
   if isForm and not ctForm then
   begin
-    key := 'Content-Type';
-    value := 'application/x-www-form-urlencoded';
-    FHttpClient.AddHeader(key, value);
-    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', key, value]);
+    kv.key := 'Content-Type';
+    kv.value := 'application/x-www-form-urlencoded';
+    FHttpClient.AddHeader(kv.key, kv.value);
+    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', kv.key, kv.value]);
   end;
 
   // Set request cookies
   for I := 1 to gridReqCookie.RowCount - 1 do
   begin
-    if gridReqCookie.Cells[0, I] = '0' then continue;
-    key := Trim(gridReqCookie.Cells[1, I]);
-    if key = '' then continue;
-    value := gridReqCookie.Cells[2, I];
-    FHttpClient.AddCookie(key, value);
+    if not IsRowEnabled(gridReqCookie, I) then continue;
+    kv := GetRowKV(gridReqCookie, I);
+    if kv.key = '' then continue;
+    FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
   UpdateStatusLine('Waiting for the response...');
@@ -397,21 +399,20 @@ procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
   aRow: Integer; aState: TCheckboxState);
 var
   Params: TQueryParams;
-  Key, Value: string;
+  KV: TKeyValuePair;
   I: Integer;
 begin
   try
-    Key:=Trim(gridParams.Cells[1, aRow]);
-    if Key = '' then Exit;
-    Value:=gridParams.Cells[2, aRow];
+    KV:=GetRowKV(gridParams, aRow);
+    if KV.Key = '' then Exit;
     Params := GetURLQueryParams(cbUrl.Text);
-    I := Params.IndexOf(Key);
+    I := Params.IndexOf(KV.Key);
     // Add param to the url.
-    if (gridParams.Cells[aCol, aRow] = '1') and (I = -1) then
-      Params.AddOrSetData(Key, Value);
+    if (IsRowEnabled(gridParams, aRow)) and (I = -1) then
+      Params.AddOrSetData(KV.Key, KV.Value);
     // Remove param from the url
-    if (gridParams.Cells[aCol, aRow] = '0') and (I >= 0) then
-      Params.Remove(Key);
+    if (not IsRowEnabled(gridParams, aRow)) and (I >= 0) then
+      Params.Remove(KV.Key);
     // Construct a new url.
     cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
   finally
@@ -421,18 +422,17 @@ end;
 
 procedure TForm1.gridParamsEditingDone(Sender: TObject);
 var
-  Key, Value: string;
   Params: TQueryParams;
+  KV: TKeyValuePair;
   I: Integer;
 begin
-  if gridParams.Cells[0, gridParams.Row] = '0' then Exit;
+  if not IsRowEnabled(gridParams) then Exit;
   Params := TQueryParams.Create;
   try
     for I:=1 to gridParams.RowCount-1 do begin
-      if gridParams.Cells[0, I] = '0' then Continue;
-      Key := Trim(gridParams.Cells[1, I]);
-      Value:=gridParams.Cells[2, I];
-      Params.AddOrSetData(Key, Value);
+      if not IsRowEnabled(gridParams, I) then Continue;
+      KV:=GetRowKV(gridParams);
+      Params.AddOrSetData(KV.Key, KV.Value);
     end;
     cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
   finally
@@ -635,6 +635,7 @@ end;
 
 procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
 begin
+  // Update Query tab and app title.
   SetAppCaption(cbUrl.Text);
   SyncQueryParams;
 end;
@@ -680,7 +681,7 @@ procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
 var
   header: string;
 begin
-  header := Trim(requestHeaders.Cells[1, aRow]);
+  header := Trim(GetRowKV(requestHeaders, aRow).Value);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
@@ -723,6 +724,19 @@ begin
     Params.Free;
     KV.Free;
   end;
+end;
+
+function TForm1.IsRowEnabled(const grid: TStringGrid; aRow: Integer): Boolean;
+begin
+  if aRow = -1 then aRow := grid.Row;
+  Result := grid.Cells[0, aRow] = '1';
+end;
+
+function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValuePair;
+begin
+  if aRow = -1 then aRow := grid.Row;
+  Result.Key:=Trim(grid.Cells[1, aRow]); // Key cannot be whitespaced.
+  Result.Value:=grid.Cells[2, aRow];
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
@@ -868,17 +882,16 @@ end;
 function TForm1.EncodeFormData: string;
 var
   i: integer;
-  n, v: string;
+  KV: TKeyValuePair;
 begin
   Result := '';
   for i:=0 to gridForm.RowCount-1 do
   begin
-    if gridForm.Cells[0, i] = '0' then continue;
-    n := Trim(gridForm.Cells[1, i]); // Name
-    v := Trim(gridForm.Cells[2, i]); // Value
-    if n = '' then continue; // Skip empty names
+    if not IsRowEnabled(gridForm) then continue;
+    KV := GetRowKV(gridForm);
+    if KV.Key = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
-    Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
+    Result := Result + EncodeURLElement(KV.Key) + '=' + EncodeURLElement(KV.Value);
   end;
 end;
 
