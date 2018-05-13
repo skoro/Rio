@@ -687,18 +687,33 @@ end;
 // Synchronizes query parameters from the url.
 procedure TForm1.SyncURLQueryParams;
 var
-  Params: TQueryParams;
-  I: Integer;
+  Params, Keep: TQueryParams;
+  I, Idx: Integer;
+  KV: TKeyValuePair;
 begin
   Params:=nil;
   try
+    Keep:=TQueryParams.Create;
     Params := GetURLQueryParams(cbUrl.Text);
+    // Preserve disabled params.
+    for I:=1 to gridParams.RowCount-1 do
+      if not IsRowEnabled(gridParams, I) then begin
+        KV:=GetRowKV(gridParams, I);
+        if KV.Key='' then Continue;
+        Keep.Add(KV.Key, KV.Value);
+      end;
     gridParams.RowCount:=1;
-    for I:=0 to Params.Count-1 do begin
-      gridParams.InsertRowWithValues(I+1, ['1', Params.Keys[I], Params.Data[I]])
+    for I:=0 to Params.Count-1 do
+      gridParams.InsertRowWithValues(I+1, ['1', Params.Keys[I], Params.Data[I]]);
+    // Return disabled params to the grid.
+    for I:=0 to Keep.Count-1 do begin
+      Idx:=gridParams.Cols[1].IndexOf(Keep.Keys[I]);
+      if Idx = -1 then
+        gridParams.InsertRowWithValues(gridParams.RowCount, ['0', Keep.Keys[I], Keep.Data[I]]);
     end;
   finally
     if assigned(Params) then Params.Free;
+    Keep.Free;
   end;
 end;
 
