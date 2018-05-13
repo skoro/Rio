@@ -404,6 +404,7 @@ var
   KV: TKeyValuePair;
   I: Integer;
 begin
+  Params:=nil;
   try
     KV:=GetRowKV(gridParams, aRow);
     if KV.Key = '' then Exit;
@@ -689,14 +690,15 @@ var
   Params: TQueryParams;
   I: Integer;
 begin
+  Params:=nil;
   try
     Params := GetURLQueryParams(cbUrl.Text);
-    // TODO: don't clear grid, disable all the grid rows.
-    gridParams.RowCount := 1;
-    for I:=0 to Params.Count-1 do
-      gridParams.InsertRowWithValues(I + 1, ['1', Params.Keys[I], Params.Data[I]]);
+    gridParams.RowCount:=1;
+    for I:=0 to Params.Count-1 do begin
+      gridParams.InsertRowWithValues(I+1, ['1', Params.Keys[I], Params.Data[I]])
+    end;
   finally
-    Params.Free;
+    if assigned(Params) then Params.Free;
   end;
 end;
 
