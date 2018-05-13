@@ -93,10 +93,10 @@ begin
     SplitStrings(URI.Params, '&', Params);
     for I := 0 to Params.Count - 1 do begin
       SplitStrings(Params[I], '=', KV);
-      if KV.Count = 1 then
-        Result.Add(KV[0])
-      else
-        Result.Add(KV[0], KV[1]);
+      case KV.Count of
+        1: Result.Add(KV[0]);
+        2: Result.Add(KV[0], KV[1]);
+      end;
     end;
   finally
     KV.Free;
