@@ -105,6 +105,7 @@ type
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
+    procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
@@ -263,7 +264,6 @@ var
   C: string;
 begin
   inherited;
-  SetAppCaption;
 
   // Init app configuration.
   C := GetAppConfigFile(False, True);
@@ -631,6 +631,12 @@ begin
   gaSaveHeader.Visible := False;
   if GetPopupSenderAsStringGrid(Sender) = requestHeaders then
     gaSaveHeader.Visible := True;
+end;
+
+procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
+begin
+  SetAppCaption(cbUrl.Text);
+  SyncQueryParams;
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
