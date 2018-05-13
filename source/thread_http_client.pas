@@ -94,8 +94,8 @@ begin
     for I := 0 to Params.Count - 1 do begin
       SplitStrings(Params[I], '=', KV);
       case KV.Count of
-        1: Result.Add(KV[0]);
-        2: Result.Add(KV[0], KV[1]);
+        1: Result.Add(DecodeURLElement(KV[0]));
+        2: Result.Add(DecodeURLElement(KV[0]), DecodeURLElement(KV[1]));
       end;
     end;
   finally
@@ -114,7 +114,7 @@ begin
   for I:=0 to Params.Count-1 do begin
     Key:=Trim(Params.Keys[I]);
     if Key <> '' then
-      ParamStr:=ParamStr + Format('%s=%s&', [Key, Params.Data[I]]);
+      ParamStr:=ParamStr + Format('%s=%s&', [EncodeURLElement(Key), EncodeURLElement(Params.Data[I])]);
   end;
   ParamStr:=TrimRightSet(ParamStr, ['&']);
 
