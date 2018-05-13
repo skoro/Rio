@@ -75,10 +75,8 @@ type
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
     tabQuery: TTabSheet;
-    tbParams: TToolBar;
-    tbtnImportParams: TToolButton;
-    tbtnPreviewUrl: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
+    procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -90,6 +88,9 @@ type
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
+    procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
+      aState: TCheckboxState);
+    procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
@@ -109,7 +110,6 @@ type
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure respImgDblClick(Sender: TObject);
-    procedure tbtnImportParamsClick(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -135,6 +135,7 @@ type
     procedure ShowHideResponseTabs(Info: TResponseInfo);
     procedure ImageResize(ToStretch: Boolean = True);
     function GetContentSubtype: string;
+    procedure SyncQueryParams;
   public
 
   end;
@@ -245,6 +246,11 @@ begin
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
+end;
+
+procedure TForm1.cbUrlChange(Sender: TObject);
+begin
+  SyncQueryParams;
 end;
 
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -384,6 +390,53 @@ begin
     end
     else
       EditGridRow(grid);
+  end;
+end;
+
+procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
+  aRow: Integer; aState: TCheckboxState);
+var
+  Params: TQueryParams;
+  Key, Value: string;
+  I: Integer;
+begin
+  try
+    Key:=Trim(gridParams.Cells[1, aRow]);
+    if Key = '' then Exit;
+    Value:=gridParams.Cells[2, aRow];
+    Params := GetURLQueryParams(cbUrl.Text);
+    I := Params.IndexOf(Key);
+    // Add param to the url.
+    if (gridParams.Cells[aCol, aRow] = '1') and (I = -1) then
+      Params.AddOrSetData(Key, Value);
+    // Remove param from the url
+    if (gridParams.Cells[aCol, aRow] = '0') and (I >= 0) then
+      Params.Remove(Key);
+    // Construct a new url.
+    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
+  finally
+    if Assigned(Params) then Params.Free;
+  end;
+end;
+
+procedure TForm1.gridParamsEditingDone(Sender: TObject);
+var
+  Key, Value: string;
+  Params: TQueryParams;
+  I: Integer;
+begin
+  if gridParams.Cells[0, gridParams.Row] = '0' then Exit;
+  Params := TQueryParams.Create;
+  try
+    for I:=1 to gridParams.RowCount-1 do begin
+      if gridParams.Cells[0, I] = '0' then Continue;
+      Key := Trim(gridParams.Cells[1, I]);
+      Value:=gridParams.Cells[2, I];
+      Params.AddOrSetData(Key, Value);
+    end;
+    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
+  finally
+    Params.Free;
   end;
 end;
 
@@ -631,7 +684,7 @@ begin
   ImageResize(not respImg.Stretch);
 end;
 
-procedure TForm1.tbtnImportParamsClick(Sender: TObject);
+procedure TForm1.SyncQueryParams;
 var
   Uri: TURI;
   I, Idx: Integer;
@@ -660,8 +713,6 @@ begin
          end;
       end;
     end;
-    uri.Params := '';
-    cbUrl.Text := EncodeURI(uri);
   finally
     Params.Free;
     KV.Free;
