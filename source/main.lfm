@@ -560,6 +560,7 @@ object Form1: TForm1
           TitleStyle = tsNative
           OnCheckboxToggled = gridParamsCheckboxToggled
           OnColRowInserted = gridColRowInserted
+          OnDblClick = gridEditDblClick
           OnEditingDone = gridParamsEditingDone
         end
       end

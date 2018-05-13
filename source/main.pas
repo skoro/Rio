@@ -136,7 +136,8 @@ type
     procedure ShowHideResponseTabs(Info: TResponseInfo);
     procedure ImageResize(ToStretch: Boolean = True);
     function GetContentSubtype: string;
-    procedure SyncQueryParams;
+    procedure SyncURLQueryParams;
+    procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
   public
@@ -244,7 +245,7 @@ begin
     FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
-  SyncQueryParams;
+  SyncURLQueryParams;
   UpdateStatusLine('Waiting for the response...');
 
   FHttpClient.Url := url;
@@ -254,7 +255,7 @@ end;
 
 procedure TForm1.cbUrlChange(Sender: TObject);
 begin
-  SyncQueryParams;
+  SyncURLQueryParams;
 end;
 
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -336,6 +337,7 @@ begin
       Cells[0, 1] := '1';
       Cells[1, 1] := '';
       Cells[2, 1] := '';
+      if Grid = gridParams then SyncGridQueryParams;
     end;
 end;
 
@@ -356,8 +358,7 @@ begin
   if Grid = requestHeaders then
     miInsertHeaderClick(Grid)
   else
-    if (Grid = gridForm) or (Grid = gridReqCookie) then
-      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
+    Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
 procedure TForm1.gaSaveHeaderClick(Sender: TObject);
@@ -388,8 +389,8 @@ begin
     grid := TStringGrid(Sender);
     if grid = responseHeaders then
     begin
-      if grid.RowCount > 1 then with grid do
-        KeyValueForm.View(Cells[0, Row], Cells[1, Row], 'View: ' + Cells[0, Row])
+      if grid.RowCount > 1 then
+        KeyValueForm.View(GetRowKV(grid), 'View: ' + grid.Cells[0, grid.Row])
     end
     else
       EditGridRow(grid);
@@ -422,24 +423,8 @@ begin
 end;
 
 procedure TForm1.gridParamsEditingDone(Sender: TObject);
-var
-  Params: TQueryParams;
-  KV: TKeyValuePair;
-  I: Integer;
 begin
-  if not IsRowEnabled(gridParams) then Exit;
-  Params := TQueryParams.Create;
-  try
-    for I:=1 to gridParams.RowCount-1 do begin
-      if not IsRowEnabled(gridParams, I) then Continue;
-      KV:=GetRowKV(gridParams, I);
-      if KV.Key = '' then Continue;
-      Params.AddOrSetData(KV.Key, KV.Value);
-    end;
-    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
-  finally
-    Params.Free;
-  end;
+  SyncGridQueryParams;
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
@@ -552,10 +537,12 @@ end;
 procedure TForm1.gaDeleteRowClick(Sender: TObject);
 var
   Component: TComponent;
+  Grid: TStringGrid;
 begin
   Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if Component is TStringGrid then
-    with TStringGrid(Component) do
+  if Component is TStringGrid then begin
+    Grid := TStringGrid(Component);
+    with Grid do
       if RowCount > 2 then DeleteRow(Row)
       else begin
         // Don't delete last row (user cannot add one) just empty it.
@@ -563,6 +550,9 @@ begin
         Cells[1, 1] := '';
         Cells[2, 1] := '';
       end;
+    // Force to update url query params.
+    if Grid = gridParams then SyncGridQueryParams;
+  end;
 end;
 
 procedure TForm1.miSaveRequestClick(Sender: TObject);
@@ -639,7 +629,7 @@ procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
   SetAppCaption(cbUrl.Text);
-  SyncQueryParams;
+  SyncURLQueryParams;
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
@@ -693,7 +683,8 @@ begin
   ImageResize(not respImg.Stretch);
 end;
 
-procedure TForm1.SyncQueryParams;
+// Synchronizes query parameters from the url.
+procedure TForm1.SyncURLQueryParams;
 var
   Params: TQueryParams;
   I: Integer;
@@ -704,6 +695,28 @@ begin
     gridParams.RowCount := 1;
     for I:=0 to Params.Count-1 do
       gridParams.InsertRowWithValues(I + 1, ['1', Params.Keys[I], Params.Data[I]]);
+  finally
+    Params.Free;
+  end;
+end;
+
+// Synchronizes query parameters from the grid.
+procedure TForm1.SyncGridQueryParams;
+var
+  Params: TQueryParams;
+  KV: TKeyValuePair;
+  I: Integer;
+begin
+  if not IsRowEnabled(gridParams) then Exit;
+  Params := TQueryParams.Create;
+  try
+    for I:=1 to gridParams.RowCount-1 do begin
+      if not IsRowEnabled(gridParams, I) then Continue;
+      KV:=GetRowKV(gridParams, I);
+      if KV.Key = '' then Continue;
+      Params.AddOrSetData(KV.Key, KV.Value);
+    end;
+    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
   finally
     Params.Free;
   end;
@@ -1106,9 +1119,11 @@ var
   kv: TKeyValuePair;
 begin
   with Grid do begin
-    kv := KeyValueForm.Edit(Cells[1, Row], Cells[2, Row], 'Edit...');
+    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...');
     Cells[1, Row] := kv.Key;
     Cells[2, Row] := kv.Value;
+    // Force to update url after editing query params.
+    if Grid = gridParams then SyncGridQueryParams;
   end;
 end;
 
