@@ -559,6 +559,7 @@ object Form1: TForm1
           TabOrder = 0
           TitleStyle = tsNative
           OnCheckboxToggled = gridParamsCheckboxToggled
+          OnColRowInserted = gridColRowInserted
           OnEditingDone = gridParamsEditingDone
         end
       end

@@ -244,6 +244,7 @@ begin
     FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
+  SyncQueryParams;
   UpdateStatusLine('Waiting for the response...');
 
   FHttpClient.Url := url;
@@ -431,7 +432,8 @@ begin
   try
     for I:=1 to gridParams.RowCount-1 do begin
       if not IsRowEnabled(gridParams, I) then Continue;
-      KV:=GetRowKV(gridParams);
+      KV:=GetRowKV(gridParams, I);
+      if KV.Key = '' then Continue;
       Params.AddOrSetData(KV.Key, KV.Value);
     end;
     cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
@@ -693,36 +695,17 @@ end;
 
 procedure TForm1.SyncQueryParams;
 var
-  Uri: TURI;
-  I, Idx: Integer;
-  Params, KV: TStringList;
+  Params: TQueryParams;
+  I: Integer;
 begin
-  Params := TStringList.Create;
-  KV := TStringList.Create;
   try
-    uri := ParseURI(cbUrl.Text);
-    SplitStrings(Uri.Params, '&', Params);
+    Params := GetURLQueryParams(cbUrl.Text);
+    // TODO: don't clear grid, disable all the grid rows.
     gridParams.RowCount := 1;
-    for I := 0 to Params.Count - 1 do begin
-      SplitStrings(Params[I], '=', KV);
-      if KV.Count = 0 then Continue;
-      Idx := gridParams.Cols[1].IndexOf(KV[0]);
-      case Idx of
-        -1, 0:
-          if KV.Count = 1 then gridParams.InsertRowWithValues(1, ['1', KV[0], ''])
-          else gridParams.InsertRowWithValues(1, ['1', KV[0], KV[1]]);
-         else begin
-           gridParams.Cells[1, Idx] := KV[0];
-           if KV.Count = 1 then
-             gridParams.Cells[2, Idx] := ''
-           else
-             gridParams.Cells[2, Idx] := KV[1];
-         end;
-      end;
-    end;
+    for I:=0 to Params.Count-1 do
+      gridParams.InsertRowWithValues(I + 1, ['1', Params.Keys[I], Params.Data[I]]);
   finally
     Params.Free;
-    KV.Free;
   end;
 end;
 
