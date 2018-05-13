@@ -94,8 +94,9 @@ begin
     for I := 0 to Params.Count - 1 do begin
       SplitStrings(Params[I], '=', KV);
       case KV.Count of
-        1: Result.Add(DecodeURLElement(KV[0]));
-        2: Result.Add(DecodeURLElement(KV[0]), DecodeURLElement(KV[1]));
+        1: Result.Add(DecodeURLElement(KV[0]), '');
+        // Fix: DecodeURLElement on empty string leads to use the value from the previous iteration.
+        2: Result.Add(DecodeURLElement(KV[0]), IfThen(KV[1] = '', '', DecodeURLElement(KV[1])));
       end;
     end;
   finally
