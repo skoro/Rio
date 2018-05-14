@@ -1,5 +1,7 @@
 {
+=============================================================================
 Global application helpers.
+=============================================================================
 }
 unit app_helpers;
 
@@ -16,6 +18,8 @@ function FilePutContents(const filename, contents: ansistring): Boolean;
 function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
 { Execute an app and don't wait when it exits. }
 procedure AppExec(const exename: string);
+{ Split input string to list of strings delimited by character }
+procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
 
 implementation
 
@@ -57,6 +61,14 @@ begin
     Execute;
     Free;
   end;
+end;
+
+procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
+begin
+  Strings.Clear;
+  Strings.Delimiter := Delim;
+  Strings.StrictDelimiter := True;
+  Strings.DelimitedText := Input;
 end;
 
 end.

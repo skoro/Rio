@@ -32,7 +32,9 @@ type
     property Key: string read GetKey write SetKey;
     property Value: string read GetValue write SetValue;
     function Edit(const AKey, AValue, title: string): TKeyValuePair;
+    function Edit(const KV: TKeyValuePair; const title: string): TKeyValuePair;
     procedure View(const AKey, AValue, Title: string);
+    procedure View(const KV: TKeyValuePair; const title: string);
   end;
 
 var
@@ -86,12 +88,23 @@ begin
   end;
 end;
 
+function TKeyValueForm.Edit(const KV: TKeyValuePair; const title: string
+  ): TKeyValuePair;
+begin
+  Result:=Edit(KV.Key, KV.Value, title);
+end;
+
 procedure TKeyValueForm.View(const AKey, AValue, Title: string);
 begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
   ShowModal;
+end;
+
+procedure TKeyValueForm.View(const KV: TKeyValuePair; const title: string);
+begin
+  View(KV.Key, KV.Value, title);
 end;
 
 end.

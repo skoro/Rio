@@ -64,6 +64,7 @@ type
     responseRaw: TMemo;
     gridRespCookie: TStringGrid;
     gridReqCookie: TStringGrid;
+    gridParams: TStringGrid;
     tabContent: TTabSheet;
     tabForm: TTabSheet;
     tabJson: TTabSheet;
@@ -73,7 +74,9 @@ type
     tabRespCookie: TTabSheet;
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
+    tabQuery: TTabSheet;
     procedure btnSubmitClick(Sender: TObject);
+    procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -85,6 +88,9 @@ type
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
+    procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
+      aState: TCheckboxState);
+    procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
     procedure miInsertHeaderClick(Sender: TObject);
@@ -99,6 +105,7 @@ type
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
+    procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
@@ -108,7 +115,6 @@ type
     FContentType: string;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
-    FIsChildForm: Boolean;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
@@ -130,6 +136,10 @@ type
     procedure ShowHideResponseTabs(Info: TResponseInfo);
     procedure ImageResize(ToStretch: Boolean = True);
     function GetContentSubtype: string;
+    procedure SyncURLQueryParams;
+    procedure SyncGridQueryParams;
+    function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
+    function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
   public
 
   end;
@@ -158,8 +168,9 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 var
-  url, method, key, value, formData: string;
+  url, method, formData: string;
   i: integer;
+  KV: TKeyValuePair;
   isForm: boolean; // is it form submit request
   ctForm: boolean; // append form content type to headers grid
 begin
@@ -200,45 +211,50 @@ begin
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
-    if requestHeaders.Cells[0, i] = '0' then continue; // Skip disabled headers.
-    key := trim(requestHeaders.Cells[1, i]);
-    if key = '' then continue;
-    value := trim(requestHeaders.Cells[2, i]);
-    if isForm and (LowerCase(key) = 'content-type') then
+    if not IsRowEnabled(requestHeaders, i) then continue; // Skip disabled headers.
+    KV := GetRowKV(requestHeaders, i);
+    if KV.key = '' then continue;
+    if isForm and (LowerCase(KV.key) = 'content-type') then
+      KV.value := trim(kv.value);
       // Forms must be with appropriate content type.
-      if LowerCase(value) = 'application/x-www-form-urlencoded' then ctForm := True
+      if LowerCase(KV.value) = 'application/x-www-form-urlencoded' then ctForm := True
       else begin
-        value := 'application/x-www-form-urlencoded';
-        requestHeaders.Cells[2, i] := value;
+        KV.value := 'application/x-www-form-urlencoded';
+        requestHeaders.Cells[2, i] := KV.value;
         ctForm := True
       end;
-    FHttpClient.AddHeader(key, value);
+    FHttpClient.AddHeader(KV.key, KV.value);
   end;
   // It's a form submit request but there is no form content type in the
   // headers grid. Append one to the grid.
   if isForm and not ctForm then
   begin
-    key := 'Content-Type';
-    value := 'application/x-www-form-urlencoded';
-    FHttpClient.AddHeader(key, value);
-    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', key, value]);
+    kv.key := 'Content-Type';
+    kv.value := 'application/x-www-form-urlencoded';
+    FHttpClient.AddHeader(kv.key, kv.value);
+    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', kv.key, kv.value]);
   end;
 
   // Set request cookies
   for I := 1 to gridReqCookie.RowCount - 1 do
   begin
-    if gridReqCookie.Cells[0, I] = '0' then continue;
-    key := Trim(gridReqCookie.Cells[1, I]);
-    if key = '' then continue;
-    value := gridReqCookie.Cells[2, I];
-    FHttpClient.AddCookie(key, value);
+    if not IsRowEnabled(gridReqCookie, I) then continue;
+    kv := GetRowKV(gridReqCookie, I);
+    if kv.key = '' then continue;
+    FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
+  SyncURLQueryParams;
   UpdateStatusLine('Waiting for the response...');
 
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
+end;
+
+procedure TForm1.cbUrlChange(Sender: TObject);
+begin
+  SyncURLQueryParams;
 end;
 
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -251,7 +267,6 @@ var
   C: string;
 begin
   inherited;
-  SetAppCaption;
 
   // Init app configuration.
   C := GetAppConfigFile(False, True);
@@ -271,6 +286,7 @@ begin
 
   gridForm.Cells[0, 1] := '1';
   gridReqCookie.Cells[0, 1] := '1';
+  gridParams.Cells[0, 1] := '1';
 
   // Init cookie form.
   CookieForm := TCookieForm.Create(Application);
@@ -320,6 +336,7 @@ begin
       Cells[0, 1] := '1';
       Cells[1, 1] := '';
       Cells[2, 1] := '';
+      if Grid = gridParams then SyncGridQueryParams;
     end;
 end;
 
@@ -340,8 +357,7 @@ begin
   if Grid = requestHeaders then
     miInsertHeaderClick(Grid)
   else
-    if (Grid = gridForm) or (Grid = gridReqCookie) then
-      Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
+    Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
 procedure TForm1.gaSaveHeaderClick(Sender: TObject);
@@ -372,12 +388,43 @@ begin
     grid := TStringGrid(Sender);
     if grid = responseHeaders then
     begin
-      if grid.RowCount > 1 then with grid do
-        KeyValueForm.View(Cells[0, Row], Cells[1, Row], 'View: ' + Cells[0, Row])
+      if grid.RowCount > 1 then
+        KeyValueForm.View(GetRowKV(grid), 'View: ' + grid.Cells[0, grid.Row])
     end
     else
       EditGridRow(grid);
   end;
+end;
+
+procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
+  aRow: Integer; aState: TCheckboxState);
+var
+  Params: TQueryParams;
+  KV: TKeyValuePair;
+  I: Integer;
+begin
+  Params:=nil;
+  try
+    KV:=GetRowKV(gridParams, aRow);
+    if KV.Key = '' then Exit;
+    Params := GetURLQueryParams(cbUrl.Text);
+    I := Params.IndexOf(KV.Key);
+    // Add param to the url.
+    if (IsRowEnabled(gridParams, aRow)) and (I = -1) then
+      Params.AddOrSetData(KV.Key, KV.Value);
+    // Remove param from the url
+    if (not IsRowEnabled(gridParams, aRow)) and (I >= 0) then
+      Params.Remove(KV.Key);
+    // Construct a new url.
+    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
+  finally
+    FreeAndNil(Params);
+  end;
+end;
+
+procedure TForm1.gridParamsEditingDone(Sender: TObject);
+begin
+  SyncGridQueryParams;
 end;
 
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
@@ -486,10 +533,12 @@ end;
 procedure TForm1.gaDeleteRowClick(Sender: TObject);
 var
   Component: TComponent;
+  Grid: TStringGrid;
 begin
   Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if Component is TStringGrid then
-    with TStringGrid(Component) do
+  if Component is TStringGrid then begin
+    Grid := TStringGrid(Component);
+    with Grid do
       if RowCount > 2 then DeleteRow(Row)
       else begin
         // Don't delete last row (user cannot add one) just empty it.
@@ -497,6 +546,9 @@ begin
         Cells[1, 1] := '';
         Cells[2, 1] := '';
       end;
+    // Force to update url query params.
+    if Grid = gridParams then SyncGridQueryParams;
+  end;
 end;
 
 procedure TForm1.miSaveRequestClick(Sender: TObject);
@@ -569,6 +621,13 @@ begin
     gaSaveHeader.Visible := True;
 end;
 
+procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
+begin
+  // Update Query tab and app title.
+  SetAppCaption(cbUrl.Text);
+  SyncURLQueryParams;
+end;
+
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
   procedure SetColumns(grid: TStringGrid);
   var
@@ -585,6 +644,7 @@ begin
   SetColumns(gridForm);
   SetColumns(gridReqCookie);
   SetColumns(gridRespCookie);
+  SetColumns(gridParams);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -601,6 +661,7 @@ begin
   SaveColumns(responseHeaders);
   SaveColumns(gridReqCookie);
   SaveColumns(gridRespCookie);
+  SaveColumns(gridParams);
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -608,7 +669,7 @@ procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
 var
   header: string;
 begin
-  header := Trim(requestHeaders.Cells[1, aRow]);
+  header := Trim(GetRowKV(requestHeaders, aRow).Value);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
@@ -616,6 +677,78 @@ end;
 procedure TForm1.respImgDblClick(Sender: TObject);
 begin
   ImageResize(not respImg.Stretch);
+end;
+
+// Synchronizes query parameters from the url.
+procedure TForm1.SyncURLQueryParams;
+var
+  Params, Keep: TQueryParams;
+  I, Idx: Integer;
+  KV: TKeyValuePair;
+begin
+  Params:=nil;
+  try
+    Keep:=TQueryParams.Create;
+    Params := GetURLQueryParams(cbUrl.Text);
+    // Preserve disabled params.
+    for I:=1 to gridParams.RowCount-1 do
+      if not IsRowEnabled(gridParams, I) then begin
+        KV:=GetRowKV(gridParams, I);
+        if KV.Key='' then Continue;
+        Keep.Add(KV.Key, KV.Value);
+      end;
+    gridParams.RowCount:=1;
+    for I:=0 to Params.Count-1 do
+      gridParams.InsertRowWithValues(I+1, ['1', Params.Keys[I], Params.Data[I]]);
+    // Return disabled params to the grid.
+    for I:=0 to Keep.Count-1 do begin
+      Idx:=gridParams.Cols[1].IndexOf(Keep.Keys[I]);
+      if Idx = -1 then
+        gridParams.InsertRowWithValues(gridParams.RowCount, ['0', Keep.Keys[I], Keep.Data[I]]);
+    end;
+  finally
+    FreeAndNil(Params);
+    FreeAndNil(Keep);
+  end;
+end;
+
+// Synchronizes query parameters from the grid.
+procedure TForm1.SyncGridQueryParams;
+var
+  Params: TQueryParams;
+  KV: TKeyValuePair;
+  I: Integer;
+begin
+  if not IsRowEnabled(gridParams) then Exit;
+  Params := TQueryParams.Create;
+  try
+    for I:=1 to gridParams.RowCount-1 do begin
+      if not IsRowEnabled(gridParams, I) then Continue;
+      KV:=GetRowKV(gridParams, I);
+      if KV.Key = '' then Continue;
+      Params.AddOrSetData(KV.Key, KV.Value);
+    end;
+    cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
+  finally
+    FreeAndNil(Params);
+  end;
+end;
+
+function TForm1.IsRowEnabled(const grid: TStringGrid; aRow: Integer): Boolean;
+begin
+  if aRow = -1 then aRow := grid.Row;
+  Result := grid.Cells[0, aRow] = '1';
+end;
+
+function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValuePair;
+var
+  Offset: ShortInt;
+begin
+  if aRow = -1 then aRow := grid.Row;
+  // Grids with more two columns should have first column with checkboxes.
+  if grid.ColCount = 2 then Offset:=0 else Offset:=1;
+  Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
+  Result.Value:=grid.Cells[Offset+1, aRow];
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
@@ -761,17 +894,16 @@ end;
 function TForm1.EncodeFormData: string;
 var
   i: integer;
-  n, v: string;
+  KV: TKeyValuePair;
 begin
   Result := '';
   for i:=0 to gridForm.RowCount-1 do
   begin
-    if gridForm.Cells[0, i] = '0' then continue;
-    n := Trim(gridForm.Cells[1, i]); // Name
-    v := Trim(gridForm.Cells[2, i]); // Value
-    if n = '' then continue; // Skip empty names
+    if not IsRowEnabled(gridForm) then continue;
+    KV := GetRowKV(gridForm);
+    if KV.Key = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
-    Result := Result + EncodeURLElement(n) + '=' + EncodeURLElement(v);
+    Result := Result + EncodeURLElement(KV.Key) + '=' + EncodeURLElement(KV.Value);
   end;
 end;
 
@@ -939,27 +1071,26 @@ begin
 end;
 
 procedure TForm1.StartNewRequest;
+  procedure ResetGrid(grid: TStringGrid);
+  begin
+    grid.RowCount := 2;
+    grid.Cells[0, 1] := '1';
+    grid.Cells[1, 1] := '';
+    grid.Cells[2, 1] := '';
+  end;
+
 begin
   // Request fields.
   cbUrl.Text := '';
   cbMethod.Text := 'GET';
   PostText.Text := '';
-  requestHeaders.RowCount := 2;
-  requestHeaders.Cells[0, 1] := '1';
-  requestHeaders.Cells[1, 1] := '';
-  requestHeaders.Cells[2, 1] := '';
-  gridForm.RowCount := 2;
-  gridForm.Cells[0, 1] := '1';
-  gridForm.Cells[1, 1] := '';
-  gridForm.Cells[2, 1] := '';
-  gridReqCookie.RowCount := 2;
-  gridReqCookie.Cells[0, 1] := '1';
-  gridReqCookie.Cells[1, 1] := '';
-  gridReqCookie.Cells[2, 1] := '';
+  ResetGrid(requestHeaders);
+  ResetGrid(gridForm);
+  ResetGrid(gridReqCookie);
+  ResetGrid(gridParams);
 
   // Response fields.
   responseHeaders.RowCount := 1;
-  gridRespCookie.Clear;
   responseRaw.Text := '';
   FContentType := '';
   tabContent.TabVisible := False;
@@ -1003,9 +1134,11 @@ var
   kv: TKeyValuePair;
 begin
   with Grid do begin
-    kv := KeyValueForm.Edit(Cells[1, Row], Cells[2, Row], 'Edit...');
+    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...');
     Cells[1, Row] := kv.Key;
     Cells[2, Row] := kv.Value;
+    // Force to update url after editing query params.
+    if Grid = gridParams then SyncGridQueryParams;
   end;
 end;
 

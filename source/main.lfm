@@ -452,6 +452,7 @@ object Form1: TForm1
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       ItemHeight = 0
+      OnChange = cbUrlChange
       OnKeyPress = cbUrlKeyPress
       TabOrder = 1
     end
@@ -522,6 +523,47 @@ object Form1: TForm1
           )
         end
       end
+      object tabQuery: TTabSheet
+        Caption = 'Query'
+        ClientHeight = 148
+        ClientWidth = 541
+        object gridParams: TStringGrid
+          Left = 0
+          Height = 148
+          Top = 0
+          Width = 541
+          Align = alClient
+          BorderStyle = bsNone
+          ColCount = 3
+          Columns = <          
+            item
+              ButtonStyle = cbsCheckboxColumn
+              MaxSize = 32
+              Title.Caption = ''
+              Width = 32
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Name'
+              Width = 128
+            end          
+            item
+              Title.Font.Style = [fsBold]
+              Title.Caption = 'Value'
+              Width = 256
+            end>
+          FixedCols = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
+          PopupMenu = popupGridActions
+          RowCount = 2
+          TabOrder = 0
+          TitleStyle = tsNative
+          OnCheckboxToggled = gridParamsCheckboxToggled
+          OnColRowInserted = gridColRowInserted
+          OnDblClick = gridEditDblClick
+          OnEditingDone = gridParamsEditingDone
+        end
+      end
       object tabBody: TTabSheet
         Caption = 'Body'
         ClientHeight = 148
@@ -543,9 +585,9 @@ object Form1: TForm1
         ClientWidth = 541
         object gridForm: TStringGrid
           Left = 0
-          Height = 145
+          Height = 148
           Top = 0
-          Width = 539
+          Width = 541
           Align = alClient
           BorderStyle = bsNone
           ColCount = 3
@@ -587,9 +629,9 @@ object Form1: TForm1
         ClientWidth = 541
         object gridReqCookie: TStringGrid
           Left = 0
-          Height = 145
+          Height = 148
           Top = 0
-          Width = 539
+          Width = 541
           Align = alClient
           BorderStyle = bsNone
           ColCount = 3
@@ -941,6 +983,7 @@ object Form1: TForm1
     Formatted = True
     OnSavingProperties = PSMAINSavingProperties
     OnRestoringProperties = PSMAINRestoringProperties
+    OnRestoreProperties = PSMAINRestoreProperties
     left = 320
     top = 163
   end

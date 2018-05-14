@@ -5,9 +5,13 @@ unit thread_http_client;
 interface
 
 uses
-  Classes, SysUtils, fphttpclient;
+  Classes, SysUtils, fphttpclient, fgl;
 
 type
+
+  { TQueryParams }
+
+  TQueryParams = specialize TFPGMap<string, string>;
 
   { TRequestInfo }
 
@@ -62,15 +66,63 @@ type
   end;
 
   function DecodeUrl(const url: string): string;
+  function GetURLQueryParams(const url: string): TQueryParams;
+  function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
 
 implementation
 
-uses dateutils, strutils;
+uses dateutils, strutils, URIParser, app_helpers;
 
 function DecodeUrl(const url: string): string;
 begin
   Result := ReplaceStr(url, '+', ' ');
   Result := DecodeURLElement(Result);
+end;
+
+function GetURLQueryParams(const url: string): TQueryParams;
+var
+  URI: TURI;
+  Params, KV: TStringList;
+  I: Integer;
+begin
+  Result := TQueryParams.Create;
+  Params := TStringList.Create;
+  KV := TStringList.Create;
+  try
+    URI := ParseURI(url);
+    SplitStrings(URI.Params, '&', Params);
+    for I := 0 to Params.Count - 1 do begin
+      SplitStrings(Params[I], '=', KV);
+      case KV.Count of
+        1: Result.Add(DecodeURLElement(KV[0]), '');
+        // Fix: DecodeURLElement on empty string leads to use the value from the previous iteration.
+        2: Result.Add(DecodeURLElement(KV[0]), IfThen(KV[1] = '', '', DecodeURLElement(KV[1])));
+      end;
+    end;
+  finally
+    KV.Free;
+    Params.Free;
+  end;
+end;
+
+function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
+var
+  URI: TURI;
+  ParamStr, Key, Data: string;
+  I: integer;
+begin
+  ParamStr:='';
+  for I:=0 to Params.Count-1 do begin
+    Key:=Trim(Params.Keys[I]);
+    Data:=Params.Data[I];
+    if Key <> '' then
+      ParamStr:=ParamStr + IfThen(Data = '', Key, Format('%s=%s', [Key, Data])) + '&';
+  end;
+  ParamStr:=TrimRightSet(ParamStr, ['&']);
+
+  URI:=ParseURI(url);
+  URI.Params:=ParamStr;
+  Result:=EncodeURI(URI);
 end;
 
 { TThreadHttpClient }
