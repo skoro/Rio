@@ -285,6 +285,7 @@ begin
   jsImages.Free;
 
   FreeJsonTree;
+  // In some rare situations Terminate leads to access violation error.
   {if Assigned(FHttpClient) then begin
     FHttpClient.Terminate;
   end;}
@@ -695,21 +696,13 @@ end;
 
 procedure TForm1.JsonDocument(json: string);
 var
-  //D: TJSONData;
-  //P: TJSONParser;
   S: TStringStream;
 begin
   S := TStringStream.Create(json);
-  //if Assigned(FJsonParser) then FreeAndNil(FJsonParser);
   FJsonParser := TJSONParser.Create(S);
-  //D := P.Parse;
-  //FJsonRoot := D;
   ShowJsonDocument;
   if OptionsForm.JsonExpanded then JsonTree.FullExpand;
-  //FreeAndNil(P);
   FreeAndNil(S);
-  //FreeAndNil(D);
-  //FJsonRoot := nil;
 end;
 
 procedure TForm1.ShowJsonDocument;
@@ -717,8 +710,6 @@ begin
   with JsonTree.Items do begin
     BeginUpdate;
     try
-      //JsonTree.Items.Clear;
-      //ShowJsonData(Nil, FJsonRoot);
       FJsonRoot := FJsonParser.Parse;
       ShowJsonData(Nil, FJsonRoot);
       with JsonTree do
