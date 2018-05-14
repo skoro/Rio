@@ -746,10 +746,14 @@ begin
 end;
 
 function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValuePair;
+var
+  Offset: ShortInt;
 begin
   if aRow = -1 then aRow := grid.Row;
-  Result.Key:=Trim(grid.Cells[1, aRow]); // Key cannot be whitespaced.
-  Result.Value:=grid.Cells[2, aRow];
+  // Grids with more two columns should have first column with checkboxes.
+  if grid.ColCount = 2 then Offset:=0 else Offset:=1;
+  Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
+  Result.Value:=grid.Cells[Offset+1, aRow];
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
