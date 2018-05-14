@@ -100,8 +100,8 @@ begin
       end;
     end;
   finally
-    KV.Free;
-    Params.Free;
+    FreeAndNil(KV);
+    FreeAndNil(Params);
   end;
 end;
 

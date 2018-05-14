@@ -121,7 +121,6 @@ type
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
-    procedure ShowJsonDocument;
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -841,13 +840,6 @@ var
 begin
   S := TStringStream.Create(json);
   FJsonParser := TJSONParser.Create(S);
-  ShowJsonDocument;
-  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
-  FreeAndNil(S);
-end;
-
-procedure TForm1.ShowJsonDocument;
-begin
   with JsonTree.Items do begin
     BeginUpdate;
     try
@@ -863,6 +855,8 @@ begin
       EndUpdate;
     end;
   end;
+  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
+  FreeAndNil(S);
 end;
 
 procedure TForm1.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
@@ -1080,7 +1074,7 @@ begin
       end;
     end; // for
   finally
-    tokens.Free;
+    FreeAndNil(tokens);
   end;
 
   if Row > 1 then tabRespCookie.TabVisible := True
