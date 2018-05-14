@@ -108,14 +108,15 @@ end;
 function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
 var
   URI: TURI;
-  ParamStr, Key: string;
+  ParamStr, Key, Data: string;
   I: integer;
 begin
   ParamStr:='';
   for I:=0 to Params.Count-1 do begin
     Key:=Trim(Params.Keys[I]);
+    Data:=Params.Data[I];
     if Key <> '' then
-      ParamStr:=ParamStr + Format('%s=%s&', [EncodeURLElement(Key), EncodeURLElement(Params.Data[I])]);
+      ParamStr:=ParamStr + IfThen(Data = '', Key, Format('%s=%s', [Key, Data])) + '&';
   end;
   ParamStr:=TrimRightSet(ParamStr, ['&']);
 
