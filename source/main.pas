@@ -419,7 +419,7 @@ begin
     // Construct a new url.
     cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
   finally
-    if Assigned(Params) then Params.Free;
+    FreeAndNil(Params);
   end;
 end;
 
@@ -712,8 +712,8 @@ begin
         gridParams.InsertRowWithValues(gridParams.RowCount, ['0', Keep.Keys[I], Keep.Data[I]]);
     end;
   finally
-    if assigned(Params) then Params.Free;
-    Keep.Free;
+    FreeAndNil(Params);
+    FreeAndNil(Keep);
   end;
 end;
 
@@ -735,7 +735,7 @@ begin
     end;
     cbUrl.Text:=ReplaceURLQueryParams(cbUrl.Text, Params);
   finally
-    Params.Free;
+    FreeAndNil(Params);
   end;
 end;
 
