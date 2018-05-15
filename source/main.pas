@@ -214,7 +214,7 @@ begin
     if not IsRowEnabled(requestHeaders, i) then continue; // Skip disabled headers.
     KV := GetRowKV(requestHeaders, i);
     if KV.key = '' then continue;
-    if isForm and (LowerCase(KV.key) = 'content-type') then
+    if isForm and (LowerCase(KV.key) = 'content-type') then begin
       KV.value := trim(kv.value);
       // Forms must be with appropriate content type.
       if LowerCase(KV.value) = 'application/x-www-form-urlencoded' then ctForm := True
@@ -223,6 +223,7 @@ begin
         requestHeaders.Cells[2, i] := KV.value;
         ctForm := True
       end;
+    end;
     FHttpClient.AddHeader(KV.key, KV.value);
   end;
   // It's a form submit request but there is no form content type in the
@@ -948,8 +949,8 @@ begin
   Result := '';
   for i:=0 to gridForm.RowCount-1 do
   begin
-    if not IsRowEnabled(gridForm) then continue;
-    KV := GetRowKV(gridForm);
+    if not IsRowEnabled(gridForm, i) then continue;
+    KV := GetRowKV(gridForm, i);
     if KV.Key = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
     Result := Result + EncodeURLElement(KV.Key) + '=' + EncodeURLElement(KV.Value);
