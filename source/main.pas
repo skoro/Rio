@@ -21,7 +21,6 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
-    gaSaveHeader: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
     StatusText3: TLabel;
@@ -75,6 +74,9 @@ type
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
     tabQuery: TTabSheet;
+    tbarHeaders: TToolBar;
+    tbtnManage: TToolButton;
+    tbtnSave: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -84,7 +86,6 @@ type
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
-    procedure gaSaveHeaderClick(Sender: TObject);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
@@ -104,13 +105,14 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
-    procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure respImgDblClick(Sender: TObject);
+    procedure tbtnManageClick(Sender: TObject);
+    procedure tbtnSaveClick(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -355,23 +357,7 @@ var
 begin
   Grid := GetPopupSenderAsStringGrid(Sender);
   if Grid = nil then Exit;
-  if Grid = requestHeaders then
-    miInsertHeaderClick(Grid)
-  else
-    Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
-end;
-
-procedure TForm1.gaSaveHeaderClick(Sender: TObject);
-var
-  Grid: TStringGrid;
-  Header: String;
-begin
-  Grid := GetPopupSenderAsStringGrid(Sender);
-  if Grid = requestHeaders then begin
-    Header := Trim(Grid.Cells[1, Grid.Row]);
-    if Header <> '' then
-      HeadersEditorForm.Add(Header, Grid.Cells[2, Grid.Row]);
-  end;
+  Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
@@ -612,16 +598,6 @@ begin
   end;
 end;
 
-// Show/hide some items in Grid's popup menu.
-// Depending on grid popup menu can show or hide some menu items for specific
-// grid.
-procedure TForm1.popupGridActionsPopup(Sender: TObject);
-begin
-  gaSaveHeader.Visible := False;
-  if GetPopupSenderAsStringGrid(Sender) = requestHeaders then
-    gaSaveHeader.Visible := True;
-end;
-
 procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
@@ -678,6 +654,20 @@ end;
 procedure TForm1.respImgDblClick(Sender: TObject);
 begin
   ImageResize(not respImg.Stretch);
+end;
+
+procedure TForm1.tbtnManageClick(Sender: TObject);
+begin
+  miInsertHeaderClick(requestHeaders);
+end;
+
+procedure TForm1.tbtnSaveClick(Sender: TObject);
+var
+  KV: TKeyValuePair;
+begin
+  KV := GetRowKV(requestHeaders);
+  if KV.Key <> '' then
+    HeadersEditorForm.Add(KV.Key, KV.Value);
 end;
 
 // Synchronizes query parameters from the url.

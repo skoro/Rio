@@ -481,8 +481,8 @@ object Form1: TForm1
         ClientWidth = 541
         object requestHeaders: TStringGrid
           Left = 0
-          Height = 148
-          Top = 0
+          Height = 122
+          Top = 26
           Width = 541
           Align = alClient
           AutoEdit = False
@@ -521,6 +521,29 @@ object Form1: TForm1
             267
             268
           )
+        end
+        object tbarHeaders: TToolBar
+          Left = 0
+          Height = 26
+          Top = 0
+          Width = 541
+          EdgeBorders = []
+          EdgeInner = esNone
+          EdgeOuter = esNone
+          ShowCaptions = True
+          TabOrder = 1
+          object tbtnManage: TToolButton
+            Left = 1
+            Top = 0
+            Caption = '&Manage'
+            OnClick = tbtnManageClick
+          end
+          object tbtnSave: TToolButton
+            Left = 59
+            Top = 0
+            Caption = '&Save header'
+            OnClick = tbtnSaveClick
+          end
         end
       end
       object tabQuery: TTabSheet
@@ -988,16 +1011,11 @@ object Form1: TForm1
     top = 163
   end
   object popupGridActions: TPopupMenu
-    OnPopup = popupGridActionsPopup
     left = 416
     top = 163
     object gaInsertRow: TMenuItem
       Caption = 'Insert'
       OnClick = gaInsertRowClick
-    end
-    object gaSaveHeader: TMenuItem
-      Caption = 'Save'
-      OnClick = gaSaveHeaderClick
     end
     object gaEditRow: TMenuItem
       Caption = 'Edit...'
