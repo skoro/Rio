@@ -44,7 +44,7 @@ type
     StatusText2: TLabel;
     miEdit: TMenuItem;
     gaClearRows: TMenuItem;
-    miInsertHeader: TMenuItem;
+    miManageHeaders: TMenuItem;
     gaDeleteRow: TMenuItem;
     pagesResponse: TPageControl;
     StatusPanel: TPanel;
@@ -94,7 +94,7 @@ type
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure JsonTreeClick(Sender: TObject);
-    procedure miInsertHeaderClick(Sender: TObject);
+    procedure miManageHeadersClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
     procedure miNewWindowClick(Sender: TObject);
     procedure miOpenRequestClick(Sender: TObject);
@@ -427,7 +427,7 @@ begin
   if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
 end;
 
-procedure TForm1.miInsertHeaderClick(Sender: TObject);
+procedure TForm1.miManageHeadersClick(Sender: TObject);
 var
   i, row: integer;
   gridHeaders: TStringGrid;
@@ -658,7 +658,7 @@ end;
 
 procedure TForm1.tbtnManageClick(Sender: TObject);
 begin
-  miInsertHeaderClick(requestHeaders);
+  miManageHeadersClick(requestHeaders);
 end;
 
 procedure TForm1.tbtnSaveClick(Sender: TObject);

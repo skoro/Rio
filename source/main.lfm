@@ -535,7 +535,7 @@ object Form1: TForm1
           object tbtnManage: TToolButton
             Left = 1
             Top = 0
-            Caption = '&Manage'
+            Caption = 'Manage'
             OnClick = tbtnManageClick
           end
           object tbtnSave: TToolButton
@@ -742,10 +742,10 @@ object Form1: TForm1
     end
     object miEdit: TMenuItem
       Caption = '&Edit'
-      object miInsertHeader: TMenuItem
-        Caption = '&Insert header...'
+      object miManageHeaders: TMenuItem
+        Caption = '&Manage headers...'
         ShortCut = 16457
-        OnClick = miInsertHeaderClick
+        OnClick = miManageHeadersClick
       end
       object miOptions: TMenuItem
         Caption = 'Options...'
