@@ -646,7 +646,7 @@ procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
 var
   header: string;
 begin
-  header := Trim(GetRowKV(requestHeaders, aRow).Value);
+  header := Trim(GetRowKV(requestHeaders, aRow).Key);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
