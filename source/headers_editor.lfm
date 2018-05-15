@@ -35,6 +35,7 @@ object HeadersEditorForm: THeadersEditorForm
       Align = alClient
       BorderStyle = bsNone
       ColCount = 2
+      ColumnClickSorts = True
       Columns = <      
         item
           Title.Font.Style = [fsBold]
