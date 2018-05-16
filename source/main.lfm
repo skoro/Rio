@@ -316,6 +316,7 @@ object Form1: TForm1
           ScrollBars = ssAutoBoth
           TabOrder = 0
           ToolTips = False
+          OnDblClick = JsonTreeDblClick
           Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoThemedDraw]
         end
       end
