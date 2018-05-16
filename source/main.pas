@@ -21,6 +21,7 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    miJsonView: TMenuItem;
     miJsonCopyValue: TMenuItem;
     miJsonCopyKey: TMenuItem;
     miJsonCopyValueKey: TMenuItem;
@@ -493,6 +494,9 @@ begin
     Clipboard.AsText := Key
   else if MenuItem = miJsonCopyValueKey then
     Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, JsonData.FormatJSON]));
+
+  if MenuItem = miJsonView then
+    KeyValueForm.View(Key, Value, Key);
 end;
 
 procedure TForm1.miInsertHeaderClick(Sender: TObject);
