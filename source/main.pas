@@ -144,6 +144,7 @@ type
     procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
+    function FormatJson(json: TJSONData): string;
   public
 
   end;
@@ -459,7 +460,7 @@ begin
   JsonData := TJSONData(Node.Data);
   case JsonData.JSONType of
     jtNumber, jtString, jtBoolean: Value := JsonData.AsString;
-    jtArray, jtObject:             Value := JsonData.FormatJSON;
+    jtArray, jtObject:             Value := FormatJson(JsonData);
     jtNull:                        Value := '';
   end;
 
@@ -493,7 +494,7 @@ begin
   if MenuItem = miJsonCopyKey then
     Clipboard.AsText := Key
   else if MenuItem = miJsonCopyValueKey then
-    Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, JsonData.FormatJSON]));
+    Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, FormatJson(JsonData)]));
 
   if MenuItem = miJsonView then
     KeyValueForm.View(Key, Value, Key);
@@ -650,7 +651,7 @@ begin
     if dlgSave.Execute then begin
       if tabContent.TabVisible then begin
         if (tabJson.TabVisible and OptionsForm.JsonSaveFormatted) then
-          FilePutContents(dlgSave.FileName, FJsonRoot.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize))
+          FilePutContents(dlgSave.FileName, FormatJson(FJsonRoot))
         else
           responseRaw.Lines.SaveToFile(dlgSave.FileName)
       end
@@ -813,6 +814,11 @@ begin
   if grid.ColCount = 2 then Offset:=0 else Offset:=1;
   Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
   Result.Value:=grid.Cells[Offset+1, aRow];
+end;
+
+function TForm1.FormatJson(json: TJSONData): string;
+begin
+  Result := json.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize);
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);

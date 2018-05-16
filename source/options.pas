@@ -22,7 +22,6 @@ type
     Props: TJSONPropStorage;
     Panel1: TPanel;
     Panel2: TPanel;
-    procedure cbJsonSaveFmtChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     function GetFmtIndentSize: Integer;
@@ -51,17 +50,11 @@ begin
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
   Props.Active := True;
-  cbJsonSaveFmtChange(Sender);
 end;
 
 function TOptionsForm.GetFmtIndentSize: Integer;
 begin
   Result := editIndentSize.Value;
-end;
-
-procedure TOptionsForm.cbJsonSaveFmtChange(Sender: TObject);
-begin
-  PanelIndent.Enabled := cbJsonSaveFmt.Checked;
 end;
 
 function TOptionsForm.GetJsonExpanded: Boolean;

@@ -61,7 +61,6 @@ object OptionsForm: TOptionsForm
       Top = 40
       Width = 154
       Caption = '&Save formatted JSON'
-      OnChange = cbJsonSaveFmtChange
       TabOrder = 1
     end
     object PanelIndent: TPanel
