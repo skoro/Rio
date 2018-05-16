@@ -8,7 +8,7 @@ uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, thread_http_client,
-  SysUtils;
+  SysUtils, jsonparser;
 
 type
 
@@ -21,8 +21,14 @@ type
     gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    miJsonView: TMenuItem;
+    miJsonCopyValue: TMenuItem;
+    miJsonCopyKey: TMenuItem;
+    miJsonCopyValueKey: TMenuItem;
+    gaSaveHeader: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
+    popupJsonTree: TPopupMenu;
     StatusText3: TLabel;
     respImg: TImage;
     miOpenRequest: TMenuItem;
@@ -54,8 +60,6 @@ type
     AppMenu: TMainMenu;
     miFile: TMenuItem;
     miHelp: TMenuItem;
-    miView: TMenuItem;
-    miTreeExpand: TMenuItem;
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
@@ -93,8 +97,8 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
-    procedure JsonTreeClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
+    procedure JsonTreePopupMenuClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
     procedure miNewWindowClick(Sender: TObject);
     procedure miOpenRequestClick(Sender: TObject);
@@ -115,12 +119,12 @@ type
     procedure tbtnSaveClick(Sender: TObject);
   private
     FContentType: string;
+    FJsonParser: TJSONParser;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
-    procedure ShowJsonDocument;
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -138,10 +142,12 @@ type
     procedure ShowHideResponseTabs(Info: TResponseInfo);
     procedure ImageResize(ToStretch: Boolean = True);
     function GetContentSubtype: string;
+    procedure FreeJsonTree;
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
+    function FormatJson(json: TJSONData): string;
   public
 
   end;
@@ -151,16 +157,14 @@ var
 
 implementation
 
-uses lcltype, jsonparser, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value, strutils, options;
+uses lcltype, about, headers_editor, cookie_form, uriparser,
+  request_object, app_helpers, fpjsonrtti, key_value, strutils, options,
+  Clipbrd;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
   // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
   (-1, 3, 2, 4, 5, 0, 1);
-
-  JSONTypeNames: array[TJSONtype] of string =
-  ('Unknown', 'Number', 'String', 'Boolean', 'Null', 'Array', 'Object');
 
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
 
@@ -208,7 +212,6 @@ begin
   end;
 
   btnSubmit.Enabled := False;
-  miTreeExpand.Enabled := False;
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -305,7 +308,11 @@ begin
   // из приложения возникают исключения что память не освобождена.
   jsImages.Free;
 
-  if Assigned(FHttpClient) then FHttpClient.Terminate;
+  FreeJsonTree;
+  // In some rare situations Terminate leads to access violation error.
+  {if Assigned(FHttpClient) then begin
+    FHttpClient.Terminate;
+  end;}
   inherited;
 end;
 
@@ -419,12 +426,65 @@ begin
   CookieForm.View;
 end;
 
-procedure TForm1.JsonTreeClick(Sender: TObject);
+// Various copy operations on Json tree node.
+// Popup menu handler for the following operations:
+// 1. Copy node value. For root values (object, array) it will copy the whole
+//    child tree.
+// 2. Copy node key.
+// 3. Copy node key + value.
+procedure TForm1.JsonTreePopupMenuClick(Sender: TObject);
 var
-  Node: TTreeNode;
+  Node, ParentNode: TTreeNode;
+  MenuItem: TMenuItem;
+  JsonData, ParentData: TJSONData;
+  I: Integer;
+  Value, Key: String;
 begin
-  Node := TTreeView(Sender).Selected;
-  if Assigned(Node) then miTreeExpand.Enabled := True else miTreeExpand.Enabled := False;
+  Node := JsonTree.Selected;
+  if not Assigned(Node) then Exit;
+
+  // Get json node value.
+  JsonData := TJSONData(Node.Data);
+  case JsonData.JSONType of
+    jtNumber, jtString, jtBoolean: Value := JsonData.AsString;
+    jtArray, jtObject:             Value := FormatJson(JsonData);
+    jtNull:                        Value := '';
+  end;
+
+  MenuItem := Sender as TMenuItem;
+  if MenuItem = miJsonCopyValue then
+  begin
+    Clipboard.AsText := Value;
+    Exit;
+  end;
+
+  // Get json node key.
+  Key := '';
+  ParentNode := Node.Parent;
+  if not Assigned(ParentNode) then Exit;
+  ParentData := TJSONData(ParentNode.Data);
+  case ParentData.JSONType of
+    jtObject:
+      begin
+        I := TJSONObject(ParentData).IndexOf(JsonData);
+        if I >= 0 then
+          Key := TJSONObject(ParentData).Names[I];
+      end;
+    jtArray:
+      begin
+        I := TJSONArray(ParentData).IndexOf(JsonData);
+        if I >= 0 then
+          Key := IntToStr(I);
+      end;
+  end;
+
+  if MenuItem = miJsonCopyKey then
+    Clipboard.AsText := Key
+  else if MenuItem = miJsonCopyValueKey then
+    Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, FormatJson(JsonData)]));
+
+  if MenuItem = miJsonView then
+    KeyValueForm.View(Key, Value, Key);
 end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
@@ -576,10 +636,15 @@ begin
     dlgSave.FileName := GetRequestFilename;
     dlgSave.Title := 'Save the response to a file';
     if dlgSave.Execute then begin
-      if tabContent.TabVisible then
-        responseRaw.Lines.SaveToFile(dlgSave.FileName)
-      else if tabImage.TabVisible then
-        respImg.Picture.SaveToFile(dlgSave.FileName);
+      if tabContent.TabVisible then begin
+        if (tabJson.TabVisible and OptionsForm.JsonSaveFormatted) then
+          FilePutContents(dlgSave.FileName, FormatJson(FJsonRoot))
+        else
+          responseRaw.Lines.SaveToFile(dlgSave.FileName)
+      end
+      else
+        if tabImage.TabVisible then
+          respImg.Picture.SaveToFile(dlgSave.FileName);
     end;
   except on E: Exception do
     ShowMessage(E.Message);
@@ -742,6 +807,11 @@ begin
   Result.Value:=grid.Cells[Offset+1, aRow];
 end;
 
+function TForm1.FormatJson(json: TJSONData): string;
+begin
+  Result := json.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize);
+end;
+
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
   UpdateStatusLine;
@@ -768,28 +838,14 @@ end;
 
 procedure TForm1.JsonDocument(json: string);
 var
-  D: TJSONData;
-  P: TJSONParser;
   S: TStringStream;
 begin
   S := TStringStream.Create(json);
-  P := TJSONParser.Create(S);
-  D := P.Parse;
-  FJsonRoot := D;
-  ShowJsonDocument;
-  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
-  FreeAndNil(P);
-  FreeAndNil(S);
-  FreeAndNil(D);
-  FJsonRoot := nil;
-end;
-
-procedure TForm1.ShowJsonDocument;
-begin
+  FJsonParser := TJSONParser.Create(S);
   with JsonTree.Items do begin
     BeginUpdate;
     try
-      JsonTree.Items.Clear;
+      FJsonRoot := FJsonParser.Parse;
       ShowJsonData(Nil, FJsonRoot);
       with JsonTree do
         if (Items.Count > 0) and Assigned(Items[0]) then
@@ -801,11 +857,13 @@ begin
       EndUpdate;
     end;
   end;
+  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
+  FreeAndNil(S);
 end;
 
 procedure TForm1.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
 var
-  N,N2: TTreeNode;
+  N2: TTreeNode;
   I: Integer;
   D: TJSONData;
   C: String;
@@ -819,6 +877,7 @@ begin
     AParent := JsonTree.Items.AddChild(nil, '');
     AParent.ImageIndex := ImageTypeMap[Data.JSONType];
     AParent.SelectedIndex := ImageTypeMap[Data.JSONType];
+    AParent.Data := Data;
   end;
 
   Case Data.JSONType of
@@ -842,6 +901,7 @@ begin
           D := TJSONData(S.Objects[i]);
           N2.ImageIndex := ImageTypeMap[D.JSONType];
           N2.SelectedIndex := ImageTypeMap[D.JSONType];
+          N2.Data := D;
           ShowJSONData(N2, D);
           end
       finally
@@ -1016,7 +1076,7 @@ begin
       end;
     end; // for
   finally
-    tokens.Free;
+    FreeAndNil(tokens);
   end;
 
   if Row > 1 then tabRespCookie.TabVisible := True
@@ -1156,6 +1216,7 @@ var
 begin
   Info.Content.Position := 0;
 
+  FreeJsonTree;
   responseRaw.Clear;
   respImg.Picture.Clear;
   StatusText3.Caption := '';
@@ -1228,6 +1289,18 @@ begin
     raise Exception.Create('Cannot get subtype. Content type is empty');
   p := Pos('/', FContentType);
   Result := RightStr(FContentType, Length(FContentType) - p);
+end;
+
+procedure TForm1.FreeJsonTree;
+begin
+  if Assigned(FJsonRoot) then begin
+    case FJsonRoot.JSONType of
+      jtArray, jtObject: FJsonRoot.Clear;
+    end;
+    FreeAndNil(FJsonRoot);
+  end;
+  JsonTree.Items.Clear;
+  if Assigned(FJsonParser) then FreeAndNil(FJsonParser);
 end;
 
 end.

@@ -305,15 +305,18 @@ object Form1: TForm1
         TabVisible = False
         object JsonTree: TTreeView
           Left = 0
-          Height = 242
+          Height = 244
           Top = 0
-          Width = 547
+          Width = 549
           Align = alClient
           BorderStyle = bsNone
           Images = jsImages
+          PopupMenu = popupJsonTree
+          ReadOnly = True
           ScrollBars = ssAutoBoth
           TabOrder = 0
-          OnClick = JsonTreeClick
+          ToolTips = False
+          Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoThemedDraw]
         end
       end
       object tabImage: TTabSheet
@@ -753,15 +756,6 @@ object Form1: TForm1
         OnClick = miOptionsClick
       end
     end
-    object miView: TMenuItem
-      Caption = '&View'
-      object miTreeExpand: TMenuItem
-        Caption = 'Collapse/&Expand tree'
-        Enabled = False
-        ShortCut = 16453
-        OnClick = miTreeExpandClick
-      end
-    end
     object miHelp: TMenuItem
       Caption = '&Help'
       object miAbout: TMenuItem
@@ -1039,5 +1033,29 @@ object Form1: TForm1
   object dlgOpen: TOpenDialog
     left = 257
     top = 163
+  end
+  object popupJsonTree: TPopupMenu
+    left = 308
+    top = 374
+    object miJsonCopyValue: TMenuItem
+      Caption = 'Copy value'
+      ShortCut = 16451
+      OnClick = JsonTreePopupMenuClick
+    end
+    object miJsonCopyKey: TMenuItem
+      Caption = 'Copy key'
+      ShortCut = 32835
+      OnClick = JsonTreePopupMenuClick
+    end
+    object miJsonCopyValueKey: TMenuItem
+      Caption = 'Copy key + value'
+      ShortCut = 24643
+      OnClick = JsonTreePopupMenuClick
+    end
+    object miJsonView: TMenuItem
+      Caption = 'View...'
+      ShortCut = 32854
+      OnClick = JsonTreePopupMenuClick
+    end
   end
 end

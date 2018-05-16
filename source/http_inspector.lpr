@@ -5,6 +5,7 @@ program http_inspector;
 uses
   {$IFDEF UNIX}
   cthreads,
+  cmem,
   {$ENDIF}
   Forms, Interfaces, main, options;
 
