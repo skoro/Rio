@@ -98,6 +98,7 @@ type
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
+    procedure JsonTreeDblClick(Sender: TObject);
     procedure JsonTreePopupMenuClick(Sender: TObject);
     procedure miNewClick(Sender: TObject);
     procedure miNewWindowClick(Sender: TObject);
@@ -424,6 +425,18 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TForm1.JsonTreeDblClick(Sender: TObject);
+var
+  Node: TTreeNode;
+begin
+  Node := JsonTree.Selected;
+  if not Assigned(Node) then Exit;
+  // Double click on parent nodes expand/collapse children.
+  // But on child node shows KeyValue modal.
+  if not Node.HasChildren then
+    JsonTreePopupMenuClick(miJsonView);
 end;
 
 // Various copy operations on Json tree node.
