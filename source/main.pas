@@ -521,6 +521,7 @@ begin
       cbUrl.Text := obj.Url;
       cbMethod.Text := obj.Method;
       editOther.Text := obj.Body;
+      editJson.Text := obj.Json;
       obj.SetCollectionToGrid(obj.Headers, requestHeaders);
       obj.SetCollectionToGrid(obj.Form, gridForm);
       obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
@@ -586,6 +587,7 @@ begin
     obj.Url := cbUrl.Text;
     obj.Method := cbMethod.Text;
     obj.Body := editOther.Text;
+    obj.Json := editJson.Text;
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
     obj.SetCollectionFromGrid(gridForm, obj.Form);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
