@@ -5,12 +5,13 @@ unit main;
 interface
 
 uses
-  Classes, Forms, Dialogs, StdCtrls,
-  ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage, thread_http_client,
-  SysUtils;
+  Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
+  fphttpclient, fpjson, Controls, JSONPropStorage, SynEdit,
+  SynHighlighterJScript, thread_http_client, SysUtils;
 
 type
+
+  TBodyTab = (btForm, btJson, btOther);
 
   { TForm1 }
 
@@ -18,12 +19,18 @@ type
     btnSubmit: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
-    gridForm: TStringGrid;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
     gaSaveHeader: TMenuItem;
+    gridForm: TStringGrid;
+    miBodyForm: TMenuItem;
+    miBodyJson: TMenuItem;
+    miBodyOther: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
+    pagesBody: TPageControl;
+    pmBodyType: TPopupMenu;
+    editOther: TMemo;
     StatusText3: TLabel;
     respImg: TImage;
     miOpenRequest: TMenuItem;
@@ -33,7 +40,6 @@ type
     dlgOpen: TOpenDialog;
     Panel1: TPanel;
     pagesRequest: TPageControl;
-    PostText: TMemo;
     requestHeaders: TStringGrid;
     dlgSave: TSaveDialog;
     scrollImage: TScrollBox;
@@ -65,8 +71,9 @@ type
     gridRespCookie: TStringGrid;
     gridReqCookie: TStringGrid;
     gridParams: TStringGrid;
+    editJson: TSynEdit;
+    synJS: TSynJScriptSyn;
     tabContent: TTabSheet;
-    tabForm: TTabSheet;
     tabJson: TTabSheet;
     tabResponse: TTabSheet;
     tabHeaders: TTabSheet;
@@ -75,6 +82,12 @@ type
     tabReqCookie: TTabSheet;
     tabImage: TTabSheet;
     tabQuery: TTabSheet;
+    tabBodyJson: TTabSheet;
+    tabBodyForm: TTabSheet;
+    tabBodyOther: TTabSheet;
+    tbarBody: TToolBar;
+    tbtnBodyType: TToolButton;
+    tbtnBodyFormat: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -104,6 +117,7 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
+    procedure pmBodyTypeClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
@@ -140,6 +154,8 @@ type
     procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
+    procedure SelectBodyTab(const tab: tbodytab);
+    function GetSelectedBodyTab: TBodyTab;
   public
 
   end;
@@ -168,11 +184,9 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 var
-  url, method, formData: string;
+  url, method, formData, contentType: string;
   i: integer;
   KV: TKeyValuePair;
-  isForm: boolean; // is it form submit request
-  ctForm: boolean; // append form content type to headers grid
 begin
   try
     url := NormalizeUrl;
@@ -184,8 +198,8 @@ begin
   end;
 
   FContentType := '';
-  isForm := False;
-  ctForm := False;
+  formData := '';
+  contentType := '';
 
   FHttpClient := TThreadHttpClient.Create(true);
   FHttpClient.OnRequestComplete := @OnRequestComplete;
@@ -194,16 +208,25 @@ begin
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
 
-  // Do submit form ?
-  formData := EncodeFormData;
-  if (method = 'POST') and (Length(formData) > 0) then begin
-    isForm := True;
-    FHttpClient.RequestBody := TStringStream.Create(formData);
+  // Post a form data.
+  if (method = 'POST') and (GetSelectedBodyTab = btForm) then begin
+    formData := EncodeFormData;
+    contentType := 'application/x-www-form-urlencoded';
   end;
 
-  if (not isForm) and (Length(Trim(PostText.Text)) > 0) then begin
-    FHttpClient.RequestBody := TStringStream.Create(PostText.Text);
+  // Post, put, delete, etc other data.
+  if (method <> 'GET') and (GetSelectedBodyTab <> btForm) then begin
+    case GetSelectedBodyTab of
+      btJson : begin
+        formData := editJson.Text;
+        contentType := 'application/json';
+      end;
+      btOther: formData:=editOther.Text;
+    end;
   end;
+
+  if (method <> 'GET') and (Length(formData) > 0) then
+    FHttpClient.RequestBody := TStringStream.Create(formData);
 
   btnSubmit.Enabled := False;
   miTreeExpand.Enabled := False;
@@ -211,29 +234,23 @@ begin
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
   begin
-    if not IsRowEnabled(requestHeaders, i) then continue; // Skip disabled headers.
     KV := GetRowKV(requestHeaders, i);
-    if KV.key = '' then continue;
-    if isForm and (LowerCase(KV.key) = 'content-type') then begin
-      KV.value := trim(kv.value);
-      // Forms must be with appropriate content type.
-      if LowerCase(KV.value) = 'application/x-www-form-urlencoded' then ctForm := True
-      else begin
-        KV.value := 'application/x-www-form-urlencoded';
-        requestHeaders.Cells[2, i] := KV.value;
-        ctForm := True
+    if (LowerCase(KV.Key) = 'content-type') and (contentType <> '') then begin
+      if LowerCase(KV.Value) <> contentType then begin
+        requestHeaders.Cells[2, i] := contentType;
+        KV.Value := contentType;
+        if not IsRowEnabled(requestHeaders, i) then
+          requestHeaders.Cells[0, i] := '1';
       end;
+      contentType := ''; // No need to insert content type below.
     end;
-    FHttpClient.AddHeader(KV.key, KV.value);
+    if (IsRowEnabled(requestHeaders, i)) and (Trim(KV.Key) <> '') then
+      FHttpClient.AddHeader(KV.key, KV.value);
   end;
-  // It's a form submit request but there is no form content type in the
-  // headers grid. Append one to the grid.
-  if isForm and not ctForm then
-  begin
-    kv.key := 'Content-Type';
-    kv.value := 'application/x-www-form-urlencoded';
-    FHttpClient.AddHeader(kv.key, kv.value);
-    requestHeaders.InsertRowWithValues(requestHeaders.RowCount, ['1', kv.key, kv.value]);
+
+  if contentType <> '' then begin
+    requestHeaders.InsertRowWithValues(1, ['1', 'Content-Type', contentType]);
+    FHttpClient.AddHeader('Content-Type', contentType);
   end;
 
   // Set request cookies
@@ -295,6 +312,9 @@ begin
   CookieForm.RequestGrid := gridReqCookie;
 
   KeyValueForm := TKeyValueForm.Create(Application);
+
+  SelectBodyTab(btForm);
+  pagesRequest.ActivePage := tabHeaders;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -499,7 +519,7 @@ begin
       StartNewRequest;
       cbUrl.Text := obj.Url;
       cbMethod.Text := obj.Method;
-      PostText.Text := obj.Body;
+      editOther.Text := obj.Body;
       obj.SetCollectionToGrid(obj.Headers, requestHeaders);
       obj.SetCollectionToGrid(obj.Form, gridForm);
       obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
@@ -564,7 +584,7 @@ begin
   try
     obj.Url := cbUrl.Text;
     obj.Method := cbMethod.Text;
-    obj.Body := PostText.Text;
+    obj.Body := editOther.Text;
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
     obj.SetCollectionFromGrid(gridForm, obj.Form);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
@@ -610,6 +630,16 @@ begin
     Node.Expanded := not Node.Expanded;
     if Node.Expanded then Node.Expand(True) else Node.Collapse(True);
   end;
+end;
+
+procedure TForm1.pmBodyTypeClick(Sender: TObject);
+var
+  mi: TMenuItem;
+begin
+  mi := Sender as TMenuItem;
+  if mi = miBodyForm then SelectBodyTab(btForm)
+  else if mi = miBodyJson then SelectBodyTab(btJson)
+  else if mi = miBodyOther then SelectBodyTab(btOther);
 end;
 
 // Show/hide some items in Grid's popup menu.
@@ -750,6 +780,39 @@ begin
   if grid.ColCount = 2 then Offset:=0 else Offset:=1;
   Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
   Result.Value:=grid.Cells[Offset+1, aRow];
+end;
+
+procedure TForm1.SelectBodyTab(const tab: tbodytab);
+begin
+  tbtnBodyFormat.Visible:=False;
+  case tab of
+    btForm:
+      begin
+        pagesBody.ActivePage:=tabBodyForm;
+        tbtnBodyType.Caption:='Form';
+      end;
+    btJson:
+      begin
+        pagesBody.ActivePage:=tabBodyJson;
+        tbtnBodyType.Caption:='JSON';
+        tbtnBodyFormat.Visible:=True;
+      end;
+    btOther:
+      begin
+        pagesBody.ActivePage:=tabBodyOther;
+        tbtnBodyType.Caption:='Other';
+      end;
+  end;
+end;
+
+function TForm1.GetSelectedBodyTab: TBodyTab;
+begin
+  case pagesBody.ActivePageIndex of
+    0: Result:=btJson;
+    1: Result:=btForm;
+    2: Result:=btOther;
+    else raise Exception.Create('No value for active tab.');
+  end;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
@@ -1084,7 +1147,7 @@ begin
   // Request fields.
   cbUrl.Text := '';
   cbMethod.Text := 'GET';
-  PostText.Text := '';
+  editOther.Text := '';
   ResetGrid(requestHeaders);
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
