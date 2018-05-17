@@ -1168,6 +1168,7 @@ begin
   cbUrl.Text := '';
   cbMethod.Text := 'GET';
   editOther.Text := '';
+  editJson.Text := '{'+#13+'}';
   ResetGrid(requestHeaders);
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
