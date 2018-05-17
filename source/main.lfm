@@ -589,6 +589,7 @@ object Form1: TForm1
             Left = 110
             Top = 0
             Caption = 'Format'
+            OnClick = tbtnBodyFormatClick
           end
         end
         object pagesBody: TPageControl

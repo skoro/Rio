@@ -125,6 +125,7 @@ type
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure respImgDblClick(Sender: TObject);
+    procedure tbtnBodyFormatClick(Sender: TObject);
   private
     FContentType: string;
     FJsonRoot: TJSONData;
@@ -708,6 +709,25 @@ end;
 procedure TForm1.respImgDblClick(Sender: TObject);
 begin
   ImageResize(not respImg.Stretch);
+end;
+
+procedure TForm1.tbtnBodyFormatClick(Sender: TObject);
+var
+  ss: TStringStream;
+  parser: TJSONParser;
+  data: TJSONData;
+begin
+  data := nil;
+  try
+    ss := TStringStream.Create(editJson.Text);
+    Parser := TJSONParser.Create(ss);
+    Data := Parser.Parse;
+    editJson.Text := Data.FormatJSON;
+  finally
+    FreeAndNil(ss);
+    FreeAndNil(parser);
+    FreeAndNil(data);
+  end;
 end;
 
 // Synchronizes query parameters from the url.
