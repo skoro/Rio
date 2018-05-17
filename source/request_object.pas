@@ -31,6 +31,7 @@ type
     FMethod: string;
     FUrl: string;
     FBody: string;
+    FJson: string;
     FHeaders: TCollection;
     FForm: TCollection;
     FCookies: TCollection;
@@ -44,6 +45,7 @@ type
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
     property Body: string read FBody write FBody;
+    property Json: string read FJson write FJson;
     property Headers: TCollection read FHeaders;
     property Form: TCollection read FForm;
     property Cookies: TCollection read FCookies;
