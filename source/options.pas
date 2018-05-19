@@ -5,8 +5,8 @@ unit options;
 interface
 
 uses
-  Classes, SysUtils, Forms, ExtCtrls,
-  StdCtrls, JSONPropStorage, Spin;
+  SysUtils, Forms, ExtCtrls,
+  StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson;
 
 type
 
@@ -16,22 +16,28 @@ type
     Button1: TButton;
     cbJsonExpanded: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
+    cbJsonFmtArray: TCheckBox;
     editIndentSize: TSpinEdit;
+    GroupBox1: TGroupBox;
     Label1: TLabel;
-    PanelIndent: TPanel;
+    pagesOptions: TPageControl;
     Props: TJSONPropStorage;
     Panel1: TPanel;
-    Panel2: TPanel;
+    tabJson: TTabSheet;
+    TabSheet2: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
-    function GetFmtIndentSize: Integer;
+    function GetJsonFormatOptions: TFormatOptions;
+    function GetJsonIndentSize: Integer;
     function GetJsonExpanded: Boolean;
     function GetJsonSaveFmt: Boolean;
 
   public
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
-    property FmtIndentSize: Integer read GetFmtIndentSize;
+    property JsonIndentSize: Integer read GetJsonIndentSize;
+    property JsonFormat: TFormatOptions read GetJsonFormatOptions;
+
   end;
 
 var
@@ -50,9 +56,17 @@ begin
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
   Props.Active := True;
+  pagesOptions.ActivePage := tabJson;
 end;
 
-function TOptionsForm.GetFmtIndentSize: Integer;
+function TOptionsForm.GetJsonFormatOptions: TFormatOptions;
+begin
+  Result := DefaultFormat;
+  if cbJsonFmtArray.Checked then
+    Result := Result + [foSingleLineArray];
+end;
+
+function TOptionsForm.GetJsonIndentSize: Integer;
 begin
   Result := editIndentSize.Value;
 end;
