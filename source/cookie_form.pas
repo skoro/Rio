@@ -151,8 +151,18 @@ end;
 
 procedure TCookieForm.EnableNextPrevButtons;
 begin
+  if FResponseGrid.RowCount > 2 then begin
+    btnPrev.Visible := True;
+    btnNext.Visible := True;
+  end
+  else begin
+    btnPrev.Visible := False;
+    btnNext.Visible := False;
+  end;
+
   btnPrev.Enabled := True;
   btnNext.Enabled := True;
+
   if FResponseGrid.Row <= 1 then
     btnPrev.Enabled := False;
   if FResponseGrid.Row >= FResponseGrid.RowCount - 1 then
