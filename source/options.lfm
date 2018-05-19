@@ -54,7 +54,7 @@ object OptionsForm: TOptionsForm
         Height = 22
         Top = 8
         Width = 150
-        Caption = '&JSON tree expanded'
+        Caption = 'JSON tree &expanded'
         TabOrder = 0
       end
       object cbJsonSaveFmt: TCheckBox
@@ -101,7 +101,7 @@ object OptionsForm: TOptionsForm
           Height = 22
           Top = 56
           Width = 122
-          Caption = 'Single line array'
+          Caption = 'Single line &array'
           TabOrder = 1
         end
       end
