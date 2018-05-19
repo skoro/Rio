@@ -17,6 +17,7 @@ begin
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
   Application.CreateForm(TOptionsForm, OptionsForm);
+  Form1.ApplyOptions;
   Application.Run;
 end.
 

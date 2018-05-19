@@ -170,7 +170,7 @@ type
     procedure SelectBodyTab(const tab: tbodytab);
     function GetSelectedBodyTab: TBodyTab;
   public
-
+    procedure ApplyOptions;
   end;
 
 var
@@ -598,7 +598,7 @@ end;
 
 procedure TForm1.miOptionsClick(Sender: TObject);
 begin
-  OptionsForm.ShowModal;
+  if OptionsForm.ShowModal = mrOK then ApplyOptions;
 end;
 
 procedure TForm1.miQuitClick(Sender: TObject);
@@ -887,7 +887,7 @@ end;
 
 function TForm1.FormatJson(json: TJSONData): string;
 begin
-  Result := json.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize);
+  Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
 procedure TForm1.SelectBodyTab(const tab: tbodytab);
@@ -921,6 +921,11 @@ begin
     2: Result:=btOther;
     else raise Exception.Create('No value for active tab.');
   end;
+end;
+
+procedure TForm1.ApplyOptions;
+begin
+  editJson.TabWidth := OptionsForm.JsonIndentSize;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
