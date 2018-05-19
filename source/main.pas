@@ -887,7 +887,7 @@ end;
 
 function TForm1.FormatJson(json: TJSONData): string;
 begin
-  Result := json.FormatJSON(DefaultFormat, OptionsForm.FmtIndentSize);
+  Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
 procedure TForm1.SelectBodyTab(const tab: tbodytab);
