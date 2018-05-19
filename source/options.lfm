@@ -1,7 +1,7 @@
 object OptionsForm: TOptionsForm
-  Left = 327
+  Left = 374
   Height = 300
-  Top = 154
+  Top = 141
   Width = 300
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
@@ -10,7 +10,7 @@ object OptionsForm: TOptionsForm
   Constraints.MinHeight = 300
   Constraints.MinWidth = 300
   OnCreate = FormCreate
-  SessionProperties = 'cbJsonExpanded.Checked;Height;Left;Top;Width;cbJsonSaveFmt.Checked;editIndentSize.Value'
+  SessionProperties = 'cbJsonExpanded.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;Top;Width;cbJsonFmtArray.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
@@ -112,7 +112,7 @@ object OptionsForm: TOptionsForm
     JSONFileName = 'options.json'
     Formatted = True
     Active = False
-    left = 120
-    top = 320
+    left = 184
+    top = 248
   end
 end

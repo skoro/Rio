@@ -21,8 +21,8 @@ type
     GroupBox1: TGroupBox;
     Label1: TLabel;
     pagesOptions: TPageControl;
-    Props: TJSONPropStorage;
     Panel1: TPanel;
+    Props: TJSONPropStorage;
     tabJson: TTabSheet;
     TabSheet2: TTabSheet;
     procedure FormCreate(Sender: TObject);
