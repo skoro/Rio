@@ -1275,7 +1275,7 @@ object Form1: TForm1
         OnClick = miManageHeadersClick
       end
       object miOptions: TMenuItem
-        Caption = 'Options...'
+        Caption = '&Options...'
         ShortCut = 16572
         OnClick = miOptionsClick
       end
