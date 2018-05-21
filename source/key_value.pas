@@ -21,8 +21,11 @@ type
     textValue: TMemo;
     Panel1: TPanel;
     Panel2: TPanel;
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
+    FFocusedComponent: TWinControl;
+
     function GetKey: string;
     function GetValue: string;
     procedure SetKey(AValue: string);
@@ -42,13 +45,21 @@ var
 
 implementation
 
+uses Clipbrd;
+
 {$R *.lfm}
 
 { TKeyValueForm }
 
 procedure TKeyValueForm.FormShow(Sender: TObject);
 begin
-  editName.SetFocus;
+  if Assigned(FFocusedComponent) then
+    FFocusedComponent.SetFocus;
+end;
+
+procedure TKeyValueForm.FormCreate(Sender: TObject);
+begin
+  FFocusedComponent := nil;
 end;
 
 function TKeyValueForm.GetKey: string;
@@ -78,6 +89,10 @@ begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
+  btnOK.AutoSize:=False;
+  btnOK.Width:=67;
+  btnOK.Caption := '&OK';
+  FFocusedComponent := editName;
   if ShowModal = mrOK then begin
     Result.Key := GetKey;
     Result.Value := GetValue;
@@ -99,7 +114,12 @@ begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
-  ShowModal;
+  btnOK.Caption:='C&opy and Close';
+  btnOK.AutoSize:=True;
+  FFocusedComponent := textValue;
+  if ShowModal = mrOK then begin
+    Clipboard.AsText := textValue.Text;
+  end;
 end;
 
 procedure TKeyValueForm.View(const KV: TKeyValuePair; const title: string);

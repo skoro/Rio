@@ -9,6 +9,7 @@ object KeyValueForm: TKeyValueForm
   ClientWidth = 246
   Constraints.MinHeight = 180
   Constraints.MinWidth = 200
+  OnCreate = FormCreate
   OnShow = FormShow
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
