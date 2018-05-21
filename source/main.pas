@@ -45,12 +45,12 @@ type
     miSaveResponse: TMenuItem;
     miNew: TMenuItem;
     dlgOpen: TOpenDialog;
-    Panel1: TPanel;
+    panelRequest: TPanel;
     pagesRequest: TPageControl;
     requestHeaders: TStringGrid;
     dlgSave: TSaveDialog;
     scrollImage: TScrollBox;
-    Splitter1: TSplitter;
+    Splitter: TSplitter;
     StatusImage1: TImage;
     jsImages: TImageList;
     JsonTree: TTreeView;
@@ -62,7 +62,7 @@ type
     gaDeleteRow: TMenuItem;
     pagesResponse: TPageControl;
     StatusPanel: TPanel;
-    Panel2: TPanel;
+    panelResponse: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     AppMenu: TMainMenu;
@@ -926,6 +926,20 @@ end;
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
+  case OptionsForm.PanelsLayout of
+    plVertical: begin
+      panelRequest.Align:=alTop;
+      Splitter.Align:=alTop;
+      Splitter.ResizeAnchor:=akTop;
+      panelResponse.Align:=alClient;
+    end;
+    plHorizontal: begin
+      panelRequest.Align:=alLeft;
+      Splitter.Align:=alRight;
+      Splitter.ResizeAnchor:=akLeft;
+      panelResponse.Align:=alClient;
+    end;
+  end;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);

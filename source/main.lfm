@@ -150,7 +150,7 @@ object Form1: TForm1
   OnKeyDown = FormKeyDown
   SessionProperties = 'cbUrl.Items;Height;Left;Top;Width;cbUrl.Text;cbMethod.Text;cbMethod.Items'
   LCLVersion = '1.8.2.0'
-  object Panel2: TPanel
+  object panelResponse: TPanel
     Left = 0
     Height = 315
     Top = 235
@@ -415,7 +415,7 @@ object Form1: TForm1
       end
     end
   end
-  object Panel1: TPanel
+  object panelRequest: TPanel
     Left = 2
     Height = 226
     Top = 2
@@ -1219,7 +1219,7 @@ object Form1: TForm1
       end
     end
   end
-  object Splitter1: TSplitter
+  object Splitter: TSplitter
     Cursor = crVSplit
     Left = 0
     Height = 5
