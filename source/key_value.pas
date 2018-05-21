@@ -74,13 +74,15 @@ end;
 
 procedure TKeyValueForm.SetKey(AValue: string);
 begin
-  if editName.Text = AValue then Exit;
+  if editName.Text = AValue then
+    Exit;
   editName.Text := AValue;
 end;
 
 procedure TKeyValueForm.SetValue(AValue: string);
 begin
-  if textValue.Text = AValue then Exit;
+  if textValue.Text = AValue then
+    Exit;
   textValue.Text := AValue;
 end;
 
@@ -89,24 +91,26 @@ begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
-  btnOK.AutoSize:=False;
-  btnOK.Width:=67;
+  btnOK.AutoSize := False;
+  btnOK.Width := 67;
   btnOK.Caption := '&OK';
   FFocusedComponent := editName;
-  if ShowModal = mrOK then begin
+  if ShowModal = mrOk then
+  begin
     Result.Key := GetKey;
     Result.Value := GetValue;
   end
-  else begin
+  else
+  begin
     Result.Key := akey;
     Result.Value := avalue;
   end;
 end;
 
-function TKeyValueForm.Edit(const KV: TKeyValuePair; const title: string
-  ): TKeyValuePair;
+function TKeyValueForm.Edit(const KV: TKeyValuePair;
+  const title: string): TKeyValuePair;
 begin
-  Result:=Edit(KV.Key, KV.Value, title);
+  Result := Edit(KV.Key, KV.Value, title);
 end;
 
 procedure TKeyValueForm.View(const AKey, AValue, Title: string);
@@ -114,10 +118,11 @@ begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
-  btnOK.Caption:='C&opy and Close';
-  btnOK.AutoSize:=True;
+  btnOK.Caption := 'C&opy and Close';
+  btnOK.AutoSize := True;
   FFocusedComponent := textValue;
-  if ShowModal = mrOK then begin
+  if ShowModal = mrOk then
+  begin
     Clipboard.AsText := textValue.Text;
   end;
 end;
@@ -128,4 +133,3 @@ begin
 end;
 
 end.
-
