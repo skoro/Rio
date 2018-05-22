@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage, SynEdit,
+  fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
   SynHighlighterJScript, thread_http_client,
   SysUtils, jsonparser;
 
@@ -21,48 +21,47 @@ type
     btnSubmit: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
+    editJson: TSynEdit;
+    editOther: TMemo;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
+    gridForm: TStringGrid;
+    gridParams: TStringGrid;
+    gridReqCookie: TStringGrid;
+    gridRespCookie: TStringGrid;
+    JsonTree: TTreeView;
     miJsonView: TMenuItem;
     miJsonCopyValue: TMenuItem;
     miJsonCopyKey: TMenuItem;
     miJsonCopyValueKey: TMenuItem;
     gaSaveHeader: TMenuItem;
-    gridForm: TStringGrid;
     miBodyForm: TMenuItem;
     miBodyJson: TMenuItem;
     miBodyOther: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
-    popupJsonTree: TPopupMenu;
     pagesBody: TPageControl;
+    pagesRequest: TPageControl;
+    pagesResponse: TPageControl;
+    PairSplitter1: TPairSplitter;
+    PairSplitterSide1: TPairSplitterSide;
+    PairSplitterSide2: TPairSplitterSide;
+    panelRequest: TPanel;
+    panelResponse: TPanel;
+    popupJsonTree: TPopupMenu;
     pmBodyType: TPopupMenu;
-    editOther: TMemo;
-    StatusText3: TLabel;
-    respImg: TImage;
+    requestHeaders: TStringGrid;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
     miNew: TMenuItem;
     dlgOpen: TOpenDialog;
-    panelRequest: TPanel;
-    pagesRequest: TPageControl;
-    requestHeaders: TStringGrid;
     dlgSave: TSaveDialog;
-    scrollImage: TScrollBox;
-    Splitter: TSplitter;
-    StatusImage1: TImage;
     jsImages: TImageList;
-    JsonTree: TTreeView;
-    StatusText1: TLabel;
-    StatusText2: TLabel;
     miEdit: TMenuItem;
     gaClearRows: TMenuItem;
     miManageHeaders: TMenuItem;
     gaDeleteRow: TMenuItem;
-    pagesResponse: TPageControl;
-    StatusPanel: TPanel;
-    panelResponse: TPanel;
     popupGridActions: TPopupMenu;
     PSMAIN: TJSONPropStorage;
     AppMenu: TMainMenu;
@@ -71,31 +70,34 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
+    respImg: TImage;
     responseHeaders: TStringGrid;
     responseRaw: TMemo;
-    gridRespCookie: TStringGrid;
-    gridReqCookie: TStringGrid;
-    gridParams: TStringGrid;
-    editJson: TSynEdit;
+    scrollImage: TScrollBox;
+    StatusImage1: TImage;
+    StatusPanel: TPanel;
+    StatusText1: TLabel;
+    StatusText2: TLabel;
+    StatusText3: TLabel;
     synJS: TSynJScriptSyn;
-    tabContent: TTabSheet;
-    tabJson: TTabSheet;
-    tabResponse: TTabSheet;
-    tabHeaders: TTabSheet;
     tabBody: TTabSheet;
-    tabRespCookie: TTabSheet;
-    tabReqCookie: TTabSheet;
+    tabBodyForm: TTabSheet;
+    tabBodyJson: TTabSheet;
+    tabBodyOther: TTabSheet;
+    tabContent: TTabSheet;
+    tabHeaders: TTabSheet;
     tabImage: TTabSheet;
+    tabJson: TTabSheet;
     tabQuery: TTabSheet;
+    tabReqCookie: TTabSheet;
+    tabRespCookie: TTabSheet;
+    tabResponse: TTabSheet;
+    tbarBody: TToolBar;
     tbarHeaders: TToolBar;
+    tbtnBodyFormat: TToolButton;
+    tbtnBodyType: TToolButton;
     tbtnManage: TToolButton;
     tbtnSave: TToolButton;
-    tabBodyJson: TTabSheet;
-    tabBodyForm: TTabSheet;
-    tabBodyOther: TTabSheet;
-    tbarBody: TToolBar;
-    tbtnBodyType: TToolButton;
-    tbtnBodyFormat: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -926,20 +928,7 @@ end;
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
-  case OptionsForm.PanelsLayout of
-    plVertical: begin
-      panelRequest.Align:=alTop;
-      Splitter.Align:=alTop;
-      Splitter.ResizeAnchor:=akTop;
-      panelResponse.Align:=alClient;
-    end;
-    plHorizontal: begin
-      panelRequest.Align:=alLeft;
-      Splitter.Align:=alRight;
-      Splitter.ResizeAnchor:=akLeft;
-      panelResponse.Align:=alClient;
-    end;
-  end;
+  PairSplitter1.SplitterType := OptionsForm.PanelsLayout;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);

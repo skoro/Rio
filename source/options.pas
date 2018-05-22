@@ -6,13 +6,9 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls,
-  StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson;
+  StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson, PairSplitter;
 
 type
-
-  { TPanelsLayout }
-
-  TPanelsLayout = (plVertical, plHorizontal);
 
   { TOptionsForm }
 
@@ -39,14 +35,14 @@ type
     function GetJsonIndentSize: Integer;
     function GetJsonExpanded: Boolean;
     function GetJsonSaveFmt: Boolean;
-    function GetPanelsLayout: TPanelsLayout;
+    function GetPanelsLayout: TPairSplitterType;
 
   public
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
-    property PanelsLayout: TPanelsLayout read GetPanelsLayout;
+    property PanelsLayout: TPairSplitterType read GetPanelsLayout;
   end;
 
 var
@@ -90,12 +86,12 @@ begin
   Result := cbJsonSaveFmt.Checked;
 end;
 
-function TOptionsForm.GetPanelsLayout: TPanelsLayout;
+function TOptionsForm.GetPanelsLayout: TPairSplitterType;
 begin
   if rbLayoutHor.Checked then
-    Result := plHorizontal
+    Result := pstHorizontal
   else
-    Result := plVertical;
+    Result := pstVertical;
 end;
 
 end.

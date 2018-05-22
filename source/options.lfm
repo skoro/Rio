@@ -67,6 +67,7 @@ object OptionsForm: TOptionsForm
           Caption = '&Vertical'
           Checked = True
           TabOrder = 0
+          TabStop = True
         end
         object rbLayoutHor: TRadioButton
           Left = 8
