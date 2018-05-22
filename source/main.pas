@@ -43,10 +43,10 @@ type
     pagesBody: TPageControl;
     pagesRequest: TPageControl;
     pagesResponse: TPageControl;
-    PairSplitter1: TPairSplitter;
+    LayoutSplitter: TPairSplitter;
     PairSplitterSide1: TPairSplitterSide;
     PairSplitterSide2: TPairSplitterSide;
-    Panel1: TPanel;
+    panelUrl: TPanel;
     panelRequest: TPanel;
     panelResponse: TPanel;
     popupJsonTree: TPopupMenu;
@@ -929,7 +929,16 @@ end;
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
-  PairSplitter1.SplitterType := OptionsForm.PanelsLayout;
+  // Adjust window size before change layout.
+  if (LayoutSplitter.SplitterType = pstVertical) and
+       (OptionsForm.PanelsLayout = pstHorizontal) and
+       (Width < 460) then
+    Width := 600;
+  if (LayoutSplitter.SplitterType = pstHorizontal) and
+       (OptionsForm.PanelsLayout = pstVertical) and
+       (Height < 400) then
+    Height := 600;
+  LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
