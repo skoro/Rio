@@ -153,8 +153,8 @@ object Form1: TForm1
   object PairSplitter1: TPairSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 550
-    Top = 0
+    Height = 510
+    Top = 40
     Width = 565
     Align = alClient
     Position = 220
@@ -178,62 +178,20 @@ object Form1: TForm1
         ClientHeight = 212
         ClientWidth = 557
         TabOrder = 0
-        object cbMethod: TComboBox
-          Left = 0
-          Height = 29
-          Top = 0
-          Width = 100
-          AutoComplete = True
-          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          ItemHeight = 0
-          ItemIndex = 0
-          Items.Strings = (
-            'GET'
-            'POST'
-            'PUT'
-            'OPTIONS'
-            'DELETE'
-            'PATCH'
-          )
-          TabOrder = 0
-          Text = 'GET'
-        end
-        object cbUrl: TComboBox
-          Left = 101
-          Height = 29
-          Top = 0
-          Width = 373
-          Anchors = [akTop, akLeft, akRight]
-          AutoComplete = True
-          AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-          ItemHeight = 0
-          OnChange = cbUrlChange
-          OnKeyPress = cbUrlKeyPress
-          TabOrder = 1
-        end
-        object btnSubmit: TButton
-          Left = 476
-          Height = 29
-          Top = 0
-          Width = 75
-          Anchors = [akTop, akRight]
-          Caption = 'Submit'
-          OnClick = btnSubmitClick
-          TabOrder = 2
-        end
         object pagesRequest: TPageControl
           Left = 0
-          Height = 175
-          Top = 32
-          Width = 556
+          Height = 212
+          Top = 0
+          Width = 557
           ActivePage = tabBody
-          Anchors = [akTop, akLeft, akRight, akBottom]
+          Align = alClient
+          Anchors = [akLeft, akRight, akBottom]
           TabIndex = 2
-          TabOrder = 3
+          TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
-            ClientHeight = 142
-            ClientWidth = 552
+            ClientHeight = 179
+            ClientWidth = 553
             object requestHeaders: TStringGrid
               Left = 0
               Height = 122
@@ -303,8 +261,8 @@ object Form1: TForm1
           end
           object tabQuery: TTabSheet
             Caption = 'Query'
-            ClientHeight = 142
-            ClientWidth = 552
+            ClientHeight = 179
+            ClientWidth = 553
             object gridParams: TStringGrid
               Left = 0
               Height = 148
@@ -344,13 +302,13 @@ object Form1: TForm1
           end
           object tabBody: TTabSheet
             Caption = 'Body'
-            ClientHeight = 142
-            ClientWidth = 552
+            ClientHeight = 179
+            ClientWidth = 553
             object tbarBody: TToolBar
               Left = 0
               Height = 26
               Top = 0
-              Width = 552
+              Width = 553
               EdgeBorders = []
               EdgeInner = esNone
               EdgeOuter = esNone
@@ -372,9 +330,9 @@ object Form1: TForm1
             end
             object pagesBody: TPageControl
               Left = 0
-              Height = 116
+              Height = 153
               Top = 26
-              Width = 552
+              Width = 553
               ActivePage = tabBodyJson
               Align = alClient
               ShowTabs = False
@@ -382,13 +340,13 @@ object Form1: TForm1
               TabOrder = 1
               object tabBodyJson: TTabSheet
                 Caption = 'tabBodyJson'
-                ClientHeight = 112
-                ClientWidth = 548
+                ClientHeight = 149
+                ClientWidth = 549
                 inline editJson: TSynEdit
                   Left = 0
-                  Height = 112
+                  Height = 149
                   Top = 0
-                  Width = 548
+                  Width = 549
                   Align = alClient
                   Font.Height = 13
                   Font.Name = 'DejaVu Sans Mono'
@@ -865,8 +823,8 @@ object Form1: TForm1
               end
               object tabBodyForm: TTabSheet
                 Caption = 'tabBodyForm'
-                ClientHeight = 112
-                ClientWidth = 548
+                ClientHeight = 149
+                ClientWidth = 549
                 object gridForm: TStringGrid
                   Left = 0
                   Height = 118
@@ -909,8 +867,8 @@ object Form1: TForm1
               end
               object tabBodyOther: TTabSheet
                 Caption = 'tabBodyOther'
-                ClientHeight = 112
-                ClientWidth = 548
+                ClientHeight = 149
+                ClientWidth = 549
                 object editOther: TMemo
                   Left = 0
                   Height = 118
@@ -926,8 +884,8 @@ object Form1: TForm1
           end
           object tabReqCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 142
-            ClientWidth = 552
+            ClientHeight = 179
+            ClientWidth = 553
             object gridReqCookie: TStringGrid
               Left = 0
               Height = 148
@@ -974,25 +932,25 @@ object Form1: TForm1
     object PairSplitterSide2: TPairSplitterSide
       Cursor = crArrow
       Left = 0
-      Height = 325
+      Height = 285
       Top = 225
       Width = 565
       ClientWidth = 565
-      ClientHeight = 325
+      ClientHeight = 285
       object panelResponse: TPanel
         Left = 4
-        Height = 317
+        Height = 277
         Top = 4
         Width = 557
         Align = alClient
         BorderSpacing.Around = 4
         BevelOuter = bvNone
-        ClientHeight = 317
+        ClientHeight = 277
         ClientWidth = 557
         TabOrder = 0
         object pagesResponse: TPageControl
           Left = 0
-          Height = 287
+          Height = 247
           Top = 0
           Width = 557
           ActivePage = tabResponse
@@ -1001,11 +959,11 @@ object Form1: TForm1
           TabOrder = 0
           object tabResponse: TTabSheet
             Caption = 'Response'
-            ClientHeight = 254
+            ClientHeight = 214
             ClientWidth = 553
             object responseHeaders: TStringGrid
               Left = 0
-              Height = 254
+              Height = 214
               Top = 0
               Width = 553
               Align = alClient
@@ -1041,7 +999,7 @@ object Form1: TForm1
           end
           object tabRespCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 254
+            ClientHeight = 214
             ClientWidth = 553
             TabVisible = False
             object gridRespCookie: TStringGrid
@@ -1113,7 +1071,7 @@ object Form1: TForm1
           end
           object tabContent: TTabSheet
             Caption = 'Content'
-            ClientHeight = 254
+            ClientHeight = 214
             ClientWidth = 553
             object responseRaw: TMemo
               Left = 0
@@ -1129,7 +1087,7 @@ object Form1: TForm1
           end
           object tabJson: TTabSheet
             Caption = 'JSON'
-            ClientHeight = 254
+            ClientHeight = 214
             ClientWidth = 553
             TabVisible = False
             object JsonTree: TTreeView
@@ -1151,7 +1109,7 @@ object Form1: TForm1
           end
           object tabImage: TTabSheet
             Caption = 'Image'
-            ClientHeight = 254
+            ClientHeight = 214
             ClientWidth = 553
             TabVisible = False
             object scrollImage: TScrollBox
@@ -1178,7 +1136,7 @@ object Form1: TForm1
         object StatusPanel: TPanel
           Left = 4
           Height = 30
-          Top = 287
+          Top = 247
           Width = 549
           Align = alBottom
           BorderSpacing.Left = 4
@@ -1244,6 +1202,60 @@ object Form1: TForm1
           end
         end
       end
+    end
+  end
+  object Panel1: TPanel
+    Left = 0
+    Height = 40
+    Top = 0
+    Width = 565
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 40
+    ClientWidth = 565
+    TabOrder = 1
+    object cbMethod: TComboBox
+      Left = 8
+      Height = 29
+      Top = 8
+      Width = 100
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
+      ItemIndex = 0
+      Items.Strings = (
+        'GET'
+        'POST'
+        'PUT'
+        'OPTIONS'
+        'DELETE'
+        'PATCH'
+      )
+      TabOrder = 0
+      Text = 'GET'
+    end
+    object cbUrl: TComboBox
+      Left = 112
+      Height = 29
+      Top = 8
+      Width = 373
+      Anchors = [akTop, akLeft, akRight]
+      AutoComplete = True
+      AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
+      ItemHeight = 0
+      OnChange = cbUrlChange
+      OnKeyPress = cbUrlKeyPress
+      TabOrder = 1
+    end
+    object btnSubmit: TButton
+      Left = 488
+      Height = 29
+      Top = 8
+      Width = 75
+      Anchors = [akTop, akRight]
+      Caption = 'Submit'
+      OnClick = btnSubmitClick
+      TabOrder = 2
     end
   end
   object AppMenu: TMainMenu

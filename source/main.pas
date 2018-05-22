@@ -46,6 +46,7 @@ type
     PairSplitter1: TPairSplitter;
     PairSplitterSide1: TPairSplitterSide;
     PairSplitterSide2: TPairSplitterSide;
+    Panel1: TPanel;
     panelRequest: TPanel;
     panelResponse: TPanel;
     popupJsonTree: TPopupMenu;
