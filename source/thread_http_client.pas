@@ -9,6 +9,13 @@ uses
 
 type
 
+  { TCustomHttpClient }
+
+  TCustomHttpClient = class(TFPCustomHTTPClient)
+  public
+    procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
+  end;
+
   { TQueryParams }
 
   TQueryParams = specialize TFPGMap<string, string>;
@@ -34,7 +41,7 @@ type
 
   TThreadHttpClient = class(TThread)
   private
-    FHttpClient: TFPHTTPClient;
+    FHttpClient: TCustomHttpClient;
     FHttpMethod: string;
     FUrl: string;
     FOnRequestComplete: TOnRequestComplete;
@@ -57,7 +64,7 @@ type
     destructor Destroy; override;
     procedure AddHeader(const AHeader,AValue : String);
     procedure AddCookie(const AName, AValue : String; EncodeValue: Boolean = True);
-    property Client: TFPHTTPClient read FHttpClient;
+    property Client: TCustomHttpClient read FHttpClient;
     property Method: string read FHttpMethod write SetHttpMethod;
     property Url: string read FUrl write SetUrl;
     property RequestBody: TStream read GetRequestBody write SetRequestBody;
@@ -72,6 +79,9 @@ type
 implementation
 
 uses dateutils, strutils, URIParser, app_helpers;
+
+const
+  CRLF = #13#10;
 
 function DecodeUrl(const url: string): string;
 begin
@@ -123,6 +133,48 @@ begin
   URI:=ParseURI(url);
   URI.Params:=ParamStr;
   Result:=EncodeURI(URI);
+end;
+
+{ TCustomHttpClient }
+
+procedure TCustomHttpClient.MultiFileStreamFormPost(FormData, FileNames: TStrings);
+var
+  N, V, S, Sep: string;
+  SS: TStringStream;
+  I: Integer;
+  FS: TFileStream;
+begin
+  Sep := Format('-------------%.8x_multipart_boundary', [Random($ffffff)]);
+  AddHeader('Content-Type','multipart/form-data; boundary=' + Sep);
+  SS := TStringStream.Create('');
+  try
+    if (FormData <> nil) then
+      for I:=0 to FormData.Count - 1 do begin
+        FormData.GetNameValue(I, N, V);
+        S := '--' + Sep + CRLF;
+        S := S + Format('Content-Disposition: form-data; name="%s"' + CRLF + CRLF + '%s' + CRLF, [N, V]);
+        SS.WriteBuffer(S[1], Length(S));
+      end;
+    for I := 0 to FileNames.Count - 1 do begin
+      S := '--' + Sep + CRLF;
+      FileNames.GetNameValue(I, N, V);
+      S := S + Format('Content-Disposition: form-data; name="%s"; filename="%s"'+CRLF, [N, ExtractFileName(V)]);
+      S := S + 'Content-Type: application/octet-string' + CRLF + CRLF;
+      SS.WriteBuffer(S[1], Length(S));
+      FS := TFileStream.Create(V, fmOpenRead);
+      FS.Seek(0, soFromBeginning);
+      SS.CopyFrom(FS, FS.Size);
+      FreeAndNil(FS);
+    end;
+    S := CRLF + '--' + Sep + '--' + CRLF;
+    SS.WriteBuffer(S[1], Length(S));
+    SS.Position := 0;
+    RequestBody := SS;
+    AddHeader('Content-Length', IntToStr(SS.Size));
+  finally
+    //RequestBody := nil;
+    //FreeAndNil(SS);
+  end;
 end;
 
 { TThreadHttpClient }
@@ -198,7 +250,7 @@ constructor TThreadHttpClient.Create(CreateSuspened: Boolean);
 begin
   inherited Create(CreateSuspened);
   FreeOnTerminate := True;
-  FHttpClient := TFPHTTPClient.Create(nil);
+  FHttpClient := TCustomHttpClient.Create(nil);
   FResponseData := TStringStream.Create('');
   FOnClientException:=nil;
   FOnRequestComplete:=nil;
