@@ -241,7 +241,15 @@ begin
               FormValues.Values[KV.Key] := KV.Value;
           end;
         end;
-        FHttpClient.Client.MultiFileStreamFormPost(FormValues, FileNames);
+        try
+          FHttpClient.Client.MultiFileStreamFormPost(FormValues, FileNames);
+        except on E: Exception do
+          begin
+            FreeAndNil(FHttpClient);
+            ShowMessage(E.Message);
+            Exit;
+          end;
+        end;
       finally
         FreeAndNil(FileNames);
         FreeAndNil(FormValues);

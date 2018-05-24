@@ -144,37 +144,40 @@ var
   I: Integer;
   FS: TFileStream;
 begin
-  Sep := Format('-------------%.8x_multipart_boundary', [Random($ffffff)]);
+  Sep := Format('-----%.8x-%.8x_multipart_boundary', [Random($ffffff), Random($ffffff)]);
   AddHeader('Content-Type','multipart/form-data; boundary=' + Sep);
   SS := TStringStream.Create('');
-  try
-    if (FormData <> nil) then
-      for I:=0 to FormData.Count - 1 do begin
-        FormData.GetNameValue(I, N, V);
-        S := '--' + Sep + CRLF;
-        S := S + Format('Content-Disposition: form-data; name="%s"' + CRLF + CRLF + '%s' + CRLF, [N, V]);
-        SS.WriteBuffer(S[1], Length(S));
-      end;
-    for I := 0 to FileNames.Count - 1 do begin
+  if (FormData <> nil) then
+    for I:=0 to FormData.Count - 1 do begin
+      FormData.GetNameValue(I, N, V);
       S := '--' + Sep + CRLF;
-      FileNames.GetNameValue(I, N, V);
-      S := S + Format('Content-Disposition: form-data; name="%s"; filename="%s"'+CRLF, [N, ExtractFileName(V)]);
-      S := S + 'Content-Type: application/octet-string' + CRLF + CRLF;
+      S := S + Format('Content-Disposition: form-data; name="%s"' + CRLF + CRLF + '%s' + CRLF, [N, V]);
       SS.WriteBuffer(S[1], Length(S));
+    end;
+  for I := 0 to FileNames.Count - 1 do begin
+    S := '--' + Sep + CRLF;
+    FileNames.GetNameValue(I, N, V);
+    S := S + Format('Content-Disposition: form-data; name="%s"; filename="%s"'+CRLF, [N, ExtractFileName(V)]);
+    S := S + 'Content-Type: application/octet-string' + CRLF + CRLF;
+    SS.WriteBuffer(S[1], Length(S));
+    try
       FS := TFileStream.Create(V, fmOpenRead);
       FS.Seek(0, soFromBeginning);
       SS.CopyFrom(FS, FS.Size);
       FreeAndNil(FS);
+    except on E: Exception do
+      begin
+        //FreeAndNil(FS);
+        FreeAndNil(SS);
+        raise Exception.Create('Couldn''t read file: ' + V);
+      end;
     end;
-    S := CRLF + '--' + Sep + '--' + CRLF;
-    SS.WriteBuffer(S[1], Length(S));
-    SS.Position := 0;
-    RequestBody := SS;
-    AddHeader('Content-Length', IntToStr(SS.Size));
-  finally
-    //RequestBody := nil;
-    //FreeAndNil(SS);
   end;
+  S := CRLF + '--' + Sep + '--' + CRLF;
+  SS.WriteBuffer(S[1], Length(S));
+  SS.Position := 0;
+  RequestBody := SS;
+  AddHeader('Content-Length', IntToStr(SS.Size));
 end;
 
 { TThreadHttpClient }
