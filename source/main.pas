@@ -108,6 +108,7 @@ type
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
+    procedure gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
     procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
@@ -198,6 +199,7 @@ var
   url, method, formData, contentType: string;
   i: integer;
   KV: TKeyValuePair;
+  FileNames, FormValues: TStringList;
 begin
   try
     url := NormalizeUrl;
@@ -219,10 +221,32 @@ begin
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
 
-  // Post a form data.
+  // Post the form data.
   if (method = 'POST') and (GetSelectedBodyTab = btForm) then begin
-    formData := EncodeFormData;
-    contentType := 'application/x-www-form-urlencoded';
+    if gridForm.Cols[3].IndexOf('File') = -1 then begin
+      formData := EncodeFormData;
+      contentType := 'application/x-www-form-urlencoded';
+    end
+    else begin
+      // Form multi file upload.
+      FileNames := TStringList.Create;
+      FormValues := TStringList.Create;
+      try
+        for I := 1 to gridForm.RowCount - 1 do begin
+          if IsRowEnabled(gridForm, I) then begin
+            KV := GetRowKV(gridForm, I);
+            if gridForm.Cells[3, I] = 'File' then
+              FileNames.Values[KV.Key] := KV.Value
+            else
+              FormValues.Values[KV.Key] := KV.Value;
+          end;
+        end;
+        FHttpClient.Client.MultiFileStreamFormPost(FormValues, FileNames);
+      finally
+        FreeAndNil(FileNames);
+        FreeAndNil(FormValues);
+      end;
+    end;
   end;
 
   // Post, put, delete, etc other data.
@@ -412,6 +436,15 @@ begin
     end
     else
       EditGridRow(grid);
+  end;
+end;
+
+procedure TForm1.gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
+begin
+  dlgOpen.Title := 'Upload a file';
+  if dlgOpen.Execute then begin
+    gridForm.Cells[2, aRow] := dlgOpen.FileName;
+    gridForm.Cells[3, aRow] := 'File';
   end;
 end;
 
@@ -1064,7 +1097,7 @@ var
   KV: TKeyValuePair;
 begin
   Result := '';
-  for i:=0 to gridForm.RowCount-1 do
+  for i := 1 to gridForm.RowCount - 1 do
   begin
     if not IsRowEnabled(gridForm, i) then continue;
     KV := GetRowKV(gridForm, i);

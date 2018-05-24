@@ -624,10 +624,10 @@ object Form1: TForm1
           Height = 122
           Top = 26
           Width = 541
-          ActivePage = tabBodyJson
+          ActivePage = tabBodyForm
           Align = alClient
           ShowTabs = False
-          TabIndex = 0
+          TabIndex = 1
           TabOrder = 1
           object tabBodyJson: TTabSheet
             Caption = 'tabBodyJson'
@@ -1123,7 +1123,7 @@ object Form1: TForm1
               Width = 537
               Align = alClient
               BorderStyle = bsNone
-              ColCount = 3
+              ColCount = 4
               Columns = <              
                 item
                   ButtonStyle = cbsCheckboxColumn
@@ -1137,9 +1137,16 @@ object Form1: TForm1
                   Width = 259
                 end              
                 item
+                  ButtonStyle = cbsEllipsis
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Value'
                   Width = 259
+                end              
+                item
+                  ReadOnly = True
+                  Title.Font.Style = [fsBold]
+                  Title.Caption = 'Type'
+                  Width = 64
                 end>
               FixedCols = 0
               Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goSmoothScroll, goRowHighlight]
@@ -1149,10 +1156,12 @@ object Form1: TForm1
               TitleStyle = tsNative
               OnColRowInserted = gridColRowInserted
               OnDblClick = gridEditDblClick
+              OnButtonClick = gridFormButtonClick
               ColWidths = (
                 32
                 259
                 259
+                64
               )
             end
           end
