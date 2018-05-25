@@ -109,6 +109,8 @@ type
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
     procedure gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
+    procedure gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
+      var Editor: TWinControl);
     procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
@@ -454,6 +456,22 @@ begin
     gridForm.Cells[2, aRow] := dlgOpen.FileName;
     gridForm.Cells[3, aRow] := 'File';
   end;
+end;
+
+procedure TForm1.gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
+  var Editor: TWinControl);
+begin
+  if aCol = 2 then
+    if gridForm.Cells[3, aRow] = 'File' then
+      gridForm.Columns.Items[aCol].ButtonStyle := cbsEllipsis
+    else
+      gridForm.Columns.Items[aCol].ButtonStyle := cbsAuto;
+  if aCol = 3 then
+    if Editor is TCustomComboBox then
+      with Editor as TCustomComboBox do begin
+        Style := csDropDownList;
+        Items.CommaText := 'Text,File';
+      end;
 end;
 
 procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
