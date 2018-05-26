@@ -1147,7 +1147,6 @@ object Form1: TForm1
                     'Text'
                     'File'
                   )
-                  ReadOnly = False
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Type'
                   Width = 64

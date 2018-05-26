@@ -245,6 +245,16 @@ begin
         end;
         try
           FHttpClient.Client.MultiFileStreamFormPost(FormValues, FileNames);
+          // Content-type header is already added to the http client.
+          // Remove any content-type from request grid.
+          for I := 1 to requestHeaders.RowCount - 1 do
+            if IsRowEnabled(requestHeaders, I) then begin
+              KV := GetRowKV(requestHeaders, I);
+              if LowerCase(KV.Key) = 'content-type' then begin
+                requestHeaders.DeleteRow(I);
+                Break;
+              end;
+            end;
         except on E: Exception do
           begin
             FreeAndNil(FHttpClient);
