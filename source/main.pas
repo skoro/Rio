@@ -111,6 +111,9 @@ type
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
+    procedure gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
+    procedure gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
+      var Editor: TWinControl);
     procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
@@ -201,6 +204,7 @@ var
   url, method, formData, contentType: string;
   i: integer;
   KV: TKeyValuePair;
+  FileNames, FormValues: TStringList;
 begin
   try
     url := NormalizeUrl;
@@ -222,10 +226,50 @@ begin
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
 
-  // Post a form data.
+  // Post the form data.
   if (method = 'POST') and (GetSelectedBodyTab = btForm) then begin
-    formData := EncodeFormData;
-    contentType := 'application/x-www-form-urlencoded';
+    if gridForm.Cols[3].IndexOf('File') = -1 then begin
+      formData := EncodeFormData;
+      contentType := 'application/x-www-form-urlencoded';
+    end
+    else begin
+      // Form multi file upload.
+      FileNames := TStringList.Create;
+      FormValues := TStringList.Create;
+      try
+        for I := 1 to gridForm.RowCount - 1 do begin
+          if IsRowEnabled(gridForm, I) then begin
+            KV := GetRowKV(gridForm, I);
+            if gridForm.Cells[3, I] = 'File' then
+              FileNames.Values[KV.Key] := KV.Value
+            else
+              FormValues.Values[KV.Key] := KV.Value;
+          end;
+        end;
+        try
+          FHttpClient.Client.MultiFileStreamFormPost(FormValues, FileNames);
+          // Content-type header is already added to the http client.
+          // Remove any content-type from request grid.
+          for I := 1 to requestHeaders.RowCount - 1 do
+            if IsRowEnabled(requestHeaders, I) then begin
+              KV := GetRowKV(requestHeaders, I);
+              if LowerCase(KV.Key) = 'content-type' then begin
+                requestHeaders.DeleteRow(I);
+                Break;
+              end;
+            end;
+        except on E: Exception do
+          begin
+            FreeAndNil(FHttpClient);
+            ShowMessage(E.Message);
+            Exit;
+          end;
+        end;
+      finally
+        FreeAndNil(FileNames);
+        FreeAndNil(FormValues);
+      end;
+    end;
   end;
 
   // Post, put, delete, etc other data.
@@ -416,6 +460,31 @@ begin
     else
       EditGridRow(grid);
   end;
+end;
+
+procedure TForm1.gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
+begin
+  dlgOpen.Title := 'Upload a file';
+  if dlgOpen.Execute then begin
+    gridForm.Cells[2, aRow] := dlgOpen.FileName;
+    gridForm.Cells[3, aRow] := 'File';
+  end;
+end;
+
+procedure TForm1.gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
+  var Editor: TWinControl);
+begin
+  if aCol = 2 then
+    if gridForm.Cells[3, aRow] = 'File' then
+      gridForm.Columns.Items[aCol].ButtonStyle := cbsEllipsis
+    else
+      gridForm.Columns.Items[aCol].ButtonStyle := cbsAuto;
+  if aCol = 3 then
+    if Editor is TCustomComboBox then
+      with Editor as TCustomComboBox do begin
+        Style := csDropDownList;
+        Items.CommaText := 'Text,File';
+      end;
 end;
 
 procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
@@ -1077,7 +1146,7 @@ var
   KV: TKeyValuePair;
 begin
   Result := '';
-  for i:=0 to gridForm.RowCount-1 do
+  for i := 1 to gridForm.RowCount - 1 do
   begin
     if not IsRowEnabled(gridForm, i) then continue;
     KV := GetRowKV(gridForm, i);
@@ -1304,8 +1373,13 @@ begin
 
   if Component is TStringGrid then
     Result := TStringGrid(Component)
-  else if Component is TStringCellEditor then
-    Result := TStringCellEditor(Component).Parent as TStringGrid
+  else if Component is TStringCellEditor then begin
+    Component := TStringCellEditor(Component).Parent;
+    if Component is TCompositeCellEditor then
+      Result := TCompositeCellEditor(Component).Parent as TStringGrid
+    else
+      Result := Component as TStringGrid;
+  end
   else
     Result := nil;
 end;
