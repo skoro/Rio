@@ -1347,7 +1347,7 @@ end;
 // Raises an exception when sender isn't popup or menu item.
 function TForm1.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
 var
-  Component: TComponent;
+  Component, z: TComponent;
 begin
   // What the sender is: popup or menu item ?
   if Sender is TMenuItem then
@@ -1360,8 +1360,13 @@ begin
 
   if Component is TStringGrid then
     Result := TStringGrid(Component)
-  else if Component is TStringCellEditor then
-    Result := TStringCellEditor(Component).Parent as TStringGrid
+  else if Component is TStringCellEditor then begin
+    Component := TStringCellEditor(Component).Parent;
+    if Component is TCompositeCellEditor then
+      Result := TCompositeCellEditor(Component).Parent as TStringGrid
+    else
+      Result := Component as TStringGrid;
+  end
   else
     Result := nil;
 end;
