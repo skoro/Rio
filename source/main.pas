@@ -161,7 +161,8 @@ type
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     procedure StartNewRequest;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
-    procedure EditGridRow(Grid: TStringGrid);
+    procedure EditGridRow(Grid: TStringGrid;
+      const ValueFocused: Boolean = False);
     function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
     procedure ShowHideResponseTabs(Info: TResponseInfo);
@@ -453,7 +454,7 @@ begin
         gridForm.Cells[2, aRow] := dlgOpen.FileName;
     end
     else
-      EditGridRow(Grid);
+      EditGridRow(Grid, aCol = 2);
   end;
 end;
 
@@ -1388,12 +1389,15 @@ begin
     Result := nil;
 end;
 
-procedure TForm1.EditGridRow(Grid: TStringGrid);
+procedure TForm1.EditGridRow(Grid: TStringGrid; const ValueFocused: Boolean);
 var
   kv: TKeyValuePair;
+  focus: Integer = FocusKey;
 begin
+  if ValueFocused then
+    focus := FocusVal;
   with Grid do begin
-    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...');
+    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', focus);
     Cells[1, Row] := kv.Key;
     Cells[2, Row] := kv.Value;
     // Force to update url after editing query params.

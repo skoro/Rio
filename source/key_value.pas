@@ -5,8 +5,12 @@ unit key_value;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ExtCtrls,
+  Classes, SysUtils, Forms, Controls, ExtCtrls,
   StdCtrls, ValEdit;
+
+const
+  FocusKey = 1;
+  FocusVal = 2;
 
 type
 
@@ -34,8 +38,10 @@ type
   public
     property Key: string read GetKey write SetKey;
     property Value: string read GetValue write SetValue;
-    function Edit(const AKey, AValue, title: string): TKeyValuePair;
-    function Edit(const KV: TKeyValuePair; const title: string): TKeyValuePair;
+    function Edit(const AKey, AValue, title: string;
+                        const Focus: Integer = FocusKey): TKeyValuePair;
+    function Edit(const KV: TKeyValuePair; const title: string;
+                        const Focus: Integer = FocusKey): TKeyValuePair;
     procedure View(const AKey, AValue, Title: string);
     procedure View(const KV: TKeyValuePair; const title: string);
   end;
@@ -86,7 +92,8 @@ begin
   textValue.Text := AValue;
 end;
 
-function TKeyValueForm.Edit(const AKey, AValue, title: string): TKeyValuePair;
+function TKeyValueForm.Edit(const AKey, AValue, title: string;
+  const Focus: Integer = FocusKey): TKeyValuePair;
 begin
   SetKey(AKey);
   SetValue(AValue);
@@ -94,7 +101,10 @@ begin
   btnOK.AutoSize := False;
   btnOK.Width := 67;
   btnOK.Caption := '&OK';
-  FFocusedComponent := editName;
+  case Focus of
+    FocusKey: FFocusedComponent := editName;
+    FocusVal: FFocusedComponent := textValue;
+  end;
   if ShowModal = mrOk then
   begin
     Result.Key := GetKey;
@@ -107,10 +117,10 @@ begin
   end;
 end;
 
-function TKeyValueForm.Edit(const KV: TKeyValuePair;
-  const title: string): TKeyValuePair;
+function TKeyValueForm.Edit(const KV: TKeyValuePair; const title: string;
+  const Focus: Integer = FocusKey): TKeyValuePair;
 begin
-  Result := Edit(KV.Key, KV.Value, title);
+  Result := Edit(KV.Key, KV.Value, title, Focus);
 end;
 
 procedure TKeyValueForm.View(const AKey, AValue, Title: string);
