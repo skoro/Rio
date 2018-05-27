@@ -108,10 +108,10 @@ type
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
+    procedure gridButtonClick(Sender: TObject; aCol, aRow: Integer);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
-    procedure gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
     procedure gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
       var Editor: TWinControl);
     procedure gridParamsCheckboxToggled(sender: TObject; aCol, aRow: Integer;
@@ -439,6 +439,24 @@ begin
   Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
 end;
 
+procedure TForm1.gridButtonClick(Sender: TObject; aCol, aRow: Integer);
+var
+  Grid: TStringGrid;
+begin
+  if Sender is TCustomStringGrid then begin
+    Grid := TStringGrid(Sender);
+    if (Grid = gridForm) and (gridForm.Cells[3, aRow] = 'File')
+       and (aCol = 2) then
+    begin
+      dlgOpen.Title := 'Upload a file';
+      if dlgOpen.Execute then
+        gridForm.Cells[2, aRow] := dlgOpen.FileName;
+    end
+    else
+      EditGridRow(Grid);
+  end;
+end;
+
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
   tIndex: Integer);
 begin
@@ -462,23 +480,9 @@ begin
   end;
 end;
 
-procedure TForm1.gridFormButtonClick(Sender: TObject; aCol, aRow: Integer);
-begin
-  dlgOpen.Title := 'Upload a file';
-  if dlgOpen.Execute then begin
-    gridForm.Cells[2, aRow] := dlgOpen.FileName;
-    gridForm.Cells[3, aRow] := 'File';
-  end;
-end;
-
 procedure TForm1.gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
   var Editor: TWinControl);
 begin
-  if aCol = 2 then
-    if gridForm.Cells[3, aRow] = 'File' then
-      gridForm.Columns.Items[aCol].ButtonStyle := cbsEllipsis
-    else
-      gridForm.Columns.Items[aCol].ButtonStyle := cbsAuto;
   if aCol = 3 then
     if Editor is TCustomComboBox then
       with Editor as TCustomComboBox do begin
