@@ -234,27 +234,39 @@ object Form1: TForm1
                 268
               )
             end
-            object tbarHeaders: TToolBar
+            object gnavHeaders: TGridNavigator
               Left = 0
               Height = 26
               Top = 0
               Width = 553
+              Caption = 'gnavHeaders'
               EdgeBorders = []
-              EdgeInner = esNone
-              EdgeOuter = esNone
               ShowCaptions = True
               TabOrder = 1
-              object tbtnManage: TToolButton
-                Left = 1
+              Grid = requestHeaders
+              OnNewRow = OnGridNewRow
+              OnEditRow = OnGridEditRow
+              OnDeleteRow = OnGridDeleteRow
+              OnGridClear = OnGridClear
+              ShowNavButtons = True
+              object ToolButton1: TToolButton
+                Left = 158
+                Height = 22
+                Top = 0
+                Caption = 'ToolButton1'
+                Style = tbsDivider
+              end
+              object tbtnManageHeaders: TToolButton
+                Left = 163
                 Top = 0
                 Caption = 'Manage'
-                OnClick = tbtnManageClick
+                OnClick = tbtnManageHeadersClick
               end
-              object tbtnSave: TToolButton
-                Left = 59
+              object tbtnSaveHeader: TToolButton
+                Left = 221
                 Top = 0
-                Caption = '&Save header'
-                OnClick = tbtnSaveClick
+                Caption = 'Save header'
+                OnClick = tbtnSaveHeaderClick
               end
             end
           end
@@ -264,8 +276,8 @@ object Form1: TForm1
             ClientWidth = 553
             object gridParams: TStringGrid
               Left = 0
-              Height = 179
-              Top = 0
+              Height = 153
+              Top = 26
               Width = 553
               Align = alClient
               BorderStyle = bsNone
@@ -279,13 +291,11 @@ object Form1: TForm1
                   Width = 32
                 end              
                 item
-                  ButtonStyle = cbsEllipsis
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Name'
                   Width = 128
                 end              
                 item
-                  ButtonStyle = cbsEllipsis
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Value'
                   Width = 256
@@ -298,38 +308,29 @@ object Form1: TForm1
               TitleStyle = tsNative
               OnCheckboxToggled = gridParamsCheckboxToggled
               OnColRowInserted = gridColRowInserted
-              OnButtonClick = gridButtonClick
               OnEditingDone = gridParamsEditingDone
+            end
+            object gnavParams: TGridNavigator
+              Left = 0
+              Height = 26
+              Top = 0
+              Width = 553
+              Caption = 'gnavParams'
+              EdgeBorders = []
+              ShowCaptions = True
+              TabOrder = 1
+              Grid = gridParams
+              OnNewRow = OnGridNewRow
+              OnEditRow = OnGridEditRow
+              OnDeleteRow = OnGridDeleteRow
+              OnGridClear = OnGridClear
+              ShowNavButtons = True
             end
           end
           object tabBody: TTabSheet
             Caption = 'Body'
             ClientHeight = 179
             ClientWidth = 553
-            object tbarBody: TToolBar
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 553
-              EdgeBorders = []
-              EdgeInner = esNone
-              EdgeOuter = esNone
-              ShowCaptions = True
-              TabOrder = 0
-              object tbtnBodyType: TToolButton
-                Left = 1
-                Top = 0
-                Caption = 'tbtnBodyType'
-                DropdownMenu = pmBodyType
-                Style = tbsButtonDrop
-              end
-              object tbtnBodyFormat: TToolButton
-                Left = 110
-                Top = 0
-                Caption = 'Format'
-                OnClick = tbtnBodyFormatClick
-              end
-            end
             object pagesBody: TPageControl
               Left = 0
               Height = 153
@@ -339,7 +340,7 @@ object Form1: TForm1
               Align = alClient
               ShowTabs = False
               TabIndex = 1
-              TabOrder = 1
+              TabOrder = 0
               object tabBodyJson: TTabSheet
                 Caption = 'tabBodyJson'
                 ClientHeight = 149
@@ -844,13 +845,11 @@ object Form1: TForm1
                       Width = 32
                     end                  
                     item
-                      ButtonStyle = cbsEllipsis
                       Title.Font.Style = [fsBold]
                       Title.Caption = 'Name'
                       Width = 259
                     end                  
                     item
-                      ButtonStyle = cbsEllipsis
                       Title.Font.Style = [fsBold]
                       Title.Caption = 'Value'
                       Width = 259
@@ -872,7 +871,6 @@ object Form1: TForm1
                   TabOrder = 0
                   TitleStyle = tsNative
                   OnColRowInserted = gridColRowInserted
-                  OnButtonClick = gridButtonClick
                   OnSelectEditor = gridFormSelectEditor
                   ColWidths = (
                     32
@@ -898,6 +896,40 @@ object Form1: TForm1
                 end
               end
             end
+            object gnavBody: TGridNavigator
+              Left = 0
+              Height = 26
+              Top = 0
+              Width = 553
+              Caption = 'gnavBody'
+              EdgeBorders = []
+              ShowCaptions = True
+              TabOrder = 1
+              Grid = gridForm
+              OnNewRow = OnGridNewRow
+              OnEditRow = OnGridEditRow
+              OnDeleteRow = OnGridDeleteRow
+              OnGridClear = OnGridClear
+              ShowNavButtons = True
+              object tbtnBodyType: TToolButton
+                Left = 158
+                Top = 0
+                Caption = 'tbtnBodyType'
+                DropdownMenu = pmBodyType
+                Style = tbsButtonDrop
+              end
+              object tbtnBodyFormat: TToolButton
+                Left = 267
+                Top = 0
+                Caption = 'Format'
+              end
+              object tbtnFormUpload: TToolButton
+                Left = 320
+                Top = 0
+                Caption = 'Upload'
+                OnClick = tbtnFormUploadClick
+              end
+            end
           end
           object tabReqCookie: TTabSheet
             Caption = 'Cookie'
@@ -905,8 +937,8 @@ object Form1: TForm1
             ClientWidth = 553
             object gridReqCookie: TStringGrid
               Left = 0
-              Height = 179
-              Top = 0
+              Height = 153
+              Top = 26
               Width = 553
               Align = alClient
               BorderStyle = bsNone
@@ -920,13 +952,11 @@ object Form1: TForm1
                   Width = 32
                 end              
                 item
-                  ButtonStyle = cbsEllipsis
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Name'
                   Width = 179
                 end              
                 item
-                  ButtonStyle = cbsEllipsis
                   Title.Font.Style = [fsBold]
                   Title.Caption = 'Value'
                   Width = 181
@@ -937,12 +967,27 @@ object Form1: TForm1
               RowCount = 2
               TabOrder = 0
               TitleStyle = tsNative
-              OnButtonClick = gridButtonClick
               ColWidths = (
                 32
                 179
                 181
               )
+            end
+            object gnavCookie: TGridNavigator
+              Left = 0
+              Height = 26
+              Top = 0
+              Width = 553
+              Caption = 'gnavCookie'
+              EdgeBorders = []
+              ShowCaptions = True
+              TabOrder = 1
+              Grid = gridReqCookie
+              OnNewRow = OnGridNewRow
+              OnEditRow = OnGridEditRow
+              OnDeleteRow = OnGridDeleteRow
+              OnGridClear = OnGridClear
+              ShowNavButtons = True
             end
           end
         end
@@ -1023,9 +1068,9 @@ object Form1: TForm1
             TabVisible = False
             object gridRespCookie: TStringGrid
               Left = 0
-              Height = 244
+              Height = 214
               Top = 0
-              Width = 547
+              Width = 553
               Align = alClient
               BorderStyle = bsNone
               ColCount = 9
@@ -1581,7 +1626,7 @@ object Form1: TForm1
     left = 416
     top = 163
     object gaInsertRow: TMenuItem
-      Caption = 'Insert'
+      Caption = 'New...'
       OnClick = gaInsertRowClick
     end
     object gaEditRow: TMenuItem

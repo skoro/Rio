@@ -8,12 +8,13 @@ uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
-  SynHighlighterJScript, thread_http_client,
+  SynHighlighterJScript, thread_http_client, GridNavigator,
   SysUtils, jsonparser;
 
 type
 
   TBodyTab = (btForm, btJson, btOther);
+  TGridOperation = (goNew, goEdit, goDelete, goClear);
 
   { TForm1 }
 
@@ -26,6 +27,10 @@ type
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
     gridForm: TStringGrid;
+    gnavParams: TGridNavigator;
+    gnavHeaders: TGridNavigator;
+    gnavCookie: TGridNavigator;
+    gnavBody: TGridNavigator;
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
@@ -34,7 +39,6 @@ type
     miJsonCopyValue: TMenuItem;
     miJsonCopyKey: TMenuItem;
     miJsonCopyValueKey: TMenuItem;
-    gaSaveHeader: TMenuItem;
     miBodyForm: TMenuItem;
     miBodyJson: TMenuItem;
     miBodyOther: TMenuItem;
@@ -93,12 +97,12 @@ type
     tabReqCookie: TTabSheet;
     tabRespCookie: TTabSheet;
     tabResponse: TTabSheet;
-    tbarBody: TToolBar;
-    tbarHeaders: TToolBar;
-    tbtnBodyFormat: TToolButton;
+    ToolButton1: TToolButton;
+    tbtnManageHeaders: TToolButton;
+    tbtnSaveHeader: TToolButton;
     tbtnBodyType: TToolButton;
-    tbtnManage: TToolButton;
-    tbtnSave: TToolButton;
+    tbtnBodyFormat: TToolButton;
+    tbtnFormUpload: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -108,7 +112,6 @@ type
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
-    procedure gridButtonClick(Sender: TObject; aCol, aRow: Integer);
     procedure gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
       tIndex: Integer);
     procedure gridEditDblClick(Sender: TObject);
@@ -131,17 +134,23 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure miTreeExpandClick(Sender: TObject);
+    procedure OnGridClear(Sender: TObject; Grid: TStringGrid);
+    procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+    procedure OnGridEditRow(Sender: TObject; Grid: TStringGrid;
+      const aRow: Integer);
+    procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
+      const aRow: Integer);
     procedure pmBodyTypeClick(Sender: TObject);
-    procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure respImgDblClick(Sender: TObject);
-    procedure tbtnManageClick(Sender: TObject);
-    procedure tbtnSaveClick(Sender: TObject);
+    procedure tbtnFormUploadClick(Sender: TObject);
+    procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
+    procedure tbtnSaveHeaderClick(Sender: TObject);
   private
     FContentType: string;
     FJsonParser: TJSONParser;
@@ -161,8 +170,8 @@ type
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     procedure StartNewRequest;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
-    procedure EditGridRow(Grid: TStringGrid;
-      const ValueFocused: Boolean = False);
+    function EditGridRow(Grid: TStringGrid;
+      const ValueFocused: Boolean = False): TModalResult;
     function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
     procedure ShowHideResponseTabs(Info: TResponseInfo);
@@ -176,6 +185,7 @@ type
     function FormatJson(json: TJSONData): string;
     procedure SelectBodyTab(const tab: tbodytab);
     function GetSelectedBodyTab: TBodyTab;
+    procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
   public
     procedure ApplyOptions;
   end;
@@ -407,20 +417,10 @@ end;
 
 procedure TForm1.gaClearRowsClick(Sender: TObject);
 var
-  Answer: Integer;
   Grid: TStringGrid;
 begin
-  Answer := Application.MessageBox('Are you sure to clear content ?', 'Clear rows', MB_ICONQUESTION + MB_YESNO);
-  if Answer = IDNO then Exit; // =>
   Grid := GetPopupSenderAsStringGrid(Sender);
-  if Grid <> nil then
-    with Grid do begin
-      RowCount := 2;
-      Cells[0, 1] := '1';
-      Cells[1, 1] := '';
-      Cells[2, 1] := '';
-      if Grid = gridParams then SyncGridQueryParams;
-    end;
+  DoGridOperation(Grid, goClear);
 end;
 
 procedure TForm1.gaEditRowClick(Sender: TObject);
@@ -428,7 +428,7 @@ var
   Grid: TStringGrid;
 begin
   Grid := GetPopupSenderAsStringGrid(Sender);
-  if Grid <> nil then EditGridRow(Grid);
+  DoGridOperation(Grid, goEdit);
 end;
 
 procedure TForm1.gaInsertRowClick(Sender: TObject);
@@ -436,26 +436,7 @@ var
   Grid: TStringGrid;
 begin
   Grid := GetPopupSenderAsStringGrid(Sender);
-  if Grid = nil then Exit;
-  Grid.InsertRowWithValues(Grid.RowCount, ['1', '', '']);
-end;
-
-procedure TForm1.gridButtonClick(Sender: TObject; aCol, aRow: Integer);
-var
-  Grid: TStringGrid;
-begin
-  if Sender is TCustomStringGrid then begin
-    Grid := TStringGrid(Sender);
-    if (Grid = gridForm) and (gridForm.Cells[3, aRow] = 'File')
-       and (aCol = 2) then
-    begin
-      dlgOpen.Title := 'Upload a file';
-      if dlgOpen.Execute then
-        gridForm.Cells[2, aRow] := dlgOpen.FileName;
-    end
-    else
-      EditGridRow(Grid, aCol = 2);
-  end;
+  DoGridOperation(Grid, goNew);
 end;
 
 procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
@@ -694,23 +675,10 @@ end;
 
 procedure TForm1.gaDeleteRowClick(Sender: TObject);
 var
-  Component: TComponent;
   Grid: TStringGrid;
 begin
-  Component := TPopupMenu(TMenuItem(Sender).GetParentMenu).PopupComponent;
-  if Component is TStringGrid then begin
-    Grid := TStringGrid(Component);
-    with Grid do
-      if RowCount > 2 then DeleteRow(Row)
-      else begin
-        // Don't delete last row (user cannot add one) just empty it.
-        Cells[0, 1] := '1';
-        Cells[1, 1] := '';
-        Cells[2, 1] := '';
-      end;
-    // Force to update url query params.
-    if Grid = gridParams then SyncGridQueryParams;
-  end;
+  Grid := GetPopupSenderAsStringGrid(Sender);
+  DoGridOperation(Grid, goDelete);
 end;
 
 procedure TForm1.miSaveRequestClick(Sender: TObject);
@@ -779,6 +747,33 @@ begin
   end;
 end;
 
+procedure TForm1.OnGridClear(Sender: TObject; Grid: TStringGrid);
+begin
+  // Force to update url query params.
+  if Grid = gridParams then SyncGridQueryParams;
+end;
+
+procedure TForm1.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+begin
+  // Force to update url query params.
+  if Grid = gridParams then SyncGridQueryParams;
+end;
+
+procedure TForm1.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
+  const aRow: Integer);
+begin
+  EditGridRow(Grid);
+end;
+
+procedure TForm1.OnGridNewRow(Sender: TObject; Grid: TStringGrid;
+  const aRow: Integer);
+begin
+  // New inserted columns with "On" checked by default.
+  Grid.Cells[0, aRow] := '1';
+  if EditGridRow(Grid) <> mrOK then
+    Grid.DeleteRow(aRow);
+end;
+
 procedure TForm1.pmBodyTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
@@ -787,16 +782,6 @@ begin
   if mi = miBodyForm then SelectBodyTab(btForm)
   else if mi = miBodyJson then SelectBodyTab(btJson)
   else if mi = miBodyOther then SelectBodyTab(btOther);
-end;
-
-// Show/hide some items in Grid's popup menu.
-// Depending on grid popup menu can show or hide some menu items for specific
-// grid.
-procedure TForm1.popupGridActionsPopup(Sender: TObject);
-begin
-  gaSaveHeader.Visible := False;
-  if GetPopupSenderAsStringGrid(Sender) = requestHeaders then
-    gaSaveHeader.Visible := True;
 end;
 
 procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
@@ -857,18 +842,21 @@ begin
   ImageResize(not respImg.Stretch);
 end;
 
-procedure TForm1.tbtnManageClick(Sender: TObject);
+procedure TForm1.tbtnFormUploadClick(Sender: TObject);
+var
+  Row: Integer;
 begin
-  miManageHeadersClick(requestHeaders);
+  Row := gridForm.Row;
+  if gridForm.Cells[3, Row] = 'File' then begin
+    dlgOpen.Title := 'Upload a file';
+    if dlgOpen.Execute then
+      gridForm.Cells[2, Row] := dlgOpen.FileName;
+  end;
 end;
 
-procedure TForm1.tbtnSaveClick(Sender: TObject);
-var
-  KV: TKeyValuePair;
+procedure TForm1.tbtnManageHeadersClick(Sender: TObject);
 begin
-  KV := GetRowKV(requestHeaders);
-  if KV.Key <> '' then
-    HeadersEditorForm.Add(KV.Key, KV.Value);
+  miManageHeadersClick(requestHeaders);
 end;
 
 procedure TForm1.tbtnBodyFormatClick(Sender: TObject);
@@ -888,6 +876,15 @@ begin
     FreeAndNil(parser);
     FreeAndNil(data);
   end;
+end;
+
+procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
+var
+  KV: TKeyValuePair;
+begin
+  KV := GetRowKV(requestHeaders);
+  if KV.Key <> '' then
+    HeadersEditorForm.Add(KV.Key, KV.Value);
 end;
 
 // Synchronizes query parameters from the url.
@@ -969,25 +966,37 @@ end;
 
 procedure TForm1.SelectBodyTab(const tab: tbodytab);
 begin
-  tbtnBodyFormat.Visible:=False;
+  tbtnFormUpload.Visible  := False;
+  tbtnBodyFormat.Visible  := False;
+  tbtnBodyType.Visible    := False;
+  gnavBody.ShowNavButtons := False;
+
   case tab of
     btForm:
       begin
         pagesBody.ActivePage:=tabBodyForm;
-        tbtnBodyType.Caption:='Form';
+        gnavBody.ShowNavButtons := True;
+        tbtnBodyType.Visible := True;
+        tbtnFormUpload.Visible := True;
+        tbtnBodyType.Caption := 'Form';
       end;
     btJson:
       begin
         pagesBody.ActivePage:=tabBodyJson;
+        tbtnBodyType.Visible:=True;
         tbtnBodyType.Caption:='JSON';
         tbtnBodyFormat.Visible:=True;
       end;
     btOther:
       begin
         pagesBody.ActivePage:=tabBodyOther;
+        tbtnBodyType.Visible:=True;
         tbtnBodyType.Caption:='Other';
       end;
   end;
+
+  // Keep buttons order after some buttons is hidden.
+  gnavBody.SetButtonsOrder;
 end;
 
 function TForm1.GetSelectedBodyTab: TBodyTab;
@@ -997,6 +1006,29 @@ begin
     1: Result:=btForm;
     2: Result:=btOther;
     else raise Exception.Create('No value for active tab.');
+  end;
+end;
+
+procedure TForm1.DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
+var
+  toolbar: TGridNavigator;
+begin
+  if Grid = requestHeaders then
+    toolbar := gnavHeaders
+  else if Grid = gridParams then
+    toolbar := gnavParams
+  else if Grid = gridForm then
+    toolbar := gnavBody
+  else if Grid = gridReqCookie then
+    toolbar := gnavCookie
+  else
+    Exit;
+
+  case op of
+    goNew:    toolbar.NewButton.Click;
+    goEdit:   toolbar.EditButton.Click;
+    goDelete: toolbar.DeleteButton.Click;
+    goClear:  toolbar.ClearButton.Click;
   end;
 end;
 
@@ -1385,11 +1417,15 @@ begin
     else
       Result := Component as TStringGrid;
   end
+  else if Component is TPickListCellEditor then begin
+    Result := TPickListCellEditor(Component).Parent as TStringGrid;
+  end
   else
     Result := nil;
 end;
 
-procedure TForm1.EditGridRow(Grid: TStringGrid; const ValueFocused: Boolean);
+function TForm1.EditGridRow(Grid: TStringGrid;
+  const ValueFocused: Boolean): TModalResult;
 var
   kv: TKeyValuePair;
   focus: Integer = FocusKey;
@@ -1398,10 +1434,14 @@ begin
     focus := FocusVal;
   with Grid do begin
     kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', focus);
-    Cells[1, Row] := kv.Key;
-    Cells[2, Row] := kv.Value;
-    // Force to update url after editing query params.
-    if Grid = gridParams then SyncGridQueryParams;
+    Result := KeyValueForm.ModalResult;
+    if Result = mrOK then begin
+      Cells[1, Row] := kv.Key;
+      Cells[2, Row] := kv.Value;
+      // Force to update url after editing query params.
+      if Grid = gridParams then
+        SyncGridQueryParams;
+    end;
   end;
 end;
 
