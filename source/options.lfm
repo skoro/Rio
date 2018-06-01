@@ -10,7 +10,7 @@ object OptionsForm: TOptionsForm
   Constraints.MinHeight = 300
   Constraints.MinWidth = 300
   OnCreate = FormCreate
-  SessionProperties = 'cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;Top;Width;rbLayoutHor.Checked;rbLayoutVert.Checked'
+  SessionProperties = 'cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;rbLayoutHor.Checked;rbLayoutVert.Checked;Top;Width;cbHideGridButtons.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
@@ -77,6 +77,14 @@ object OptionsForm: TOptionsForm
           Caption = '&Horizontal'
           TabOrder = 1
         end
+      end
+      object cbHideGridButtons: TCheckBox
+        Left = 8
+        Height = 22
+        Top = 112
+        Width = 179
+        Caption = 'Hide &grid control buttons'
+        TabOrder = 1
       end
     end
     object tabJson: TTabSheet

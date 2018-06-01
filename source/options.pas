@@ -17,6 +17,7 @@ type
     cbJsonExpanded: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
     cbJsonFmtArray: TCheckBox;
+    cbHideGridButtons: TCheckBox;
     editIndentSize: TSpinEdit;
     GroupBox1: TGroupBox;
     gbLayout: TGroupBox;
@@ -31,6 +32,7 @@ type
     TabSheet2: TTabSheet;
     procedure FormCreate(Sender: TObject);
   private
+    function GetGridButtonsHidden: Boolean;
     function GetJsonFormatOptions: TFormatOptions;
     function GetJsonIndentSize: Integer;
     function GetJsonExpanded: Boolean;
@@ -43,6 +45,7 @@ type
     property JsonIndentSize: Integer read GetJsonIndentSize;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
+    property GridButtonsHidden: Boolean read GetGridButtonsHidden;
   end;
 
 var
@@ -62,6 +65,11 @@ begin
   Props.JSONFileName := CF;
   Props.Active := True;
   pagesOptions.ActivePage := tabAppearance;
+end;
+
+function TOptionsForm.GetGridButtonsHidden: Boolean;
+begin
+  Result := cbHideGridButtons.Checked;
 end;
 
 function TOptionsForm.GetJsonFormatOptions: TFormatOptions;

@@ -974,8 +974,14 @@ begin
   case tab of
     btForm:
       begin
-        pagesBody.ActivePage:=tabBodyForm;
-        gnavBody.ShowNavButtons := True;
+        pagesBody.ActivePage := tabBodyForm;
+        // This procedure is invoked in Form's Create method when
+        // options form is not initalized. So, for the first time
+        // we always show toolbar.
+        if Assigned(OptionsForm) then
+          gnavBody.ShowNavButtons := not OptionsForm.GridButtonsHidden
+        else
+          gnavBody.ShowNavButtons := True;
         tbtnBodyType.Visible := True;
         tbtnFormUpload.Visible := True;
         tbtnBodyType.Caption := 'Form';
@@ -1045,6 +1051,14 @@ begin
        (Height < 400) then
     Height := 600;
   LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
+
+  gnavHeaders.ShowNavButtons := not OptionsForm.GridButtonsHidden;
+  gnavHeaders.SetButtonsOrder;
+  if GetSelectedBodyTab = btForm then
+    gnavBody.ShowNavButtons := not OptionsForm.GridButtonsHidden;
+  gnavBody.SetButtonsOrder;
+  gnavParams.Visible := not OptionsForm.GridButtonsHidden;
+  gnavCookie.Visible := not OptionsForm.GridButtonsHidden;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
