@@ -82,8 +82,8 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 22
         Top = 112
-        Width = 179
-        Caption = 'Hide &grid control buttons'
+        Width = 279
+        Caption = 'Hide &grid buttons: new, edit, delete, clear'
         TabOrder = 1
       end
     end
