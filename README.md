@@ -25,6 +25,12 @@ For compiling from sources you need the following requirements:
 - Lazarus 1.8
 - FreePascal 3.0.4
 
+Before compiling the application you need to install a components package
+from the `components/rest_explorer` folder. In Lazarus open in main
+menu `Package / Open package file (.lpk)...` and open the file
+`components/rest_explorer/rest_explorer.lpk` then compile and install the
+package.
+
 On Linux you can compile and create the install package (deb) by Makefile.
 For example:
 - `make linux32` for compiling release binary for i386
