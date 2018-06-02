@@ -1185,7 +1185,10 @@ begin
     jtNull:
       C := 'null';
   else
-    C := Data.AsString;
+    if Data.JSONType = jtNumber then
+      C := Data.AsFloat.ToString
+    else
+      C := Data.AsString;
     if (Data.JSONType = jtString) then
       C := '"'+C+'"';
     AParent.Text := AParent.Text + ': ' + C;
