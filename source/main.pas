@@ -35,6 +35,9 @@ type
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
     JsonTree: TTreeView;
+    gaManageHeaders: TMenuItem;
+    gaSaveHeader: TMenuItem;
+    gaSeparator: TMenuItem;
     miJsonView: TMenuItem;
     miJsonCopyValue: TMenuItem;
     miJsonCopyKey: TMenuItem;
@@ -141,6 +144,7 @@ type
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure pmBodyTypeClick(Sender: TObject);
+    procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoreProperties(Sender: TObject);
     procedure PSMAINRestoringProperties(Sender: TObject);
     procedure PSMAINSavingProperties(Sender: TObject);
@@ -784,6 +788,19 @@ begin
   else if mi = miBodyOther then SelectBodyTab(btOther);
 end;
 
+// Show/hide some items in Grid's popup menu.
+// Depending on grid popup menu can show or hide some menu items for specific
+// grid.
+procedure TForm1.popupGridActionsPopup(Sender: TObject);
+begin
+  gaSaveHeader.Visible := False;
+  gaManageHeaders.Visible := False;
+  if GetPopupSenderAsStringGrid(Sender) = requestHeaders then begin
+    gaManageHeaders.Visible := True;
+    gaSaveHeader.Visible := True;
+  end;
+end;
+
 procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
@@ -1052,11 +1069,17 @@ begin
     Height := 600;
   LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
 
-  gnavHeaders.ShowNavButtons := not OptionsForm.GridButtonsHidden;
-  gnavHeaders.SetButtonsOrder;
   if GetSelectedBodyTab = btForm then
     gnavBody.ShowNavButtons := not OptionsForm.GridButtonsHidden;
   gnavBody.SetButtonsOrder;
+  gnavHeaders.Visible := not OptionsForm.GridButtonsHidden;
+  // Ugly hack to hide toolbar.
+  // Когда тулбар скрыт при запуске приложения он всё равно отображается как
+  // пустая панель. (When toolbar is hidden it always shows like empty panel)
+  if OptionsForm.GridButtonsHidden then
+    gnavHeaders.Height := 0
+  else
+    gnavHeaders.Height := gnavBody.Height;
   gnavParams.Visible := not OptionsForm.GridButtonsHidden;
   gnavCookie.Visible := not OptionsForm.GridButtonsHidden;
 end;
