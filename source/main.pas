@@ -588,7 +588,7 @@ end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
 var
-  i, row: integer;
+  i, aRow: integer;
   gridHeaders: TStringGrid;
 begin
   gridHeaders := HeadersEditorForm.gridHeaders;
@@ -598,12 +598,14 @@ begin
   begin
     for i := 0 to gridHeaders.SelectedRangeCount - 1 do
     begin
-      Row := gridHeaders.SelectedRange[i].Top;
-      requestHeaders.InsertRowWithValues(requestHeaders.Row, [
-        '1', // Checked by default
-        gridHeaders.Cells[0, Row],
-        gridHeaders.Cells[1, Row]
-      ]);
+      aRow := gridHeaders.SelectedRange[i].Top;
+      with requestHeaders do begin
+        RowCount := RowCount + 1;
+        Row := RowCount - 1;
+        Cells[0, Row] := '1';
+        Cells[1, Row] := gridHeaders.Cells[0, aRow];
+        Cells[2, Row] := gridHeaders.Cells[1, aRow];
+      end;
     end;
   end;
   UpdateHeadersPickList;
@@ -1210,8 +1212,11 @@ end;
 
 procedure TForm1.UpdateHeadersPickList;
 begin
-  HeadersEditorForm.FillHeaders(requestHeaders.Columns.Items[1].PickList);
-  requestHeaders.Cells[0, 1] := '1';
+  with requestHeaders do begin
+    HeadersEditorForm.FillHeaders(Columns.Items[1].PickList);
+    if RowCount > 1 then
+      Cells[0, 1] := '1';
+  end;
 end;
 
 function TForm1.EncodeFormData: string;
