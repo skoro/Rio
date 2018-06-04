@@ -14,6 +14,7 @@ uses
 type
 
   TBodyTab = (btForm, btJson, btOther);
+  TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
 
   { TForm1 }
@@ -22,6 +23,7 @@ type
     btnSubmit: TButton;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
+    cbBasicShowPassword: TCheckBox;
     editJson: TSynEdit;
     editOther: TMemo;
     gaInsertRow: TMenuItem;
@@ -38,6 +40,13 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    editBasicLogin: TLabeledEdit;
+    editBasicPassword: TLabeledEdit;
+    editBearerToken: TLabeledEdit;
+    editBearerPrefix: TLabeledEdit;
+    miAuthNone: TMenuItem;
+    miAuthBasic: TMenuItem;
+    miAuthBearer: TMenuItem;
     miJsonView: TMenuItem;
     miJsonCopyValue: TMenuItem;
     miJsonCopyKey: TMenuItem;
@@ -47,6 +56,7 @@ type
     miBodyOther: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
+    pagesAuth: TPageControl;
     pagesBody: TPageControl;
     pagesRequest: TPageControl;
     pagesResponse: TPageControl;
@@ -58,6 +68,7 @@ type
     panelResponse: TPanel;
     popupJsonTree: TPopupMenu;
     pmBodyType: TPopupMenu;
+    pmAuthType: TPopupMenu;
     requestHeaders: TStringGrid;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
@@ -100,12 +111,17 @@ type
     tabReqCookie: TTabSheet;
     tabRespCookie: TTabSheet;
     tabResponse: TTabSheet;
+    tabAuth: TTabSheet;
+    tabAuthBasic: TTabSheet;
+    tabAuthBearer: TTabSheet;
+    toolbarAuth: TToolBar;
     ToolButton1: TToolButton;
     tbtnManageHeaders: TToolButton;
     tbtnSaveHeader: TToolButton;
     tbtnBodyType: TToolButton;
     tbtnBodyFormat: TToolButton;
     tbtnFormUpload: TToolButton;
+    tbtnAuthType: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -143,6 +159,7 @@ type
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
+    procedure pmAuthTypeClick(Sender: TObject);
     procedure pmBodyTypeClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
     procedure PSMAINRestoreProperties(Sender: TObject);
@@ -188,7 +205,9 @@ type
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
     function FormatJson(json: TJSONData): string;
     procedure SelectBodyTab(const tab: tbodytab);
+    procedure SelectAuthTab(const tab: TAuthTab);
     function GetSelectedBodyTab: TBodyTab;
+    function GetSelectedAuthTab: TAuthTab;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
   public
     procedure ApplyOptions;
@@ -386,6 +405,7 @@ begin
   KeyValueForm := TKeyValueForm.Create(Application);
 
   SelectBodyTab(btForm);
+  SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
 end;
 
@@ -780,6 +800,16 @@ begin
     Grid.DeleteRow(aRow);
 end;
 
+procedure TForm1.pmAuthTypeClick(Sender: TObject);
+var
+  mi: TMenuItem;
+begin
+  mi := Sender as TMenuItem;
+  if mi = miAuthNone then SelectAuthTab(atNone)
+  else if mi = miAuthBasic then SelectAuthTab(atBasic)
+  else if mi = miAuthBearer then SelectAuthTab(atBearer);
+end;
+
 procedure TForm1.pmBodyTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
@@ -1024,6 +1054,21 @@ begin
   gnavBody.SetButtonsOrder;
 end;
 
+procedure TForm1.SelectAuthTab(const tab: TAuthTab);
+begin
+  if tab = atNone then
+    pagesAuth.Visible := False
+  else begin
+    pagesAuth.Visible := True;
+    pagesAuth.ActivePageIndex := LongInt(tab);
+  end;
+  case tab of
+    atNone:   tbtnAuthType.Caption := 'None';
+    atBasic:  tbtnAuthType.Caption := 'Basic';
+    atBearer: tbtnAuthType.Caption := 'Bearer token';
+  end;
+end;
+
 function TForm1.GetSelectedBodyTab: TBodyTab;
 begin
   case pagesBody.ActivePageIndex of
@@ -1032,6 +1077,18 @@ begin
     2: Result:=btOther;
     else raise Exception.Create('No value for active tab.');
   end;
+end;
+
+function TForm1.GetSelectedAuthTab: TAuthTab;
+begin
+  if pagesAuth.Visible then
+    case pagesAuth.ActivePageIndex of
+      0: Result := atBasic;
+      1: Result := atBearer;
+      else raise Exception.Create('No value for active tab');
+    end
+  else
+    Result := atNone;
 end;
 
 procedure TForm1.DoGridOperation(Grid: TStringGrid; const op: TGridOperation);

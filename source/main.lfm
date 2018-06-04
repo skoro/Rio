@@ -991,6 +991,128 @@ object Form1: TForm1
               ShowNavButtons = True
             end
           end
+          object tabAuth: TTabSheet
+            Caption = 'Auth'
+            ClientHeight = 179
+            ClientWidth = 553
+            object toolbarAuth: TToolBar
+              Left = 0
+              Height = 26
+              Top = 0
+              Width = 553
+              EdgeBorders = []
+              ShowCaptions = True
+              TabOrder = 0
+              object tbtnAuthType: TToolButton
+                Left = 1
+                Top = 0
+                Caption = 'tbtnAuthType'
+                DropdownMenu = pmAuthType
+                Style = tbsButtonDrop
+              end
+            end
+            object pagesAuth: TPageControl
+              Left = 0
+              Height = 153
+              Top = 26
+              Width = 553
+              ActivePage = tabAuthBasic
+              Align = alClient
+              ShowTabs = False
+              TabIndex = 0
+              TabOrder = 1
+              object tabAuthBasic: TTabSheet
+                Caption = 'Basic'
+                ClientHeight = 149
+                ClientWidth = 549
+                object editBasicLogin: TLabeledEdit
+                  Left = 8
+                  Height = 29
+                  Top = 24
+                  Width = 224
+                  EditLabel.AnchorSideLeft.Control = editBasicLogin
+                  EditLabel.AnchorSideRight.Control = editBasicLogin
+                  EditLabel.AnchorSideRight.Side = asrBottom
+                  EditLabel.AnchorSideBottom.Control = editBasicLogin
+                  EditLabel.Left = 8
+                  EditLabel.Height = 19
+                  EditLabel.Top = 2
+                  EditLabel.Width = 224
+                  EditLabel.Caption = 'Login:'
+                  EditLabel.ParentColor = False
+                  TabOrder = 0
+                end
+                object editBasicPassword: TLabeledEdit
+                  Left = 8
+                  Height = 29
+                  Top = 80
+                  Width = 224
+                  EchoMode = emPassword
+                  EditLabel.AnchorSideLeft.Control = editBasicPassword
+                  EditLabel.AnchorSideRight.Control = editBasicPassword
+                  EditLabel.AnchorSideRight.Side = asrBottom
+                  EditLabel.AnchorSideBottom.Control = editBasicPassword
+                  EditLabel.Left = 8
+                  EditLabel.Height = 19
+                  EditLabel.Top = 58
+                  EditLabel.Width = 224
+                  EditLabel.Caption = 'Password:'
+                  EditLabel.ParentColor = False
+                  PasswordChar = '*'
+                  TabOrder = 1
+                end
+                object cbBasicShowPassword: TCheckBox
+                  Left = 8
+                  Height = 22
+                  Top = 112
+                  Width = 119
+                  Caption = 'Show password'
+                  TabOrder = 2
+                end
+              end
+              object tabAuthBearer: TTabSheet
+                Caption = 'tabAuthBearer'
+                ClientHeight = 149
+                ClientWidth = 549
+                object editBearerPrefix: TLabeledEdit
+                  Left = 8
+                  Height = 29
+                  Top = 24
+                  Width = 200
+                  EditLabel.AnchorSideLeft.Control = editBearerPrefix
+                  EditLabel.AnchorSideRight.Control = editBearerPrefix
+                  EditLabel.AnchorSideRight.Side = asrBottom
+                  EditLabel.AnchorSideBottom.Control = editBearerPrefix
+                  EditLabel.Left = 8
+                  EditLabel.Height = 19
+                  EditLabel.Top = 2
+                  EditLabel.Width = 200
+                  EditLabel.Caption = 'Prefix:'
+                  EditLabel.ParentColor = False
+                  TabOrder = 0
+                  Text = 'Bearer'
+                end
+                object editBearerToken: TLabeledEdit
+                  Left = 8
+                  Height = 29
+                  Top = 80
+                  Width = 536
+                  Anchors = [akTop, akLeft, akRight]
+                  EditLabel.AnchorSideLeft.Control = editBearerToken
+                  EditLabel.AnchorSideRight.Control = editBearerToken
+                  EditLabel.AnchorSideRight.Side = asrBottom
+                  EditLabel.AnchorSideBottom.Control = editBearerToken
+                  EditLabel.Left = 8
+                  EditLabel.Height = 19
+                  EditLabel.Top = 58
+                  EditLabel.Width = 536
+                  EditLabel.Caption = 'Token:'
+                  EditLabel.ParentColor = False
+                  TabOrder = 1
+                end
+              end
+            end
+          end
         end
       end
     end
@@ -1324,8 +1446,8 @@ object Form1: TForm1
     end
   end
   object AppMenu: TMainMenu
-    left = 105
-    top = 163
+    left = 320
+    top = 448
     object miFile: TMenuItem
       Caption = '&File'
       object miNewWindow: TMenuItem
@@ -1659,12 +1781,12 @@ object Form1: TForm1
   end
   object dlgSave: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]
-    left = 203
-    top = 163
+    left = 400
+    top = 374
   end
   object dlgOpen: TOpenDialog
-    left = 257
-    top = 163
+    left = 208
+    top = 440
   end
   object popupJsonTree: TPopupMenu
     left = 308
@@ -1691,8 +1813,8 @@ object Form1: TForm1
     end
   end
   object pmBodyType: TPopupMenu
-    left = 480
-    top = 112
+    left = 352
+    top = 120
     object miBodyForm: TMenuItem
       Caption = 'Form'
       OnClick = pmBodyTypeClick
@@ -1710,7 +1832,23 @@ object Form1: TForm1
     Enabled = False
     NumberAttri.Style = [fsBold]
     StringAttri.Style = [fsItalic]
-    left = 384
-    top = 112
+    left = 96
+    top = 374
+  end
+  object pmAuthType: TPopupMenu
+    left = 496
+    top = 120
+    object miAuthNone: TMenuItem
+      Caption = 'None'
+      OnClick = pmAuthTypeClick
+    end
+    object miAuthBasic: TMenuItem
+      Caption = 'Basic'
+      OnClick = pmAuthTypeClick
+    end
+    object miAuthBearer: TMenuItem
+      Caption = 'Bearer token'
+      OnClick = pmAuthTypeClick
+    end
   end
 end
