@@ -1516,6 +1516,14 @@ begin
   pagesResponse.ActivePage := tabResponse;
   miSaveResponse.Enabled := False;
 
+  // Reset auth
+  editBasicLogin.Text := '';
+  editBasicPassword.Text := '';
+  cbBasicShowPassword.Checked := False;
+  editBearerPrefix.Text := 'Bearer';
+  editBearerToken.Text := '';
+  SelectAuthTab(atNone);
+
   SetAppCaption;
 end;
 
