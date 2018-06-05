@@ -353,6 +353,23 @@ begin
     FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
+  // Process auth tab
+  case GetSelectedAuthTab of
+    atBearer: begin
+      if (Length(editBearerPrefix.Text) > 0)
+           and (Length(editBearerToken.Text) > 0)
+      then
+        FHttpClient.AddHeader('Authorization', Format('%s %s', [
+          editBearerPrefix.Text,
+          editBearerToken.Text
+        ]));
+    end;
+    atBasic: begin
+      FHttpClient.Client.UserName := editBasicLogin.Text;
+      FHttpClient.Client.Password := editBasicPassword.Text;
+    end;
+  end;
+
   SyncURLQueryParams;
   UpdateStatusLine('Waiting for the response...');
 
