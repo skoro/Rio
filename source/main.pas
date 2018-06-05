@@ -123,6 +123,7 @@ type
     tbtnFormUpload: TToolButton;
     tbtnAuthType: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
+    procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
@@ -376,6 +377,14 @@ begin
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
+end;
+
+procedure TForm1.cbBasicShowPasswordClick(Sender: TObject);
+begin
+  if cbBasicShowPassword.Checked then
+    editBasicPassword.EchoMode := emNormal
+  else
+    editBasicPassword.EchoMode := emPassword;
 end;
 
 procedure TForm1.cbUrlChange(Sender: TObject);
