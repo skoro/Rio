@@ -11,7 +11,7 @@ type
 
   { TCustomHttpClient }
 
-  TCustomHttpClient = class(TFPCustomHTTPClient)
+  TCustomHttpClient = class(TFPHTTPClient)
   public
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
   end;
