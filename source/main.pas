@@ -694,9 +694,17 @@ begin
       cbMethod.Text := obj.Method;
       editOther.Text := obj.Body;
       editJson.Text := obj.Json;
+
       obj.SetCollectionToGrid(obj.Headers, requestHeaders);
       obj.SetCollectionToGrid(obj.Form, gridForm);
       obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
+
+      SelectAuthTab(TAuthTab(obj.AuthType));
+      editBasicLogin.Text    := obj.AuthBasic.Login;
+      editBasicPassword.Text := obj.AuthBasic.Password;
+      editBearerPrefix.Text  := obj.AuthBearer.Prefix;
+      editBearerToken.Text   := obj.AuthBearer.Token;
+
     except on E: Exception do
         ShowMessage(E.Message);
     end;
@@ -747,10 +755,19 @@ begin
     obj.Method := cbMethod.Text;
     obj.Body := editOther.Text;
     obj.Json := editJson.Text;
+
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
     obj.SetCollectionFromGrid(gridForm, obj.Form);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
+
+    obj.AuthType := Integer(GetSelectedAuthTab);
+    obj.AuthBasic.Login    := editBasicLogin.Text;
+    obj.AuthBasic.Password := editBasicPassword.Text;
+    obj.AuthBearer.Prefix  := editBearerPrefix.Text;
+    obj.AuthBearer.Token   := editBearerToken.Text;
+
     json := streamer.ObjectToJSONString(obj);
+
     try
       dlgSave.FileName := GetRequestFilename('request.json');
       dlgSave.Title := 'Save the request to a file';

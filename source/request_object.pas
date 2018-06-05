@@ -24,6 +24,28 @@ type
     property Value: string read FValue write FValue;
   end;
 
+  { TAuthBasic }
+
+  TAuthBasic = class
+  private
+    FLogin: string;
+    FPassword: string;
+  published
+    property Login: string read FLogin write FLogin;
+    property Password: string read FPassword write FPassword;
+  end;
+
+  { TAuthBearer }
+
+  TAuthBearer = class
+  private
+    FPrefix: string;
+    FToken: string;
+  published
+    property Prefix: string read FPrefix write FPrefix;
+    property Token: string read FToken write FToken;
+  end;
+
   { TRequestObject }
 
   TRequestObject = class(TPersistent)
@@ -35,6 +57,9 @@ type
     FHeaders: TCollection;
     FForm: TCollection;
     FCookies: TCollection;
+    FAuthBasic: TAuthBasic;
+    FAuthBearer: TAuthBearer;
+    FAuthType: Integer;
   protected
   public
     constructor Create;
@@ -49,6 +74,9 @@ type
     property Headers: TCollection read FHeaders;
     property Form: TCollection read FForm;
     property Cookies: TCollection read FCookies;
+    property AuthType: Integer read FAuthType write FAuthType;
+    property AuthBasic: TAuthBasic read FAuthBasic;
+    property AuthBearer: TAuthBearer read FAuthBearer;
   end;
 
 implementation
@@ -82,6 +110,8 @@ begin
   FHeaders := TCollection.Create(TRequestParamItem);
   FForm := TCollection.Create(TRequestParamItem);
   FCookies := TCollection.Create(TRequestParamItem);
+  FAuthBasic := TAuthBasic.Create;
+  FAuthBearer := TAuthBearer.Create;
 end;
 
 destructor TRequestObject.Destroy;
@@ -89,6 +119,8 @@ begin
   FHeaders.Free;
   FForm.Free;
   FCookies.Free;
+  FAuthBasic.Free;
+  FAuthBearer.Free;
   inherited Destroy;
 end;
 
