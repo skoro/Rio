@@ -21,9 +21,13 @@ type
 
   TForm1 = class(TForm)
     btnSubmit: TButton;
+    cbBasicShowPassword: TCheckBox;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
-    cbBasicShowPassword: TCheckBox;
+    editBasicLogin: TLabeledEdit;
+    editBasicPassword: TLabeledEdit;
+    editBearerPrefix: TLabeledEdit;
+    editBearerToken: TLabeledEdit;
     editJson: TSynEdit;
     editOther: TMemo;
     gaInsertRow: TMenuItem;
@@ -40,10 +44,6 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
-    editBasicLogin: TLabeledEdit;
-    editBasicPassword: TLabeledEdit;
-    editBearerToken: TLabeledEdit;
-    editBearerPrefix: TLabeledEdit;
     miAuthNone: TMenuItem;
     miAuthBasic: TMenuItem;
     miAuthBearer: TMenuItem;
@@ -92,6 +92,8 @@ type
     respImg: TImage;
     responseHeaders: TStringGrid;
     responseRaw: TMemo;
+    ScrollBox1: TScrollBox;
+    ScrollBox2: TScrollBox;
     scrollImage: TScrollBox;
     StatusImage1: TImage;
     StatusPanel: TPanel;

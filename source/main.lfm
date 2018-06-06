@@ -1016,100 +1016,130 @@ object Form1: TForm1
               Height = 153
               Top = 26
               Width = 553
-              ActivePage = tabAuthBasic
+              ActivePage = tabAuthBearer
               Align = alClient
               ShowTabs = False
-              TabIndex = 0
+              TabIndex = 1
               TabOrder = 1
               object tabAuthBasic: TTabSheet
                 Caption = 'Basic'
                 ClientHeight = 149
                 ClientWidth = 549
-                object editBasicLogin: TLabeledEdit
-                  Left = 8
-                  Height = 29
-                  Top = 24
-                  Width = 224
-                  EditLabel.AnchorSideLeft.Control = editBasicLogin
-                  EditLabel.AnchorSideRight.Control = editBasicLogin
-                  EditLabel.AnchorSideRight.Side = asrBottom
-                  EditLabel.AnchorSideBottom.Control = editBasicLogin
-                  EditLabel.Left = 8
-                  EditLabel.Height = 19
-                  EditLabel.Top = 2
-                  EditLabel.Width = 224
-                  EditLabel.Caption = 'Login:'
-                  EditLabel.ParentColor = False
+                object ScrollBox1: TScrollBox
+                  Left = 0
+                  Height = 149
+                  Top = 0
+                  Width = 549
+                  HorzScrollBar.Page = 232
+                  VertScrollBar.Page = 134
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ClientHeight = 149
+                  ClientWidth = 549
+                  Color = clNone
+                  ParentColor = False
                   TabOrder = 0
-                end
-                object editBasicPassword: TLabeledEdit
-                  Left = 8
-                  Height = 29
-                  Top = 80
-                  Width = 224
-                  EchoMode = emPassword
-                  EditLabel.AnchorSideLeft.Control = editBasicPassword
-                  EditLabel.AnchorSideRight.Control = editBasicPassword
-                  EditLabel.AnchorSideRight.Side = asrBottom
-                  EditLabel.AnchorSideBottom.Control = editBasicPassword
-                  EditLabel.Left = 8
-                  EditLabel.Height = 19
-                  EditLabel.Top = 58
-                  EditLabel.Width = 224
-                  EditLabel.Caption = 'Password:'
-                  EditLabel.ParentColor = False
-                  PasswordChar = '*'
-                  TabOrder = 1
-                end
-                object cbBasicShowPassword: TCheckBox
-                  Left = 8
-                  Height = 22
-                  Top = 112
-                  Width = 119
-                  Caption = 'Show password'
-                  OnClick = cbBasicShowPasswordClick
-                  TabOrder = 2
+                  object editBasicLogin: TLabeledEdit
+                    Left = 8
+                    Height = 29
+                    Top = 24
+                    Width = 224
+                    EditLabel.AnchorSideLeft.Control = editBasicLogin
+                    EditLabel.AnchorSideRight.Control = editBasicLogin
+                    EditLabel.AnchorSideRight.Side = asrBottom
+                    EditLabel.AnchorSideBottom.Control = editBasicLogin
+                    EditLabel.Left = 8
+                    EditLabel.Height = 19
+                    EditLabel.Top = 2
+                    EditLabel.Width = 224
+                    EditLabel.Caption = 'Login:'
+                    EditLabel.ParentColor = False
+                    TabOrder = 0
+                  end
+                  object editBasicPassword: TLabeledEdit
+                    Left = 8
+                    Height = 29
+                    Top = 80
+                    Width = 224
+                    EchoMode = emPassword
+                    EditLabel.AnchorSideLeft.Control = editBasicPassword
+                    EditLabel.AnchorSideRight.Control = editBasicPassword
+                    EditLabel.AnchorSideRight.Side = asrBottom
+                    EditLabel.AnchorSideBottom.Control = editBasicPassword
+                    EditLabel.Left = 8
+                    EditLabel.Height = 19
+                    EditLabel.Top = 58
+                    EditLabel.Width = 224
+                    EditLabel.Caption = 'Password:'
+                    EditLabel.ParentColor = False
+                    PasswordChar = '*'
+                    TabOrder = 1
+                  end
+                  object cbBasicShowPassword: TCheckBox
+                    Left = 8
+                    Height = 22
+                    Top = 112
+                    Width = 119
+                    Caption = 'Show password'
+                    OnClick = cbBasicShowPasswordClick
+                    TabOrder = 2
+                  end
                 end
               end
               object tabAuthBearer: TTabSheet
                 Caption = 'tabAuthBearer'
                 ClientHeight = 149
                 ClientWidth = 549
-                object editBearerPrefix: TLabeledEdit
-                  Left = 8
-                  Height = 29
-                  Top = 24
-                  Width = 200
-                  EditLabel.AnchorSideLeft.Control = editBearerPrefix
-                  EditLabel.AnchorSideRight.Control = editBearerPrefix
-                  EditLabel.AnchorSideRight.Side = asrBottom
-                  EditLabel.AnchorSideBottom.Control = editBearerPrefix
-                  EditLabel.Left = 8
-                  EditLabel.Height = 19
-                  EditLabel.Top = 2
-                  EditLabel.Width = 200
-                  EditLabel.Caption = 'Prefix:'
-                  EditLabel.ParentColor = False
+                object ScrollBox2: TScrollBox
+                  Left = 0
+                  Height = 149
+                  Top = 0
+                  Width = 549
+                  HorzScrollBar.Page = 208
+                  VertScrollBar.Page = 109
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ClientHeight = 149
+                  ClientWidth = 549
+                  Color = clNone
+                  ParentColor = False
                   TabOrder = 0
-                  Text = 'Bearer'
-                end
-                object editBearerToken: TLabeledEdit
-                  Left = 8
-                  Height = 29
-                  Top = 80
-                  Width = 536
-                  Anchors = [akTop, akLeft, akRight]
-                  EditLabel.AnchorSideLeft.Control = editBearerToken
-                  EditLabel.AnchorSideRight.Control = editBearerToken
-                  EditLabel.AnchorSideRight.Side = asrBottom
-                  EditLabel.AnchorSideBottom.Control = editBearerToken
-                  EditLabel.Left = 8
-                  EditLabel.Height = 19
-                  EditLabel.Top = 58
-                  EditLabel.Width = 536
-                  EditLabel.Caption = 'Token:'
-                  EditLabel.ParentColor = False
-                  TabOrder = 1
+                  object editBearerToken: TLabeledEdit
+                    Left = 8
+                    Height = 29
+                    Top = 80
+                    Width = 536
+                    Anchors = [akTop, akLeft, akRight]
+                    EditLabel.AnchorSideLeft.Control = editBearerToken
+                    EditLabel.AnchorSideRight.Control = editBearerToken
+                    EditLabel.AnchorSideRight.Side = asrBottom
+                    EditLabel.AnchorSideBottom.Control = editBearerToken
+                    EditLabel.Left = 8
+                    EditLabel.Height = 19
+                    EditLabel.Top = 58
+                    EditLabel.Width = 536
+                    EditLabel.Caption = 'Token:'
+                    EditLabel.ParentColor = False
+                    TabOrder = 0
+                  end
+                  object editBearerPrefix: TLabeledEdit
+                    Left = 8
+                    Height = 29
+                    Top = 24
+                    Width = 200
+                    EditLabel.AnchorSideLeft.Control = editBearerPrefix
+                    EditLabel.AnchorSideRight.Control = editBearerPrefix
+                    EditLabel.AnchorSideRight.Side = asrBottom
+                    EditLabel.AnchorSideBottom.Control = editBearerPrefix
+                    EditLabel.Left = 8
+                    EditLabel.Height = 19
+                    EditLabel.Top = 2
+                    EditLabel.Width = 200
+                    EditLabel.Caption = 'Prefix:'
+                    EditLabel.ParentColor = False
+                    TabOrder = 1
+                    Text = 'Bearer'
+                  end
                 end
               end
             end
