@@ -1839,7 +1839,7 @@ object Form1: TForm1
     end
     object miJsonView: TMenuItem
       Caption = 'View...'
-      ShortCut = 32854
+      ShortCut = 13
       OnClick = JsonTreePopupMenuClick
     end
   end
