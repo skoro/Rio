@@ -57,6 +57,7 @@ type
     FHeaders: TCollection;
     FForm: TCollection;
     FCookies: TCollection;
+    FParams: TCollection; // GET params
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
     FAuthType: Integer;
@@ -74,6 +75,7 @@ type
     property Headers: TCollection read FHeaders;
     property Form: TCollection read FForm;
     property Cookies: TCollection read FCookies;
+    property Params: TCollection read FParams;
     property AuthType: Integer read FAuthType write FAuthType;
     property AuthBasic: TAuthBasic read FAuthBasic;
     property AuthBearer: TAuthBearer read FAuthBearer;
@@ -107,10 +109,11 @@ end;
 constructor TRequestObject.Create;
 begin
   inherited Create;
-  FHeaders := TCollection.Create(TRequestParamItem);
-  FForm := TCollection.Create(TRequestParamItem);
-  FCookies := TCollection.Create(TRequestParamItem);
-  FAuthBasic := TAuthBasic.Create;
+  FHeaders    := TCollection.Create(TRequestParamItem);
+  FForm       := TCollection.Create(TRequestParamItem);
+  FCookies    := TCollection.Create(TRequestParamItem);
+  FParams     := TCollection.Create(TRequestParamItem);
+  FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
 end;
 
@@ -119,6 +122,7 @@ begin
   FHeaders.Free;
   FForm.Free;
   FCookies.Free;
+  FParams.Free;
   FAuthBasic.Free;
   FAuthBearer.Free;
   inherited Destroy;
