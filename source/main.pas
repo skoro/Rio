@@ -1097,6 +1097,8 @@ begin
       end;
   end;
 
+  tabBody.Caption := 'Body: ' + tbtnBodyType.Caption;
+
   // Keep buttons order after some buttons is hidden.
   gnavBody.SetButtonsOrder;
 end;
@@ -1109,11 +1111,14 @@ begin
     pagesAuth.Visible := True;
     pagesAuth.ActivePageIndex := LongInt(tab);
   end;
+
   case tab of
     atNone:   tbtnAuthType.Caption := 'None';
     atBasic:  tbtnAuthType.Caption := 'Basic';
     atBearer: tbtnAuthType.Caption := 'Bearer token';
   end;
+
+  tabAuth.Caption := 'Auth: ' + tbtnAuthType.Caption;
 end;
 
 function TForm1.GetSelectedBodyTab: TBodyTab;
