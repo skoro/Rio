@@ -24,6 +24,17 @@ type
     property Value: string read FValue write FValue;
   end;
 
+  TFormTypeItem = (ftiText, ftiFile);
+
+  { TFormParamItem }
+
+  TFormParamItem = class(TRequestParamItem)
+  private
+    FElemType: TFormTypeItem;
+  published
+    property ElemType: TFormTypeItem read FElemType write FElemType;
+  end;
+
   { TAuthBasic }
 
   TAuthBasic = class
@@ -55,9 +66,9 @@ type
     FBody: string;
     FJson: string;
     FHeaders: TCollection;
-    FForm: TCollection;
     FCookies: TCollection;
     FParams: TCollection; // GET params
+    FForm: TCollection;
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
     FAuthType: Integer;
@@ -67,6 +78,8 @@ type
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
+    procedure SetForm(FormGrid: TStringGrid);
+    procedure GetForm(FormGrid: TStringGrid);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
@@ -110,9 +123,9 @@ constructor TRequestObject.Create;
 begin
   inherited Create;
   FHeaders    := TCollection.Create(TRequestParamItem);
-  FForm       := TCollection.Create(TRequestParamItem);
   FCookies    := TCollection.Create(TRequestParamItem);
   FParams     := TCollection.Create(TRequestParamItem);
+  FForm       := TCollection.Create(TFormParamItem);
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
 end;
@@ -140,6 +153,45 @@ begin
     Grid.Cells[0, I + 1] := IfThen(item.Enabled, '1', '0');
     Grid.Cells[1, I + 1] := item.Name;
     Grid.Cells[2, I + 1] := item.Value;
+  end;
+end;
+
+procedure TRequestObject.SetForm(FormGrid: TStringGrid);
+var
+  Item: TFormParamItem;
+  I: Integer;
+  Name: String;
+begin
+  for I := 1 to FormGrid.RowCount - 1 do begin
+    Name := Trim(FormGrid.Cells[1, I]);
+    if Name = '' then
+      Continue;
+    Item := TFormParamItem(FForm.Add);
+    Item.Enabled  := FormGrid.Cells[0, I] = '1';
+    Item.Name     := FormGrid.Cells[1, I];
+    Item.Value    := FormGrid.Cells[2, I];
+    if FormGrid.Cells[3, I] = 'File' then
+      Item.ElemType := ftiFile
+    else
+      Item.ElemType := ftiText;
+  end;
+end;
+
+procedure TRequestObject.GetForm(FormGrid: TStringGrid);
+var
+  Item: TFormParamItem;
+  I: Integer;
+begin
+  FormGrid.RowCount := FForm.Count + 1;
+  for I := 0 to FForm.Count - 1 do begin
+    Item := TFormParamItem(FForm.Items[I]);
+    FormGrid.Cells[0, I + 1] := IfThen(Item.Enabled, '1', '0');
+    FormGrid.Cells[1, I + 1] := Item.Name;
+    FormGrid.Cells[2, I + 1] := Item.Value;
+    case Item.ElemType of
+      ftiText: FormGrid.Cells[3, I + 1] := '';
+      ftiFile: FormGrid.Cells[3, I + 1] := 'File';
+    end;
   end;
 end;
 

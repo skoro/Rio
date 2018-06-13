@@ -698,9 +698,9 @@ begin
       editJson.Text := obj.Json;
 
       obj.SetCollectionToGrid(obj.Headers, requestHeaders);
-      obj.SetCollectionToGrid(obj.Form, gridForm);
       obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
       obj.SetCollectionToGrid(obj.Params, gridParams);
+      obj.GetForm(gridForm);
 
       SelectAuthTab(TAuthTab(obj.AuthType));
       editBasicLogin.Text    := obj.AuthBasic.Login;
@@ -760,9 +760,9 @@ begin
     obj.Json := editJson.Text;
 
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
-    obj.SetCollectionFromGrid(gridForm, obj.Form);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
     obj.SetCollectionFromGrid(gridParams, obj.Params);
+    obj.SetForm(gridForm);
 
     obj.AuthType := Integer(GetSelectedAuthTab);
     obj.AuthBasic.Login    := editBasicLogin.Text;
