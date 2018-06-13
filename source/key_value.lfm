@@ -64,6 +64,7 @@ object KeyValueForm: TKeyValueForm
       Top = 73
       Width = 238
       Align = alClient
+      OnKeyPress = textValueKeyPress
       ScrollBars = ssAutoBoth
       TabOrder = 1
     end

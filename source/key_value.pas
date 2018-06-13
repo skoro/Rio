@@ -27,6 +27,7 @@ type
     Panel2: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure textValueKeyPress(Sender: TObject; var Key: char);
   private
     FFocusedComponent: TWinControl;
 
@@ -61,6 +62,12 @@ procedure TKeyValueForm.FormShow(Sender: TObject);
 begin
   if Assigned(FFocusedComponent) then
     FFocusedComponent.SetFocus;
+end;
+
+procedure TKeyValueForm.textValueKeyPress(Sender: TObject; var Key: char);
+begin
+  if Key = #27 then
+    ModalResult := mrCancel;
 end;
 
 procedure TKeyValueForm.FormCreate(Sender: TObject);
