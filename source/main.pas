@@ -636,8 +636,9 @@ end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
 var
-  i, aRow: integer;
+  i, aRow, p1, p2: integer;
   gridHeaders: TStringGrid;
+  hname, hvalue: string;
 begin
   gridHeaders := HeadersEditorForm.gridHeaders;
   // Button "Insert" pressed.
@@ -647,12 +648,23 @@ begin
     for i := 0 to gridHeaders.SelectedRangeCount - 1 do
     begin
       aRow := gridHeaders.SelectedRange[i].Top;
+      hname := gridHeaders.Cells[0, aRow];
+      hvalue := gridHeaders.Cells[1, aRow];
       with requestHeaders do begin
-        RowCount := RowCount + 1;
-        Row := RowCount - 1;
-        Cells[0, Row] := '1';
-        Cells[1, Row] := gridHeaders.Cells[0, aRow];
-        Cells[2, Row] := gridHeaders.Cells[1, aRow];
+        p1 := Cols[1].IndexOf(hname);
+        p2 := Cols[2].IndexOf(hvalue);
+        // A new header-value pair.
+        if (p1 = -1) then begin
+          RowCount := RowCount + 1;
+          Row := RowCount - 1;
+          Cells[0, Row] := '1';
+          Cells[1, Row] := hname;
+          Cells[2, Row] := hvalue;
+        end;
+        // Update a header value.
+        if (p1 <> -1) and (p1 <> p2) then begin
+          Cells[2, p1] := hvalue;
+        end;
       end;
     end;
   end;
