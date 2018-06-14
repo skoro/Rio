@@ -336,10 +336,10 @@ object Form1: TForm1
               Height = 153
               Top = 26
               Width = 553
-              ActivePage = tabBodyForm
+              ActivePage = tabBodyJson
               Align = alClient
               ShowTabs = False
-              TabIndex = 1
+              TabIndex = 0
               TabOrder = 0
               object tabBodyJson: TTabSheet
                 Caption = 'tabBodyJson'
@@ -788,10 +788,6 @@ object Form1: TForm1
                   MouseActions = <>
                   MouseTextActions = <>
                   MouseSelActions = <>
-                  Lines.Strings = (
-                    '{'
-                    '}'
-                  )
                   Options = [eoAutoIndent, eoBracketHighlight, eoGroupUndo, eoScrollPastEol, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
                   VisibleSpecialChars = [vscSpace, vscTabAtLast]
                   SelectedColor.BackPriority = 50

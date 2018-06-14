@@ -435,6 +435,8 @@ begin
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
+
+  StartNewRequest;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
@@ -1516,9 +1518,39 @@ end;
 function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
 var
   I: Integer;
+  Need: Boolean = False;
+
+  function IsEmpty(Grid: TStringGrid): Boolean;
+  var
+    I: Integer;
+  begin
+    for I := 1 to Grid.RowCount - 1 do
+      if (Grid.Cells[1, I] <> '') or (Grid.Cells[2, I] <> '') then
+        Exit(False);
+    Result := True;
+  end;
+
 begin
-  I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
-  if I <> IDYES then Exit(False); // =>
+  Need := Length(cbUrl.Text) > 0;
+  if not Need then
+    Need := not IsEmpty(requestHeaders);
+  if not Need then
+    Need := not IsEmpty(gridReqCookie);
+  if not Need then
+    Need := not IsEmpty(gridForm);
+  if not Need then
+    Need := not IsEmpty(gridParams);
+  if not Need then
+    Need := GetSelectedAuthTab <> atNone;
+  if not Need then
+    Need := Length(editOther.Text) > 0;
+  if not Need then
+    Need := Length(Trim(editJson.Text)) > 0;
+
+  if Need then begin
+    I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
+    if I <> IDYES then Exit(False); // =>
+  end;
   Result := True;
 end;
 
@@ -1536,7 +1568,7 @@ begin
   cbUrl.Text := '';
   cbMethod.Text := 'GET';
   editOther.Text := '';
-  editJson.Text := '{'+#13+'}';
+  editJson.Text := '';
   ResetGrid(requestHeaders);
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
