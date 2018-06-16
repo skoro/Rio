@@ -5,8 +5,8 @@ unit response_tabs;
 interface
 
 uses
-  Classes, SysUtils, contnrs, ComCtrls, ExtCtrls, Controls, Forms,
-  thread_http_client;
+  Classes, SysUtils, contnrs, fpjson, ComCtrls, ExtCtrls, Controls, Forms,
+  StdCtrls, thread_http_client;
 
 type
 
@@ -60,7 +60,83 @@ type
     property Image: TImage read GetImage;
   end;
 
+  { TResponseJsonTab }
+
+  TResponseJsonTab = class(TResponseTab)
+  private
+    FTreeView: TTreeView;
+    FJsonRoot: TJSONData;
+    function GetTreeView: TTreeView;
+    procedure LoadDocument(doc: string);
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function OpenOnMimeType(const MimeType: string): boolean; override;
+    procedure CreateUI(ATabSheet: TTabSheet); override;
+    procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
+    procedure OnSaveResponse(const AFileName: string); override;
+    property TreeView: TTreeView read GetTreeView;
+  end;
+
 implementation
+
+
+{ TResponseJsonTab }
+
+procedure TResponseJsonTab.LoadDocument(doc: string);
+begin
+
+end;
+
+function TResponseJsonTab.GetTreeView: TTreeView;
+begin
+  if not Assigned(FTreeView) then
+    raise Exception.Create('Tree view component is not initialized.');
+  Result := FTreeView;
+end;
+
+constructor TResponseJsonTab.Create;
+begin
+  inherited;
+  FTreeView := nil;
+  FJsonRoot := nil;
+end;
+
+destructor TResponseJsonTab.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TResponseJsonTab.OpenOnMimeType(const MimeType: string): boolean;
+begin
+  Result := MimeType = 'application/json';
+end;
+
+procedure TResponseJsonTab.CreateUI(ATabSheet: TTabSheet);
+begin
+  inherited CreateUI(ATabSheet);
+  FTreeView := TTreeView.Create(ATabSheet);
+  FTreeView.Parent := ATabSheet;
+  FTreeView.Align := alClient;
+  FTreeView.BorderStyle := bsNone;
+  FTreeView.ReadOnly := True;
+  FTreeView.RightClickSelect := True;
+  FTreeView.ScrollBars := ssAutoBoth;
+end;
+
+procedure TResponseJsonTab.OnHttpResponse(ResponseInfo: TResponseInfo);
+begin
+  if Assigned(FTreeView) then begin
+    LoadDocument(ResponseInfo.Content.DataString);
+  end;
+end;
+
+procedure TResponseJsonTab.OnSaveResponse(const AFileName: string);
+begin
+  if Assigned(FTreeView) then begin
+
+  end;
+end;
 
 { TResponseTabManager }
 
@@ -106,7 +182,7 @@ end;
 function TResponseImageTab.GetImage: TImage;
 begin
   if not Assigned(FImage) then
-    raise Exception.Create('No image created or response is not an image.');
+    raise Exception.Create('Image component is not initialized.');
   Result := FImage;
 end;
 
