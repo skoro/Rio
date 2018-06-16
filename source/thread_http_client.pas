@@ -31,6 +31,7 @@ type
     RequestHeaders: TStrings;
     ResponseHeaders: TStrings;
     Content: TStringStream;
+    ContentType: String;
     Time: Int64; // time of request execution in milliseconds
   end;
 
@@ -59,6 +60,7 @@ type
     procedure OnClientException;
   protected
     procedure Execute; override;
+    function ParseContentType: String;
   public
     constructor Create(CreateSuspened: Boolean);
     destructor Destroy; override;
@@ -223,6 +225,7 @@ begin
     info.HttpVersion:=FHttpClient.ServerHTTPVersion;
     info.Content:=FResponseData;
     info.Time:=MilliSecondsBetween(FFinishTime, FStartTime);
+    info.ContentType:=ParseContentType;
     FOnRequestComplete(info);
   end;
 end;
@@ -245,6 +248,27 @@ begin
     begin
       FException := E;
       Synchronize(@OnClientException);
+    end;
+  end;
+end;
+
+function TThreadHttpClient.ParseContentType: String;
+var
+  I, P: Integer;
+  Line, Header: String;
+begin
+  Result := '';
+  for I := 0 to FHttpClient.ResponseHeaders.Count - 1 do begin
+    Line := FHttpClient.ResponseHeaders.Strings[I];
+    P := Pos(':', Line);
+    if p <> 0 then begin
+      Header := LeftStr(Line, P - 1);
+      if LowerCase(Header) = 'content-type' then begin
+        Result := Trim(RightStr(Line, Length(Line) - P));
+        P := Pos(';', Result);
+        if P <> 0 then
+          Result := Trim(LeftStr(Result, P - 1));
+      end;
     end;
   end;
 end;
