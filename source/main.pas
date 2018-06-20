@@ -1195,7 +1195,11 @@ end;
 
 procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
   ResponseInfo: TResponseInfo);
+var
+  ImageTab: TResponseImageTab;
 begin
+  StatusText3.Caption := '';
+
   if Tab is TResponseJsonTab then begin
     FJsonTree := TResponseJsonTab(Tab).TreeView;
     with FJsonTree do begin
@@ -1205,6 +1209,15 @@ begin
       if OptionsForm.JsonExpanded then
         FullExpand;
     end;
+  end
+
+  else if Tab is TResponseImageTab then begin
+    ImageTab := TResponseImageTab(Tab);
+    StatusText3.Caption := Format('%s: %d x %d', [
+      ImageTab.ImageType,
+      ImageTab.Image.Picture.Width,
+      ImageTab.Image.Picture.Height
+    ]);
   end;
 end;
 
