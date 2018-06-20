@@ -53,9 +53,11 @@ type
   TResponseImageTab = class(TResponseTab)
   private
     FImage: TImage;
+    FImageType: string;
     function GetImage: TImage;
     procedure OnDblClickResize(Sender: TObject);
     procedure ResizeImage(ToStretch: boolean);
+    function ParseImageType(const ContentType: string): string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -64,6 +66,7 @@ type
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     procedure OnSaveResponse(const AFileName: string); override;
     property Image: TImage read GetImage;
+    property ImageType: string read FImageType;
   end;
 
   { TResponseJsonTab }
@@ -331,6 +334,16 @@ begin
     end;
 end;
 
+function TResponseImageTab.ParseImageType(const ContentType: string): string;
+var
+  P: integer;
+begin
+  P := Pos('/', ContentType);
+  Result := UpperCase(RightStr(ContentType, Length(ContentType) - P));
+  if Result = 'JPEG' then
+    Result := 'JPG';
+end;
+
 constructor TResponseImageTab.Create;
 begin
   inherited;
@@ -373,6 +386,7 @@ procedure TResponseImageTab.OnHttpResponse(ResponseInfo: TResponseInfo);
 begin
   if Assigned(FImage) then
   begin
+    FImageType := ParseImageType(ResponseInfo.ContentType);
     FImage.Picture.LoadFromStream(ResponseInfo.Content);
     ResizeImage(False);
   end;
