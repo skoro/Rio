@@ -8,7 +8,7 @@ uses
   Classes, Forms, Dialogs, StdCtrls,
   ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
-  SynHighlighterJScript, thread_http_client, GridNavigator,
+  SynHighlighterJScript, thread_http_client, response_tabs, GridNavigator,
   SysUtils, jsonparser;
 
 type
@@ -180,6 +180,8 @@ type
     FJsonParser: TJSONParser;
     FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
+    FJsonTree: TTreeView;
+    FResponseTabManager: TResponseTabManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     procedure JsonDocument(json: string);
@@ -212,6 +214,7 @@ type
     function GetSelectedBodyTab: TBodyTab;
     function GetSelectedAuthTab: TAuthTab;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
+    procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
   public
     procedure ApplyOptions;
   end;
@@ -419,6 +422,11 @@ begin
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
 
+  FResponseTabManager := TResponseTabManager.Create(pagesResponse);
+  FResponseTabManager.RegisterTab(TResponseImageTab.Create);
+  FResponseTabManager.RegisterTab(TResponseJsonTab.Create);
+  FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
+
   UpdateHeadersPickList;
 
   gridForm.Cells[0, 1] := '1';
@@ -441,6 +449,8 @@ end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
+  FreeAndNil(FResponseTabManager);
+
   // Если не освободить, то когда активна вкладка JSON при выходе
   // из приложения возникают исключения что память не освобождена.
   jsImages.Free;
@@ -567,12 +577,15 @@ procedure TForm1.JsonTreeDblClick(Sender: TObject);
 var
   Node: TTreeNode;
 begin
-  Node := JsonTree.Selected;
-  if not Assigned(Node) then Exit;
-  // Double click on parent nodes expand/collapse children.
-  // But on child node shows KeyValue modal.
-  if not Node.HasChildren then
-    JsonTreePopupMenuClick(miJsonView);
+  if Sender is TTreeView then begin
+    Node := TTreeView(Sender).Selected;
+    if not Assigned(Node) then
+      Exit;
+    // Double click on parent nodes expand/collapse children.
+    // But on child node shows KeyValue modal.
+    if not Node.HasChildren then
+      JsonTreePopupMenuClick(miJsonView);
+  end;
 end;
 
 // Various copy operations on Json tree node.
@@ -589,7 +602,7 @@ var
   I: Integer;
   Value, Key: String;
 begin
-  Node := JsonTree.Selected;
+  Node := FJsonTree.Selected;
   if not Assigned(Node) then Exit;
 
   // Get json node value.
@@ -1180,6 +1193,21 @@ begin
   end;
 end;
 
+procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
+  ResponseInfo: TResponseInfo);
+begin
+  if Tab is TResponseJsonTab then begin
+    FJsonTree := TResponseJsonTab(Tab).TreeView;
+    with FJsonTree do begin
+      Images := jsImages;
+      PopupMenu := popupJsonTree;
+      OnDblClick := @JsonTreeDblClick;
+      if OptionsForm.JsonExpanded then
+        FullExpand;
+    end;
+  end;
+end;
+
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -1679,13 +1707,15 @@ begin
   respImg.Picture.Clear;
   StatusText3.Caption := '';
 
+  FResponseTabManager.OpenTabs(Info);
+
   case FContentType of
     'application/json':
       begin
-        JsonDocument(Info.Content.DataString);
+        {JsonDocument(Info.Content.DataString);
         tabImage.TabVisible := False;
         tabContent.TabVisible := True;
-        tabJson.TabVisible := True;
+        tabJson.TabVisible := True;}
       end;
 
     'image/jpeg',
@@ -1693,14 +1723,14 @@ begin
     'image/png',
     'image/gif':
       begin
-        respImg.Picture.LoadFromStream(Info.Content);
+        {respImg.Picture.LoadFromStream(Info.Content);
         ImageResize(False);
         tabContent.TabVisible := False;
         tabJson.TabVisible := False;
         tabImage.TabVisible := True;
         subtype := UpperCase(GetContentSubtype);
         if subtype = 'JPEG' then subtype := 'JPG';
-        StatusText3.Caption := Format('%s: %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);
+        StatusText3.Caption := Format('%s: %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);}
       end;
 
     else
