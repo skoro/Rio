@@ -1199,6 +1199,7 @@ var
   ImageTab: TResponseImageTab;
 begin
   StatusText3.Caption := '';
+  responseRaw.Clear;
 
   if Tab is TResponseJsonTab then begin
     FJsonTree := TResponseJsonTab(Tab).TreeView;
@@ -1209,6 +1210,7 @@ begin
       if OptionsForm.JsonExpanded then
         FullExpand;
     end;
+    tabContent.TabVisible := True;
   end
 
   else if Tab is TResponseImageTab then begin
@@ -1218,6 +1220,12 @@ begin
       ImageTab.Image.Picture.Width,
       ImageTab.Image.Picture.Height
     ]);
+    tabContent.TabVisible := False;
+  end;
+
+  if tabContent.TabVisible then begin
+    responseRaw.Append(ResponseInfo.Content.DataString);
+    responseRaw.CaretPos := Point(0, 0);
   end;
 end;
 
