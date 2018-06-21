@@ -256,6 +256,7 @@ end;
 procedure TResponseJsonTab.FreeTab;
 begin
   ClearJsonData;
+  FreeAndNil(FTreeView);
   inherited;
 end;
 
