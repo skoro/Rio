@@ -75,9 +75,17 @@ type
     property OnException: TOnException read FOnClientException write FOnClientException;
   end;
 
+  { TMimeType }
+
+  TMimeType = record
+    MimeType: string;
+    Subtype: string;
+  end;
+
 function DecodeUrl(const url: string): string;
 function GetURLQueryParams(const url: string): TQueryParams;
 function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
+function SplitMimeType(const ContentType: string): TMimeType;
 
 implementation
 
@@ -139,6 +147,19 @@ begin
   URI := ParseURI(url);
   URI.Params := ParamStr;
   Result := EncodeURI(URI);
+end;
+
+function SplitMimeType(const ContentType: string): TMimeType;
+var
+  P: Word;
+begin
+  Result.MimeType := '';
+  Result.Subtype  := '';
+  P := Pos('/', ContentType);
+  if P = 0 then
+    Exit;
+  Result.MimeType := LowerCase(LeftStr(ContentType, P - 1));
+  Result.Subtype  := LowerCase(RightStr(ContentType, Length(ContentType) - P));
 end;
 
 { TCustomHttpClient }
