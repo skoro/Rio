@@ -5,7 +5,7 @@ unit response_tabs;
 interface
 
 uses
-  Classes, SysUtils, contnrs, fpjson, jsonparser, ComCtrls, ExtCtrls, Controls,
+  Classes, SysUtils, fpjson, jsonparser, ComCtrls, ExtCtrls, Controls,
   Forms, StdCtrls, thread_http_client;
 
 type
@@ -23,7 +23,7 @@ type
     procedure CreateUI(ATabSheet: TTabSheet); virtual;
     procedure FreeTab; virtual;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); virtual; abstract;
-    procedure OnSaveResponse(const AFileName: string); virtual; abstract;
+    procedure Save(const AFileName: string); virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -31,21 +31,26 @@ type
   { TOnOpenResponseTab }
 
   TOnOpenResponseTab = procedure(Tab: TResponseTab; ResponseInfo: TResponseInfo) of object;
+  TOnSaveTab = procedure(const FileName: string; Tab: TResponseTab) of object;
 
   { TResponseTabManager }
 
   TResponseTabManager = class
   private
     FPageControl: TPageControl;
-    FTabs: TObjectList;
+    FTabs: TFPList;
+    FOpenedTabs: TFPList;
     FOnOpenResponseTab: TOnOpenResponseTab;
+    FOnSaveTab: TOnSaveTab;
   public
     constructor Create(APageControl: TPageControl);
     destructor Destroy; override;
     procedure RegisterTab(Tab: TResponseTab);
     procedure OpenTabs(ResponseInfo: TResponseInfo);
+    procedure Save(const FileName: string);
     property PageControl: TPageControl read FPageControl write FPageControl;
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
+    property OnSaveTab: TOnSaveTab read FOnSaveTab write FOnSaveTab;
   end;
 
   { TResponseImageTab }
@@ -64,7 +69,7 @@ type
     function OpenOnMimeType(const MimeType: string): boolean; override;
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
-    procedure OnSaveResponse(const AFileName: string); override;
+    procedure Save(const AFileName: string); override;
     property Image: TImage read GetImage;
     property ImageType: string read FImageType;
   end;
@@ -86,9 +91,9 @@ type
     function OpenOnMimeType(const MimeType: string): boolean; override;
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
-    procedure OnSaveResponse(const AFileName: string); override;
     procedure FreeTab; override;
     property TreeView: TTreeView read GetTreeView;
+    property JsonRoot: TJSONData read FJsonRoot;
   end;
 
 implementation
@@ -246,13 +251,6 @@ begin
   end;
 end;
 
-procedure TResponseJsonTab.OnSaveResponse(const AFileName: string);
-begin
-  if Assigned(FTreeView) then begin
-
-  end;
-end;
-
 procedure TResponseJsonTab.FreeTab;
 begin
   ClearJsonData;
@@ -265,13 +263,16 @@ end;
 constructor TResponseTabManager.Create(APageControl: TPageControl);
 begin
   FPageControl := APageControl;
-  FTabs := TObjectList.Create;
+  FTabs := TFPList.Create;
+  FOpenedTabs := TFPList.Create;
   FOnOpenResponseTab := nil;
+  FOnSaveTab := nil;
 end;
 
 destructor TResponseTabManager.Destroy;
 begin
   FreeAndNil(FTabs);
+  FreeAndNil(FOpenedTabs);
   FreeAndNil(FPageControl);
   inherited Destroy;
 end;
@@ -286,6 +287,7 @@ var
   I: integer;
   Tab: TResponseTab;
 begin
+  FOpenedTabs.Clear;
   for I := 0 to FTabs.Count - 1 do
   begin
     Tab := TResponseTab(FTabs.Items[I]);
@@ -296,10 +298,20 @@ begin
       Tab.OnHttpResponse(ResponseInfo);
       if Assigned(FOnOpenResponseTab) then
         FOnOpenResponseTab(Tab, ResponseInfo);
+      FOpenedTabs.Add(Tab);
     end
     else
       Tab.FreeTab;
   end;
+end;
+
+procedure TResponseTabManager.Save(const FileName: string);
+var
+  Tab: Pointer;
+begin
+  for Tab in FOpenedTabs do
+    if Assigned(FOnSaveTab) then
+      FOnSaveTab(FileName, TResponseTab(Tab));
 end;
 
 { TResponseImageTab }
@@ -393,7 +405,7 @@ begin
   end;
 end;
 
-procedure TResponseImageTab.OnSaveResponse(const AFileName: string);
+procedure TResponseImageTab.Save(const AFileName: string);
 begin
   if Assigned(FImage) then
     FImage.Picture.SaveToFile(AFileName);
@@ -420,6 +432,11 @@ end;
 procedure TResponseTab.FreeTab;
 begin
   FreeAndNil(FTabSheet);
+end;
+
+procedure TResponseTab.Save(const AFileName: string);
+begin
+  raise Exception.Create('Save is not implemented.');
 end;
 
 end.
