@@ -155,7 +155,6 @@ type
     procedure gaDeleteRowClick(Sender: TObject);
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
-    procedure miTreeExpandClick(Sender: TObject);
     procedure OnGridClear(Sender: TObject; Grid: TStringGrid);
     procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
     procedure OnGridEditRow(Sender: TObject; Grid: TStringGrid;
@@ -170,22 +169,17 @@ type
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
-    procedure respImgDblClick(Sender: TObject);
     procedure tbtnFormUploadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
   private
     FContentType: string;
-    FJsonParser: TJSONParser;
-    FJsonRoot: TJSONData;
     FHttpClient: TThreadHttpClient;
     FJsonTree: TTreeView;
     FResponseTabManager: TResponseTabManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
-    procedure JsonDocument(json: string);
-    procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
@@ -200,10 +194,6 @@ type
       const ValueFocused: Boolean = False): TModalResult;
     function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
-    procedure ShowHideResponseTabs(Info: TResponseInfo);
-    procedure ImageResize(ToStretch: Boolean = True);
-    function GetContentSubtype: string;
-    procedure FreeJsonTree;
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
@@ -229,10 +219,6 @@ uses lcltype, about, headers_editor, cookie_form, uriparser,
   Clipbrd;
 
 const
-  ImageTypeMap: array[TJSONtype] of Integer =
-  // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
-  (-1, 3, 2, 4, 5, 0, 1);
-
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
 
 {$R *.lfm}
@@ -422,6 +408,7 @@ begin
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
 
+  // Initialize and register response tabs.
   FResponseTabManager := TResponseTabManager.Create(pagesResponse);
   FResponseTabManager.RegisterTab(TResponseImageTab.Create);
   FResponseTabManager.RegisterTab(TResponseJsonTab.Create);
@@ -455,7 +442,6 @@ begin
   // из приложения возникают исключения что память не освобождена.
   jsImages.Free;
 
-  FreeJsonTree;
   // In some rare situations Terminate leads to access violation error.
   {if Assigned(FHttpClient) then begin
     FHttpClient.Terminate;
@@ -822,7 +808,7 @@ begin
     if dlgSave.Execute then begin
       if tabContent.TabVisible then begin
         if (tabJson.TabVisible and OptionsForm.JsonSaveFormatted) then
-          FilePutContents(dlgSave.FileName, FormatJson(FJsonRoot))
+          //FilePutContents(dlgSave.FileName, FormatJson(FJsonRoot))
         else
           responseRaw.Lines.SaveToFile(dlgSave.FileName)
       end
@@ -832,18 +818,6 @@ begin
     end;
   except on E: Exception do
     ShowMessage(E.Message);
-  end;
-end;
-
-procedure TForm1.miTreeExpandClick(Sender: TObject);
-var
-  Node: TTreeNode;
-begin
-  Node := JsonTree.Selected;
-  if Assigned(Node) then
-  begin
-    Node.Expanded := not Node.Expanded;
-    if Node.Expanded then Node.Expand(True) else Node.Collapse(True);
   end;
 end;
 
@@ -958,11 +932,6 @@ begin
   header := Trim(GetRowKV(requestHeaders, aRow).Key);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
-end;
-
-procedure TForm1.respImgDblClick(Sender: TObject);
-begin
-  ImageResize(not respImg.Stretch);
 end;
 
 procedure TForm1.tbtnFormUploadClick(Sender: TObject);
@@ -1198,9 +1167,6 @@ procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
 var
   ImageTab: TResponseImageTab;
 begin
-  StatusText3.Caption := '';
-  responseRaw.Clear;
-
   if Tab is TResponseJsonTab then begin
     FJsonTree := TResponseJsonTab(Tab).TreeView;
     with FJsonTree do begin
@@ -1210,7 +1176,6 @@ begin
       if OptionsForm.JsonExpanded then
         FullExpand;
     end;
-    tabContent.TabVisible := True;
   end
 
   else if Tab is TResponseImageTab then begin
@@ -1220,12 +1185,6 @@ begin
       ImageTab.Image.Picture.Width,
       ImageTab.Image.Picture.Height
     ]);
-    tabContent.TabVisible := False;
-  end;
-
-  if tabContent.TabVisible then begin
-    responseRaw.Append(ResponseInfo.Content.DataString);
-    responseRaw.CaretPos := Point(0, 0);
   end;
 end;
 
@@ -1282,92 +1241,6 @@ begin
   end;
 end;
 
-procedure TForm1.JsonDocument(json: string);
-var
-  S: TStringStream;
-begin
-  S := TStringStream.Create(json);
-  FJsonParser := TJSONParser.Create(S);
-  with JsonTree.Items do begin
-    BeginUpdate;
-    try
-      FJsonRoot := FJsonParser.Parse;
-      ShowJsonData(Nil, FJsonRoot);
-      with JsonTree do
-        if (Items.Count > 0) and Assigned(Items[0]) then
-        begin
-          Items[0].Expand(False);
-          Selected := Items[0];
-        end;
-    finally
-      EndUpdate;
-    end;
-  end;
-  if OptionsForm.JsonExpanded then JsonTree.FullExpand;
-  FreeAndNil(S);
-end;
-
-procedure TForm1.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
-var
-  N2: TTreeNode;
-  I: Integer;
-  D: TJSONData;
-  C: String;
-  S: TStringList;
-begin
-  if Not Assigned(Data) then
-    exit;
-
-  if not Assigned(AParent) then
-  begin
-    AParent := JsonTree.Items.AddChild(nil, '');
-    AParent.ImageIndex := ImageTypeMap[Data.JSONType];
-    AParent.SelectedIndex := ImageTypeMap[Data.JSONType];
-    AParent.Data := Data;
-  end;
-
-  Case Data.JSONType of
-    jtArray,
-    jtObject:
-      begin
-      If (Data.JSONType = jtArray) then
-        AParent.Text := AParent.Text + Format('[%d]', [Data.Count])
-      else if (Data.JSONType = jtObject) and (AParent.Text = '') then
-        AParent.Text := 'Object';
-      S := TstringList.Create;
-      try
-        For I:=0 to Data.Count-1 do
-          If Data.JSONtype = jtArray then
-            S.AddObject(IntToStr(I), Data.items[i])
-          else
-            S.AddObject(TJSONObject(Data).Names[i], Data.items[i]);
-        For I:=0 to S.Count-1 do
-          begin
-          N2 := JsonTree.Items.AddChild(AParent, S[i]);
-          D := TJSONData(S.Objects[i]);
-          N2.ImageIndex := ImageTypeMap[D.JSONType];
-          N2.SelectedIndex := ImageTypeMap[D.JSONType];
-          N2.Data := D;
-          ShowJSONData(N2, D);
-          end
-      finally
-        S.Free;
-      end;
-      end;
-    jtNull:
-      C := 'null';
-  else
-    if Data.JSONType = jtNumber then
-      C := Data.AsFloat.ToString
-    else
-      C := Data.AsString;
-    if (Data.JSONType = jtString) then
-      C := '"'+C+'"';
-    AParent.Text := AParent.Text + ': ' + C;
-    AParent.Data := Data;
-  end;
-end;
-
 function TForm1.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
 var
   p: integer;
@@ -1414,6 +1287,7 @@ procedure TForm1.OnRequestComplete(Info: TResponseInfo);
 var
   i, p: integer;
   h: string;
+  mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
   SetAppCaption(cbUrl.Text);
@@ -1451,7 +1325,22 @@ begin
   //miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
   miSaveResponse.Enabled := True;
 
-  ShowHideResponseTabs(Info);
+  Info.Content.Position := 0;
+  StatusText3.Caption := '';
+  responseRaw.Clear;
+  mime := SplitMimeType(Info.ContentType);
+
+  FResponseTabManager.OpenTabs(Info);
+
+  if (mime.MimeType = 'text') or ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
+    tabContent.TabVisible := True
+  else
+    tabContent.TabVisible := False;
+
+  if tabContent.TabVisible then begin
+    responseRaw.Append(Info.Content.DataString);
+    responseRaw.CaretPos := Point(0, 0);
+  end;
 end;
 
 procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
@@ -1714,102 +1603,6 @@ procedure TForm1.SetAppCaption(const AValue: String);
 begin
   Caption := ApplicationName;
   if AValue <> '' then Caption := Caption + ': ' + AValue;
-end;
-
-// Depending on content type - show/hide response tabs.
-procedure TForm1.ShowHideResponseTabs(Info: TResponseInfo);
-var
-  subtype: string;
-begin
-  Info.Content.Position := 0;
-
-  FreeJsonTree;
-  responseRaw.Clear;
-  respImg.Picture.Clear;
-  StatusText3.Caption := '';
-
-  FResponseTabManager.OpenTabs(Info);
-
-  case FContentType of
-    'application/json':
-      begin
-        {JsonDocument(Info.Content.DataString);
-        tabImage.TabVisible := False;
-        tabContent.TabVisible := True;
-        tabJson.TabVisible := True;}
-      end;
-
-    'image/jpeg',
-    'image/jpg',
-    'image/png',
-    'image/gif':
-      begin
-        {respImg.Picture.LoadFromStream(Info.Content);
-        ImageResize(False);
-        tabContent.TabVisible := False;
-        tabJson.TabVisible := False;
-        tabImage.TabVisible := True;
-        subtype := UpperCase(GetContentSubtype);
-        if subtype = 'JPEG' then subtype := 'JPG';
-        StatusText3.Caption := Format('%s: %d x %d', [subtype, respImg.Picture.Width, respImg.Picture.Height]);}
-      end;
-
-    else
-      begin
-        tabImage.TabVisible := False;
-        tabJson.TabVisible := False;
-        tabContent.TabVisible := True;
-      end;
-  end;
-
-  if tabContent.TabVisible then begin
-    responseRaw.Append(Info.Content.DataString);
-    responseRaw.CaretPos := Point(0, 0);
-  end;
-end;
-
-// Resize response image.
-// ToStretch = True stretch image.
-// ToStretch = False set image original size.
-procedure TForm1.ImageResize(ToStretch: Boolean);
-begin
-  with respImg do
-    if ToStretch then begin
-      Width := scrollImage.ClientWidth;
-      Height := scrollImage.ClientHeight;
-      Proportional := True;
-      Stretch := True;
-    end
-    else begin
-      Width := Picture.Width;
-      Height := Picture.Height;
-      Proportional := False;
-      Stretch := False;
-    end;
-end;
-
-// Returns subtype from content type property.
-// For example, for 'application/json' it returns 'json'.
-function TForm1.GetContentSubtype: string;
-var
-  p: integer;
-begin
-  if FContentType = '' then
-    raise Exception.Create('Cannot get subtype. Content type is empty');
-  p := Pos('/', FContentType);
-  Result := RightStr(FContentType, Length(FContentType) - p);
-end;
-
-procedure TForm1.FreeJsonTree;
-begin
-  if Assigned(FJsonRoot) then begin
-    case FJsonRoot.JSONType of
-      jtArray, jtObject: FJsonRoot.Clear;
-    end;
-    FreeAndNil(FJsonRoot);
-  end;
-  JsonTree.Items.Clear;
-  if Assigned(FJsonParser) then FreeAndNil(FJsonParser);
 end;
 
 end.
