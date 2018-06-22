@@ -205,6 +205,7 @@ type
     function GetSelectedAuthTab: TAuthTab;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
+    procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
   public
     procedure ApplyOptions;
   end;
@@ -413,6 +414,7 @@ begin
   FResponseTabManager.RegisterTab(TResponseImageTab.Create);
   FResponseTabManager.RegisterTab(TResponseJsonTab.Create);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
+  FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
 
   UpdateHeadersPickList;
 
@@ -805,17 +807,8 @@ begin
   try
     dlgSave.FileName := GetRequestFilename;
     dlgSave.Title := 'Save the response to a file';
-    if dlgSave.Execute then begin
-      if tabContent.TabVisible then begin
-        if (tabJson.TabVisible and OptionsForm.JsonSaveFormatted) then
-          //FilePutContents(dlgSave.FileName, FormatJson(FJsonRoot))
-        else
-          responseRaw.Lines.SaveToFile(dlgSave.FileName)
-      end
-      else
-        if tabImage.TabVisible then
-          respImg.Picture.SaveToFile(dlgSave.FileName);
-    end;
+    if dlgSave.Execute then
+      FResponseTabManager.Save(dlgSave.FileName);
   except on E: Exception do
     ShowMessage(E.Message);
   end;
@@ -1185,6 +1178,20 @@ begin
       ImageTab.Image.Picture.Width,
       ImageTab.Image.Picture.Height
     ]);
+  end;
+end;
+
+procedure TForm1.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
+begin
+  if Tab is TResponseImageTab then begin
+    TResponseImageTab(Tab).Save(FileName);
+  end
+
+  else if Tab is TResponseJsonTab then begin
+    if OptionsForm.JsonSaveFormatted then
+      FilePutContents(FileName, FormatJson(TResponseJsonTab(Tab).JsonRoot))
+    else
+      responseRaw.Lines.SaveToFile(FileName)
   end;
 end;
 
