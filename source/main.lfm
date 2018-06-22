@@ -1289,61 +1289,14 @@ object Form1: TForm1
             ClientWidth = 553
             object responseRaw: TMemo
               Left = 0
-              Height = 250
+              Height = 214
               Top = 0
-              Width = 539
+              Width = 553
               Align = alClient
               BorderStyle = bsNone
               ReadOnly = True
               ScrollBars = ssAutoBoth
               TabOrder = 0
-            end
-          end
-          object tabJson: TTabSheet
-            Caption = 'JSON'
-            ClientHeight = 214
-            ClientWidth = 553
-            TabVisible = False
-            object JsonTree: TTreeView
-              Left = 0
-              Height = 244
-              Top = 0
-              Width = 549
-              Align = alClient
-              BorderStyle = bsNone
-              Images = jsImages
-              PopupMenu = popupJsonTree
-              ReadOnly = True
-              ScrollBars = ssAutoBoth
-              TabOrder = 0
-              ToolTips = False
-              OnDblClick = JsonTreeDblClick
-              Options = [tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoReadOnly, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoThemedDraw]
-            end
-          end
-          object tabImage: TTabSheet
-            Caption = 'Image'
-            ClientHeight = 214
-            ClientWidth = 553
-            TabVisible = False
-            object scrollImage: TScrollBox
-              Left = 0
-              Height = 242
-              Top = 0
-              Width = 547
-              HorzScrollBar.Page = 321
-              VertScrollBar.Page = 240
-              Align = alClient
-              ClientHeight = 238
-              ClientWidth = 543
-              TabOrder = 0
-              object respImg: TImage
-                Left = 0
-                Height = 240
-                Top = 0
-                Width = 321
-                OnDblClick = respImgDblClick
-              end
             end
           end
         end

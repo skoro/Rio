@@ -40,7 +40,6 @@ type
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
-    JsonTree: TTreeView;
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
@@ -89,12 +88,10 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
-    respImg: TImage;
     responseHeaders: TStringGrid;
     responseRaw: TMemo;
     ScrollBox1: TScrollBox;
     ScrollBox2: TScrollBox;
-    scrollImage: TScrollBox;
     StatusImage1: TImage;
     StatusPanel: TPanel;
     StatusText1: TLabel;
@@ -107,8 +104,6 @@ type
     tabBodyOther: TTabSheet;
     tabContent: TTabSheet;
     tabHeaders: TTabSheet;
-    tabImage: TTabSheet;
-    tabJson: TTabSheet;
     tabQuery: TTabSheet;
     tabReqCookie: TTabSheet;
     tabRespCookie: TTabSheet;
@@ -1524,10 +1519,7 @@ begin
   responseRaw.Text := '';
   FContentType := '';
   tabContent.TabVisible := False;
-  tabImage.TabVisible := False;
   tabRespCookie.TabVisible := False;
-  { TODO : Free json tree items ? }
-  tabJson.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
   miSaveResponse.Enabled := False;
 
