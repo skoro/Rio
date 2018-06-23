@@ -1154,9 +1154,11 @@ procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
   ResponseInfo: TResponseInfo);
 var
   ImageTab: TResponseImageTab;
+  JsonTab: TResponseJsonTab;
 begin
   if Tab is TResponseJsonTab then begin
-    FJsonTree := TResponseJsonTab(Tab).TreeView;
+    JsonTab := TResponseJsonTab(Tab);
+    FJsonTree := JsonTab.TreeView;
     with FJsonTree do begin
       Images := jsImages;
       PopupMenu := popupJsonTree;
@@ -1164,6 +1166,9 @@ begin
       if OptionsForm.JsonExpanded then
         FullExpand;
     end;
+    JsonTab.SynEdit.Highlighter := synJS;
+    JsonTab.SynEdit.Text := FormatJson(JsonTab.JsonRoot);
+    JsonTab.ViewPage := vpTree;
   end
 
   else if Tab is TResponseImageTab then begin
