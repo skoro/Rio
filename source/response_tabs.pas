@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, jsonparser, ComCtrls, ExtCtrls, Controls,
-  Forms, StdCtrls, thread_http_client;
+  Forms, StdCtrls, SynEdit, thread_http_client;
 
 type
 
@@ -74,6 +74,10 @@ type
     property ImageType: string read FImageType;
   end;
 
+  { TViewPage }
+
+  TViewPage = (vpTree, vpFormatted);
+
   { TResponseJsonTab }
 
   TResponseJsonTab = class(TResponseTab)
@@ -81,10 +85,20 @@ type
     FTreeView: TTreeView;
     FJsonRoot: TJSONData;
     FJsonParser: TJSONParser;
+    FBtnView: TToolButton;
+    FPageControl: TPageControl;
+    FTreeSheet: TTabSheet;
+    FFormatSheet: TTabSheet;
+    FSynEdit: TSynEdit;
     function GetTreeView: TTreeView;
+    function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
+    procedure SetViewPage(AValue: TViewPage);
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     procedure ClearJsonData;
+    procedure CreateToolbar(Parent: TWinControl);
+    procedure OnChangeTreeMode(Sender: TObject);
+    procedure OnChangeFormatMode(Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -93,10 +107,14 @@ type
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     procedure FreeTab; override;
     property TreeView: TTreeView read GetTreeView;
+    property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
+    property ViewPage: TViewPage read GetViewPage write SetViewPage;
   end;
 
 implementation
+
+uses Menus;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -109,6 +127,7 @@ procedure TResponseJsonTab.LoadDocument(doc: string);
 var
   S: TStringStream;
 begin
+  FSynEdit.Text := doc;
   S := TStringStream.Create(doc);
   FJsonParser := TJSONParser.Create(S);
   with FTreeView.Items do begin
@@ -126,6 +145,20 @@ begin
     end;
   end;
   FreeAndNil(S);
+end;
+
+procedure TResponseJsonTab.SetViewPage(AValue: TViewPage);
+begin
+  case AValue of
+    vpTree: begin
+      FPageControl.ActivePage := FTreeSheet;
+      FBtnView.Caption := 'Tree';
+    end;
+    vpFormatted: begin
+      FPageControl.ActivePage := FFormatSheet;
+      FBtnView.Caption := 'Formatted';
+    end;
+  end;
 end;
 
 procedure TResponseJsonTab.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
@@ -203,11 +236,58 @@ begin
     FreeAndNil(FJsonParser);
 end;
 
+procedure TResponseJsonTab.CreateToolbar(Parent: TWinControl);
+var
+  Toolbar: TToolBar;
+  pm: TPopupMenu;
+  itemTree: TMenuItem;
+  itemFmt: TMenuItem;
+begin
+  Toolbar := TToolBar.Create(Parent);
+  Toolbar.Parent := Parent;
+  Toolbar.EdgeBorders := [];
+  Toolbar.ShowCaptions := True;
+  pm := TPopupMenu.Create(Parent);
+  pm.Parent := Parent;
+  itemTree := TMenuItem.Create(pm);
+  itemTree.Caption := 'Tree';
+  itemTree.OnClick := @OnChangeTreeMode;
+  itemFmt := TMenuItem.Create(pm);
+  itemFmt.Caption := 'Formatted';
+  itemFmt.OnClick := @OnChangeFormatMode;
+  pm.Items.Add(itemTree);
+  pm.Items.Add(itemFmt);
+  FBtnView := TToolButton.Create(Toolbar);
+  with FBtnView do begin
+    Parent := Toolbar;
+    Style := tbsButtonDrop;
+    DropdownMenu := pm;
+  end;
+end;
+
+procedure TResponseJsonTab.OnChangeTreeMode(Sender: TObject);
+begin
+  SetViewPage(vpTree);
+end;
+
+procedure TResponseJsonTab.OnChangeFormatMode(Sender: TObject);
+begin
+  SetViewPage(vpFormatted);
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
     raise Exception.Create('Tree view component is not initialized.');
   Result := FTreeView;
+end;
+
+function TResponseJsonTab.GetViewPage: TViewPage;
+begin
+  if FPageControl.ActivePage = FTreeSheet then
+    Result := vpTree
+  else
+    Result := vpFormatted;
 end;
 
 constructor TResponseJsonTab.Create;
@@ -233,14 +313,38 @@ end;
 procedure TResponseJsonTab.CreateUI(ATabSheet: TTabSheet);
 begin
   inherited CreateUI(ATabSheet);
-  FTreeView := TTreeView.Create(ATabSheet);
-  FTreeView.Parent := ATabSheet;
+
+  CreateToolbar(ATabSheet);
+
+  FPageControl := TPageControl.Create(ATabSheet);
+  with FPageControl do begin
+    Parent := ATabSheet;
+    Align := alClient;
+    FTreeSheet := AddTabSheet;
+    FFormatSheet := AddTabSheet;
+    ShowTabs := False;
+  end;
+
+  FTreeView := TTreeView.Create(FTreeSheet);
+  FTreeView.Parent := FTreeSheet;
   FTreeView.Align := alClient;
   FTreeView.BorderStyle := bsNone;
   FTreeView.ReadOnly := True;
   FTreeView.RightClickSelect := True;
   FTreeView.ScrollBars := ssAutoBoth;
   FTreeView.ToolTips := False;
+
+  FSynEdit := TSynEdit.Create(FFormatSheet);
+  FSynEdit.Parent := FFormatSheet;
+  FSynEdit.Align := alClient;
+  FSynEdit.BorderStyle := bsNone;
+  FSynEdit.ReadOnly := True;
+
+  // Hide all the gutters except code folding.
+  FSynEdit.Gutter.Parts.Part[0].Visible := False;
+  FSynEdit.Gutter.Parts.Part[1].Visible := False;
+  FSynEdit.Gutter.Parts.Part[2].Visible := False;
+  FSynEdit.Gutter.Parts.Part[3].Visible := False;
 end;
 
 procedure TResponseJsonTab.OnHttpResponse(ResponseInfo: TResponseInfo);
