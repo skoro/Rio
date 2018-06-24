@@ -10,6 +10,10 @@ uses
 
 type
 
+  { TOptionsPage }
+
+  TOptionsPage = (opAppearance, opJson);
+
   { TOptionsForm }
 
   TOptionsForm = class(TForm)
@@ -44,6 +48,7 @@ type
     function GetPanelsLayout: TPairSplitterType;
 
   public
+    function ShowModalPage(page: TOptionsPage): TModalResult;
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
@@ -57,7 +62,6 @@ var
   OptionsForm: TOptionsForm;
 
 implementation
-
 
 {$R *.lfm}
 
@@ -114,6 +118,15 @@ begin
     Result := pstHorizontal
   else
     Result := pstVertical;
+end;
+
+function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;
+begin
+  case page of
+    opAppearance: pagesOptions.ActivePage := tabAppearance;
+    opJson:       pagesOptions.ActivePage := tabJson;
+  end;
+  Result := ShowModal;
 end;
 
 end.
