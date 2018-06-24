@@ -1,22 +1,22 @@
 object OptionsForm: TOptionsForm
   Left = 374
-  Height = 300
+  Height = 360
   Top = 141
   Width = 300
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
-  ClientHeight = 300
+  ClientHeight = 360
   ClientWidth = 300
-  Constraints.MinHeight = 300
+  Constraints.MinHeight = 360
   Constraints.MinWidth = 300
   OnCreate = FormCreate
-  SessionProperties = 'cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;rbLayoutHor.Checked;rbLayoutVert.Checked;Top;Width;cbHideGridButtons.Checked'
+  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;rbLayoutHor.Checked;rbLayoutVert.Checked;Top;Width;rbJsonFormatted.Checked;rbJsonTree.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 2
     Height = 42
-    Top = 256
+    Top = 316
     Width = 296
     Align = alBottom
     BorderSpacing.Around = 2
@@ -37,17 +37,17 @@ object OptionsForm: TOptionsForm
   end
   object pagesOptions: TPageControl
     Left = 4
-    Height = 248
+    Height = 308
     Top = 4
     Width = 292
-    ActivePage = tabAppearance
+    ActivePage = tabJson
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 1
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 215
+      ClientHeight = 275
       ClientWidth = 288
       object gbLayout: TGroupBox
         Left = 8
@@ -89,7 +89,7 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 215
+      ClientHeight = 275
       ClientWidth = 288
       object cbJsonExpanded: TCheckBox
         Left = 8
@@ -109,12 +109,12 @@ object OptionsForm: TOptionsForm
       end
       object GroupBox1: TGroupBox
         Left = 8
-        Height = 143
-        Top = 64
+        Height = 108
+        Top = 160
         Width = 276
-        Anchors = [akTop, akLeft, akRight, akBottom]
+        Anchors = [akTop, akLeft, akRight]
         Caption = 'Format options'
-        ClientHeight = 122
+        ClientHeight = 87
         ClientWidth = 272
         TabOrder = 2
         object Label1: TLabel
@@ -144,6 +144,34 @@ object OptionsForm: TOptionsForm
           Top = 56
           Width = 122
           Caption = 'Single line &array'
+          TabOrder = 1
+        end
+      end
+      object GroupBox2: TGroupBox
+        Left = 8
+        Height = 96
+        Top = 64
+        Width = 277
+        Anchors = [akTop, akLeft, akRight]
+        Caption = 'Default view'
+        ClientHeight = 75
+        ClientWidth = 273
+        TabOrder = 3
+        object rbJsonTree: TRadioButton
+          Left = 8
+          Height = 22
+          Top = 8
+          Width = 52
+          Caption = '&Tree'
+          Checked = True
+          TabOrder = 0
+        end
+        object rbJsonFormatted: TRadioButton
+          Left = 8
+          Height = 22
+          Top = 40
+          Width = 90
+          Caption = '&Formatted'
           TabOrder = 1
         end
       end

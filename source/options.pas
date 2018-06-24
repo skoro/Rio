@@ -5,8 +5,8 @@ unit options;
 interface
 
 uses
-  SysUtils, Forms, ExtCtrls,
-  StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson, PairSplitter;
+  SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
+  PairSplitter, response_tabs;
 
 type
 
@@ -21,10 +21,13 @@ type
     editIndentSize: TSpinEdit;
     GroupBox1: TGroupBox;
     gbLayout: TGroupBox;
+    GroupBox2: TGroupBox;
     Label1: TLabel;
     pagesOptions: TPageControl;
     Panel1: TPanel;
     Props: TJSONPropStorage;
+    rbJsonTree: TRadioButton;
+    rbJsonFormatted: TRadioButton;
     rbLayoutVert: TRadioButton;
     rbLayoutHor: TRadioButton;
     tabJson: TTabSheet;
@@ -37,12 +40,14 @@ type
     function GetJsonIndentSize: Integer;
     function GetJsonExpanded: Boolean;
     function GetJsonSaveFmt: Boolean;
+    function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
 
   public
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
+    property JsonView: TViewPage read GetJsonView;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
@@ -52,6 +57,7 @@ var
   OptionsForm: TOptionsForm;
 
 implementation
+
 
 {$R *.lfm}
 
@@ -92,6 +98,14 @@ end;
 function TOptionsForm.GetJsonSaveFmt: Boolean;
 begin
   Result := cbJsonSaveFmt.Checked;
+end;
+
+function TOptionsForm.GetJsonView: TViewPage;
+begin
+  if rbJsonTree.Checked then
+    Result := vpTree
+  else if rbJsonFormatted.Checked then
+    Result := vpFormatted;
 end;
 
 function TOptionsForm.GetPanelsLayout: TPairSplitterType;
