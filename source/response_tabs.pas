@@ -86,6 +86,7 @@ type
     FJsonRoot: TJSONData;
     FJsonParser: TJSONParser;
     FBtnView: TToolButton;
+    FBtnOptions: TToolButton;
     FPageControl: TPageControl;
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
@@ -110,6 +111,7 @@ type
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
+    property ButtonOptions: TToolButton read FBtnOptions;
   end;
 
 implementation
@@ -263,6 +265,9 @@ begin
     Style := tbsButtonDrop;
     DropdownMenu := pm;
   end;
+  FBtnOptions := TToolButton.Create(Toolbar);
+  FBtnOptions.Parent := Toolbar;
+  FBtnOptions.Caption := 'Options';
 end;
 
 procedure TResponseJsonTab.OnChangeTreeMode(Sender: TObject);
