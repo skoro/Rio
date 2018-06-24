@@ -201,6 +201,7 @@ type
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
+    procedure OnJsonTabButtonOptionsClick(Sender: TObject);
   public
     procedure ApplyOptions;
   end;
@@ -1169,6 +1170,7 @@ begin
     JsonTab.SynEdit.Highlighter := synJS;
     JsonTab.SynEdit.Text := FormatJson(JsonTab.JsonRoot);
     JsonTab.ViewPage := OptionsForm.JsonView;
+    JsonTab.ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
   end
 
   else if Tab is TResponseImageTab then begin
@@ -1193,6 +1195,11 @@ begin
     else
       responseRaw.Lines.SaveToFile(FileName)
   end;
+end;
+
+procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
+begin
+  OptionsForm.ShowModalPage(opJson);
 end;
 
 procedure TForm1.ApplyOptions;
