@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, jsonparser, ComCtrls, ExtCtrls, Controls,
-  Forms, StdCtrls, SynEdit, thread_http_client;
+  Forms, StdCtrls, EditBtn, SynEdit, thread_http_client;
 
 type
 
@@ -78,6 +78,10 @@ type
 
   TViewPage = (vpTree, vpFormatted);
 
+  { TOnJsonFormat }
+
+  TOnJsonFormat = procedure (JsonData: TJSONData; Editor: TSynEdit) of object;
+
   { TResponseJsonTab }
 
   TResponseJsonTab = class(TResponseTab)
@@ -91,15 +95,22 @@ type
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
     FSynEdit: TSynEdit;
+    FFilter: TEditButton;
+    FOnJsonFormat: TOnJsonFormat;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
+    procedure SetOnJsonFormat(AValue: TOnJsonFormat);
     procedure SetViewPage(AValue: TViewPage);
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     procedure ClearJsonData;
     procedure CreateToolbar(Parent: TWinControl);
+    procedure ApplyFilter;
+    procedure BuildTree(JsonData: TJSONData);
+    procedure SetFormattedText(JsonData: TJSONData);
     procedure OnChangeTreeMode(Sender: TObject);
     procedure OnChangeFormatMode(Sender: TObject);
+    procedure OnFilterClick(Sender: TObject);
   public
     constructor Create;
     destructor Destroy; override;
@@ -112,6 +123,7 @@ type
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
     property ButtonOptions: TToolButton read FBtnOptions;
+    property OnJsonFormat: TOnJsonFormat read FOnJsonFormat write SetOnJsonFormat;
   end;
 
 implementation
@@ -129,24 +141,36 @@ procedure TResponseJsonTab.LoadDocument(doc: string);
 var
   S: TStringStream;
 begin
-  FSynEdit.Text := doc;
   S := TStringStream.Create(doc);
   FJsonParser := TJSONParser.Create(S);
   with FTreeView.Items do begin
     BeginUpdate;
     try
       FJsonRoot := FJsonParser.Parse;
-      ShowJsonData(nil, FJsonRoot);
+      if FFilter.Text <> '' then
+        ApplyFilter
+      else begin
+        SetFormattedText(FJsonRoot);
+        BuildTree(FJsonRoot);
+      end;
+      {ShowJsonData(nil, FJsonRoot);
       with FTreeView do
         if (Items.Count > 0) and Assigned(Items[0]) then begin
           Items[0].Expand(False);
           Selected := Items[0];
-        end;
+        end;}
     finally
       EndUpdate;
     end;
   end;
   FreeAndNil(S);
+end;
+
+procedure TResponseJsonTab.SetOnJsonFormat(AValue: TOnJsonFormat);
+begin
+  if FOnJsonFormat = AValue then
+    Exit;
+  FOnJsonFormat := AValue;
 end;
 
 procedure TResponseJsonTab.SetViewPage(AValue: TViewPage);
@@ -270,6 +294,38 @@ begin
   FBtnOptions.Caption := 'Options';
 end;
 
+procedure TResponseJsonTab.ApplyFilter;
+var
+  Filtered: TJSONData;
+begin
+  Filtered := FJsonRoot.FindPath(FFilter.Text);
+  if Assigned(Filtered) then begin
+    SetFormattedText(Filtered);
+    BuildTree(Filtered);
+  end
+  else
+    FSynEdit.Text := '';
+end;
+
+procedure TResponseJsonTab.BuildTree(JsonData: TJSONData);
+begin
+  FTreeView.Items.Clear;
+  ShowJsonData(nil, JsonData);
+  with FTreeView do
+    if (Items.Count > 0) and Assigned(Items[0]) then begin
+      Items[0].Expand(False);
+      Selected := Items[0];
+    end;
+end;
+
+procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
+begin
+  if Assigned(FOnJsonFormat) then
+    FOnJsonFormat(JsonData, FSynEdit)
+  else
+    FSynEdit.Text := JsonData.FormatJSON;
+end;
+
 procedure TResponseJsonTab.OnChangeTreeMode(Sender: TObject);
 begin
   SetViewPage(vpTree);
@@ -278,6 +334,11 @@ end;
 procedure TResponseJsonTab.OnChangeFormatMode(Sender: TObject);
 begin
   SetViewPage(vpFormatted);
+end;
+
+procedure TResponseJsonTab.OnFilterClick(Sender: TObject);
+begin
+  ApplyFilter;
 end;
 
 function TResponseJsonTab.GetTreeView: TTreeView;
@@ -320,6 +381,13 @@ begin
   inherited CreateUI(ATabSheet);
 
   CreateToolbar(ATabSheet);
+
+  FFilter := TEditButton.Create(ATabSheet);
+  FFilter.Parent := ATabSheet;
+  FFilter.Align := alBottom;
+  FFilter.ButtonCaption := 'Find';
+  FFilter.ButtonWidth := 64;
+  FFilter.OnButtonClick := @OnFilterClick;
 
   FPageControl := TPageControl.Create(ATabSheet);
   with FPageControl do begin
