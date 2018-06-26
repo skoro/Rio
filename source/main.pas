@@ -202,6 +202,7 @@ type
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
+    procedure OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
   public
     procedure ApplyOptions;
   end;
@@ -1168,8 +1169,8 @@ begin
         FullExpand;
     end;
     JsonTab.SynEdit.Highlighter := synJS;
-    JsonTab.SynEdit.Text := FormatJson(JsonTab.JsonRoot);
     JsonTab.ViewPage := OptionsForm.JsonView;
+    JsonTab.OnJsonFormat := @OnJsonFormat;
     JsonTab.ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
   end
 
@@ -1200,6 +1201,11 @@ end;
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
   OptionsForm.ShowModalPage(opJson);
+end;
+
+procedure TForm1.OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
+begin
+  Editor.Text := FormatJson(JsonData);
 end;
 
 procedure TForm1.ApplyOptions;
