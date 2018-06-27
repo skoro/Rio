@@ -91,6 +91,7 @@ type
     FJsonParser: TJSONParser;
     FBtnView: TToolButton;
     FBtnOptions: TToolButton;
+    FBtnFilter: TToolButton;
     FPageControl: TPageControl;
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
@@ -295,7 +296,8 @@ begin
   FBtnOptions := TToolButton.Create(Toolbar);
   FBtnOptions.Parent := Toolbar;
   FBtnOptions.Caption := 'Options';
-  with TToolButton.Create(Toolbar) do begin
+  FBtnFilter := TToolButton.Create(Toolbar);
+  with FBtnFilter do begin
     Parent  := Toolbar;
     Caption := 'Filter';
     Style   := tbsCheck;
@@ -361,6 +363,11 @@ procedure TResponseJsonTab.OnFilterKeyPress(Sender: TObject; var Key: char);
 begin
   if Key = #13 then
     ApplyFilter;
+  if Key = #27 then begin
+    FFilter.Text := '';
+    FFilter.Visible := False;
+    FBtnFilter.Down := False;
+  end;
 end;
 
 function TResponseJsonTab.GetTreeView: TTreeView;
