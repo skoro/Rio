@@ -108,6 +108,7 @@ type
     procedure ApplyFilter;
     procedure BuildTree(JsonData: TJSONData);
     procedure SetFormattedText(JsonData: TJSONData);
+    procedure InternalOnSwitchFilter(Sender: TObject);
     procedure OnChangeTreeMode(Sender: TObject);
     procedure OnChangeFormatMode(Sender: TObject);
     procedure OnFilterClick(Sender: TObject);
@@ -119,6 +120,7 @@ type
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     procedure FreeTab; override;
+    function IsFilterActive: Boolean;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -148,7 +150,7 @@ begin
     BeginUpdate;
     try
       FJsonRoot := FJsonParser.Parse;
-      if FFilter.Text <> '' then
+      if IsFilterActive then
         ApplyFilter
       else begin
         SetFormattedText(FJsonRoot);
@@ -293,6 +295,12 @@ begin
   FBtnOptions := TToolButton.Create(Toolbar);
   FBtnOptions.Parent := Toolbar;
   FBtnOptions.Caption := 'Options';
+  with TToolButton.Create(Toolbar) do begin
+    Parent  := Toolbar;
+    Caption := 'Filter';
+    Style   := tbsCheck;
+    OnClick := @InternalOnSwitchFilter;
+  end;
 end;
 
 procedure TResponseJsonTab.ApplyFilter;
@@ -325,6 +333,13 @@ begin
     FOnJsonFormat(JsonData, FSynEdit)
   else
     FSynEdit.Text := JsonData.FormatJSON;
+end;
+
+procedure TResponseJsonTab.InternalOnSwitchFilter(Sender: TObject);
+begin
+  FFilter.Visible := not FFilter.Visible;
+  if FFilter.Visible then
+    FFilter.SetFocus;
 end;
 
 procedure TResponseJsonTab.OnChangeTreeMode(Sender: TObject);
@@ -396,6 +411,7 @@ begin
   FFilter.ButtonWidth := 64;
   FFilter.OnButtonClick := @OnFilterClick;
   FFilter.OnKeyPress := @OnFilterKeyPress;
+  FFilter.Visible := False;
 
   FPageControl := TPageControl.Create(ATabSheet);
   with FPageControl do begin
@@ -441,6 +457,11 @@ begin
   ClearJsonData;
   FreeAndNil(FTreeView);
   inherited;
+end;
+
+function TResponseJsonTab.IsFilterActive: Boolean;
+begin
+  Result := FFilter.Visible and (Trim(FFilter.Text) <> '');
 end;
 
 { TResponseTabManager }
