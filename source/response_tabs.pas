@@ -98,10 +98,12 @@ type
     FSynEdit: TSynEdit;
     FFilter: TEditButton;
     FOnJsonFormat: TOnJsonFormat;
+    FTreeExpanded: Boolean;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
     procedure SetOnJsonFormat(AValue: TOnJsonFormat);
+    procedure SetTreeExpanded(AValue: Boolean);
     procedure SetViewPage(AValue: TViewPage);
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     procedure ClearJsonData;
@@ -127,6 +129,7 @@ type
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
     property ButtonOptions: TToolButton read FBtnOptions;
+    property TreeExpanded: Boolean read FTreeExpanded write SetTreeExpanded default True;
     property OnJsonFormat: TOnJsonFormat read FOnJsonFormat write SetOnJsonFormat;
   end;
 
@@ -175,6 +178,13 @@ begin
   if FOnJsonFormat = AValue then
     Exit;
   FOnJsonFormat := AValue;
+end;
+
+procedure TResponseJsonTab.SetTreeExpanded(AValue: Boolean);
+begin
+  FTreeExpanded := AValue;
+  if AValue then
+    FTreeView.FullExpand;
 end;
 
 procedure TResponseJsonTab.SetViewPage(AValue: TViewPage);
@@ -313,6 +323,8 @@ begin
   if Assigned(Filtered) then begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
+    if FTreeExpanded then
+      FTreeView.FullExpand;
   end
   else
     FSynEdit.Text := '';
@@ -414,7 +426,7 @@ begin
   FFilter := TEditButton.Create(ATabSheet);
   FFilter.Parent := ATabSheet;
   FFilter.Align := alBottom;
-  FFilter.ButtonCaption := 'Find';
+  FFilter.ButtonCaption := 'Filter';
   FFilter.ButtonWidth := 64;
   FFilter.OnButtonClick := @OnFilterClick;
   FFilter.OnKeyPress := @OnFilterKeyPress;

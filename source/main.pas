@@ -1165,11 +1165,12 @@ begin
       Images := jsImages;
       PopupMenu := popupJsonTree;
       OnDblClick := @JsonTreeDblClick;
-      if OptionsForm.JsonExpanded then
-        FullExpand;
+      {if OptionsForm.JsonExpanded then
+        FullExpand;}
     end;
     JsonTab.SynEdit.Highlighter := synJS;
     JsonTab.ViewPage := OptionsForm.JsonView;
+    JsonTab.TreeExpanded := OptionsForm.JsonExpanded;
     JsonTab.OnJsonFormat := @OnJsonFormat;
     JsonTab.ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
   end
