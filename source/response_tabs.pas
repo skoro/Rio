@@ -111,6 +111,7 @@ type
     procedure OnChangeTreeMode(Sender: TObject);
     procedure OnChangeFormatMode(Sender: TObject);
     procedure OnFilterClick(Sender: TObject);
+    procedure OnFilterKeyPress(Sender: TObject; var Key: char);
   public
     constructor Create;
     destructor Destroy; override;
@@ -341,6 +342,12 @@ begin
   ApplyFilter;
 end;
 
+procedure TResponseJsonTab.OnFilterKeyPress(Sender: TObject; var Key: char);
+begin
+  if Key = #13 then
+    ApplyFilter;
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
@@ -388,6 +395,7 @@ begin
   FFilter.ButtonCaption := 'Find';
   FFilter.ButtonWidth := 64;
   FFilter.OnButtonClick := @OnFilterClick;
+  FFilter.OnKeyPress := @OnFilterKeyPress;
 
   FPageControl := TPageControl.Create(ATabSheet);
   with FPageControl do begin
