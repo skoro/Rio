@@ -115,6 +115,7 @@ type
     procedure OnChangeFormatMode(Sender: TObject);
     procedure OnFilterClick(Sender: TObject);
     procedure OnFilterKeyPress(Sender: TObject; var Key: char);
+    procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   public
     constructor Create;
     destructor Destroy; override;
@@ -374,6 +375,14 @@ begin
   end;
 end;
 
+procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  // Control-F show/hide filter panel.
+  if (Shift = [ssCtrl]) and (Key = 70) then
+     InternalOnSwitchFilter(Sender);
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
@@ -422,6 +431,7 @@ begin
   FFilter.ButtonWidth := 64;
   FFilter.OnButtonClick := @OnFilterClick;
   FFilter.OnKeyPress := @OnFilterKeyPress;
+  FFilter.OnKeyDown := @InternalOnKeyDown;
   FFilter.Visible := False;
 
   FPageControl := TPageControl.Create(ATabSheet);
@@ -441,12 +451,14 @@ begin
   FTreeView.RightClickSelect := True;
   FTreeView.ScrollBars := ssAutoBoth;
   FTreeView.ToolTips := False;
+  FTreeView.OnKeyDown := @InternalOnKeyDown;
 
   FSynEdit := TSynEdit.Create(FFormatSheet);
   FSynEdit.Parent := FFormatSheet;
   FSynEdit.Align := alClient;
   FSynEdit.BorderStyle := bsNone;
   FSynEdit.ReadOnly := True;
+  FSynEdit.OnKeyDown := @InternalOnKeyDown;
 
   // Hide all the gutters except code folding.
   FSynEdit.Gutter.Parts.Part[0].Visible := False;
