@@ -171,8 +171,8 @@ type
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
-    FJsonTree: TTreeView;
     FResponseTabManager: TResponseTabManager;
+    FResponseJsonTab: TResponseJsonTab;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -202,7 +202,7 @@ type
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
-    procedure OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
+    procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
   public
     procedure ApplyOptions;
   end;
@@ -409,7 +409,8 @@ begin
   // Initialize and register response tabs.
   FResponseTabManager := TResponseTabManager.Create(pagesResponse);
   FResponseTabManager.RegisterTab(TResponseImageTab.Create);
-  FResponseTabManager.RegisterTab(TResponseJsonTab.Create);
+  FResponseJsonTab := TResponseJsonTab.Create;
+  FResponseTabManager.RegisterTab(FResponseJsonTab);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
   FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
 
@@ -587,7 +588,7 @@ var
   I: Integer;
   Value, Key: String;
 begin
-  Node := FJsonTree.Selected;
+  Node := FResponseJsonTab.TreeView.Selected;
   if not Assigned(Node) then Exit;
 
   // Get json node value.
@@ -1156,23 +1157,17 @@ procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
   ResponseInfo: TResponseInfo);
 var
   ImageTab: TResponseImageTab;
-  JsonTab: TResponseJsonTab;
 begin
-  if Tab is TResponseJsonTab then begin
-    JsonTab := TResponseJsonTab(Tab);
-    FJsonTree := JsonTab.TreeView;
-    with FJsonTree do begin
-      Images := jsImages;
-      PopupMenu := popupJsonTree;
-      OnDblClick := @JsonTreeDblClick;
-      {if OptionsForm.JsonExpanded then
-        FullExpand;}
+  if Tab = FResponseJsonTab then begin
+    with FResponseJsonTab do begin
+      TreeView.Images := jsImages;
+      TreeView.PopupMenu := popupJsonTree;
+      TreeView.OnDblClick := @JsonTreeDblClick;
+      SynEdit.Highlighter := synJS;
+      ViewPage := OptionsForm.JsonView;
+      OnJsonFormat := @JsonTab_OnJsonFormat;
+      ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
     end;
-    JsonTab.SynEdit.Highlighter := synJS;
-    JsonTab.ViewPage := OptionsForm.JsonView;
-    JsonTab.TreeExpanded := OptionsForm.JsonExpanded;
-    JsonTab.OnJsonFormat := @OnJsonFormat;
-    JsonTab.ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
   end
 
   else if Tab is TResponseImageTab then begin
@@ -1204,7 +1199,7 @@ begin
   OptionsForm.ShowModalPage(opJson);
 end;
 
-procedure TForm1.OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
+procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
 begin
   Editor.Text := FormatJson(JsonData);
 end;
@@ -1212,6 +1207,8 @@ end;
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
+  FResponseJsonTab.TreeExpanded := OptionsForm.JsonExpanded;
+
   // Adjust window size before change layout.
   if (LayoutSplitter.SplitterType = pstVertical) and
        (OptionsForm.PanelsLayout = pstHorizontal) and
