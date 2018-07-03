@@ -927,9 +927,17 @@ end;
 
 procedure TForm1.tbtnFormUploadClick(Sender: TObject);
 var
-  Row: Integer;
+  Row, A: Integer;
 begin
+  if gridForm.RowCount = 1 then Exit;
   Row := gridForm.Row;
+
+  if gridForm.Cells[3, Row] <> 'File' then begin
+    A := Application.MessageBox('To upload a file the form element must be the file type.'#13'Do you want to change it to the file type ?', 'Upload', MB_ICONQUESTION + MB_YESNO);
+    if A = IDYES then
+      gridForm.Cells[3, Row] := 'File';
+  end;
+
   if gridForm.Cells[3, Row] = 'File' then begin
     dlgOpen.Title := 'Upload a file';
     if dlgOpen.Execute then
