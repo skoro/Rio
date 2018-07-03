@@ -345,6 +345,7 @@ end;
 procedure TResponseJsonTab.InternalOnSwitchFilter(Sender: TObject);
 begin
   FFilter.Visible := not FFilter.Visible;
+  FBtnFilter.Down := FFilter.Visible;
   if FFilter.Visible then
     FFilter.SetFocus;
 end;
