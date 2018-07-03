@@ -805,8 +805,12 @@ begin
   try
     dlgSave.FileName := GetRequestFilename;
     dlgSave.Title := 'Save the response to a file';
-    if dlgSave.Execute then
-      FResponseTabManager.Save(dlgSave.FileName);
+    if dlgSave.Execute then begin
+      if (FResponseTabManager.OpenedTabs.Count = 0) and (tabContent.TabVisible) then
+        responseRaw.Lines.SaveToFile(dlgSave.FileName)
+      else
+        FResponseTabManager.Save(dlgSave.FileName);
+    end;
   except on E: Exception do
     ShowMessage(E.Message);
   end;

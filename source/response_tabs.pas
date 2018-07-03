@@ -51,6 +51,7 @@ type
     property PageControl: TPageControl read FPageControl write FPageControl;
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
     property OnSaveTab: TOnSaveTab read FOnSaveTab write FOnSaveTab;
+    property OpenedTabs: TFPList read FOpenedTabs;
   end;
 
   { TResponseImageTab }
