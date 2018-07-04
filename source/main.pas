@@ -1078,7 +1078,7 @@ begin
       begin
         pagesBody.ActivePage := tabBodyForm;
         // This procedure is invoked in Form's Create method when
-        // options form is not initalized. So, for the first time
+        // options form is not initalized yet. So, for the first time
         // we always show toolbar.
         if Assigned(OptionsForm) then
           gnavBody.ShowNavButtons := not OptionsForm.GridButtonsHidden
@@ -1105,7 +1105,7 @@ begin
 
   tabBody.Caption := 'Body: ' + tbtnBodyType.Caption;
 
-  // Keep buttons order after some buttons is hidden.
+  // Keep buttons order after some buttons are hidden.
   gnavBody.SetButtonsOrder;
 end;
 
@@ -1215,7 +1215,8 @@ end;
 
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
-  OptionsForm.ShowModalPage(opJson);
+  if OptionsForm.ShowModalPage(opJson) = mrOK then
+    ApplyOptions;
 end;
 
 procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
