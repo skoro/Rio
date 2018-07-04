@@ -961,11 +961,18 @@ var
   data: TJSONData;
 begin
   data := nil;
+  if Length(Trim(editJson.Text)) = 0 then
+    Exit;
   try
     ss := TStringStream.Create(editJson.Text);
     Parser := TJSONParser.Create(ss);
-    Data := Parser.Parse;
-    editJson.Text := FormatJson(Data);
+    try
+      Data := Parser.Parse;
+      editJson.Text := FormatJson(Data);
+    except
+      on E: Exception do
+        ShowMessage(E.Message);
+    end;
   finally
     FreeAndNil(ss);
     FreeAndNil(parser);
