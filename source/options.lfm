@@ -10,6 +10,7 @@ object OptionsForm: TOptionsForm
   Constraints.MinHeight = 360
   Constraints.MinWidth = 300
   OnCreate = FormCreate
+  Position = poMainFormCenter
   SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;rbLayoutHor.Checked;rbLayoutVert.Checked;Top;Width;rbJsonFormatted.Checked;rbJsonTree.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
@@ -165,6 +166,7 @@ object OptionsForm: TOptionsForm
           Caption = '&Tree'
           Checked = True
           TabOrder = 0
+          TabStop = True
         end
         object rbJsonFormatted: TRadioButton
           Left = 8

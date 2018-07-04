@@ -9,8 +9,9 @@ object AboutForm: TAboutForm
   ClientHeight = 163
   ClientWidth = 239
   OnCreate = FormCreate
+  Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.0.6'
+  LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 0
     Height = 163
@@ -2224,15 +2225,15 @@ object AboutForm: TAboutForm
     end
     object LabelVersion: TLabel
       Left = 120
-      Height = 18
+      Height = 19
       Top = 128
-      Width = 48
+      Width = 51
       Caption = 'Version:'
       ParentColor = False
     end
     object Edit1: TEdit
       Left = 8
-      Height = 19
+      Height = 20
       Top = 104
       Width = 224
       BorderStyle = bsNone

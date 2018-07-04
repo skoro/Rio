@@ -13,6 +13,7 @@ object HeadersEditorForm: THeadersEditorForm
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
   OnShow = FormShow
+  Position = poMainFormCenter
   SessionProperties = 'Left;Top;Width;Height'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'

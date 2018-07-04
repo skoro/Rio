@@ -12,6 +12,7 @@ object CookieForm: TCookieForm
   KeyPreview = True
   OnCreate = FormCreate
   OnKeyDown = FormKeyDown
+  Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
