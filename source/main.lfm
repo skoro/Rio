@@ -1,10 +1,10 @@
 object Form1: TForm1
   Left = 327
-  Height = 575
-  Top = 116
+  Height = 614
+  Top = 45
   Width = 565
   Caption = 'HTTP request inspector'
-  ClientHeight = 550
+  ClientHeight = 589
   ClientWidth = 565
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
@@ -153,7 +153,7 @@ object Form1: TForm1
   object LayoutSplitter: TPairSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 510
+    Height = 519
     Top = 40
     Width = 565
     Align = alClient
@@ -1146,25 +1146,25 @@ object Form1: TForm1
     object PairSplitterSide2: TPairSplitterSide
       Cursor = crArrow
       Left = 0
-      Height = 285
+      Height = 294
       Top = 225
       Width = 565
       ClientWidth = 565
-      ClientHeight = 285
+      ClientHeight = 294
       object panelResponse: TPanel
         Left = 4
-        Height = 277
+        Height = 286
         Top = 4
         Width = 557
         Align = alClient
         BorderSpacing.Around = 4
         BevelOuter = bvNone
-        ClientHeight = 277
+        ClientHeight = 286
         ClientWidth = 557
         TabOrder = 0
         object pagesResponse: TPageControl
           Left = 0
-          Height = 247
+          Height = 286
           Top = 0
           Width = 557
           ActivePage = tabResponse
@@ -1173,11 +1173,11 @@ object Form1: TForm1
           TabOrder = 0
           object tabResponse: TTabSheet
             Caption = 'Response'
-            ClientHeight = 214
+            ClientHeight = 253
             ClientWidth = 553
             object responseHeaders: TStringGrid
               Left = 0
-              Height = 214
+              Height = 253
               Top = 0
               Width = 553
               Align = alClient
@@ -1213,7 +1213,7 @@ object Form1: TForm1
           end
           object tabRespCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 214
+            ClientHeight = 253
             ClientWidth = 553
             TabVisible = False
             object gridRespCookie: TStringGrid
@@ -1285,7 +1285,7 @@ object Form1: TForm1
           end
           object tabContent: TTabSheet
             Caption = 'Content'
-            ClientHeight = 214
+            ClientHeight = 253
             ClientWidth = 553
             object responseRaw: TMemo
               Left = 0
@@ -1298,74 +1298,6 @@ object Form1: TForm1
               ScrollBars = ssAutoBoth
               TabOrder = 0
             end
-          end
-        end
-        object StatusPanel: TPanel
-          Left = 4
-          Height = 30
-          Top = 247
-          Width = 549
-          Align = alBottom
-          BorderSpacing.Left = 4
-          BorderSpacing.Right = 4
-          BevelColor = clNone
-          BevelOuter = bvNone
-          ClientHeight = 30
-          ClientWidth = 549
-          ParentColor = False
-          TabOrder = 1
-          object StatusText1: TLabel
-            Left = 0
-            Height = 30
-            Top = 0
-            Width = 145
-            Align = alLeft
-            Caption = 'HTTP request inspector'
-            Layout = tlCenter
-            ParentColor = False
-          end
-          object StatusImage1: TImage
-            Left = 161
-            Height = 30
-            Top = 0
-            Width = 16
-            Align = alLeft
-            AutoSize = True
-            BorderSpacing.Left = 16
-            Center = True
-            Picture.Data = {
-              1754506F727461626C654E6574776F726B47726170686963F300000089504E47
-              0D0A1A0A0000000D49484452000000100000001008060000001FF3FF61000000
-              1974455874536F6674776172650041646F626520496D616765526561647971C9
-              653C000000954944415478DA6260A0017000E2F540FC1F0DAF87CAE105F39134
-              DC07E2FD507C1F49BC1F97E67EA882F7386C7280CA6135C40149B300544C012A
-              860C04900C41B1643D36412C06205BB61E5DE17D2C8AFFE3F02E2C4C18989004
-              1F90105370B52C442846760523BA24B2010A583433E23014432DAE4064203610
-              B145233680331A9153215909093D35929594A9929948060001060041D94209FD
-              817FCC0000000049454E44AE426082
-            }
-            Visible = False
-          end
-          object StatusText2: TLabel
-            Left = 181
-            Height = 30
-            Top = 0
-            Width = 72
-            Align = alLeft
-            BorderSpacing.Left = 4
-            Caption = 'StatusText2'
-            Layout = tlCenter
-            ParentColor = False
-          end
-          object StatusText3: TLabel
-            Left = 477
-            Height = 30
-            Top = 0
-            Width = 72
-            Align = alRight
-            Caption = 'StatusText3'
-            Layout = tlCenter
-            ParentColor = False
           end
         end
       end
@@ -1423,6 +1355,74 @@ object Form1: TForm1
       Caption = 'Submit'
       OnClick = btnSubmitClick
       TabOrder = 2
+    end
+  end
+  object StatusPanel: TPanel
+    Left = 4
+    Height = 30
+    Top = 559
+    Width = 557
+    Align = alBottom
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    BevelColor = clNone
+    BevelOuter = bvNone
+    ClientHeight = 30
+    ClientWidth = 557
+    ParentColor = False
+    TabOrder = 2
+    object StatusText1: TLabel
+      Left = 0
+      Height = 30
+      Top = 0
+      Width = 145
+      Align = alLeft
+      Caption = 'HTTP request inspector'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object StatusImage1: TImage
+      Left = 161
+      Height = 30
+      Top = 0
+      Width = 16
+      Align = alLeft
+      AutoSize = True
+      BorderSpacing.Left = 16
+      Center = True
+      Picture.Data = {
+        1754506F727461626C654E6574776F726B47726170686963F300000089504E47
+        0D0A1A0A0000000D49484452000000100000001008060000001FF3FF61000000
+        1974455874536F6674776172650041646F626520496D616765526561647971C9
+        653C000000954944415478DA6260A0017000E2F540FC1F0DAF87CAE105F39134
+        DC07E2FD507C1F49BC1F97E67EA882F7386C7280CA6135C40149B300544C012A
+        860C04900C41B1643D36412C06205BB61E5DE17D2C8AFFE3F02E2C4C18989004
+        1F90105370B52C442846760523BA24B2010A583433E23014432DAE4064203610
+        B145233680331A9153215909093D35929594A9929948060001060041D94209FD
+        817FCC0000000049454E44AE426082
+      }
+      Visible = False
+    end
+    object StatusText2: TLabel
+      Left = 181
+      Height = 30
+      Top = 0
+      Width = 72
+      Align = alLeft
+      BorderSpacing.Left = 4
+      Caption = 'StatusText2'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object StatusText3: TLabel
+      Left = 485
+      Height = 30
+      Top = 0
+      Width = 72
+      Align = alRight
+      Caption = 'StatusText3'
+      Layout = tlCenter
+      ParentColor = False
     end
   end
   object AppMenu: TMainMenu
