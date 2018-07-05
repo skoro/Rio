@@ -1472,16 +1472,7 @@ var
 begin
   uri := ParseURI(NormalizeUrl);
   if ext = '' then
-    case FContentType of
-      'text/html': ext := 'html';
-      'text/plain': ext := 'txt';
-      'application/json': ext := 'json';
-      'application/javascript': ext := 'js';
-      'application/xml': ext := 'xml';
-      'image/png': ext := 'png';
-      'image/jpg', 'image/jpeg': ext := 'jpg';
-      else ext := 'data';
-    end;
+    ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
   basename := TrimSet(uri.Document, ['/']);
   if basename = '' then
     basename := uri.Host;
