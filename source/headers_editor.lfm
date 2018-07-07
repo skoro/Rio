@@ -14,7 +14,7 @@ object HeadersEditorForm: THeadersEditorForm
   OnKeyDown = FormKeyDown
   OnShow = FormShow
   Position = poMainFormCenter
-  SessionProperties = 'Left;Top;Width;Height'
+  SessionProperties = 'Height;Width'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel

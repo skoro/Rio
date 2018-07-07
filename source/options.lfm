@@ -1,29 +1,29 @@
 object OptionsForm: TOptionsForm
   Left = 374
-  Height = 360
+  Height = 380
   Top = 141
-  Width = 300
+  Width = 320
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
-  ClientHeight = 360
-  ClientWidth = 300
+  ClientHeight = 380
+  ClientWidth = 320
   Constraints.MinHeight = 360
-  Constraints.MinWidth = 300
+  Constraints.MinWidth = 320
   OnCreate = FormCreate
   Position = poMainFormCenter
-  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;Left;rbLayoutHor.Checked;rbLayoutVert.Checked;Top;Width;rbJsonFormatted.Checked;rbJsonTree.Checked'
+  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;Width'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
     Left = 2
     Height = 42
-    Top = 316
-    Width = 296
+    Top = 336
+    Width = 316
     Align = alBottom
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     ClientHeight = 42
-    ClientWidth = 296
+    ClientWidth = 316
     TabOrder = 0
     object Button1: TButton
       Left = 0
@@ -38,9 +38,9 @@ object OptionsForm: TOptionsForm
   end
   object pagesOptions: TPageControl
     Left = 4
-    Height = 308
+    Height = 328
     Top = 4
-    Width = 292
+    Width = 312
     ActivePage = tabJson
     Align = alClient
     BorderSpacing.Around = 4
@@ -48,8 +48,8 @@ object OptionsForm: TOptionsForm
     TabOrder = 1
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 275
-      ClientWidth = 288
+      ClientHeight = 295
+      ClientWidth = 308
       object gbLayout: TGroupBox
         Left = 8
         Height = 97
@@ -90,8 +90,8 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 275
-      ClientWidth = 288
+      ClientHeight = 295
+      ClientWidth = 308
       object cbJsonExpanded: TCheckBox
         Left = 8
         Height = 22
@@ -112,11 +112,11 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 108
         Top = 160
-        Width = 276
+        Width = 296
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Format options'
         ClientHeight = 87
-        ClientWidth = 272
+        ClientWidth = 292
         TabOrder = 2
         object Label1: TLabel
           Left = 8
@@ -152,11 +152,11 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 96
         Top = 64
-        Width = 277
+        Width = 297
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Default view'
         ClientHeight = 75
-        ClientWidth = 273
+        ClientWidth = 293
         TabOrder = 3
         object rbJsonTree: TRadioButton
           Left = 8
