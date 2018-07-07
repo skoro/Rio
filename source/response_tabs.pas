@@ -5,7 +5,7 @@ unit response_tabs;
 interface
 
 uses
-  Classes, SysUtils, fpjson, jsonparser, ComCtrls, ExtCtrls, Controls,
+  Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls,
   Forms, StdCtrls, EditBtn, SynEdit, thread_http_client;
 
 type
@@ -245,10 +245,7 @@ begin
     jtNull:
       C := 'null';
   else
-    if Data.JSONType = jtNumber then
-      C := Data.AsFloat.ToString
-    else
-      C := Data.AsString;
+    C := Data.AsString;
     if (Data.JSONType = jtString) then
       C := '"'+C+'"';
     AParent.Text := AParent.Text + ': ' + C;
