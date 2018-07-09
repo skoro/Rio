@@ -27,6 +27,7 @@ type
     gbLayout: TGroupBox;
     GroupBox2: TGroupBox;
     Label1: TLabel;
+    Label2: TLabel;
     pagesOptions: TPageControl;
     Panel1: TPanel;
     Props: TJSONPropStorage;

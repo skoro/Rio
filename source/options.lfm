@@ -7,7 +7,7 @@ object OptionsForm: TOptionsForm
   Caption = 'Options'
   ClientHeight = 380
   ClientWidth = 320
-  Constraints.MinHeight = 360
+  Constraints.MinHeight = 380
   Constraints.MinWidth = 320
   OnCreate = FormCreate
   Position = poMainFormCenter
@@ -96,8 +96,8 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 22
         Top = 8
-        Width = 150
-        Caption = 'JSON tree &expanded'
+        Width = 168
+        Caption = 'JSON tree &expanded (*)'
         TabOrder = 0
       end
       object cbJsonSaveFmt: TCheckBox
@@ -154,7 +154,7 @@ object OptionsForm: TOptionsForm
         Top = 64
         Width = 297
         Anchors = [akTop, akLeft, akRight]
-        Caption = 'Default view'
+        Caption = 'Default view (*)'
         ClientHeight = 75
         ClientWidth = 293
         TabOrder = 3
@@ -176,6 +176,17 @@ object OptionsForm: TOptionsForm
           Caption = '&Formatted'
           TabOrder = 1
         end
+      end
+      object Label2: TLabel
+        Left = 0
+        Height = 16
+        Top = 279
+        Width = 308
+        Align = alBottom
+        Caption = '(*) these options will be applied on next request.'
+        Font.Height = -11
+        ParentColor = False
+        ParentFont = False
       end
     end
   end
