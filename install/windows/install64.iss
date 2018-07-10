@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Http Inspector"
-#define MyAppVersion "0.2"
+#define MyAppVersion "0.3"
 #define MyAppPublisher "Skorobogatko Alexei"
 #define MyAppURL "https://github.com/skoro/http_inspector"
 #define MyAppExeName "http-inspector.exe"
