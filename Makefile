@@ -1,7 +1,7 @@
 
 PROJECT=source/http_inspector.lpr
 VER=$(shell grep APP_VER source/version.inc|grep -o "'.*'"|sed "s/'//g")
-LAZBUILD=lazbuild
+LAZBUILD?=lazbuild
 APP=http-inspector
 
 all:
