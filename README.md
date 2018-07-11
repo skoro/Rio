@@ -4,6 +4,10 @@ The crossplatform desktop tool for inspecting http requests.
 The application allows you to send http requests GET, POST, PUT, etc and
 analyse its responses.
 
+<img src="https://github.com/skoro/http_inspector/blob/master/docs/screenshots/Screenshot_0.3-xfce-json.png" alt="Linux" width="320">
+<img src="https://github.com/skoro/http_inspector/blob/master/docs/screenshots/Screenshot_0.3-xfce-hor_layout.png" alt="Linux horizonal layout" width="400">
+<img src="https://github.com/skoro/http_inspector/blob/master/docs/screenshots/Screenshot-0.3-win-json.png" alt="Windows" width="320">
+
 ### Usage
 
 Keyboard:
