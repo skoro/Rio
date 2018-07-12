@@ -1342,7 +1342,9 @@ begin
 
   UpdateStatusLine(
     Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
-    Format('%d ms', [Info.Time])
+    IfThen(Info.Time > 1000,
+      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
+      Format('%d ms', [Info.Time]))
   );
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
