@@ -20,6 +20,8 @@ function FileGetContents(const filename: ansistring; out buffer: ansistring): Bo
 procedure AppExec(const exename: string);
 { Split input string to list of strings delimited by character }
 procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
+{ Approximate milliseconds }
+function FormatMsApprox(ms: Int64): string;
 
 implementation
 
@@ -69,6 +71,27 @@ begin
   Strings.Delimiter := Delim;
   Strings.StrictDelimiter := True;
   Strings.DelimitedText := Input;
+end;
+
+function FormatMsApprox(ms: Int64): string;
+var
+  seconds, minutes, hours: Integer;
+begin
+  Result := Format('%d ms', [ms]);
+  if ms >= 1000 then begin
+    seconds := round(ms / 1000);
+    Result := Format('~ %d sec', [seconds]);
+    if seconds >= 60 then begin
+      minutes := round(seconds / 60);
+      seconds := seconds mod 60;
+      Result := Format('~ %d min %d sec', [minutes, seconds]);
+      if minutes >= 60 then begin
+        hours := round(minutes / 60);
+        minutes := minutes mod 60;
+        Result := Format('%d h %d min', [hours, minutes]);
+      end;
+    end;
+  end;
 end;
 
 end.
