@@ -43,6 +43,9 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    StatusImageSize: TImage;
+    StatusTextInfo: TLabel;
+    StatusTextSize: TLabel;
     miAuthNone: TMenuItem;
     miAuthBasic: TMenuItem;
     miAuthBearer: TMenuItem;
@@ -92,11 +95,10 @@ type
     responseRaw: TMemo;
     ScrollBox1: TScrollBox;
     ScrollBox2: TScrollBox;
-    StatusImage1: TImage;
+    StatusImageTime: TImage;
     StatusPanel: TPanel;
-    StatusText1: TLabel;
-    StatusText2: TLabel;
-    StatusText3: TLabel;
+    StatusTextMain: TLabel;
+    StatusTextTime: TLabel;
     synJS: TSynJScriptSyn;
     tabBody: TTabSheet;
     tabBodyForm: TTabSheet;
@@ -179,7 +181,8 @@ type
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
     procedure OnRequestComplete(Info: TResponseInfo);
-    procedure UpdateStatusLine(Text1: string = ''; Text2: string = '');
+    procedure UpdateStatusLine(Main: string = '');
+    procedure UpdateStatusLine(Info: TResponseInfo);
     procedure ShowResponseCookie(Headers: TStrings);
     function GetRequestFilename(ext: string = ''): string;
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
@@ -400,8 +403,9 @@ begin
   PSMAIN.Active := True;
 
   // Form components defaults.
-  StatusText2.Caption := '';
-  StatusText3.Caption := '';
+  StatusTextTime.Caption := '';
+  StatusTextSize.Caption := '';
+  StatusTextInfo.Caption := '';
   miSaveResponse.Enabled := False;
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
@@ -1191,7 +1195,7 @@ begin
 
   else if Tab is TResponseImageTab then begin
     ImageTab := TResponseImageTab(Tab);
-    StatusText3.Caption := Format('%s: %d x %d', [
+    StatusTextInfo.Caption := Format('%s: %d x %d', [
       ImageTab.ImageType,
       ImageTab.Image.Picture.Width,
       ImageTab.Image.Picture.Height
@@ -1340,12 +1344,13 @@ begin
   end;
   ParseContentType(Info.ResponseHeaders);
 
-  UpdateStatusLine(
+  UpdateStatusLine(Info);
+  {UpdateStatusLine(
     Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
     IfThen(Info.Time > 1000,
       Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
       Format('%d ms', [Info.Time]))
-  );
+  );}
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
   begin
@@ -1366,7 +1371,7 @@ begin
   miSaveResponse.Enabled := True;
 
   Info.Content.Position := 0;
-  StatusText3.Caption := '';
+  StatusTextInfo.Caption := '';
   responseRaw.Clear;
   mime := SplitMimeType(Info.ContentType);
 
@@ -1383,27 +1388,58 @@ begin
   end;
 end;
 
-procedure TForm1.UpdateStatusLine(Text1: string = ''; Text2: string = '');
+procedure TForm1.UpdateStatusLine(Main: string);
+begin
+  StatusTextMain.Caption  := Main;
+  StatusImageTime.Visible := False;
+  StatusTextTime.Visible  := False;
+  StatusImageSize.Visible := False;
+  StatusTextSize.Visible  := False;
+  StatusTextInfo.Caption  := '';
+end;
+
+procedure TForm1.UpdateStatusLine(Info: TResponseInfo);
 var
   w: Integer;
 begin
-  StatusText1.Caption := Text1;
-  if Text2 = '' then
-  begin
-    StatusText2.Caption := '';
-    StatusImage1.Visible := False;
-    StatusText2.Visible := False;
-  end
-  else begin
-    // Manual place components. Align property in the some cases can
-    // lead to exchange of order of the image and text.
-    w := StatusText1.Left + StatusText1.Width + 8;
-    StatusImage1.Left := w;
-    StatusText2.Left := w + StatusImage1.Width + 2;
-    StatusImage1.Visible := True;
-    StatusText2.Visible := True;
-    StatusText2.Caption := Text2;
-  end;
+  StatusTextMain.Caption := Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]);
+
+  // Component's visible property break components alignment order.
+  // We must fix order after visible is changed.
+
+  // Reset alignment to reorder components.
+  StatusImageTime.Align := alNone;
+  StatusTextTime.Align  := alNone;
+  StatusImageSize.Align := alNone;
+  StatusTextSize.Align  := alNone;
+
+  // Manual place components. Align property in the some cases can
+  // lead to exchange of order of the image and text.
+  w := StatusTextMain.Left + StatusTextMain.Width;
+
+  // Place components in proper order.
+  StatusImageTime.Left := w;
+  StatusTextTime.Left  := w + StatusImageTime.Width;
+  StatusImageSize.Left := StatusTextTime.Left + StatusTextTime.Width;
+  StatusTextSize.Left  := StatusImageSize.Left + StatusImageSize.Width;
+
+  StatusImageTime.Visible := True;
+
+  StatusTextTime.Visible := True;
+  StatusTextTime.Caption := IfThen(Info.Time > 1000,
+      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
+      Format('%d ms',      [Info.Time]));
+
+  StatusImageSize.Visible := True;
+
+  StatusTextSize.Visible := True;
+  StatusTextSize.Caption := NumberFormat(Info.Content.Size) + ' bytes';
+
+  // Fix components order.
+  StatusImageTime.Align := alLeft;
+  StatusTextTime.Align  := alLeft;
+  StatusImageSize.Align := alLeft;
+  StatusTextSize.Align  := alLeft;
 end;
 
 procedure TForm1.ShowResponseCookie(Headers: TStrings);
