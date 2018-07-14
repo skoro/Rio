@@ -1391,11 +1391,10 @@ end;
 procedure TForm1.UpdateStatusLine(Main: string);
 begin
   StatusTextMain.Caption  := Main;
+  StatusTextTime.Caption := '';
+  StatusTextSize.Caption := '';
   StatusImageTime.Visible := False;
-  StatusTextTime.Visible  := False;
   StatusImageSize.Visible := False;
-  StatusTextSize.Visible  := False;
-  StatusTextInfo.Caption  := '';
 end;
 
 procedure TForm1.UpdateStatusLine(Info: TResponseInfo);
@@ -1404,42 +1403,26 @@ var
 begin
   StatusTextMain.Caption := Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]);
 
-  // Component's visible property break components alignment order.
-  // We must fix order after visible is changed.
+  StatusImageTime.Visible := True;
+  StatusImageSize.Visible := True;
 
-  // Reset alignment to reorder components.
-  StatusImageTime.Align := alNone;
-  StatusTextTime.Align  := alNone;
-  StatusImageSize.Align := alNone;
-  StatusTextSize.Align  := alNone;
+  StatusTextTime.Caption := IfThen(Info.Time > 1000,
+      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
+      Format('%d ms',      [Info.Time]));
+
+  StatusTextSize.Caption := NumberFormat(Info.Content.Size) + ' bytes';
 
   // Manual place components. Align property in the some cases can
   // lead to exchange of order of the image and text.
   w := StatusTextMain.Left + StatusTextMain.Width;
 
   // Place components in proper order.
-  StatusImageTime.Left := w;
-  StatusTextTime.Left  := w + StatusImageTime.Width;
-  StatusImageSize.Left := StatusTextTime.Left + StatusTextTime.Width;
-  StatusTextSize.Left  := StatusImageSize.Left + StatusImageSize.Width;
-
-  StatusImageTime.Visible := True;
-
-  StatusTextTime.Visible := True;
-  StatusTextTime.Caption := IfThen(Info.Time > 1000,
-      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
-      Format('%d ms',      [Info.Time]));
-
-  StatusImageSize.Visible := True;
-
-  StatusTextSize.Visible := True;
-  StatusTextSize.Caption := NumberFormat(Info.Content.Size) + ' bytes';
-
-  // Fix components order.
-  StatusImageTime.Align := alLeft;
-  StatusTextTime.Align  := alLeft;
-  StatusImageSize.Align := alLeft;
-  StatusTextSize.Align  := alLeft;
+  StatusImageTime.Left  := w + 16;
+  StatusTextTime.Left   := StatusImageTime.Left + StatusImageTime.Width + 4;
+  StatusTextTime.Height := StatusTextMain.Height;
+  StatusImageSize.Left  := StatusTextTime.Left + StatusTextTime.Width + 8;
+  StatusTextSize.Left   := StatusImageSize.Left + StatusImageSize.Width + 4;
+  StatusTextSize.Height := StatusTextMain.Height;
 end;
 
 procedure TForm1.ShowResponseCookie(Headers: TStrings);

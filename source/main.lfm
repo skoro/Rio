@@ -1386,8 +1386,6 @@ object Form1: TForm1
       Height = 30
       Top = 0
       Width = 16
-      Align = alLeft
-      AutoSize = True
       BorderSpacing.Left = 16
       Center = True
       Picture.Data = {
@@ -1409,7 +1407,7 @@ object Form1: TForm1
       Hint = 'Response time'
       Top = 0
       Width = 94
-      Align = alLeft
+      Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextTime'
       Layout = tlCenter
@@ -1422,8 +1420,6 @@ object Form1: TForm1
       Height = 30
       Top = 0
       Width = 16
-      Align = alLeft
-      AutoSize = True
       BorderSpacing.Left = 16
       Center = True
       Picture.Data = {
@@ -1444,7 +1440,7 @@ object Form1: TForm1
       Hint = 'Response body size'
       Top = 0
       Width = 88
-      Align = alLeft
+      Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextSize'
       Layout = tlCenter
