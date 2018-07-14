@@ -22,6 +22,8 @@ procedure AppExec(const exename: string);
 procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
 { Approximate milliseconds }
 function FormatMsApprox(ms: Int64): string;
+{ Separate number parts by dot. }
+function NumberFormat(num: Int64; dot: string = '.'): string;
 
 implementation
 
@@ -91,6 +93,22 @@ begin
         Result := Format('%d h %d min', [hours, minutes]);
       end;
     end;
+  end;
+end;
+
+function NumberFormat(num: Int64; dot: string): string;
+var
+  s: string;
+  i, n: Integer;
+begin
+  n := 1;
+  s := IntToStr(num);
+  Result := '';
+  for i := Length(s) downto 1 do begin
+    Result := s[i] + result;
+    if (i <> 1) and (n mod 3 = 0) then
+      Result := dot + result;
+    Inc(n);
   end;
 end;
 
