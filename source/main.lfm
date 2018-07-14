@@ -1404,7 +1404,7 @@ object Form1: TForm1
     object StatusTextTime: TLabel
       Left = 181
       Height = 30
-      Hint = 'Response time'
+      Hint = 'Request time'
       Top = 0
       Width = 94
       Anchors = [akTop, akLeft, akBottom]
