@@ -399,7 +399,8 @@ begin
   C := GetAppConfigFile(False, True);
   PSMAIN.JSONFileName := C;
   C := ExtractFilePath(C);
-  if not ForceDirectories(C) then ShowMessage(Format('Cannot create directory "%s"', [C]));
+  if not ForceDirectories(C) then
+    ShowMessage(Format('Cannot create directory "%s"', [C]));
   PSMAIN.Active := True;
 
   // Form components defaults.
@@ -1345,12 +1346,6 @@ begin
   ParseContentType(Info.ResponseHeaders);
 
   UpdateStatusLine(Info);
-  {UpdateStatusLine(
-    Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]),
-    IfThen(Info.Time > 1000,
-      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
-      Format('%d ms', [Info.Time]))
-  );}
 
   if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
   begin
@@ -1383,7 +1378,14 @@ begin
     tabContent.TabVisible := False;
 
   if tabContent.TabVisible then begin
-    responseRaw.Append(Info.Content.DataString);
+    with responseRaw.Lines do begin
+      BeginUpdate;
+      try
+        Add(Info.Content.DataString);
+      finally
+        EndUpdate;
+      end;
+    end;
     responseRaw.CaretPos := Point(0, 0);
   end;
 end;
