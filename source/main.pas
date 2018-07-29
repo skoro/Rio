@@ -1347,15 +1347,18 @@ begin
 
   UpdateStatusLine(Info);
 
-  if (cbUrl.Items.IndexOf(Info.Url) = -1) and (Info.StatusCode <> 404) then
+
+  if (Info.StatusCode <> 404) then
   begin
-    if cbUrl.Items.Count >= MAX_URLS then
-    begin
-      cbUrl.Items.Delete(cbUrl.Items.Count - 1);
-      // FIXME: delete last item also deletes and text ?
-      cbUrl.Text := Info.Url;
-    end;
-    cbUrl.Items.Insert(0, Info.Url);
+    p := cbUrl.Items.IndexOf(Info.Url);
+    if p = -1 then begin // Add a new url.
+      if cbUrl.Items.Count >= MAX_URLS then
+        cbUrl.Items.Delete(cbUrl.Items.Count - 1);
+      cbUrl.Items.Insert(0, Info.Url);
+    end
+    else // Move an existing url to the top of the list.
+      cbUrl.Items.Move(p, 0);
+    cbUrl.Text := Info.Url;
   end;
 
   // Fill response cookie grid or hide it.
