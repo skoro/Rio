@@ -148,7 +148,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
-  SessionProperties = 'cbUrl.Items;Height;Left;Top;Width;cbUrl.Text;cbMethod.Text;cbMethod.Items'
+  SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;Left;Top;Width;LayoutSplitter.Position'
   LCLVersion = '1.8.2.0'
   object LayoutSplitter: TPairSplitter
     Cursor = crVSplit
@@ -159,7 +159,7 @@ object Form1: TForm1
     Align = alClient
     Position = 220
     SplitterType = pstVertical
-    object PairSplitterSide1: TPairSplitterSide
+    object splitterSideRequest: TPairSplitterSide
       Cursor = crArrow
       Left = 0
       Height = 220
@@ -1143,7 +1143,7 @@ object Form1: TForm1
         end
       end
     end
-    object PairSplitterSide2: TPairSplitterSide
+    object splitterSideResponse: TPairSplitterSide
       Cursor = crArrow
       Left = 0
       Height = 294

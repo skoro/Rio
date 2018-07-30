@@ -63,8 +63,8 @@ type
     pagesRequest: TPageControl;
     pagesResponse: TPageControl;
     LayoutSplitter: TPairSplitter;
-    PairSplitterSide1: TPairSplitterSide;
-    PairSplitterSide2: TPairSplitterSide;
+    splitterSideRequest: TPairSplitterSide;
+    splitterSideResponse: TPairSplitterSide;
     panelUrl: TPanel;
     panelRequest: TPanel;
     panelResponse: TPanel;
