@@ -117,6 +117,8 @@ type
     procedure OnFilterClick(Sender: TObject);
     procedure OnFilterKeyPress(Sender: TObject; var Key: char);
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+  protected
+    procedure ToggleFilterPanel;
   public
     constructor Create;
     destructor Destroy; override;
@@ -124,6 +126,7 @@ type
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     procedure FreeTab; override;
+    procedure Filter(Node: TTreeNode); virtual;
     function IsFilterActive: Boolean;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
@@ -342,10 +345,7 @@ end;
 
 procedure TResponseJsonTab.InternalOnSwitchFilter(Sender: TObject);
 begin
-  FFilter.Visible := not FFilter.Visible;
-  FBtnFilter.Down := FFilter.Visible;
-  if FFilter.Visible then
-    FFilter.SetFocus;
+  ToggleFilterPanel;
 end;
 
 procedure TResponseJsonTab.OnChangeTreeMode(Sender: TObject);
@@ -380,6 +380,14 @@ begin
   // Control-F show/hide filter panel.
   if (Shift = [ssCtrl]) and (Key = 70) then
      InternalOnSwitchFilter(Sender);
+end;
+
+procedure TResponseJsonTab.ToggleFilterPanel;
+begin
+  FFilter.Visible := not FFilter.Visible;
+  FBtnFilter.Down := FFilter.Visible;
+  if FFilter.Visible then
+    FFilter.SetFocus;
 end;
 
 function TResponseJsonTab.GetTreeView: TTreeView;
@@ -479,6 +487,49 @@ begin
   ClearJsonData;
   FreeAndNil(FTreeView);
   inherited;
+end;
+
+procedure TResponseJsonTab.Filter(Node: TTreeNode);
+var
+  FilterList: TStringList;
+  childJson, parentJson: TJSONData;
+  I: Integer;
+  Key: string;
+begin
+
+  FilterList := TStringList.Create;
+  FilterList.LineBreak := '';
+
+  while Assigned(Node.Parent) do begin
+    childJson  := TJSONData(Node.Data);
+    parentJson := TJSONData(Node.Parent.Data);
+    Key := '';
+    case parentJson.JSONType of
+      jtObject:
+        begin
+          I := TJSONObject(parentJson).IndexOf(childJson);
+          if I >= 0 then
+            Key := '.' + TJSONObject(parentJson).Names[I];
+        end;
+      jtArray:
+        begin
+          I := TJSONArray(parentJson).IndexOf(childJson);
+          if I >= 0 then
+            Key := '[' + IntToStr(I) + ']';
+        end;
+    end;
+    if Key <> '' then
+      FilterList.Insert(0, Key);
+    Node := Node.Parent;
+  end;
+
+  if FilterList.Count > 0 then begin
+    FFilter.Text := FilterList.Text;
+    ToggleFilterPanel;
+    ApplyFilter;
+  end;
+
+  FilterList.Free;
 end;
 
 function TResponseJsonTab.IsFilterActive: Boolean;
