@@ -1825,6 +1825,10 @@ object Form1: TForm1
       ShortCut = 13
       OnClick = JsonTreePopupMenuClick
     end
+    object miJsonFilter: TMenuItem
+      Caption = 'Filter...'
+      OnClick = JsonTreePopupMenuClick
+    end
   end
   object pmBodyType: TPopupMenu
     left = 352

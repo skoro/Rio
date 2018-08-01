@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miJsonFilter: TMenuItem;
     StatusImageSize: TImage;
     StatusTextInfo: TLabel;
     StatusTextSize: TLabel;
@@ -638,6 +639,9 @@ begin
 
   if MenuItem = miJsonView then
     KeyValueForm.View(Key, Value, Key);
+
+  if MenuItem = miJsonFilter then
+    FResponseJsonTab.Filter(Node);
 end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
