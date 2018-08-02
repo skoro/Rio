@@ -502,37 +502,40 @@ begin
   FilterList := TStringList.Create;
   FilterList.LineBreak := '';
 
-  while Assigned(Node.Parent) do begin
-    childJson  := TJSONData(Node.Data);
-    parentJson := TJSONData(Node.Parent.Data);
-    Key := '';
-    case parentJson.JSONType of
-      jtObject:
-        begin
-          I := TJSONObject(parentJson).IndexOf(childJson);
-          if I >= 0 then
-            Key := '.' + TJSONObject(parentJson).Names[I];
-        end;
-      jtArray:
-        begin
-          I := TJSONArray(parentJson).IndexOf(childJson);
-          if I >= 0 then
-            Key := '[' + IntToStr(I) + ']';
-        end;
+  try
+    while Assigned(Node.Parent) do begin
+      childJson  := TJSONData(Node.Data);
+      parentJson := TJSONData(Node.Parent.Data);
+      Key := '';
+      case parentJson.JSONType of
+        jtObject:
+          begin
+            I := TJSONObject(parentJson).IndexOf(childJson);
+            if I >= 0 then
+              Key := '.' + TJSONObject(parentJson).Names[I];
+          end;
+        jtArray:
+          begin
+            I := TJSONArray(parentJson).IndexOf(childJson);
+            if I >= 0 then
+              Key := '[' + IntToStr(I) + ']';
+          end;
+      end;
+      if Key <> '' then
+        FilterList.Insert(0, Key);
+      Node := Node.Parent;
     end;
-    if Key <> '' then
-      FilterList.Insert(0, Key);
-    Node := Node.Parent;
-  end;
 
-  if FilterList.Count > 0 then begin
-    FFilter.Text := FilterList.Text;
-    if not FFilter.Visible then
-      ToggleFilterPanel;
-    ApplyFilter;
-  end;
+    if FilterList.Count > 0 then begin
+      FFilter.Text := FilterList.Text;
+      if not FFilter.Visible then
+        ToggleFilterPanel;
+      ApplyFilter;
+    end;
 
-  FilterList.Free;
+  finally
+    FilterList.Free;
+  end;
 end;
 
 function TResponseJsonTab.IsFilterActive: Boolean;
