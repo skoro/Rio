@@ -525,7 +525,8 @@ begin
 
   if FilterList.Count > 0 then begin
     FFilter.Text := FilterList.Text;
-    ToggleFilterPanel;
+    if not FFilter.Visible then
+      ToggleFilterPanel;
     ApplyFilter;
   end;
 
