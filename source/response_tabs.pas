@@ -83,6 +83,10 @@ type
 
   TOnJsonFormat = procedure (JsonData: TJSONData; Editor: TSynEdit) of object;
 
+  { TOnJsonData }
+
+  TOnJsonData = procedure (RootJson, FilteredJson: TJSONData) of object;
+
   { TResponseJsonTab }
 
   TResponseJsonTab = class(TResponseTab)
@@ -100,6 +104,7 @@ type
     FFilter: TEditButton;
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
+    FOnJsonData: TOnJsonData;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -135,6 +140,7 @@ type
     property ButtonOptions: TToolButton read FBtnOptions;
     property TreeExpanded: Boolean read FTreeExpanded write FTreeExpanded default True;
     property OnJsonFormat: TOnJsonFormat read FOnJsonFormat write SetOnJsonFormat;
+    property OnJsonData: TOnJsonData read FOnJsonData write FOnJsonData;
   end;
 
 implementation
@@ -158,18 +164,7 @@ begin
     BeginUpdate;
     try
       FJsonRoot := FJsonParser.Parse;
-      if IsFilterActive then
-        ApplyFilter
-      else begin
-        SetFormattedText(FJsonRoot);
-        BuildTree(FJsonRoot);
-      end;
-      {ShowJsonData(nil, FJsonRoot);
-      with FTreeView do
-        if (Items.Count > 0) and Assigned(Items[0]) then begin
-          Items[0].Expand(False);
-          Selected := Items[0];
-        end;}
+      ApplyFilter;
     finally
       EndUpdate;
     end;
@@ -313,7 +308,14 @@ procedure TResponseJsonTab.ApplyFilter;
 var
   Filtered: TJSONData;
 begin
-  Filtered := FJsonRoot.FindPath(FFilter.Text);
+  if not IsFilterActive then
+    Filtered := FJsonRoot
+  else
+    Filtered := FJsonRoot.FindPath(FFilter.Text);
+
+  if Assigned(FOnJsonData) then
+    FOnJsonData(FJsonRoot, Filtered);
+
   if Assigned(Filtered) then begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
