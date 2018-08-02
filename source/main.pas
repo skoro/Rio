@@ -207,6 +207,7 @@ type
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
+    procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
   public
     procedure ApplyOptions;
   end;
@@ -416,6 +417,8 @@ begin
   FResponseTabManager := TResponseTabManager.Create(pagesResponse);
   FResponseTabManager.RegisterTab(TResponseImageTab.Create);
   FResponseJsonTab := TResponseJsonTab.Create;
+  FResponseJsonTab.OnJsonFormat := @JsonTab_OnJsonFormat;
+  FResponseJsonTab.OnJsonData := @JsonTab_OnJsonData;
   FResponseTabManager.RegisterTab(FResponseJsonTab);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
   FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
@@ -1192,9 +1195,8 @@ begin
       TreeView.PopupMenu := popupJsonTree;
       TreeView.OnDblClick := @JsonTreeDblClick;
       SynEdit.Highlighter := synJS;
-      ViewPage := OptionsForm.JsonView;
-      OnJsonFormat := @JsonTab_OnJsonFormat;
       ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
+      ViewPage := OptionsForm.JsonView;
     end;
   end
 
@@ -1231,6 +1233,15 @@ end;
 procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
 begin
   Editor.Text := FormatJson(JsonData);
+end;
+
+procedure TForm1.JsonTab_OnJsonData(Root, Filtered: TJSONData);
+begin
+  // Cannot refilter already filtered json tree.
+  if Root = Filtered then
+    miJsonFilter.Enabled := True
+  else
+    miJsonFilter.Enabled := False;
 end;
 
 procedure TForm1.ApplyOptions;
