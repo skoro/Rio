@@ -179,7 +179,8 @@ end;
 
 procedure TOptionsForm.SetFontItem(aIndex: Integer; AValue: TFont);
 begin
-
+  if FFontItemList[aIndex] <> AValue then
+    FFontItemList[aIndex] := AValue;
 end;
 
 procedure TOptionsForm.InitFonts;
