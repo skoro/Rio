@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
-  PairSplitter, Dialogs, Graphics, response_tabs, Classes;
+  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes;
 
 type
 
@@ -65,6 +65,7 @@ type
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
     procedure SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
+    procedure ApplyControlFont(const ParentControl: TWinControl; const AClassName: string; AFontItem: TUIFontItem);
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
@@ -78,6 +79,8 @@ var
   OptionsForm: TOptionsForm;
 
 implementation
+
+uses app_helpers;
 
 {$R *.lfm}
 
@@ -176,6 +179,23 @@ procedure TOptionsForm.SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
 begin
   if FFontItemList[Ord(AFontItem)] <> AFont then
     FFontItemList[Ord(AFontItem)] := AFont;
+end;
+
+procedure TOptionsForm.ApplyControlFont(const ParentControl: TWinControl;
+  const AClassName: string; AFontItem: TUIFontItem);
+var
+  ChildControls: TList;
+  I: Integer;
+begin
+  ChildControls := TList.Create;
+  try
+    EnumControls(ParentControl, AClassName, ChildControls);
+    if ChildControls.Count > 0 then
+      for I := 0 to ChildControls.Count - 1 do
+        TWinControl(ChildControls[I]).Font := GetFontItem(AFontItem);
+  finally
+    ChildControls.Free;
+  end;
 end;
 
 procedure TOptionsForm.InitFonts;
