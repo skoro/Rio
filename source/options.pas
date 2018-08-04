@@ -97,8 +97,8 @@ end;
 
 function TOptionsForm.GetFontItem(aIndex: Integer): TFont;
 begin
-  if (aIndex >= Integer(Low(TUIFontItem)))
-             and (aIndex <= Integer(High(TUIFontItem))) then
+  if (aIndex >= Ord(Low(TUIFontItem)))
+             and (aIndex <= Ord(High(TUIFontItem))) then
     Result := FFontItemList[aIndex]
   else
     raise ERangeError.Create('aIndex is out of range');
@@ -184,12 +184,12 @@ end;
 
 procedure TOptionsForm.InitFonts;
 begin
-  SetLength(FFontItemList, Integer(High(TUIFontItem)) + 1);
-  FFontItemList[Integer(fiGrids)]   := TFont.Create;
-  FFontItemList[Integer(fiEditor)]  := TFont.Create;
-  FFontItemList[Integer(fiJson)]    := TFont.Create;
-  FFontItemList[Integer(fiContent)] := TFont.Create;
-  FFontItemList[Integer(fiValue)]   := TFont.Create;
+  SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
+  FFontItemList[Ord(fiGrids)]   := TFont.Create;
+  FFontItemList[Ord(fiEditor)]  := TFont.Create;
+  FFontItemList[Ord(fiJson)]    := TFont.Create;
+  FFontItemList[Ord(fiContent)] := TFont.Create;
+  FFontItemList[Ord(fiValue)]   := TFont.Create;
   cboxFontItem.Items.AddStrings([
     'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
   ]);
