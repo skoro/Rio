@@ -105,7 +105,7 @@ end;
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
 begin
   if dlgFont.Execute then begin
-    FFontItemList[cboxFontItem.ItemIndex] := dlgFont.Font;
+    FFontItemList[cboxFontItem.ItemIndex].Assign(dlgFont.Font);
     SetFontDemo;
   end;
 end;
