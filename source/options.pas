@@ -51,7 +51,6 @@ type
     procedure FormCreate(Sender: TObject);
   private
     FFontItemList: TFontItemList;
-    function GetFontItem(aIndex: Integer): TFont;
     function GetGridButtonsHidden: Boolean;
     function GetJsonFormatOptions: TFormatOptions;
     function GetJsonIndentSize: Integer;
@@ -60,11 +59,12 @@ type
     function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
     procedure SetFontDemo;
-    procedure SetFontItem(aIndex: Integer; AValue: TFont);
     procedure InitFonts;
 
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
+    function GetFontItem(AFontItem: TUIFontItem): TFont;
+    procedure SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
     property JsonExpanded: Boolean read GetJsonExpanded;
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
@@ -72,7 +72,6 @@ type
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
-    property FontItem[aIndex: Integer]: TFont read GetFontItem write SetFontItem;
   end;
 
 var
@@ -95,13 +94,9 @@ begin
   InitFonts;
 end;
 
-function TOptionsForm.GetFontItem(aIndex: Integer): TFont;
+function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
 begin
-  if (aIndex >= Ord(Low(TUIFontItem)))
-             and (aIndex <= Ord(High(TUIFontItem))) then
-    Result := FFontItemList[aIndex]
-  else
-    raise ERangeError.Create('aIndex is out of range');
+  Result := FFontItemList[Ord(AFontItem)];
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
@@ -177,10 +172,10 @@ begin
   ]);
 end;
 
-procedure TOptionsForm.SetFontItem(aIndex: Integer; AValue: TFont);
+procedure TOptionsForm.SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
 begin
-  if FFontItemList[aIndex] <> AValue then
-    FFontItemList[aIndex] := AValue;
+  if FFontItemList[Ord(AFontItem)] <> AFont then
+    FFontItemList[Ord(AFontItem)] := AFont;
 end;
 
 procedure TOptionsForm.InitFonts;
