@@ -47,6 +47,7 @@ type
     tabAppearance: TTabSheet;
     TabSheet2: TTabSheet;
     procedure btnSelectFontClick(Sender: TObject);
+    procedure cboxFontItemChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
     FFontItemList: TFontItemList;
@@ -96,14 +97,24 @@ end;
 
 function TOptionsForm.GetFontItem(aIndex: Integer): TFont;
 begin
-
+  if (aIndex >= Integer(Low(TUIFontItem)))
+             and (aIndex <= Integer(High(TUIFontItem))) then
+    Result := FFontItemList[aIndex]
+  else
+    raise ERangeError.Create('aIndex is out of range');
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
 begin
   if dlgFont.Execute then begin
-    //dlgFont.Font;
+    FFontItemList[cboxFontItem.ItemIndex] := dlgFont.Font;
+    SetFontDemo;
   end;
+end;
+
+procedure TOptionsForm.cboxFontItemChange(Sender: TObject);
+begin
+  SetFontDemo;
 end;
 
 function TOptionsForm.GetGridButtonsHidden: Boolean;
@@ -150,7 +161,20 @@ begin
 end;
 
 procedure TOptionsForm.SetFontDemo;
+var
+  FontObj: TFont;
+  StyleName: string;
 begin
+  FontObj := FFontItemList[cboxFontItem.ItemIndex];
+  StyleName := 'Regular';
+  if FontObj.Bold then StyleName := 'Bold';
+  if FontObj.Italic then StyleName := StyleName + ' Italic';
+  if FontObj.Underline then StyleName := StyleName + 'Underline';
+  if FontObj.StrikeThrough then StyleName := StyleName + 'StrikeThrough';
+  lFontDemo.Font := FontObj;
+  lFontDemo.Caption := Format('%s %d %s', [
+    FontObj.Name, FontObj.Size, StyleName
+  ]);
 end;
 
 procedure TOptionsForm.SetFontItem(aIndex: Integer; AValue: TFont);
@@ -160,7 +184,17 @@ end;
 
 procedure TOptionsForm.InitFonts;
 begin
-  //SetLength(FFontItemList, High(TUIFontItem));
+  SetLength(FFontItemList, Integer(High(TUIFontItem)) + 1);
+  FFontItemList[Integer(fiGrids)]   := TFont.Create;
+  FFontItemList[Integer(fiEditor)]  := TFont.Create;
+  FFontItemList[Integer(fiJson)]    := TFont.Create;
+  FFontItemList[Integer(fiContent)] := TFont.Create;
+  FFontItemList[Integer(fiValue)]   := TFont.Create;
+  cboxFontItem.Items.AddStrings([
+    'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
+  ]);
+  cboxFontItem.ItemIndex := 0;
+  SetFontDemo;
 end;
 
 function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;

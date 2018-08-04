@@ -106,17 +106,9 @@ object OptionsForm: TOptionsForm
           BorderSpacing.Left = 8
           BorderSpacing.Right = 8
           ItemHeight = 0
-          ItemIndex = 0
-          Items.Strings = (
-            'Grids'
-            'Editor'
-            'Json tree'
-            'Response content'
-            'Value editor'
-          )
+          OnChange = cboxFontItemChange
           Style = csDropDownList
           TabOrder = 0
-          Text = 'Grids'
         end
         object btnSelectFont: TButton
           Left = 8
@@ -124,7 +116,7 @@ object OptionsForm: TOptionsForm
           Top = 32
           Width = 38
           AutoSize = True
-          Caption = 'Font'
+          Caption = '&Font'
           OnClick = btnSelectFontClick
           TabOrder = 1
         end
