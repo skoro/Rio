@@ -1273,6 +1273,11 @@ begin
     gnavHeaders.Height := gnavBody.Height;
   gnavParams.Visible := not OptionsForm.GridButtonsHidden;
   gnavCookie.Visible := not OptionsForm.GridButtonsHidden;
+
+  // Apply fonts
+  OptionsForm.ApplyControlFont(Self, 'TStringGrid', fiGrids);
+  OptionsForm.ApplyControlFont(Self, 'TSynEdit', fiEditor);
+  responseRaw.Font := OptionsForm.GetFontItem(fiContent);
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
