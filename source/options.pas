@@ -173,6 +173,11 @@ var
   StyleName: string;
 begin
   FontObj := FFontItemList[cboxFontItem.ItemIndex];
+  // Don't show LCL default font parameters: it's not actual.
+  if FontObj.Name = 'default' then begin
+    lFontDemo.Caption := '';
+    Exit;
+  end;
   StyleName := 'Regular';
   if FontObj.Bold then StyleName := 'Bold';
   if FontObj.Italic then StyleName := StyleName + ' Italic';
