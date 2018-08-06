@@ -80,7 +80,7 @@ var
 
 implementation
 
-uses app_helpers;
+uses app_helpers, SynEdit;
 
 {$R *.lfm}
 
@@ -214,13 +214,25 @@ begin
 end;
 
 procedure TOptionsForm.InitFonts;
+var
+  EditorFont: TFont;
 begin
   SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
   FFontItemList[Ord(fiGrids)]   := TFont.Create;
-  FFontItemList[Ord(fiEditor)]  := TFont.Create;
   FFontItemList[Ord(fiJson)]    := TFont.Create;
   FFontItemList[Ord(fiContent)] := TFont.Create;
   FFontItemList[Ord(fiValue)]   := TFont.Create;
+
+  // Editor needs a monospaced font.
+  EditorFont := TFont.Create;
+  with EditorFont do begin
+    Name    := SynDefaultFontName;
+    Height  := SynDefaultFontHeight;
+    Pitch   := SynDefaultFontPitch;
+    Quality := SynDefaultFontQuality;
+  end;
+  FFontItemList[Ord(fiEditor)] := EditorFont;
+
   cboxFontItem.Items.AddStrings([
     'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
   ]);
