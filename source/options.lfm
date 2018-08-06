@@ -99,7 +99,7 @@ object OptionsForm: TOptionsForm
         TabOrder = 2
         object cboxFontItem: TComboBox
           Left = 8
-          Height = 27
+          Height = 31
           Top = 0
           Width = 276
           Align = alTop

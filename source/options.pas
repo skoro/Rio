@@ -113,6 +113,7 @@ begin
     Include(fdo, fdFixedPitchOnly);
   dlgFont.Options := fdo;
 
+  dlgFont.Font := FFontItemList[cboxFontItem.ItemIndex];
   if dlgFont.Execute then begin
     FFontItemList[cboxFontItem.ItemIndex].Assign(dlgFont.Font);
     SetFontDemo;
