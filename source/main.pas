@@ -1194,7 +1194,9 @@ begin
       TreeView.Images := jsImages;
       TreeView.PopupMenu := popupJsonTree;
       TreeView.OnDblClick := @JsonTreeDblClick;
+      TreeView.Font := OptionsForm.GetFontItem(fiJson);
       SynEdit.Highlighter := synJS;
+      SynEdit.Font := OptionsForm.GetFontItem(fiEditor);
       ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
       ViewPage := OptionsForm.JsonView;
     end;
@@ -1277,6 +1279,7 @@ begin
   // Apply fonts
   OptionsForm.ApplyControlFont(Self, 'TStringGrid', fiGrids);
   OptionsForm.ApplyControlFont(Self, 'TSynEdit', fiEditor);
+  OptionsForm.ApplyControlFont(Self, 'TTreeView', fiJson);
   responseRaw.Font := OptionsForm.GetFontItem(fiContent);
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 end;
