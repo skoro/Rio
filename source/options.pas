@@ -103,7 +103,16 @@ begin
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
+var
+  fdo: TFontDialogOptions;
 begin
+  // FIXME: fdFixedPitchOnly doesn't work on GTK widgetset ?
+  fdo := dlgFont.Options;
+  Exclude(fdo, fdFixedPitchOnly);
+  if cboxFontItem.ItemIndex = Ord(fiEditor) then
+    Include(fdo, fdFixedPitchOnly);
+  dlgFont.Options := fdo;
+
   if dlgFont.Execute then begin
     FFontItemList[cboxFontItem.ItemIndex].Assign(dlgFont.Font);
     SetFontDemo;
