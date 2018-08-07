@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
-  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes;
+  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes, PropertyStorage;
 
 type
 
@@ -60,6 +60,8 @@ type
     function GetPanelsLayout: TPairSplitterType;
     procedure SetFontDemo;
     procedure InitFonts;
+    procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
+    procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
 
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
@@ -80,7 +82,7 @@ var
 
 implementation
 
-uses app_helpers, SynEdit;
+uses app_helpers, SynEdit, fpjsonrtti;
 
 {$R *.lfm}
 
@@ -89,9 +91,21 @@ uses app_helpers, SynEdit;
 procedure TOptionsForm.FormCreate(Sender: TObject);
 var
   CF: String;
+  I: integer;
 begin
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
+
+  // Save/restore fonts.
+  for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do
+    with TStoredValue(Props.StoredValues.Add) do begin
+      // Should be named like these. In save/restore index will be parsed.
+      Name := 'Font_' + IntToStr(I);
+      KeyString := 'Font_' + IntToStr(I);
+      OnSave := @OnPropsFontSave;
+      OnRestore := @OnPropsFontRestore;
+    end;
+
   Props.Active := True;
   pagesOptions.ActivePage := tabAppearance;
   InitFonts;
@@ -238,6 +252,27 @@ begin
   ]);
   cboxFontItem.ItemIndex := 0;
   SetFontDemo;
+end;
+
+procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;
+  var Value: TStoredType);
+var
+  jStr: TJSONStreamer;
+  Idx: integer;
+begin
+  jStr := TJSONStreamer.Create(nil);
+  try
+    Idx := StrToInt(StringReplace(Sender.KeyString, 'Font_', '', []));
+    Value := jStr.ObjectToJSONString(FFontItemList[Idx]);
+  finally
+    jStr.Free;
+  end;
+end;
+
+procedure TOptionsForm.OnPropsFontRestore(Sender: TStoredValue;
+  var Value: TStoredType);
+begin
+
 end;
 
 function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;
