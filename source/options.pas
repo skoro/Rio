@@ -58,6 +58,7 @@ type
     function GetJsonSaveFmt: Boolean;
     function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
+    function GetFontIndexFromKeyName(AKeyName: string): integer;
     procedure SetFontDemo;
     procedure InitFonts;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
@@ -93,6 +94,9 @@ var
   CF: String;
   I: integer;
 begin
+  SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
+  InitFonts;
+
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
 
@@ -108,7 +112,6 @@ begin
 
   Props.Active := True;
   pagesOptions.ActivePage := tabAppearance;
-  InitFonts;
 end;
 
 function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -182,6 +185,11 @@ begin
     Result := pstVertical;
 end;
 
+function TOptionsForm.GetFontIndexFromKeyName(AKeyName: string): integer;
+begin
+  Result := StrToInt(StringReplace(AKeyName, 'Font_', '', []));
+end;
+
 procedure TOptionsForm.SetFontDemo;
 var
   FontObj: TFont;
@@ -231,7 +239,6 @@ procedure TOptionsForm.InitFonts;
 var
   EditorFont: TFont;
 begin
-  SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
   FFontItemList[Ord(fiGrids)]   := TFont.Create;
   FFontItemList[Ord(fiJson)]    := TFont.Create;
   FFontItemList[Ord(fiContent)] := TFont.Create;
@@ -262,7 +269,7 @@ var
 begin
   jStr := TJSONStreamer.Create(nil);
   try
-    Idx := StrToInt(StringReplace(Sender.KeyString, 'Font_', '', []));
+    Idx := GetFontIndexFromKeyName(Sender.KeyString);
     Value := jStr.ObjectToJSONString(FFontItemList[Idx]);
   finally
     jStr.Free;
@@ -271,8 +278,17 @@ end;
 
 procedure TOptionsForm.OnPropsFontRestore(Sender: TStoredValue;
   var Value: TStoredType);
+var
+  jStr: TJSONDeStreamer;
+  Idx: integer;
 begin
-
+  jStr := TJSONDeStreamer.Create(nil);
+  try
+    Idx := GetFontIndexFromKeyName(Sender.KeyString);
+    jStr.JSONToObject(Value, FFontItemList[Idx]);
+  finally
+    jStr.Free;
+  end;
 end;
 
 function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;
