@@ -49,6 +49,7 @@ type
     procedure btnSelectFontClick(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     FFontItemList: TFontItemList;
     function GetGridButtonsHidden: Boolean;
@@ -112,6 +113,11 @@ begin
 
   Props.Active := True;
   pagesOptions.ActivePage := tabAppearance;
+end;
+
+procedure TOptionsForm.FormShow(Sender: TObject);
+begin
+  SetFontDemo;
 end;
 
 function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -258,7 +264,6 @@ begin
     'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
   ]);
   cboxFontItem.ItemIndex := 0;
-  SetFontDemo;
 end;
 
 procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;

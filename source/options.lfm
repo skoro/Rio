@@ -10,6 +10,7 @@ object OptionsForm: TOptionsForm
   Constraints.MinHeight = 380
   Constraints.MinWidth = 320
   OnCreate = FormCreate
+  OnShow = FormShow
   Position = poMainFormCenter
   SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;Width'
   ShowInTaskBar = stNever
