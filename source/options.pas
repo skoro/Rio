@@ -22,6 +22,7 @@ type
   TOptionsForm = class(TForm)
     Button1: TButton;
     btnSelectFont: TButton;
+    btnResetFont: TButton;
     cbJsonExpanded: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
     cbJsonFmtArray: TCheckBox;
@@ -46,6 +47,7 @@ type
     tabJson: TTabSheet;
     tabAppearance: TTabSheet;
     TabSheet2: TTabSheet;
+    procedure btnResetFontClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -60,6 +62,7 @@ type
     function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
     function GetFontIndexFromKeyName(AKeyName: string): integer;
+    function GetDefaultFont(FontItem: TUIFontItem): TFont;
     procedure SetFontDemo;
     procedure InitFonts;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
@@ -143,6 +146,15 @@ begin
   end;
 end;
 
+procedure TOptionsForm.btnResetFontClick(Sender: TObject);
+var
+  Idx: Integer;
+begin
+  Idx := cboxFontItem.ItemIndex;
+  FFontItemList[Idx] := GetDefaultFont(TUIFontItem(Idx));
+  SetFontDemo;
+end;
+
 procedure TOptionsForm.cboxFontItemChange(Sender: TObject);
 begin
   SetFontDemo;
@@ -196,6 +208,18 @@ begin
   Result := StrToInt(StringReplace(AKeyName, 'Font_', '', []));
 end;
 
+function TOptionsForm.GetDefaultFont(FontItem: TUIFontItem): TFont;
+begin
+  Result := TFont.Create;
+  if FontItem = fiEditor then
+    with Result do begin
+      Name    := SynDefaultFontName;
+      Height  := SynDefaultFontHeight;
+      Pitch   := SynDefaultFontPitch;
+      Quality := SynDefaultFontQuality;
+    end;
+end;
+
 procedure TOptionsForm.SetFontDemo;
 var
   FontObj: TFont;
@@ -205,6 +229,7 @@ begin
   // Don't show LCL default font parameters: it's not actual.
   if FontObj.Name = 'default' then begin
     lFontDemo.Caption := '';
+    btnResetFont.Enabled := False;
     Exit;
   end;
   StyleName := 'Regular';
@@ -216,6 +241,7 @@ begin
   lFontDemo.Caption := Format('%s %d %s', [
     FontObj.Name, FontObj.Size, StyleName
   ]);
+  btnResetFont.Enabled := True;
 end;
 
 procedure TOptionsForm.SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
@@ -243,22 +269,10 @@ end;
 
 procedure TOptionsForm.InitFonts;
 var
-  EditorFont: TFont;
+  I: integer;
 begin
-  FFontItemList[Ord(fiGrids)]   := TFont.Create;
-  FFontItemList[Ord(fiJson)]    := TFont.Create;
-  FFontItemList[Ord(fiContent)] := TFont.Create;
-  FFontItemList[Ord(fiValue)]   := TFont.Create;
-
-  // Editor needs a monospaced font.
-  EditorFont := TFont.Create;
-  with EditorFont do begin
-    Name    := SynDefaultFontName;
-    Height  := SynDefaultFontHeight;
-    Pitch   := SynDefaultFontPitch;
-    Quality := SynDefaultFontQuality;
-  end;
-  FFontItemList[Ord(fiEditor)] := EditorFont;
+  for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do
+    FFontItemList[I] := GetDefaultFont(TUIFontItem(I));
 
   cboxFontItem.Items.AddStrings([
     'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
@@ -275,7 +289,9 @@ begin
   jStr := TJSONStreamer.Create(nil);
   try
     Idx := GetFontIndexFromKeyName(Sender.KeyString);
-    if FFontItemList[Idx].Name <> 'default' then
+    if FFontItemList[Idx].Name = 'default' then
+      Value := ''
+    else
       Value := jStr.ObjectToJSONString(FFontItemList[Idx]);
   finally
     jStr.Free;
