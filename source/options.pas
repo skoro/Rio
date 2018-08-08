@@ -275,7 +275,8 @@ begin
   jStr := TJSONStreamer.Create(nil);
   try
     Idx := GetFontIndexFromKeyName(Sender.KeyString);
-    Value := jStr.ObjectToJSONString(FFontItemList[Idx]);
+    if FFontItemList[Idx].Name <> 'default' then
+      Value := jStr.ObjectToJSONString(FFontItemList[Idx]);
   finally
     jStr.Free;
   end;
