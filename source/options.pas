@@ -287,6 +287,8 @@ var
   jStr: TJSONDeStreamer;
   Idx: integer;
 begin
+  if Length(Trim(Value)) = 0 then
+    Exit;
   jStr := TJSONDeStreamer.Create(nil);
   try
     Idx := GetFontIndexFromKeyName(Sender.KeyString);
