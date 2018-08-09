@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils;
+  Classes, SysUtils, Controls;
 
 { Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
@@ -24,6 +24,8 @@ procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringL
 function FormatMsApprox(ms: Int64): string;
 { Separate number parts by dot. }
 function NumberFormat(num: Int64; dot: string = '.'): string;
+{ Finds all the named controls in an owner control. }
+procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
 
 implementation
 
@@ -109,6 +111,21 @@ begin
     if (i <> 1) and (n mod 3 = 0) then
       Result := dot + result;
     Inc(n);
+  end;
+end;
+
+procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
+var
+  cnt: integer;
+  ctrl: TControl;
+begin
+  for cnt := 0 to Owner.ControlCount - 1 do begin
+    ctrl := Owner.Controls[cnt];
+    if ctrl is TWinControl then
+      EnumControls(TWinControl(ctrl), ControlName, Controls);
+    if ctrl.ClassName = ControlName then begin
+      Controls.Add(ctrl);
+    end;
   end;
 end;
 
