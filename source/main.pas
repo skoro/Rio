@@ -210,6 +210,7 @@ type
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
   public
     procedure ApplyOptions;
+    procedure SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1);
   end;
 
 var
@@ -1284,6 +1285,26 @@ begin
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
+procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; ARow: Integer = -1);
+var
+  Start: SmallInt;
+begin
+  Start := 0;
+  with AGrid do begin
+    if aRow = -1 then begin
+      RowCount := RowCount + 1;
+      ARow := RowCount - 1;
+    end;
+    if Columns[0].ButtonStyle <> cbsAuto then begin
+      Start := 1;
+      if Columns[0].ButtonStyle = cbsCheckboxColumn then
+        Cells[0, ARow] := '1';
+    end;
+    Cells[Start, ARow] := KV.Key;
+    Cells[Start + 1, ARow] := KV.Value;
+  end;
+end;
+
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
   UpdateStatusLine;
@@ -1312,6 +1333,7 @@ function TForm1.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = 
 var
   p: integer;
 begin
+  // TODO: use SplitKV() functions from app_helpers.
   p := Pos(delim, line);
   if p = 0 then
   begin
