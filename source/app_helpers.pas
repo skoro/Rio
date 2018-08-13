@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls;
+  Classes, SysUtils, Controls, ValEdit;
 
 { Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
@@ -20,6 +20,7 @@ function FileGetContents(const filename: ansistring; out buffer: ansistring): Bo
 procedure AppExec(const exename: string);
 { Split input string to list of strings delimited by character }
 procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
+function SplitKV(const Input: string; const Delim: char): TKeyValuePair;
 { Approximate milliseconds }
 function FormatMsApprox(ms: Int64): string;
 { Separate number parts by dot. }
@@ -75,6 +76,21 @@ begin
   Strings.Delimiter := Delim;
   Strings.StrictDelimiter := True;
   Strings.DelimitedText := Input;
+end;
+
+function SplitKV(const Input: string; const Delim: char): TKeyValuePair;
+var
+  p: Integer;
+begin
+  p := Pos(delim, Input);
+  if p = 0 then
+  begin
+    Result.Key := Input;
+    Result.Value := '';
+    Exit; // =>
+  end;
+  Result.Key := LeftStr(Input, p - 1);
+  Result.Value := Trim(RightStr(Input, Length(Input) - p));
 end;
 
 function FormatMsApprox(ms: Int64): string;
