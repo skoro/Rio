@@ -7,7 +7,7 @@ uses
   cthreads,
   cmem,
   {$ENDIF}
-  Forms, sysutils, Classes, Interfaces, main, options;
+  Forms, sysutils, Classes, Interfaces, main, options, app_helpers;
 
 {$R *.res}
 
@@ -19,11 +19,11 @@ begin
     crlf +
     '%s [options] [URL]' + crlf +
     '' + crlf +
-    '-h,--help               This help.' + crlf +
-    '-X,--request <command>  Custom request method: PUT, DELETE, etc.' + crlf +
-    '-H,--header <header>    Extra header to include in the request.' + crlf +
-    '                        You may specify any number of extra headers.' + crlf +
-    '-F,--form <name=value>  Post a form data using the Content-Type application/x-www-form-urlencoded' + crlf +
+    '-h,--help                This help.' + crlf +
+    '-X,--request=<command>   Custom request method: PUT, DELETE, etc.' + crlf +
+    '-H,--header=<name:value> Extra header to include in the request.' + crlf +
+    '                         You may specify any number of extra headers.' + crlf +
+    '-F,--form=<name=value>   Post a form data using the Content-Type application/x-www-form-urlencoded' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -32,6 +32,7 @@ end;
 procedure HandleCommandLine;
 var
   ErrorMsg, Value: string;
+  I: Integer;
   Values: TStringArray;
 begin
   if Application.HasOption('h', 'help') then
@@ -42,6 +43,11 @@ begin
   if Application.HasOption('X', 'request') then begin
     Value := Application.GetOptionValue('X', 'request');
     Form1.cbMethod.Text := UpperCase(Value);
+  end;
+  if Application.HasOption('H', 'header') then begin
+    Values := Application.GetOptionValues('H', 'header');
+    for I := Length(Values) - 1 downto 0 do
+      Form1.SetRowKV(Form1.requestHeaders, SplitKV(Values[I], ':'));
   end;
 end;
 
