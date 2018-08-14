@@ -211,6 +211,7 @@ type
   public
     procedure ApplyOptions;
     procedure SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1);
+    procedure AddRequestHeader(AHeader, AValue: string);
   end;
 
 var
@@ -1285,11 +1286,12 @@ begin
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
-procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; ARow: Integer = -1);
+procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer);
 var
   Start: SmallInt;
 begin
   Start := 0;
+  // TODO: find dublicates!
   with AGrid do begin
     if aRow = -1 then begin
       RowCount := RowCount + 1;
@@ -1302,6 +1304,30 @@ begin
     end;
     Cells[Start, ARow] := KV.Key;
     Cells[Start + 1, ARow] := KV.Value;
+  end;
+end;
+
+// Add values to request grid.
+// Adjust header name from the predefined name from the headers editor form.
+procedure TForm1.AddRequestHeader(AHeader, AValue: string);
+var
+  headers: TStringList;
+  iter: string;
+  kv: TKeyValuePair;
+begin
+  headers := TStringList.Create;
+  try
+    HeadersEditorForm.FillHeaders(headers);
+    for iter in headers do
+      if LowerCase(iter) = LowerCase(AHeader) then begin
+        AHeader := iter;
+        break;
+      end;
+    kv.Key := AHeader;
+    kv.Value := AValue;
+    SetRowKV(requestHeaders, kv);
+  finally
+    headers.Free;
   end;
 end;
 
