@@ -7,7 +7,7 @@ uses
   cthreads,
   cmem,
   {$ENDIF}
-  Forms, sysutils, Classes, Interfaces, main, options, app_helpers;
+  Forms, ValEdit, sysutils, Classes, Interfaces, main, options, app_helpers;
 
 {$R *.res}
 
@@ -34,6 +34,7 @@ var
   ErrorMsg, Value: string;
   I: Integer;
   Values: TStringArray;
+  KV: TKeyValuePair;
 begin
   if Application.HasOption('h', 'help') then
     raise Exception.Create(Usage);
@@ -46,8 +47,10 @@ begin
   end;
   if Application.HasOption('H', 'header') then begin
     Values := Application.GetOptionValues('H', 'header');
-    for I := Length(Values) - 1 downto 0 do
-      Form1.SetRowKV(Form1.requestHeaders, SplitKV(Values[I], ':'));
+    for I := Length(Values) - 1 downto 0 do begin
+      KV := SplitKV(Values[I], ':');
+      Form1.AddRequestHeader(KV.Key, KV.Value);
+    end;
   end;
 end;
 
