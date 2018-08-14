@@ -30,6 +30,8 @@ begin
     '    Post a form data using the Content-Type application/x-www-form-urlencoded.' + crlf +
     '    This implies that it will be a POST request but can be overrided' + crlf +
     '    by -X option. When a value prefixed by @ then it treated as file upload.' + crlf +
+    '-C,--cookie=<name=value>' + crlf +
+    '    Include a cookie to the request.' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -44,7 +46,7 @@ var
 begin
   if Application.HasOption('h', 'help') then
     raise Exception.Create(Usage);
-  ErrorMsg := Application.CheckOptions('X:H:F:', 'request: header: form:');
+  ErrorMsg := Application.CheckOptions('X:H:F:C:', 'request: header: form: cookie:');
   if ErrorMsg <> '' then
     raise Exception.Create(ErrorMsg);
   ReqMethod := '';
@@ -68,6 +70,11 @@ begin
       else
         Form1.AddFormData(KV.Key, KV.Value);
     end;
+  end;
+  if Application.HasOption('C', 'cookie') then begin
+    Values := Application.GetOptionValues('C', 'cookie');
+    for I := Length(Values) - 1 downto 0 do
+      Form1.SetRowKV(Form1.gridReqCookie, SplitKV(Values[I], '='));
   end;
   if ReqMethod <> '' then
     Form1.cbMethod.Text := UpperCase(ReqMethod);
