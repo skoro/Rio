@@ -19,11 +19,17 @@ begin
     crlf +
     '%s [options] [URL]' + crlf +
     '' + crlf +
-    '-h,--help                This help.' + crlf +
-    '-X,--request=<command>   Custom request method: PUT, DELETE, etc.' + crlf +
-    '-H,--header=<name:value> Extra header to include in the request.' + crlf +
-    '                         You may specify any number of extra headers.' + crlf +
-    '-F,--form=<name=value>   Post a form data using the Content-Type application/x-www-form-urlencoded' + crlf +
+    '-h,--help' + crlf +
+    '    This help.' + crlf +
+    '-X,--request=<command>' + crlf +
+    '    Custom request method: PUT, DELETE, etc.' + crlf +
+    '-H,--header=<name:value>' + crlf +
+    '    Extra header to include in the request.' + crlf +
+    '    You may specify any number of extra headers.' + crlf +
+    '-F,--form=<name=value>' + crlf +
+    '    Post a form data using the Content-Type application/x-www-form-urlencoded.' + crlf +
+    '    This implies that it will be a POST request but can be overrided' + crlf +
+    '    by -X option. When a value prefixed by @ then it treated as file upload.' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -31,7 +37,7 @@ end;
 
 procedure HandleCommandLine;
 var
-  ErrorMsg, Value: string;
+  ErrorMsg, ReqMethod: string;
   I: Integer;
   Values: TStringArray;
   KV: TKeyValuePair;
@@ -41,10 +47,9 @@ begin
   ErrorMsg := Application.CheckOptions('X:H:F:', 'request: header: form:');
   if ErrorMsg <> '' then
     raise Exception.Create(ErrorMsg);
-  if Application.HasOption('X', 'request') then begin
-    Value := Application.GetOptionValue('X', 'request');
-    Form1.cbMethod.Text := UpperCase(Value);
-  end;
+  ReqMethod := '';
+  if Application.HasOption('X', 'request') then
+    ReqMethod := Application.GetOptionValue('X', 'request');
   if Application.HasOption('H', 'header') then begin
     Values := Application.GetOptionValues('H', 'header');
     for I := Length(Values) - 1 downto 0 do begin
@@ -52,6 +57,20 @@ begin
       Form1.AddRequestHeader(KV.Key, KV.Value);
     end;
   end;
+  if Application.HasOption('F', 'form') then begin
+    Values := Application.GetOptionValues('F', 'form');
+    if ReqMethod = '' then
+      ReqMethod := 'POST';
+    for I := Length(Values) - 1 downto 0 do begin
+      KV := SplitKV(Values[I], '=');
+      if LeftStr(KV.Value, 1) = '@' then
+        Form1.AddFormData(KV.Key, RightStr(KV.Value, Length(KV.Value) - 1), True)
+      else
+        Form1.AddFormData(KV.Key, KV.Value);
+    end;
+  end;
+  if ReqMethod <> '' then
+    Form1.cbMethod.Text := UpperCase(ReqMethod);
 end;
 
 begin

@@ -210,9 +210,10 @@ type
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
   public
     procedure ApplyOptions;
-    procedure SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
-      aRow: Integer = -1; isUnique: Boolean = True);
+    function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
+      aRow: Integer = -1; isUnique: Boolean = True): Integer;
     procedure AddRequestHeader(AHeader, AValue: string);
+    procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
   end;
 
 var
@@ -1287,8 +1288,8 @@ begin
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
-procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
-  aRow: Integer; isUnique: Boolean);
+function TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
+  aRow: Integer; isUnique: Boolean): Integer;
 var
   Start: SmallInt;
 begin
@@ -1307,6 +1308,7 @@ begin
     Cells[Start, ARow] := KV.Key;
     Cells[Start + 1, ARow] := KV.Value;
   end;
+  Result := ARow;
 end;
 
 // Add values to request grid.
@@ -1331,6 +1333,21 @@ begin
   finally
     headers.Free;
   end;
+end;
+
+procedure TForm1.AddFormData(AName, AValue: string; isFile: Boolean);
+var
+  isUnique: Boolean = False;
+  KV: TKeyValuePair;
+  Added: Integer;
+begin
+  if AnsiContainsStr(AValue, '[]') then
+    isUnique := False;
+  KV.Key := AName;
+  KV.Value := AValue;
+  Added := SetRowKV(gridForm, KV, -1, isUnique);
+  if isFile then
+    gridForm.Cells[3, Added] := 'File';
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
