@@ -210,7 +210,8 @@ type
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
   public
     procedure ApplyOptions;
-    procedure SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1);
+    procedure SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
+      aRow: Integer = -1; isUnique: Boolean = True);
     procedure AddRequestHeader(AHeader, AValue: string);
   end;
 
@@ -1286,22 +1287,23 @@ begin
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
-procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer);
+procedure TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
+  aRow: Integer; isUnique: Boolean);
 var
   Start: SmallInt;
 begin
   Start := 0;
-  // TODO: find dublicates!
   with AGrid do begin
+    if Columns[0].ButtonStyle <> cbsAuto then
+      Start := 1;
+    if isUnique and (Cols[Start].IndexOf(KV.Key) > 0) then
+      Exit;
     if aRow = -1 then begin
       RowCount := RowCount + 1;
       ARow := RowCount - 1;
     end;
-    if Columns[0].ButtonStyle <> cbsAuto then begin
-      Start := 1;
-      if Columns[0].ButtonStyle = cbsCheckboxColumn then
-        Cells[0, ARow] := '1';
-    end;
+    if Columns[0].ButtonStyle = cbsCheckboxColumn then
+      Cells[0, ARow] := '1';
     Cells[Start, ARow] := KV.Key;
     Cells[Start + 1, ARow] := KV.Value;
   end;
