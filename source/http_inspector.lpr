@@ -32,6 +32,13 @@ begin
     '    by -X option. When a value prefixed by @ then it treated as file upload.' + crlf +
     '-C,--cookie=<name=value>' + crlf +
     '    Include a cookie to the request.' + crlf +
+    '-d,--data=<data>' + crlf +
+    '    Send the specified data in a POST request (may be overrided by -X option).' + crlf +
+    '    Compare to the -F option you will need to specify Content-Type header.' + crlf +
+    '    Data from this option will appear in "Other" view of "Body" tab.' + crlf +
+    '-j,--json=<json>' + crlf +
+    '    Like -d but appends Content-Type: application/json header.' + crlf +
+    '    Data from this option will appear in "Json" view of "Body" tab.' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -39,8 +46,10 @@ end;
 
 procedure HandleCommandLine;
 const
-  LongOpts: array [1..4] of string = ('request:', 'header:', 'form:', 'cookie:');
-  ShortOpts: string = 'X:H:F:C:';
+  LongOpts: array [1..6] of string = ('request:', 'header:', 'form:',
+            'cookie:', 'data:', 'json:'
+  );
+  ShortOpts: string = 'X:H:F:C:d:j:';
 var
   ErrorMsg, ReqMethod: string;
   I: Integer;
@@ -83,6 +92,12 @@ begin
     for I := Length(Values) - 1 downto 0 do
       Form1.SetRowKV(Form1.gridReqCookie, SplitKV(Values[I], '='));
   end;
+  // Body data.
+  if Application.HasOption('d', 'data') then
+    Form1.editOther.Text := Application.GetOptionValue('d', 'data');
+  // Json data.
+  if Application.HasOption('j', 'json') then
+    Form1.editJson.Text := Application.GetOptionValue('j', 'json');
   // Non options values are for url but we need only one url so use
   // the first value.
   Values := Application.GetNonOptions(ShortOpts, LongOpts);
