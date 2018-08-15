@@ -39,6 +39,8 @@ begin
     '-j,--json=<json>' + crlf +
     '    Like -d but appends Content-Type: application/json header.' + crlf +
     '    Data from this option will appear in "Json" view of "Body" tab.' + crlf +
+    '-f,--file=<file>' + crlf +
+    '    Open request data from the specified file.' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -46,12 +48,12 @@ end;
 
 procedure HandleCommandLine;
 const
-  LongOpts: array [1..6] of string = ('request:', 'header:', 'form:',
-            'cookie:', 'data:', 'json:'
+  LongOpts: array [1..7] of string = ('request:', 'header:', 'form:',
+            'cookie:', 'data:', 'json:', 'file:'
   );
-  ShortOpts: string = 'X:H:F:C:d:j:';
+  ShortOpts: string = 'X:H:F:C:d:j:f:';
 var
-  ErrorMsg, ReqMethod: string;
+  ErrorMsg, ReqMethod, Value, FileName: string;
   I: Integer;
   Values: TStringArray;
   KV: TKeyValuePair;
@@ -98,6 +100,13 @@ begin
   // Json data.
   if Application.HasOption('j', 'json') then
     Form1.editJson.Text := Application.GetOptionValue('j', 'json');
+  // Open request file.
+  if Application.HasOption('f', 'file') then begin
+    FileName := Application.GetOptionValue('f', 'file');
+    if not FileGetContents(FileName, Value) then
+      raise Exception.Create('cannot read file: ' + FileName);
+    Form1.OpenRequestFile(Value);
+  end;
   // Non options values are for url but we need only one url so use
   // the first value.
   Values := Application.GetNonOptions(ShortOpts, LongOpts);

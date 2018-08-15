@@ -214,6 +214,7 @@ type
       aRow: Integer = -1; isUnique: Boolean = True): Integer;
     procedure AddRequestHeader(AHeader, AValue: string);
     procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
+    procedure OpenRequestFile(jsonStr: string);
   end;
 
 var
@@ -702,8 +703,6 @@ end;
 procedure TForm1.miOpenRequestClick(Sender: TObject);
 var
   jsonStr: string;
-  streamer: TJSONDeStreamer;
-  obj: TRequestObject;
 begin
   if not PromptNewRequest('Do you want to open a request file ?', 'Open request file') then Exit;
 
@@ -715,34 +714,7 @@ begin
       Exit;
     end;
 
-    streamer := TJSONDeStreamer.Create(nil);
-    obj := TRequestObject.Create;
-
-    try
-      streamer.JSONToObject(jsonStr, obj);
-      StartNewRequest;
-      cbUrl.Text := obj.Url;
-      cbMethod.Text := obj.Method;
-      editOther.Text := obj.Body;
-      editJson.Text := obj.Json;
-
-      obj.SetCollectionToGrid(obj.Headers, requestHeaders);
-      obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
-      obj.SetCollectionToGrid(obj.Params, gridParams);
-      obj.GetForm(gridForm);
-
-      SelectAuthTab(TAuthTab(obj.AuthType));
-      editBasicLogin.Text    := obj.AuthBasic.Login;
-      editBasicPassword.Text := obj.AuthBasic.Password;
-      editBearerPrefix.Text  := obj.AuthBearer.Prefix;
-      editBearerToken.Text   := obj.AuthBearer.Token;
-
-    except on E: Exception do
-        ShowMessage(E.Message);
-    end;
-
-    streamer.Free;
-    obj.Free;
+    OpenRequestFile(jsonStr);
   end;
 end;
 
@@ -1348,6 +1320,41 @@ begin
   Added := SetRowKV(gridForm, KV, -1, isUnique);
   if isFile then
     gridForm.Cells[3, Added] := 'File';
+end;
+
+procedure TForm1.OpenRequestFile(jsonStr: string);
+var
+  streamer: TJSONDeStreamer;
+  obj: TRequestObject;
+begin
+  streamer := TJSONDeStreamer.Create(nil);
+  obj := TRequestObject.Create;
+
+  try
+    streamer.JSONToObject(jsonStr, obj);
+    StartNewRequest;
+    cbUrl.Text := obj.Url;
+    cbMethod.Text := obj.Method;
+    editOther.Text := obj.Body;
+    editJson.Text := obj.Json;
+
+    obj.SetCollectionToGrid(obj.Headers, requestHeaders);
+    obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
+    obj.SetCollectionToGrid(obj.Params, gridParams);
+    obj.GetForm(gridForm);
+
+    SelectAuthTab(TAuthTab(obj.AuthType));
+    editBasicLogin.Text    := obj.AuthBasic.Login;
+    editBasicPassword.Text := obj.AuthBasic.Password;
+    editBearerPrefix.Text  := obj.AuthBearer.Prefix;
+    editBearerToken.Text   := obj.AuthBearer.Token;
+
+  except on E: Exception do
+      ShowMessage(E.Message);
+  end;
+
+  streamer.Free;
+  obj.Free;
 end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
