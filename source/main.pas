@@ -1378,16 +1378,7 @@ function TForm1.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = 
 var
   p: integer;
 begin
-  // TODO: use SplitKV() functions from app_helpers.
-  p := Pos(delim, line);
-  if p = 0 then
-  begin
-    Result.Key := line;
-    Result.Value := '';
-    Exit; // =>
-  end;
-  Result.Key := LeftStr(line, p - 1);
-  Result.Value := Trim(RightStr(line, Length(line) - p));
+  Result := SplitKV(line, delim);
   p := Pos(';', Result.Value);
   if (not all) and (p <> 0) then Result.Value := Trim(LeftStr(Result.Value, p - 1));
 end;
