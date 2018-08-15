@@ -38,6 +38,9 @@ begin
 end;
 
 procedure HandleCommandLine;
+const
+  LongOpts: array [1..4] of string = ('request:', 'header:', 'form:', 'cookie:');
+  ShortOpts: string = 'X:H:F:C:';
 var
   ErrorMsg, ReqMethod: string;
   I: Integer;
@@ -46,12 +49,14 @@ var
 begin
   if Application.HasOption('h', 'help') then
     raise Exception.Create(Usage);
-  ErrorMsg := Application.CheckOptions('X:H:F:C:', 'request: header: form: cookie:');
+  ErrorMsg := Application.CheckOptions(ShortOpts, LongOpts);
   if ErrorMsg <> '' then
     raise Exception.Create(ErrorMsg);
   ReqMethod := '';
+  // A request method.
   if Application.HasOption('X', 'request') then
     ReqMethod := Application.GetOptionValue('X', 'request');
+  // Request headers.
   if Application.HasOption('H', 'header') then begin
     Values := Application.GetOptionValues('H', 'header');
     for I := Length(Values) - 1 downto 0 do begin
@@ -59,6 +64,7 @@ begin
       Form1.AddRequestHeader(KV.Key, KV.Value);
     end;
   end;
+  // Form data.
   if Application.HasOption('F', 'form') then begin
     Values := Application.GetOptionValues('F', 'form');
     if ReqMethod = '' then
@@ -71,11 +77,17 @@ begin
         Form1.AddFormData(KV.Key, KV.Value);
     end;
   end;
+  // Cookies.
   if Application.HasOption('C', 'cookie') then begin
     Values := Application.GetOptionValues('C', 'cookie');
     for I := Length(Values) - 1 downto 0 do
       Form1.SetRowKV(Form1.gridReqCookie, SplitKV(Values[I], '='));
   end;
+  // Non options values are for url but we need only one url so use
+  // the first value.
+  Values := Application.GetNonOptions(ShortOpts, LongOpts);
+  if Length(Values) > 0 then
+    Form1.cbUrl.Text := Values[0];
   if ReqMethod <> '' then
     Form1.cbMethod.Text := UpperCase(ReqMethod);
 end;
