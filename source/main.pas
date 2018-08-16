@@ -189,7 +189,6 @@ type
     procedure ShowResponseCookie(Headers: TStrings);
     function GetRequestFilename(ext: string = ''): string;
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
-    procedure StartNewRequest;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     function EditGridRow(Grid: TStringGrid;
       const ValueFocused: Boolean = False): TModalResult;
@@ -197,13 +196,9 @@ type
     procedure SetAppCaption(const AValue: String = '');
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
+    function FormatJson(json: TJSONData): string;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
-    function FormatJson(json: TJSONData): string;
-    procedure SelectBodyTab(const tab: tbodytab);
-    procedure SelectAuthTab(const tab: TAuthTab);
-    function GetSelectedBodyTab: TBodyTab;
-    function GetSelectedAuthTab: TAuthTab;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
@@ -217,6 +212,12 @@ type
     procedure AddRequestHeader(AHeader, AValue: string);
     procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
     procedure OpenRequestFile(jsonStr: string);
+    procedure SelectBodyTab(const tab: tbodytab);
+    procedure SelectAuthTab(const tab: TAuthTab);
+    function GetSelectedBodyTab: TBodyTab;
+    function GetSelectedAuthTab: TAuthTab;
+    procedure StartNewRequest;
+    function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
   end;
 
 var
@@ -954,28 +955,12 @@ end;
 
 procedure TForm1.tbtnBodyFormatClick(Sender: TObject);
 var
-  ss: TStringStream;
-  parser: TJSONParser;
-  data: TJSONData;
+  ErrMsg: string;
 begin
-  data := nil;
   if Length(Trim(editJson.Text)) = 0 then
     Exit;
-  try
-    ss := TStringStream.Create(editJson.Text);
-    Parser := TJSONParser.Create(ss);
-    try
-      Data := Parser.Parse;
-      editJson.Text := FormatJson(Data);
-    except
-      on E: Exception do
-        ShowMessage(E.Message);
-    end;
-  finally
-    FreeAndNil(ss);
-    FreeAndNil(parser);
-    FreeAndNil(data);
-  end;
+  if not SetJsonBody(editJson.Text, ErrMsg) then
+    ShowMessage(ErrMsg);
 end;
 
 procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
@@ -1684,6 +1669,33 @@ begin
   SelectAuthTab(atNone);
 
   SetAppCaption;
+end;
+
+function TForm1.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
+var
+  ss: TStringStream;
+  parser: TJSONParser;
+  data: TJSONData;
+begin
+  data := nil;
+  Result := True;
+  try
+    ss := TStringStream.Create(jsonStr);
+    Parser := TJSONParser.Create(ss);
+    try
+      Data := Parser.Parse;
+      editJson.Text := FormatJson(Data);
+    except
+      on E: Exception do begin
+        Result := False;
+        ErrMsg := E.Message;
+      end;
+    end;
+  finally
+    FreeAndNil(ss);
+    FreeAndNil(parser);
+    FreeAndNil(data);
+  end;
 end;
 
 // Get StringGrid instance from Popup sender.

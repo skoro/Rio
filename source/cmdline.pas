@@ -87,6 +87,7 @@ begin
       else
         Form1.AddFormData(KV.Key, KV.Value);
     end;
+    Form1.SelectBodyTab(btForm);
   end;
   // Cookies.
   if Application.HasOption('C', 'cookie') then begin
@@ -96,10 +97,17 @@ begin
   end;
   // Body data.
   if Application.HasOption('d', 'data') then
-    Form1.editOther.Text := Application.GetOptionValue('d', 'data');
+    with Form1 do begin
+      editOther.Text := Application.GetOptionValue('d', 'data');
+      SelectBodyTab(btOther);
+    end;
   // Json data.
   if Application.HasOption('j', 'json') then
-    Form1.editJson.Text := Application.GetOptionValue('j', 'json');
+    with Form1 do begin
+      if not SetJsonBody(Application.GetOptionValue('j', 'json'), ErrorMsg) then
+        raise Exception.Create(ErrorMsg);
+      SelectBodyTab(btJson);
+    end;
   // Open request file.
   if Application.HasOption('f', 'file') then begin
     FileName := Application.GetOptionValue('f', 'file');
