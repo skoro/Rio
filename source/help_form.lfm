@@ -1,0 +1,39 @@
+object HelpForm: THelpForm
+  Left = 404
+  Height = 290
+  Top = 204
+  Width = 366
+  Caption = 'HelpForm'
+  ClientHeight = 290
+  ClientWidth = 366
+  LCLVersion = '1.8.2.0'
+  object bpButtons: TButtonPanel
+    Left = 6
+    Height = 37
+    Top = 247
+    Width = 354
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    ButtonOrder = boCloseCancelOK
+    TabOrder = 0
+    ShowButtons = [pbClose]
+  end
+  object helpText: TMemo
+    Left = 6
+    Height = 235
+    Top = 6
+    Width = 354
+    Align = alClient
+    BorderSpacing.Around = 6
+    ReadOnly = True
+    ScrollBars = ssAutoBoth
+    TabOrder = 1
+    WordWrap = False
+  end
+end
