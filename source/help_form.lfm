@@ -31,6 +31,8 @@ object HelpForm: THelpForm
     Width = 354
     Align = alClient
     BorderSpacing.Around = 6
+    Font.Pitch = fpFixed
+    ParentFont = False
     ReadOnly = True
     ScrollBars = ssAutoBoth
     TabOrder = 1
