@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miHelpCmd: TMenuItem;
     miJsonFilter: TMenuItem;
     StatusImageSize: TImage;
     StatusTextInfo: TLabel;
@@ -141,6 +142,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miHelpCmdClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
     procedure JsonTreePopupMenuClick(Sender: TObject);
@@ -222,8 +224,8 @@ var
 
 implementation
 
-uses lcltype, about, headers_editor, cookie_form, uriparser,
-  request_object, app_helpers, fpjsonrtti, key_value, strutils, options,
+uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
+  app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
   Clipbrd;
 
 const
@@ -571,6 +573,14 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TForm1.miHelpCmdClick(Sender: TObject);
+begin
+  with THelpForm.Create(Self) do begin
+    ShowModal('Command line help', Usage);
+    Free;
+  end;
 end;
 
 procedure TForm1.JsonTreeDblClick(Sender: TObject);
