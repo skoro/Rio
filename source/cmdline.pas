@@ -41,6 +41,8 @@ begin
     '    Data from this option will appear in "Json" view of "Body" tab.' + crlf +
     '-f,--file=<file>' + crlf +
     '    Open request data from the specified file.' + crlf +
+    '--new' + crlf +
+    '    Start a new request. Empty all the request fields and grids.' + crlf +
     crlf,
     [ExtractFileName(Application.ExeName)]
   );
@@ -48,8 +50,8 @@ end;
 
 procedure HandleCommandLine;
 const
-  LongOpts: array [1..7] of string = ('request:', 'header:', 'form:',
-            'cookie:', 'data:', 'json:', 'file:'
+  LongOpts: array [1..8] of string = ('request:', 'header:', 'form:',
+            'cookie:', 'data:', 'json:', 'file:', 'new'
   );
   ShortOpts: string = 'X:H:F:C:d:j:f:';
 var
@@ -63,8 +65,13 @@ begin
   ErrorMsg := Application.CheckOptions(ShortOpts, LongOpts);
   if ErrorMsg <> '' then
     raise Exception.Create(ErrorMsg);
-  ReqMethod := '';
+  // Starts a new request.
+  if Application.HasOption('new') then begin
+    Form1.StartNewRequest;
+    Exit;
+  end;
   // A request method.
+  ReqMethod := '';
   if Application.HasOption('X', 'request') then
     ReqMethod := Application.GetOptionValue('X', 'request');
   // Request headers.
