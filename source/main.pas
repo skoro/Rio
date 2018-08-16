@@ -218,6 +218,7 @@ type
     function GetSelectedAuthTab: TAuthTab;
     procedure StartNewRequest;
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
+    procedure SubmitRequest;
   end;
 
 var
@@ -237,6 +238,11 @@ const
 { TForm1 }
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
+begin
+  SubmitRequest;
+end;
+
+procedure TForm1.SubmitRequest;
 var
   url, method, formData, contentType: string;
   i: integer;
@@ -579,7 +585,7 @@ end;
 procedure TForm1.miHelpCmdClick(Sender: TObject);
 begin
   with THelpForm.Create(Self) do begin
-    ShowModal('Command line help', Usage);
+    ShowModal('Command line help', Trim(Usage));
     Free;
   end;
 end;

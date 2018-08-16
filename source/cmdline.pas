@@ -115,13 +115,17 @@ begin
       raise Exception.Create('cannot read file: ' + FileName);
     Form1.OpenRequestFile(Value);
   end;
+  // Set request method.
+  if ReqMethod <> '' then
+    Form1.cbMethod.Text := UpperCase(ReqMethod);
   // Non options values are for url but we need only one url so use
   // the first value.
   Values := Application.GetNonOptions(ShortOpts, LongOpts);
   if Length(Values) > 0 then
-    Form1.cbUrl.Text := Values[0];
-  if ReqMethod <> '' then
-    Form1.cbMethod.Text := UpperCase(ReqMethod);
+    with Form1 do begin
+      cbUrl.Text := Values[0];
+      SubmitRequest;
+    end;
 end;
 
 end.
