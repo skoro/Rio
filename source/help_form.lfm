@@ -6,6 +6,7 @@ object HelpForm: THelpForm
   Caption = 'HelpForm'
   ClientHeight = 290
   ClientWidth = 366
+  Position = poMainFormCenter
   LCLVersion = '1.8.2.0'
   object bpButtons: TButtonPanel
     Left = 6
