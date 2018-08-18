@@ -8,13 +8,14 @@ unit rest_explorer;
 interface
 
 uses
-  GridNavigator, LazarusPackageIntf;
+  GridNavigator, inputbuttons, LazarusPackageIntf;
 
 implementation
 
 procedure Register;
 begin
   RegisterUnit('GridNavigator', @GridNavigator.Register);
+  RegisterUnit('inputbuttons', @inputbuttons.Register);
 end;
 
 initialization

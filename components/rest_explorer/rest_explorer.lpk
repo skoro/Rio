@@ -7,17 +7,22 @@
     <CompilerOptions>
       <Version Value="11"/>
       <SearchPaths>
-        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)/"/>
+        <UnitOutputDirectory Value="lib/$(TargetCPU)-$(TargetOS)"/>
       </SearchPaths>
     </CompilerOptions>
     <Description Value="Some components are used in RestExplorer app."/>
     <Version Minor="1"/>
-    <Files Count="1">
+    <Files Count="2">
       <Item1>
         <Filename Value="gridnavigator.pas"/>
         <HasRegisterProc Value="True"/>
         <UnitName Value="GridNavigator"/>
       </Item1>
+      <Item2>
+        <Filename Value="inputbuttons.pas"/>
+        <HasRegisterProc Value="True"/>
+        <UnitName Value="inputbuttons"/>
+      </Item2>
     </Files>
     <RequiredPkgs Count="2">
       <Item1>
@@ -33,5 +38,8 @@
     <PublishOptions>
       <Version Value="2"/>
     </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
   </Package>
 </CONFIG>
