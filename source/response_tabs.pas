@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls,
-  Forms, StdCtrls, EditBtn, SynEdit, thread_http_client;
+  Forms, StdCtrls, SynEdit, thread_http_client, inputbuttons;
 
 type
 
@@ -101,7 +101,7 @@ type
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
     FSynEdit: TSynEdit;
-    FFilter: TEditButton;
+    FFilter: TInputButtons;
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
     FOnJsonData: TOnJsonData;
@@ -120,7 +120,7 @@ type
     procedure OnChangeTreeMode(Sender: TObject);
     procedure OnChangeFormatMode(Sender: TObject);
     procedure OnFilterClick(Sender: TObject);
-    procedure OnFilterKeyPress(Sender: TObject; var Key: char);
+    procedure OnFilterReset(Sender: TObject);
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure ToggleFilterPanel;
@@ -365,15 +365,11 @@ begin
   ApplyFilter;
 end;
 
-procedure TResponseJsonTab.OnFilterKeyPress(Sender: TObject; var Key: char);
+procedure TResponseJsonTab.OnFilterReset(Sender: TObject);
 begin
-  if Key = #13 then
-    ApplyFilter;
-  if Key = #27 then begin
-    FFilter.Text := '';
-    FFilter.Visible := False;
-    FBtnFilter.Down := False;
-  end;
+  FFilter.Visible := False;
+  FBtnFilter.Down := False;
+  ApplyFilter;
 end;
 
 procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
@@ -433,13 +429,12 @@ begin
 
   CreateToolbar(ATabSheet);
 
-  FFilter := TEditButton.Create(ATabSheet);
+  FFilter := TInputButtons.Create(ATabSheet);
   FFilter.Parent := ATabSheet;
   FFilter.Align := alBottom;
-  FFilter.ButtonCaption := 'Filter';
-  FFilter.ButtonWidth := 64;
-  FFilter.OnButtonClick := @OnFilterClick;
-  FFilter.OnKeyPress := @OnFilterKeyPress;
+  FFilter.ExecButton.Caption := 'Filter';
+  FFilter.OnExecClick := @OnFilterClick;
+  FFilter.OnResetClick := @OnFilterReset;
   FFilter.OnKeyDown := @InternalOnKeyDown;
   FFilter.Visible := False;
 
