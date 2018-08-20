@@ -9,7 +9,7 @@ uses
   Buttons, StdCtrls;
 
 type
-  TInputButtons = class(TCustomPanel)
+  TInputButtons = class(TPanel)
   private
     FResetButton: TSpeedButton;
     FExecButton: TSpeedButton;
