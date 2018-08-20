@@ -6,6 +6,9 @@ object HelpForm: THelpForm
   Caption = 'HelpForm'
   ClientHeight = 290
   ClientWidth = 366
+  KeyPreview = True
+  OnKeyPress = FormKeyPress
+  OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
