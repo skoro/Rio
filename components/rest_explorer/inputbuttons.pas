@@ -9,6 +9,9 @@ uses
   Buttons, StdCtrls;
 
 type
+
+  { TInputButtons }
+
   TInputButtons = class(TPanel)
   private
     FResetButton: TSpeedButton;
@@ -35,6 +38,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure AddHistory; virtual;
   published
     property ExecButton: TSpeedButton read FExecButton;
     property ResetButton: TSpeedButton read FResetButton;
@@ -143,7 +147,7 @@ procedure TInputButtons.ExecClick;
 begin
   if FInput.Text = '' then
     Exit;
-  FInput.AddHistoryItem(FInput.Text, 10, True, True);
+  AddHistory;
   if Assigned(FOnExecClick) then
     FOnExecClick(Self);
 end;
@@ -176,6 +180,11 @@ end;
 destructor TInputButtons.Destroy;
 begin
   inherited Destroy;
+end;
+
+procedure TInputButtons.AddHistory;
+begin
+  FInput.AddHistoryItem(FInput.Text, 10, True, True);
 end;
 
 end.
