@@ -526,6 +526,7 @@ begin
       if not FFilter.Visible then
         ToggleFilterPanel;
       ApplyFilter;
+      FFilter.AddHistory;
     end;
 
   finally
