@@ -30,6 +30,7 @@ type
     editBearerToken: TLabeledEdit;
     editJson: TSynEdit;
     editOther: TMemo;
+    dlgFind: TFindDialog;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
     gridForm: TStringGrid;
@@ -43,6 +44,9 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miFindNext: TMenuItem;
+    miSep1: TMenuItem;
+    miFind: TMenuItem;
     miHelpCmd: TMenuItem;
     miJsonFilter: TMenuItem;
     StatusImageSize: TImage;
@@ -142,6 +146,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miFindClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
@@ -580,6 +585,13 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TForm1.miFindClick(Sender: TObject);
+begin
+  if dlgFind.Execute then begin
+
+  end;
 end;
 
 procedure TForm1.miHelpCmdClick(Sender: TObject);
@@ -1421,6 +1433,7 @@ var
   i, p: integer;
   h: string;
   mime: TMimeType;
+  FindEnabled: Boolean;
 begin
   btnSubmit.Enabled := True;
   SetAppCaption(cbUrl.Text);
@@ -1455,7 +1468,6 @@ begin
   ShowResponseCookie(Info.ResponseHeaders);
 
   // Get the response content - enable menu item.
-  //miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
   miSaveResponse.Enabled := True;
 
   Info.Content.Position := 0;
@@ -1470,6 +1482,9 @@ begin
   else
     tabContent.TabVisible := False;
 
+  // Find always enabled when Content tab is visible.
+  FindEnabled := tabContent.TabVisible;
+
   if tabContent.TabVisible then begin
     with responseRaw.Lines do begin
       BeginUpdate;
@@ -1481,6 +1496,9 @@ begin
     end;
     responseRaw.CaretPos := Point(0, 0);
   end;
+
+  miFind.Enabled := FindEnabled;
+  miFindNext.Enabled := False;
 end;
 
 procedure TForm1.UpdateStatusLine(Main: string);
@@ -1664,7 +1682,11 @@ begin
   tabContent.TabVisible := False;
   tabRespCookie.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
+
+  // Menu items.
   miSaveResponse.Enabled := False;
+  miFind.Enabled := False;
+  miFindNext.Enabled := False;
 
   // Reset auth
   editBasicLogin.Text := '';

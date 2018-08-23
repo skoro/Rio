@@ -1510,6 +1510,18 @@ object Form1: TForm1
         ShortCut = 16572
         OnClick = miOptionsClick
       end
+      object miSep1: TMenuItem
+        Caption = '-'
+      end
+      object miFind: TMenuItem
+        Caption = '&Find'
+        ShortCut = 16454
+        OnClick = miFindClick
+      end
+      object miFindNext: TMenuItem
+        Caption = 'Find &next'
+        ShortCut = 114
+      end
     end
     object miHelp: TMenuItem
       Caption = '&Help'
@@ -1872,5 +1884,10 @@ object Form1: TForm1
       Caption = 'Bearer token'
       OnClick = pmAuthTypeClick
     end
+  end
+  object dlgFind: TFindDialog
+    Options = [frDown, frFindNext, frHideEntireScope, frButtonsAtBottom]
+    left = 112
+    top = 440
   end
 end
