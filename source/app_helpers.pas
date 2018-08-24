@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit;
+  Classes, SysUtils, Controls, ValEdit, StdCtrls;
 
 { Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
@@ -27,10 +27,11 @@ function FormatMsApprox(ms: Int64): string;
 function NumberFormat(num: Int64; dot: string = '.'): string;
 { Finds all the named controls in an owner control. }
 procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
+function FindInMemo(AMemo: TMemo; Search: string; FromPos: Integer = 1): Integer;
 
 implementation
 
-uses process;
+uses process, LazUTF8, strutils;
 
 function FilePutContents(const filename, contents: string): Boolean;
 var
@@ -142,6 +143,16 @@ begin
     if ctrl.ClassName = ControlName then begin
       Controls.Add(ctrl);
     end;
+  end;
+end;
+
+// http://wiki.freepascal.org/TMemo#Search_text
+function FindInMemo(AMemo: TMemo; Search: string; FromPos: Integer): Integer;
+begin
+  Result := PosEx(Search, AMemo.Text, FromPos);
+  if Result > 0 then begin
+    AMemo.SelStart := UTF8Length(PChar(AMemo.Text), Result - 1);
+    AMemo.SelLength := Length(Search);
   end;
 end;
 
