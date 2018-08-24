@@ -1521,6 +1521,7 @@ object Form1: TForm1
       object miFindNext: TMenuItem
         Caption = 'Find &next'
         ShortCut = 114
+        OnClick = miFindNextClick
       end
     end
     object miHelp: TMenuItem
@@ -1887,6 +1888,7 @@ object Form1: TForm1
   end
   object dlgFind: TFindDialog
     Options = [frDown, frFindNext, frHideEntireScope, frButtonsAtBottom]
+    OnFind = dlgFindFind
     left = 112
     top = 440
   end

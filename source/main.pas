@@ -131,6 +131,7 @@ type
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
+    procedure dlgFindFind(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -147,6 +148,7 @@ type
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
+    procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
@@ -183,6 +185,7 @@ type
     FHttpClient: TThreadHttpClient;
     FResponseTabManager: TResponseTabManager;
     FResponseJsonTab: TResponseJsonTab;
+    FFindTextPos: Integer;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -224,6 +227,7 @@ type
     procedure StartNewRequest;
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
     procedure SubmitRequest;
+    procedure FindText;
   end;
 
 var
@@ -392,6 +396,20 @@ begin
   FHttpClient.Start;
 end;
 
+procedure TForm1.FindText;
+var
+  p: Integer;
+begin
+  if tabContent.TabVisible then begin
+     p := FindInMemo(responseRaw, dlgFind.FindText, FFindTextPos);
+     if pagesResponse.ActivePage <> tabContent then
+       pagesResponse.ActivePage := tabContent;
+     responseRaw.SetFocus;
+     if p > 0 then
+       FFindTextPos := p + Length(dlgFind.FindText);
+  end;
+end;
+
 procedure TForm1.cbBasicShowPasswordClick(Sender: TObject);
 begin
   if cbBasicShowPassword.Checked then
@@ -408,6 +426,14 @@ end;
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
 begin
   if key = #13 then btnSubmitClick(Sender);
+end;
+
+procedure TForm1.dlgFindFind(Sender: TObject);
+begin
+  FFindTextPos := 1;
+  FindText;
+  dlgFind.CloseDialog;
+  miFindNext.Enabled := True;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -589,9 +615,18 @@ end;
 
 procedure TForm1.miFindClick(Sender: TObject);
 begin
-  if dlgFind.Execute then begin
-
+  if pagesResponse.ActivePage = tabContent then begin
+    if responseRaw.SelText <> '' then
+      dlgFind.FindText := responseRaw.SelText;
   end;
+  if dlgFind.Execute then begin
+    FFindTextPos := 1;
+  end;
+end;
+
+procedure TForm1.miFindNextClick(Sender: TObject);
+begin
+  FindText;
 end;
 
 procedure TForm1.miHelpCmdClick(Sender: TObject);
@@ -1433,7 +1468,6 @@ var
   i, p: integer;
   h: string;
   mime: TMimeType;
-  FindEnabled: Boolean;
 begin
   btnSubmit.Enabled := True;
   SetAppCaption(cbUrl.Text);
@@ -1483,7 +1517,9 @@ begin
     tabContent.TabVisible := False;
 
   // Find always enabled when Content tab is visible.
-  FindEnabled := tabContent.TabVisible;
+  miFind.Enabled := tabContent.TabVisible;
+  if not miFind.Enabled then
+    miFindNext.Enabled := False;
 
   if tabContent.TabVisible then begin
     with responseRaw.Lines do begin
@@ -1496,9 +1532,6 @@ begin
     end;
     responseRaw.CaretPos := Point(0, 0);
   end;
-
-  miFind.Enabled := FindEnabled;
-  miFindNext.Enabled := False;
 end;
 
 procedure TForm1.UpdateStatusLine(Main: string);
