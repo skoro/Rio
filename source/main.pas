@@ -412,7 +412,10 @@ begin
        responseRaw.SetFocus;
        responseRaw.SelStart := fp.SelStart;
        responseRaw.SelLength := UTF8Length(dlgFind.FindText);
-       FFindTextPos := fp.Pos + responseRaw.SelLength;
+       if frDown in dlgFind.Options then
+         FFindTextPos := fp.Pos + responseRaw.SelLength
+       else
+         FFindTextPos := fp.Pos - responseRaw.SelLength;
      end
      else begin
        if FFindTextPos = 1 then
