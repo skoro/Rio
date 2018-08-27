@@ -10,7 +10,14 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit, StdCtrls;
+  Classes, SysUtils, Controls, ValEdit, StdCtrls, Dialogs;
+
+type
+
+  TFindPos = record
+    Pos: Integer;
+    SelStart: Integer;
+  end;
 
 { Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
@@ -27,7 +34,8 @@ function FormatMsApprox(ms: Int64): string;
 function NumberFormat(num: Int64; dot: string = '.'): string;
 { Finds all the named controls in an owner control. }
 procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
-function FindInMemo(AMemo: TMemo; Search: string; FromPos: Integer = 1): Integer;
+
+function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 1): TFindPos;
 
 implementation
 
@@ -147,13 +155,26 @@ begin
 end;
 
 // http://wiki.freepascal.org/TMemo#Search_text
-function FindInMemo(AMemo: TMemo; Search: string; FromPos: Integer): Integer;
+function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer): TFindPos;
+var
+  p: Integer;
 begin
-  Result := PosEx(Search, AMemo.Text, FromPos);
-  if Result > 0 then begin
-    AMemo.SelStart := UTF8Length(PChar(AMemo.Text), Result - 1);
-    AMemo.SelLength := Length(Search);
+  if frDown in Options then
+    p := PosEx(Search, AText, FromPos)
+  else begin
+    if FromPos = 1 then
+      FromPos := UTF8Length(AText);
+    p := RPosex(Search, AText, FromPos);
   end;
+
+  Result.Pos := -1;
+  Result.SelStart := -1;
+
+  if p = 0 then
+    Exit;
+
+  Result.Pos := p;
+  Result.SelStart := UTF8Length(PChar(AText), p - 1);
 end;
 
 end.
