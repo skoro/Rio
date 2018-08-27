@@ -237,7 +237,7 @@ implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
-  Clipbrd;
+  Clipbrd, LazUTF8;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -398,15 +398,26 @@ end;
 
 procedure TForm1.FindText;
 var
-  p: Integer;
+  fp: TFindPos;
 begin
   if tabContent.TabVisible then begin
-     p := FindInMemo(responseRaw, dlgFind.FindText, FFindTextPos);
-     if pagesResponse.ActivePage <> tabContent then
-       pagesResponse.ActivePage := tabContent;
-     responseRaw.SetFocus;
-     if p > 0 then
-       FFindTextPos := p + Length(dlgFind.FindText);
+     fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+     if (fp.pos = -1) and (FFindTextPos > 1) then begin
+       FFindTextPos := 1;
+       fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+     end;
+     if fp.pos >= 0 then begin
+       if pagesResponse.ActivePage <> tabContent then
+         pagesResponse.ActivePage := tabContent;
+       responseRaw.SetFocus;
+       responseRaw.SelStart := fp.SelStart;
+       responseRaw.SelLength := UTF8Length(dlgFind.FindText);
+       FFindTextPos := fp.Pos + responseRaw.SelLength;
+     end
+     else begin
+       if FFindTextPos = 1 then
+         ShowMessage(Format('%s not found.', [dlgFind.FindText]));
+     end;
   end;
 end;
 
@@ -430,9 +441,9 @@ end;
 
 procedure TForm1.dlgFindFind(Sender: TObject);
 begin
+  dlgFind.CloseDialog;
   FFindTextPos := 1;
   FindText;
-  dlgFind.CloseDialog;
   miFindNext.Enabled := True;
 end;
 
