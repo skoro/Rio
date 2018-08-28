@@ -158,23 +158,38 @@ end;
 function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer): TFindPos;
 var
   p: Integer;
+  StrRes: string;
+  done: Boolean;
 begin
-  if frDown in Options then
-    p := PosEx(Search, AText, FromPos)
-  else begin
-    if FromPos = 1 then
-      FromPos := UTF8Length(AText);
-    p := RPosex(Search, AText, FromPos);
+  done := False;
+
+  while not done do begin
+    if not (frMatchCase in Options) then begin
+      AText := LowerCase(AText);
+      Search := LowerCase(Search);
+    end;
+
+    if frDown in Options then
+      p := PosEx(Search, AText, FromPos)
+    else begin
+      if FromPos = 1 then
+        FromPos := UTF8Length(AText);
+      p := RPosex(Search, AText, FromPos);
+    end;
+
+    Result.Pos := -1;
+    Result.SelStart := -1;
+
+    if p = 0 then
+      Exit;
+
+    Result.Pos := p;
+    Result.SelStart := UTF8Length(PChar(AText), p - 1);
+
+    StrRes := MidBStr(AText, p, Length(Search));
+
+    done := True;
   end;
-
-  Result.Pos := -1;
-  Result.SelStart := -1;
-
-  if p = 0 then
-    Exit;
-
-  Result.Pos := p;
-  Result.SelStart := UTF8Length(PChar(AText), p - 1);
 end;
 
 end.
