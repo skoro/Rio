@@ -186,9 +186,15 @@ begin
     Result.Pos := p;
     Result.SelStart := UTF8Length(PChar(AText), p - 1);
 
-    StrRes := MidBStr(AText, p, Length(Search));
-
-    done := True;
+    if frWholeWord in Options then begin
+      StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
+      if ((p = 1) or (StrRes[1] in StdWordDelims)) and
+          (StrRes[Length(StrRes)] in StdWordDelims) then
+        Done := True;
+      FromPos := p + Length(Search);
+    end
+    else
+      done := True;
   end;
 end;
 
