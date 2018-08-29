@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit, StdCtrls, Dialogs;
+  Classes, SysUtils, Controls, ValEdit, Dialogs;
 
 type
 
