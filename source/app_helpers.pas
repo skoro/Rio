@@ -17,6 +17,7 @@ type
   TFindPos = record
     Pos: Integer;
     SelStart: Integer;
+    SelLength: Integer;
   end;
 
 { Save string contents to a file }
@@ -185,6 +186,7 @@ begin
 
     Result.Pos := p;
     Result.SelStart := UTF8Length(PChar(AText), p - 1);
+    Result.SelLength := UTF8Length(Search);
 
     if frWholeWord in Options then begin
       StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
