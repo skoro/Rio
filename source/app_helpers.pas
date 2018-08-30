@@ -166,8 +166,8 @@ begin
 
   while not done do begin
     if not (frMatchCase in Options) then begin
-      AText := LowerCase(AText);
-      Search := LowerCase(Search);
+      AText := Utf8LowerCase(AText);
+      Search := Utf8LowerCase(Search);
     end;
 
     if frDown in Options then
