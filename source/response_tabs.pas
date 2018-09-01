@@ -5,8 +5,8 @@ unit response_tabs;
 interface
 
 uses
-  Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls,
-  Forms, StdCtrls, SynEdit, thread_http_client, inputbuttons;
+  Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls, Forms,
+  StdCtrls, Dialogs, SynEdit, SynEditTypes, thread_http_client, inputbuttons;
 
 type
 
@@ -24,6 +24,9 @@ type
     procedure FreeTab; virtual;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); virtual; abstract;
     procedure Save(const AFileName: string); virtual;
+    function CanFind: Boolean; virtual;
+    procedure InitSearch(Search: string; Options: TFindOptions); virtual;
+    function FindNext: Boolean; virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -48,6 +51,7 @@ type
     procedure RegisterTab(Tab: TResponseTab);
     procedure OpenTabs(ResponseInfo: TResponseInfo);
     procedure Save(const FileName: string);
+    function CanFind: TResponseTab; virtual;
     property PageControl: TPageControl read FPageControl write FPageControl;
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
     property OnSaveTab: TOnSaveTab read FOnSaveTab write FOnSaveTab;
@@ -105,6 +109,8 @@ type
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
     FOnJsonData: TOnJsonData;
+    FSearchText: string;
+    FSearchOptions: TSynSearchOptions;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -133,6 +139,9 @@ type
     procedure FreeTab; override;
     procedure Filter(Node: TTreeNode); virtual;
     function IsFilterActive: Boolean;
+    function CanFind: Boolean; override;
+    procedure InitSearch(Search: string; Options: TFindOptions); override;
+    function FindNext: Boolean; override;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -539,6 +548,35 @@ begin
   Result := FFilter.Visible and (Trim(FFilter.Text) <> '');
 end;
 
+function TResponseJsonTab.CanFind: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
+begin
+  FSearchText := Search;
+  FSearchOptions := [];
+  if not (frDown in Options) then
+    Include(FSearchOptions, ssoBackwards);
+  if frMatchCase in Options then
+    Include(FSearchOptions, ssoMatchCase);
+  if frWholeWord in Options then
+    Include(FSearchOptions, ssoWholeWord);
+  Include(FSearchOptions, ssoEntireScope);
+end;
+
+function TResponseJsonTab.FindNext: Boolean;
+var
+  p: Integer;
+begin
+  p := FSynEdit.SearchReplace(FSearchText, '', FSearchOptions);
+  Exclude(FSearchOptions, ssoEntireScope);
+  if p = 0 then
+    Exit(False);
+  Result := True;
+end;
+
 { TResponseTabManager }
 
 constructor TResponseTabManager.Create(APageControl: TPageControl);
@@ -593,6 +631,19 @@ begin
   for Tab in FOpenedTabs do
     if Assigned(FOnSaveTab) then
       FOnSaveTab(FileName, TResponseTab(Tab));
+end;
+
+function TResponseTabManager.CanFind: TResponseTab;
+var
+  Tab: Pointer;
+  rt: TResponseTab;
+begin
+  Result := nil;
+  for Tab in FOpenedTabs do begin
+    rt := TResponseTab(Tab);
+    if rt.CanFind then
+      Exit(rt);
+  end;
 end;
 
 { TResponseImageTab }
@@ -718,6 +769,21 @@ end;
 procedure TResponseTab.Save(const AFileName: string);
 begin
   raise Exception.Create('Save is not implemented.');
+end;
+
+function TResponseTab.CanFind: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TResponseTab.InitSearch(Search: string; Options: TFindOptions);
+begin
+  raise Exception.Create('Tab does not support search');
+end;
+
+function TResponseTab.FindNext: Boolean;
+begin
+  raise Exception.Create('Tab does not support search');
 end;
 
 end.
