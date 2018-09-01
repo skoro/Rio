@@ -237,7 +237,7 @@ implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
-  Clipbrd, LazUTF8;
+  Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -399,28 +399,34 @@ end;
 procedure TForm1.FindText;
 var
   fp: TFindPos;
+  tab: TResponseTab;
+  FindSucc: Boolean;
 begin
-  if tabContent.TabVisible then begin
-     fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
-     if (fp.pos = -1) and (FFindTextPos > 1) then begin
-       FFindTextPos := 1;
-       fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
-     end;
-     if fp.pos >= 0 then begin
-       if pagesResponse.ActivePage <> tabContent then
-         pagesResponse.ActivePage := tabContent;
-       responseRaw.SetFocus;
-       responseRaw.SelStart := fp.SelStart;
-       responseRaw.SelLength := UTF8Length(dlgFind.FindText);
-       if frDown in dlgFind.Options then
-         FFindTextPos := fp.Pos + responseRaw.SelLength
-       else
-         FFindTextPos := fp.Pos - responseRaw.SelLength;
-     end
-     else begin
-       if FFindTextPos = 1 then
-         ShowMessage(Format('%s not found.', [dlgFind.FindText]));
-     end;
+  miFindNext.Enabled := True;
+  tab := FResponseTabManager.CanFind;
+  if (tab <> nil) and (pagesResponse.ActivePage <> tabContent) then begin
+    pagesResponse.ActivePage := tab.TabSheet;
+    FindSucc := tab.FindNext;
+  end
+  else
+    if tabContent.TabVisible then begin
+      pagesResponse.ActivePage := tabContent;
+      fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+      FindSucc := fp.Pos > 0;
+      if FindSucc then begin
+        responseRaw.SelStart  := fp.SelStart;
+        responseRaw.SelLength := fp.SelLength;
+        responseRaw.SetFocus;
+        if frDown in dlgFind.Options then
+          FFindTextPos := fp.Pos + responseRaw.SelLength
+        else
+          FFindTextPos := fp.Pos - responseRaw.SelLength;
+      end;
+    end;
+
+  if not FindSucc then begin
+    miFindNext.Enabled := False;
+    ShowMessage(Format('%s not found.', [dlgFind.FindText]));
   end;
 end;
 
@@ -443,9 +449,14 @@ begin
 end;
 
 procedure TForm1.dlgFindFind(Sender: TObject);
+var
+  tab: TResponseTab;
 begin
   dlgFind.CloseDialog;
   FFindTextPos := 1;
+  tab := FResponseTabManager.CanFind;
+  if tab <> nil then
+    tab.InitSearch(dlgFind.FindText, dlgFind.Options);
   FindText;
   miFindNext.Enabled := True;
 end;
