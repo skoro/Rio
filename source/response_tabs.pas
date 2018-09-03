@@ -420,12 +420,10 @@ begin
     FSearchNodePos := fp.Pos + fp.SelLength;
     Exit(Node);
   end;
-  repeat
-    FSearchNodePos := 1;
-    Next := Node.GetNext;
-    if Next <> nil then
-      Exit(FindInNode(Next)); //=>
-  until Next <> nil;
+  FSearchNodePos := 1;
+  Next := Node.GetNext;
+  if Next <> nil then
+    Exit(FindInNode(Next)); //=>
   Result := nil;
 end;
 
