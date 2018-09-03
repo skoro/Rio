@@ -111,6 +111,8 @@ type
     FOnJsonData: TOnJsonData;
     FSearchText: string;
     FSearchOptions: TSynSearchOptions;
+    FSearchNode: TTreeNode;
+    FSearchNodePos: Integer;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -130,6 +132,7 @@ type
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure ToggleFilterPanel;
+    function FindInNode(Node: TTreeNode): TTreeNode;
   public
     constructor Create;
     destructor Destroy; override;
@@ -154,7 +157,7 @@ type
 
 implementation
 
-uses Menus;
+uses Menus, app_helpers, strutils;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -397,6 +400,35 @@ begin
     FFilter.SetFocus;
 end;
 
+function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
+var
+  Next: TTreeNode;
+  fp: TFindPos;
+  Opts: TFindOptions;
+begin
+  if Node = nil then
+    Exit(nil); //=>
+  Opts := [];
+  if ssoMatchCase in FSearchOptions then
+    Include(Opts, frMatchCase);
+  if ssoWholeWord in FSearchOptions then
+    Include(Opts, frWholeWord);
+  if not (ssoBackwards in FSearchOptions) then
+    Include(Opts, frDown);
+  fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
+  if fp.Pos > 0 then begin
+    FSearchNodePos := fp.Pos + fp.SelLength;
+    Exit(Node);
+  end;
+  repeat
+    FSearchNodePos := 1;
+    Next := Node.GetNext;
+    if Next <> nil then
+      Exit(FindInNode(Next)); //=>
+  until Next <> nil;
+  Result := nil;
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
@@ -557,8 +589,16 @@ procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
 begin
   FSearchText := Search;
   FSearchOptions := [];
-  if not (frDown in Options) then
-    Include(FSearchOptions, ssoBackwards);
+  FSearchNodePos := 1;
+  FSearchNode := nil;
+  if FTreeView.Items.Count > 0 then
+    if not (frDown in Options) then begin
+      Include(FSearchOptions, ssoBackwards);
+      FSearchNode := FTreeView.BottomItem;
+    end
+    else
+      // TopItem is not ready yet.
+      FSearchNode := FTreeView.Items.GetFirstNode.GetNext;
   if frMatchCase in Options then
     Include(FSearchOptions, ssoMatchCase);
   if frWholeWord in Options then
@@ -570,6 +610,13 @@ function TResponseJsonTab.FindNext: Boolean;
 var
   p: Integer;
 begin
+  if ssoBackwards in FSearchOptions then begin
+  end
+  else begin
+    FSearchNode := FindInNode(FSearchNode);
+  end;
+  if FSearchNode <> nil then
+    FSearchNode.Selected := True;
   p := FSynEdit.SearchReplace(FSearchText, '', FSearchOptions);
   Exclude(FSearchOptions, ssoEntireScope);
   if p = 0 then
