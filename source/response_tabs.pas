@@ -599,14 +599,8 @@ begin
   FSearchOptions := [];
   FSearchNodePos := 0;
   FSearchNode := nil;
-  if FTreeView.Items.Count > 0 then
-    if not (frDown in Options) then begin
-      Include(FSearchOptions, ssoBackwards);
-      FSearchNode := FTreeView.BottomItem;
-    end
-    else
-      // TopItem is not ready yet.
-      FSearchNode := FTreeView.Items.GetFirstNode.GetNext;
+  if not (frDown in Options) then
+    Include(FSearchOptions, ssoBackwards);
   if frMatchCase in Options then
     Include(FSearchOptions, ssoMatchCase);
   if frWholeWord in Options then
@@ -618,6 +612,11 @@ function TResponseJsonTab.FindNext: Boolean;
 var
   p: Integer;
 begin
+  if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
+    if ssoBackwards in FSearchOptions then
+      FSearchNode := FTreeView.BottomItem
+    else
+      FSearchNode := FTreeView.Items.GetFirstNode.GetNext;
   FSearchNode := FindInNode(FSearchNode);
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
