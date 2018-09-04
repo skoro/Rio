@@ -453,7 +453,7 @@ var
   tab: TResponseTab;
 begin
   dlgFind.CloseDialog;
-  FFindTextPos := 1;
+  FFindTextPos := 0;
   tab := FResponseTabManager.CanFind;
   if tab <> nil then
     tab.InitSearch(dlgFind.FindText, dlgFind.Options);
@@ -644,9 +644,7 @@ begin
     if responseRaw.SelText <> '' then
       dlgFind.FindText := responseRaw.SelText;
   end;
-  if dlgFind.Execute then begin
-    FFindTextPos := 1;
-  end;
+  dlgFind.Execute;
 end;
 
 procedure TForm1.miFindNextClick(Sender: TObject);
