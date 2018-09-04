@@ -170,8 +170,11 @@ begin
       Search := Utf8LowerCase(Search);
     end;
 
-    if frDown in Options then
-      p := PosEx(Search, AText, FromPos)
+    if frDown in Options then begin
+      if FromPos = 0 then
+        FromPos := 1;
+      p := PosEx(Search, AText, FromPos);
+    end
     else begin
       if FromPos = 0 then
         FromPos := UTF8Length(AText);
