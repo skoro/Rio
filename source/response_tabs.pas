@@ -417,11 +417,21 @@ begin
     Include(Opts, frDown);
   fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
   if fp.Pos > 0 then begin
-    FSearchNodePos := fp.Pos + fp.SelLength;
+    if frDown in Opts then
+      FSearchNodePos := fp.Pos + fp.SelLength
+    else begin
+      FSearchNodePos := fp.Pos - 1;
+      // Don't reset search pos to 0 it will be looped.
+      if FSearchNodePos = 0 then
+        FSearchNodePos := 1;
+    end;
     Exit(Node);
   end;
-  FSearchNodePos := 1;
-  Next := Node.GetNext;
+  FSearchNodePos := 0;
+  if frDown in Opts then
+    Next := Node.GetNext
+  else
+    Next := Node.GetPrev;
   if Next <> nil then
     Exit(FindInNode(Next)); //=>
   Result := nil;
@@ -587,7 +597,7 @@ procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
 begin
   FSearchText := Search;
   FSearchOptions := [];
-  FSearchNodePos := 1;
+  FSearchNodePos := 0;
   FSearchNode := nil;
   if FTreeView.Items.Count > 0 then
     if not (frDown in Options) then begin
@@ -608,11 +618,7 @@ function TResponseJsonTab.FindNext: Boolean;
 var
   p: Integer;
 begin
-  if ssoBackwards in FSearchOptions then begin
-  end
-  else begin
-    FSearchNode := FindInNode(FSearchNode);
-  end;
+  FSearchNode := FindInNode(FSearchNode);
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
   p := FSynEdit.SearchReplace(FSearchText, '', FSearchOptions);
