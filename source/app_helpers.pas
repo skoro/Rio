@@ -36,7 +36,7 @@ function NumberFormat(num: Int64; dot: string = '.'): string;
 { Finds all the named controls in an owner control. }
 procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
 
-function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 1): TFindPos;
+function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 0): TFindPos;
 
 implementation
 
@@ -173,7 +173,7 @@ begin
     if frDown in Options then
       p := PosEx(Search, AText, FromPos)
     else begin
-      if FromPos = 1 then
+      if FromPos = 0 then
         FromPos := UTF8Length(AText);
       p := RPosex(Search, AText, FromPos);
     end;
