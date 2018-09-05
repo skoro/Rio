@@ -40,7 +40,7 @@ function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integ
 
 implementation
 
-uses process, LazUTF8, strutils;
+uses process, LazUTF8, SynEditTypes, strutils;
 
 function FilePutContents(const filename, contents: string): Boolean;
 var
@@ -157,8 +157,10 @@ end;
 
 // http://wiki.freepascal.org/TMemo#Search_text
 function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer): TFindPos;
+const
+  WordDelims = TSynWordBreakChars + TSynWhiteChars;
 var
-  p: Integer;
+  p, wlen: Integer;
   StrRes: string;
   done: Boolean;
 begin
@@ -192,10 +194,22 @@ begin
     Result.SelLength := UTF8Length(Search);
 
     if frWholeWord in Options then begin
-      StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
-      if ((p = 1) or (StrRes[1] in StdWordDelims)) and
-          (StrRes[Length(StrRes)] in StdWordDelims) then
-        Done := True;
+      if (p = 1) then begin
+        if AText = Search then
+          Done := True
+        else
+          if AText[Length(Search) + 1] in WordDelims then
+            Done := True;
+      end
+      else begin
+        StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
+        wlen := Length(StrRes);
+        if (wlen = Length(Search) + 2) then
+          if (StrRes[1] in WordDelims) and (StrRes[wlen] in WordDelims) then
+            Done := True;
+        if (p = Length(AText)) and (StrRes[1] in WordDelims) then
+          Done := True;
+      end;
       FromPos := p + Length(Search);
     end
     else
