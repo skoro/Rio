@@ -213,6 +213,7 @@ type
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
+    procedure FindStart;
   public
     procedure ApplyOptions;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
@@ -401,6 +402,7 @@ var
   fp: TFindPos;
   tab: TResponseTab;
   FindSucc: Boolean;
+  Ans: Integer;
 begin
   miFindNext.Enabled := True;
   tab := FResponseTabManager.CanFind;
@@ -425,8 +427,11 @@ begin
     end;
 
   if not FindSucc then begin
-    miFindNext.Enabled := False;
-    ShowMessage(Format('%s not found.', [dlgFind.FindText]));
+    Ans := Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?'), 'Not found', MB_ICONQUESTION + MB_YESNO);
+    if Ans = ID_YES then
+      FindStart
+    else
+      miFindNext.Enabled := False;
   end;
 end;
 
@@ -449,16 +454,9 @@ begin
 end;
 
 procedure TForm1.dlgFindFind(Sender: TObject);
-var
-  tab: TResponseTab;
 begin
   dlgFind.CloseDialog;
-  FFindTextPos := 0;
-  tab := FResponseTabManager.CanFind;
-  if tab <> nil then
-    tab.InitSearch(dlgFind.FindText, dlgFind.Options);
-  FindText;
-  miFindNext.Enabled := True;
+  FindStart;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -1291,6 +1289,18 @@ begin
     miJsonFilter.Enabled := True
   else
     miJsonFilter.Enabled := False;
+end;
+
+procedure TForm1.FindStart;
+var
+  tab: TResponseTab;
+begin
+  FFindTextPos := 0;
+  tab := FResponseTabManager.CanFind;
+  if tab <> nil then
+    tab.InitSearch(dlgFind.FindText, dlgFind.Options);
+  FindText;
+  miFindNext.Enabled := True;
 end;
 
 procedure TForm1.ApplyOptions;
