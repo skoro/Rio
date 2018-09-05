@@ -113,6 +113,7 @@ type
     FSearchOptions: TSynSearchOptions;
     FSearchNode: TTreeNode;
     FSearchNodePos: Integer;
+    FSearchPos: TPoint;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -599,13 +600,13 @@ begin
   FSearchOptions := [];
   FSearchNodePos := 0;
   FSearchNode := nil;
+  FSearchPos := Point(0, 0);
   if not (frDown in Options) then
     Include(FSearchOptions, ssoBackwards);
   if frMatchCase in Options then
     Include(FSearchOptions, ssoMatchCase);
   if frWholeWord in Options then
     Include(FSearchOptions, ssoWholeWord);
-  Include(FSearchOptions, ssoEntireScope);
 end;
 
 function TResponseJsonTab.FindNext: Boolean;
@@ -620,8 +621,8 @@ begin
   FSearchNode := FindInNode(FSearchNode);
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
-  p := FSynEdit.SearchReplace(FSearchText, '', FSearchOptions);
-  Exclude(FSearchOptions, ssoEntireScope);
+  p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
+  FSearchPos := FSynEdit.CaretXY;
   if p = 0 then
     Exit(False);
   Result := True;
