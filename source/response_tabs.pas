@@ -388,8 +388,8 @@ end;
 procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  // Control-F show/hide filter panel.
-  if (Shift = [ssCtrl]) and (Key = 70) then
+  // Control-E show/hide filter panel.
+  if (Shift = [ssCtrl]) and (Key = 69) then
      InternalOnSwitchFilter(Sender);
 end;
 
