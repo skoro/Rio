@@ -26,7 +26,7 @@ type
     procedure Save(const AFileName: string); virtual;
     function CanFind: Boolean; virtual;
     procedure InitSearch(Search: string; Options: TFindOptions); virtual;
-    function FindNext: Boolean; virtual;
+    function FindNext: Integer; virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -145,7 +145,7 @@ type
     function IsFilterActive: Boolean;
     function CanFind: Boolean; override;
     procedure InitSearch(Search: string; Options: TFindOptions); override;
-    function FindNext: Boolean; override;
+    function FindNext: Integer; override;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -601,15 +601,18 @@ begin
   FSearchNodePos := 0;
   FSearchNode := nil;
   FSearchPos := Point(0, 0);
-  if not (frDown in Options) then
+  if not (frDown in Options) then begin
     Include(FSearchOptions, ssoBackwards);
+    FSearchPos.y := FSynEdit.Lines.Count;
+    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
+  end;
   if frMatchCase in Options then
     Include(FSearchOptions, ssoMatchCase);
   if frWholeWord in Options then
     Include(FSearchOptions, ssoWholeWord);
 end;
 
-function TResponseJsonTab.FindNext: Boolean;
+function TResponseJsonTab.FindNext: Integer;
 var
   p: Integer;
 begin
@@ -622,10 +625,13 @@ begin
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
   p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
+  if (p = 0) and (FSearchPos.x = 0) and (FSearchPos.y = 0)
+     and (FSearchNode = nil) then
+         Exit(-1);
   FSearchPos := FSynEdit.CaretXY;
   if p = 0 then
-    Exit(False);
-  Result := True;
+    Exit(0);
+  Result := p;
 end;
 
 { TResponseTabManager }
@@ -832,7 +838,7 @@ begin
   raise Exception.Create('Tab does not support search');
 end;
 
-function TResponseTab.FindNext: Boolean;
+function TResponseTab.FindNext: Integer;
 begin
   raise Exception.Create('Tab does not support search');
 end;

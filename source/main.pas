@@ -401,10 +401,9 @@ procedure TForm1.FindText;
 var
   fp: TFindPos;
   tab: TResponseTab;
-  FindSucc: Boolean;
+  FindSucc: Integer;
   Ans: Integer;
 begin
-  miFindNext.Enabled := True;
   tab := FResponseTabManager.CanFind;
   if (tab <> nil) and (pagesResponse.ActivePage <> tabContent) then begin
     pagesResponse.ActivePage := tab.TabSheet;
@@ -414,8 +413,11 @@ begin
     if tabContent.TabVisible then begin
       pagesResponse.ActivePage := tabContent;
       fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
-      FindSucc := fp.Pos > 0;
-      if FindSucc then begin
+      if (fp.Pos = -1) and (FFindTextPos = 0) then
+        FindSucc := -1 // Not found at all.
+      else
+        FindSucc := fp.Pos + 1;
+      if fp.Pos > 0 then begin
         responseRaw.SelStart  := fp.SelStart;
         responseRaw.SelLength := fp.SelLength;
         responseRaw.SetFocus;
@@ -426,12 +428,20 @@ begin
       end;
     end;
 
-  if not FindSucc then begin
-    Ans := Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?'), 'Not found', MB_ICONQUESTION + MB_YESNO);
-    if Ans = ID_YES then
-      FindStart
-    else
+  case FindSucc of
+    // Not found at all.
+    -1: begin
       miFindNext.Enabled := False;
+      Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'), 'Not found', MB_ICONERROR + MB_OK);
+    end;
+    // Not found but previous search was successful.
+    0: begin
+      Ans := Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?'), 'Not found', MB_ICONQUESTION + MB_YESNO);
+      if Ans = ID_YES then
+        FindStart
+      else
+        miFindNext.Enabled := False;
+    end;
   end;
 end;
 
