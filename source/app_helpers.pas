@@ -210,7 +210,10 @@ begin
         if (p = Length(AText)) and (StrRes[1] in WordDelims) then
           Done := True;
       end;
-      FromPos := p + Length(Search);
+      if frDown in Options then
+        FromPos := p + Length(Search)
+      else
+        FromPos := p - Length(Search);
     end
     else
       done := True;
