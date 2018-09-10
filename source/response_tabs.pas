@@ -614,7 +614,7 @@ end;
 
 function TResponseJsonTab.FindNext: Integer;
 var
-  p: Integer;
+  p, maxx, maxy: Integer;
 begin
   if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
     if ssoBackwards in FSearchOptions then
@@ -625,9 +625,18 @@ begin
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
   p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
-  if (p = 0) and (FSearchPos.x = 0) and (FSearchPos.y = 0)
-     and (FSearchNode = nil) then
-         Exit(-1);
+  if (p = 0) then begin
+    if (ssoBackwards in FSearchOptions) then begin
+      maxy := FSynEdit.Lines.Count;
+      maxx := FSynEdit.Lines[maxy - 1].Length;
+    end
+    else begin
+      maxy := 0;
+      maxx := 0;
+    end;
+    if (FSearchPos.x = maxx) and (FSearchPos.y = maxy) and (FSearchNode = nil) then
+      Exit(-1);
+  end;
   FSearchPos := FSynEdit.CaretXY;
   if p = 0 then
     Exit(0);
