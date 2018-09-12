@@ -180,7 +180,10 @@ begin
     else begin
       if FromPos = 0 then
         FromPos := UTF8Length(AText);
-      p := RPosex(Search, AText, FromPos);
+      if FromPos < 0 then
+        p := 0
+      else
+        p := RPosex(Search, AText, FromPos);
     end;
 
     Result.Pos := -1;
