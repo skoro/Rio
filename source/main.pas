@@ -663,6 +663,7 @@ end;
 procedure TForm1.miHelpCmdClick(Sender: TObject);
 begin
   with THelpForm.Create(Self) do begin
+    helpText.Font := OptionsForm.GetFontItem(fiHelp);
     ShowModal('Command line help', Trim(Usage));
     Free;
   end;

@@ -10,7 +10,7 @@ uses
 
 type
 
-  TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue);
+  TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue, fiHelp);
   TFontItemList = array of TFont;
 
   { TOptionsPage }
@@ -275,7 +275,8 @@ begin
     FFontItemList[I] := GetDefaultFont(TUIFontItem(I));
 
   cboxFontItem.Items.AddStrings([
-    'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor'
+    'Grids', 'Editor', 'Json tree', 'Response content', 'Value editor',
+    'Help text'
   ]);
   cboxFontItem.ItemIndex := 0;
 end;
