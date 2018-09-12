@@ -10,7 +10,15 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit;
+  Classes, SysUtils, Controls, ValEdit, Dialogs;
+
+type
+
+  TFindPos = record
+    Pos: Integer;
+    SelStart: Integer;
+    SelLength: Integer;
+  end;
 
 { Save string contents to a file }
 function FilePutContents(const filename, contents: ansistring): Boolean;
@@ -28,9 +36,11 @@ function NumberFormat(num: Int64; dot: string = '.'): string;
 { Finds all the named controls in an owner control. }
 procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
 
+function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 0): TFindPos;
+
 implementation
 
-uses process;
+uses process, LazUTF8, SynEditTypes, strutils;
 
 function FilePutContents(const filename, contents: string): Boolean;
 var
@@ -142,6 +152,74 @@ begin
     if ctrl.ClassName = ControlName then begin
       Controls.Add(ctrl);
     end;
+  end;
+end;
+
+// http://wiki.freepascal.org/TMemo#Search_text
+function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer): TFindPos;
+const
+  WordDelims = TSynWordBreakChars + TSynWhiteChars;
+var
+  p, wlen: Integer;
+  StrRes: string;
+  done: Boolean;
+begin
+  done := False;
+
+  while not done do begin
+    if not (frMatchCase in Options) then begin
+      AText := Utf8LowerCase(AText);
+      Search := Utf8LowerCase(Search);
+    end;
+
+    if frDown in Options then begin
+      if FromPos = 0 then
+        FromPos := 1;
+      p := PosEx(Search, AText, FromPos);
+    end
+    else begin
+      if FromPos = 0 then
+        FromPos := UTF8Length(AText);
+      if FromPos < 0 then
+        p := 0
+      else
+        p := RPosex(Search, AText, FromPos);
+    end;
+
+    Result.Pos := -1;
+    Result.SelStart := -1;
+
+    if p = 0 then
+      Exit;
+
+    Result.Pos := p;
+    Result.SelStart := UTF8Length(PChar(AText), p - 1);
+    Result.SelLength := UTF8Length(Search);
+
+    if frWholeWord in Options then begin
+      if (p = 1) then begin
+        if AText = Search then
+          Done := True
+        else
+          if AText[Length(Search) + 1] in WordDelims then
+            Done := True;
+      end
+      else begin
+        StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
+        wlen := Length(StrRes);
+        if (wlen = Length(Search) + 2) then
+          if (StrRes[1] in WordDelims) and (StrRes[wlen] in WordDelims) then
+            Done := True;
+        if (p = Length(AText)) and (StrRes[1] in WordDelims) then
+          Done := True;
+      end;
+      if frDown in Options then
+        FromPos := p + Length(Search)
+      else
+        FromPos := p - Length(Search);
+    end
+    else
+      done := True;
   end;
 end;
 

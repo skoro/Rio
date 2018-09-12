@@ -30,6 +30,7 @@ type
     editBearerToken: TLabeledEdit;
     editJson: TSynEdit;
     editOther: TMemo;
+    dlgFind: TFindDialog;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
     gridForm: TStringGrid;
@@ -43,6 +44,9 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miFindNext: TMenuItem;
+    miSep1: TMenuItem;
+    miFind: TMenuItem;
     miHelpCmd: TMenuItem;
     miJsonFilter: TMenuItem;
     StatusImageSize: TImage;
@@ -127,6 +131,7 @@ type
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
+    procedure dlgFindFind(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -142,6 +147,8 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miFindClick(Sender: TObject);
+    procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
@@ -178,6 +185,7 @@ type
     FHttpClient: TThreadHttpClient;
     FResponseTabManager: TResponseTabManager;
     FResponseJsonTab: TResponseJsonTab;
+    FFindTextPos: Integer;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -205,6 +213,7 @@ type
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
+    procedure FindStart;
   public
     procedure ApplyOptions;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
@@ -219,6 +228,7 @@ type
     procedure StartNewRequest;
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
     procedure SubmitRequest;
+    procedure FindText;
   end;
 
 var
@@ -387,6 +397,54 @@ begin
   FHttpClient.Start;
 end;
 
+procedure TForm1.FindText;
+var
+  fp: TFindPos;
+  tab: TResponseTab;
+  FindSucc: Integer;
+  Ans: Integer;
+begin
+  tab := FResponseTabManager.CanFind;
+  if (tab <> nil) and (pagesResponse.ActivePage <> tabContent) then begin
+    pagesResponse.ActivePage := tab.TabSheet;
+    FindSucc := tab.FindNext;
+  end
+  else
+    if tabContent.TabVisible then begin
+      pagesResponse.ActivePage := tabContent;
+      fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+      if (fp.Pos = -1) and (FFindTextPos = 0) then
+        FindSucc := -1 // Not found at all.
+      else
+        FindSucc := fp.Pos + 1;
+      if fp.Pos > 0 then begin
+        responseRaw.SelStart  := fp.SelStart;
+        responseRaw.SelLength := fp.SelLength;
+        responseRaw.SetFocus;
+        if frDown in dlgFind.Options then
+          FFindTextPos := fp.Pos + responseRaw.SelLength
+        else
+          FFindTextPos := fp.Pos - responseRaw.SelLength;
+      end;
+    end;
+
+  case FindSucc of
+    // Not found at all.
+    -1: begin
+      miFindNext.Enabled := False;
+      Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'), 'Not found', MB_ICONERROR + MB_OK);
+    end;
+    // Not found but previous search was successful.
+    0: begin
+      Ans := Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?'), 'Not found', MB_ICONQUESTION + MB_YESNO);
+      if Ans = ID_YES then
+        FindStart
+      else
+        miFindNext.Enabled := False;
+    end;
+  end;
+end;
+
 procedure TForm1.cbBasicShowPasswordClick(Sender: TObject);
 begin
   if cbBasicShowPassword.Checked then
@@ -403,6 +461,12 @@ end;
 procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
 begin
   if key = #13 then btnSubmitClick(Sender);
+end;
+
+procedure TForm1.dlgFindFind(Sender: TObject);
+begin
+  dlgFind.CloseDialog;
+  FindStart;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -580,6 +644,20 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TForm1.miFindClick(Sender: TObject);
+begin
+  if pagesResponse.ActivePage = tabContent then begin
+    if responseRaw.SelText <> '' then
+      dlgFind.FindText := responseRaw.SelText;
+  end;
+  dlgFind.Execute;
+end;
+
+procedure TForm1.miFindNextClick(Sender: TObject);
+begin
+  FindText;
 end;
 
 procedure TForm1.miHelpCmdClick(Sender: TObject);
@@ -1223,6 +1301,18 @@ begin
     miJsonFilter.Enabled := False;
 end;
 
+procedure TForm1.FindStart;
+var
+  tab: TResponseTab;
+begin
+  FFindTextPos := 0;
+  tab := FResponseTabManager.CanFind;
+  if tab <> nil then
+    tab.InitSearch(dlgFind.FindText, dlgFind.Options);
+  FindText;
+  miFindNext.Enabled := True;
+end;
+
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -1455,7 +1545,6 @@ begin
   ShowResponseCookie(Info.ResponseHeaders);
 
   // Get the response content - enable menu item.
-  //miSaveResponse.Enabled := Length(responseRaw.Text) > 0;
   miSaveResponse.Enabled := True;
 
   Info.Content.Position := 0;
@@ -1469,6 +1558,11 @@ begin
     tabContent.TabVisible := True
   else
     tabContent.TabVisible := False;
+
+  // Find always enabled when Content tab is visible.
+  miFind.Enabled := tabContent.TabVisible;
+  if not miFind.Enabled then
+    miFindNext.Enabled := False;
 
   if tabContent.TabVisible then begin
     with responseRaw.Lines do begin
@@ -1664,7 +1758,11 @@ begin
   tabContent.TabVisible := False;
   tabRespCookie.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
+
+  // Menu items.
   miSaveResponse.Enabled := False;
+  miFind.Enabled := False;
+  miFindNext.Enabled := False;
 
   // Reset auth
   editBasicLogin.Text := '';

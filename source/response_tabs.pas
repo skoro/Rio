@@ -5,8 +5,8 @@ unit response_tabs;
 interface
 
 uses
-  Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls,
-  Forms, StdCtrls, SynEdit, thread_http_client, inputbuttons;
+  Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls, Forms,
+  StdCtrls, Dialogs, SynEdit, SynEditTypes, thread_http_client, inputbuttons;
 
 type
 
@@ -24,6 +24,9 @@ type
     procedure FreeTab; virtual;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); virtual; abstract;
     procedure Save(const AFileName: string); virtual;
+    function CanFind: Boolean; virtual;
+    procedure InitSearch(Search: string; Options: TFindOptions); virtual;
+    function FindNext: Integer; virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -48,6 +51,7 @@ type
     procedure RegisterTab(Tab: TResponseTab);
     procedure OpenTabs(ResponseInfo: TResponseInfo);
     procedure Save(const FileName: string);
+    function CanFind: TResponseTab; virtual;
     property PageControl: TPageControl read FPageControl write FPageControl;
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
     property OnSaveTab: TOnSaveTab read FOnSaveTab write FOnSaveTab;
@@ -105,6 +109,11 @@ type
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
     FOnJsonData: TOnJsonData;
+    FSearchText: string;
+    FSearchOptions: TSynSearchOptions;
+    FSearchNode: TTreeNode;
+    FSearchNodePos: Integer;
+    FSearchPos: TPoint;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -124,6 +133,7 @@ type
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure ToggleFilterPanel;
+    function FindInNode(Node: TTreeNode): TTreeNode;
   public
     constructor Create;
     destructor Destroy; override;
@@ -133,6 +143,9 @@ type
     procedure FreeTab; override;
     procedure Filter(Node: TTreeNode); virtual;
     function IsFilterActive: Boolean;
+    function CanFind: Boolean; override;
+    procedure InitSearch(Search: string; Options: TFindOptions); override;
+    function FindNext: Integer; override;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -145,7 +158,7 @@ type
 
 implementation
 
-uses Menus;
+uses Menus, app_helpers, strutils;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -375,8 +388,8 @@ end;
 procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  // Control-F show/hide filter panel.
-  if (Shift = [ssCtrl]) and (Key = 70) then
+  // Control-E show/hide filter panel.
+  if (Shift = [ssCtrl]) and (Key = 69) then
      InternalOnSwitchFilter(Sender);
 end;
 
@@ -386,6 +399,43 @@ begin
   FBtnFilter.Down := FFilter.Visible;
   if FFilter.Visible then
     FFilter.SetFocus;
+end;
+
+function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
+var
+  Next: TTreeNode;
+  fp: TFindPos;
+  Opts: TFindOptions;
+begin
+  if Node = nil then
+    Exit(nil); //=>
+  Opts := [];
+  if ssoMatchCase in FSearchOptions then
+    Include(Opts, frMatchCase);
+  if ssoWholeWord in FSearchOptions then
+    Include(Opts, frWholeWord);
+  if not (ssoBackwards in FSearchOptions) then
+    Include(Opts, frDown);
+  fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
+  if fp.Pos > 0 then begin
+    if frDown in Opts then
+      FSearchNodePos := fp.Pos + fp.SelLength
+    else begin
+      FSearchNodePos := fp.Pos - 1;
+      // Don't reset search pos to 0 it will be looped.
+      if FSearchNodePos = 0 then
+        FSearchNodePos := 1;
+    end;
+    Exit(Node);
+  end;
+  FSearchNodePos := 0;
+  if frDown in Opts then
+    Next := Node.GetNext
+  else
+    Next := Node.GetPrev;
+  if Next <> nil then
+    Exit(FindInNode(Next)); //=>
+  Result := nil;
 end;
 
 function TResponseJsonTab.GetTreeView: TTreeView;
@@ -539,6 +589,60 @@ begin
   Result := FFilter.Visible and (Trim(FFilter.Text) <> '');
 end;
 
+function TResponseJsonTab.CanFind: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
+begin
+  FSearchText := Search;
+  FSearchOptions := [];
+  FSearchNodePos := 0;
+  FSearchNode := nil;
+  FSearchPos := Point(0, 0);
+  if not (frDown in Options) then begin
+    Include(FSearchOptions, ssoBackwards);
+    FSearchPos.y := FSynEdit.Lines.Count;
+    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
+  end;
+  if frMatchCase in Options then
+    Include(FSearchOptions, ssoMatchCase);
+  if frWholeWord in Options then
+    Include(FSearchOptions, ssoWholeWord);
+end;
+
+function TResponseJsonTab.FindNext: Integer;
+var
+  p, maxx, maxy: Integer;
+begin
+  if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
+    if ssoBackwards in FSearchOptions then
+      FSearchNode := FTreeView.BottomItem
+    else
+      FSearchNode := FTreeView.Items.GetFirstNode.GetNext;
+  FSearchNode := FindInNode(FSearchNode);
+  if FSearchNode <> nil then
+    FSearchNode.Selected := True;
+  p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
+  if (p = 0) then begin
+    if (ssoBackwards in FSearchOptions) then begin
+      maxy := FSynEdit.Lines.Count;
+      maxx := FSynEdit.Lines[maxy - 1].Length;
+    end
+    else begin
+      maxy := 0;
+      maxx := 0;
+    end;
+    if (FSearchPos.x = maxx) and (FSearchPos.y = maxy) and (FSearchNode = nil) then
+      Exit(-1);
+  end;
+  FSearchPos := FSynEdit.CaretXY;
+  if p = 0 then
+    Exit(0);
+  Result := p;
+end;
+
 { TResponseTabManager }
 
 constructor TResponseTabManager.Create(APageControl: TPageControl);
@@ -593,6 +697,19 @@ begin
   for Tab in FOpenedTabs do
     if Assigned(FOnSaveTab) then
       FOnSaveTab(FileName, TResponseTab(Tab));
+end;
+
+function TResponseTabManager.CanFind: TResponseTab;
+var
+  Tab: Pointer;
+  rt: TResponseTab;
+begin
+  Result := nil;
+  for Tab in FOpenedTabs do begin
+    rt := TResponseTab(Tab);
+    if rt.CanFind then
+      Exit(rt);
+  end;
 end;
 
 { TResponseImageTab }
@@ -718,6 +835,21 @@ end;
 procedure TResponseTab.Save(const AFileName: string);
 begin
   raise Exception.Create('Save is not implemented.');
+end;
+
+function TResponseTab.CanFind: Boolean;
+begin
+  Result := False;
+end;
+
+procedure TResponseTab.InitSearch(Search: string; Options: TFindOptions);
+begin
+  raise Exception.Create('Tab does not support search');
+end;
+
+function TResponseTab.FindNext: Integer;
+begin
+  raise Exception.Create('Tab does not support search');
 end;
 
 end.
