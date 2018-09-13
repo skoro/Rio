@@ -793,7 +793,7 @@ end;
 
 procedure TForm1.miNewWindowClick(Sender: TObject);
 begin
-  AppExec(Application.ExeName);
+  AppExec(Application.ExeName, ['--new']);
 end;
 
 procedure TForm1.miOpenRequestClick(Sender: TObject);
