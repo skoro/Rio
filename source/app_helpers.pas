@@ -25,7 +25,7 @@ function FilePutContents(const filename, contents: ansistring): Boolean;
 { Load string contents from a file }
 function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
 { Execute an app and don't wait when it exits. }
-procedure AppExec(const exename: string);
+procedure AppExec(const exename: string; params: array of string);
 { Split input string to list of strings delimited by character }
 procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
 function SplitKV(const Input: string; const Delim: char): TKeyValuePair;
@@ -71,10 +71,14 @@ begin
   end;
 end;
 
-procedure AppExec(const exename: string);
+procedure AppExec(const exename: string; params: array of string);
+var
+  par: string;
 begin
   with TProcess.Create(nil) do begin
     Executable := exename;
+    for par in params do
+      Parameters.Add(par);
     Execute;
     Free;
   end;
