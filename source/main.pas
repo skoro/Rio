@@ -44,6 +44,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miImport: TMenuItem;
     miFindNext: TMenuItem;
     miSep1: TMenuItem;
     miFind: TMenuItem;
@@ -150,6 +151,7 @@ type
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
+    procedure miImportClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
     procedure JsonTreePopupMenuClick(Sender: TObject);
@@ -238,7 +240,7 @@ implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
-  Clipbrd;
+  import_form, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -665,6 +667,14 @@ begin
   with THelpForm.Create(Self) do begin
     helpText.Font := OptionsForm.GetFontItem(fiHelp);
     ShowModal('Command line help', Trim(Usage));
+    Free;
+  end;
+end;
+
+procedure TForm1.miImportClick(Sender: TObject);
+begin
+  with TImportForm.Create(Self) do begin
+    ShowModal;
     Free;
   end;
 end;
