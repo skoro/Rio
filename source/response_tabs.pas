@@ -617,8 +617,13 @@ var
   p, maxx, maxy: Integer;
 begin
   if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
-    if ssoBackwards in FSearchOptions then
-      FSearchNode := FTreeView.BottomItem
+    if ssoBackwards in FSearchOptions then begin
+      FSearchNode := FTreeView.BottomItem;
+      // When the tree is collapsed the bottom item will be last collapsed item
+      // and we should expand nodes until no children found.
+      while FSearchNode.HasChildren do
+        FSearchNode := FSearchNode.GetLastChild;
+    end
     else
       FSearchNode := FTreeView.Items.GetFirstNode.GetNext;
   FSearchNode := FindInNode(FSearchNode);
