@@ -17,6 +17,7 @@ type
   TImportForm = class(TForm)
     ButtonPanel: TButtonPanel;
     cbImportFrom: TComboBox;
+    linfo: TLabel;
     lImport: TLabel;
     memoData: TMemo;
     Panel1: TPanel;
@@ -37,8 +38,9 @@ uses import;
 
 procedure TImportForm.FormCreate(Sender: TObject);
 begin
-  cbImportFrom.Items.Add('Curl command line');
+  cbImportFrom.Items.Add('Curl');
   cbImportFrom.ItemIndex := 0;
+  linfo.Caption := 'Curl command line:';
 end;
 
 end.

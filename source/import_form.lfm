@@ -27,7 +27,7 @@ object ImportForm: TImportForm
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
     TabOrder = 0
-    ShowButtons = [pbOK, pbClose]
+    ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
   end
   object Panel1: TPanel
@@ -67,13 +67,24 @@ object ImportForm: TImportForm
   end
   object memoData: TMemo
     Left = 4
-    Height = 152
-    Top = 36
+    Height = 136
+    Top = 52
     Width = 386
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Right = 4
     ScrollBars = ssAutoBoth
     TabOrder = 2
+  end
+  object linfo: TLabel
+    Left = 4
+    Height = 16
+    Top = 36
+    Width = 386
+    Align = alTop
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    Caption = 'linfo'
+    ParentColor = False
   end
 end
