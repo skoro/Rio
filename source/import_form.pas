@@ -29,6 +29,8 @@ type
 
 implementation
 
+uses import;
+
 {$R *.lfm}
 
 { TImportForm }
