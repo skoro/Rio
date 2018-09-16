@@ -24,6 +24,20 @@ type
     property Value: string read FValue write FValue;
   end;
 
+  { TRequestParamList }
+
+  TRequestParamList = class(TCollection)
+  private
+    function GetItems(Index: integer): TRequestParamItem;
+    procedure SetItems(Index: integer; AValue: TRequestParamItem);
+  public
+    constructor Create;
+    function Add: TRequestParamItem;
+    property Items[Index: integer]: TRequestParamItem read GetItems write SetItems;
+  end;
+
+  { TFormTypeItem }
+
   TFormTypeItem = (ftiText, ftiFile);
 
   { TFormParamItem }
@@ -65,9 +79,9 @@ type
     FUrl: string;
     FBody: string;
     FJson: string;
-    FHeaders: TCollection;
-    FCookies: TCollection;
-    FParams: TCollection; // GET params
+    FHeaders: TRequestParamList;
+    FCookies: TRequestParamList;
+    FParams: TRequestParamList; // GET params
     FForm: TCollection;
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
@@ -80,15 +94,17 @@ type
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
     procedure SetForm(FormGrid: TStringGrid);
     procedure GetForm(FormGrid: TStringGrid);
+    procedure AddHeader(AName, AValue: string; IsEnabled: Boolean = True);
+    procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
     property Body: string read FBody write FBody;
     property Json: string read FJson write FJson;
-    property Headers: TCollection read FHeaders;
+    property Headers: TRequestParamList read FHeaders;
     property Form: TCollection read FForm;
-    property Cookies: TCollection read FCookies;
-    property Params: TCollection read FParams;
+    property Cookies: TRequestParamList read FCookies;
+    property Params: TRequestParamList read FParams;
     property AuthType: Integer read FAuthType write FAuthType;
     property AuthBasic: TAuthBasic read FAuthBasic;
     property AuthBearer: TAuthBearer read FAuthBearer;
@@ -97,6 +113,28 @@ type
 implementation
 
 uses strutils;
+
+{ TRequestParamList }
+
+function TRequestParamList.GetItems(Index: integer): TRequestParamItem;
+begin
+  Result := TRequestParamItem(inherited Items[Index]);
+end;
+
+procedure TRequestParamList.SetItems(Index: integer; AValue: TRequestParamItem);
+begin
+  Items[Index].Assign(AValue);
+end;
+
+constructor TRequestParamList.Create;
+begin
+  inherited Create(TRequestParamItem);
+end;
+
+function TRequestParamList.Add: TRequestParamItem;
+begin
+  Result := inherited Add as TRequestParamItem;
+end;
 
 { TRequestParamItem }
 
@@ -122,9 +160,9 @@ end;
 constructor TRequestObject.Create;
 begin
   inherited Create;
-  FHeaders    := TCollection.Create(TRequestParamItem);
-  FCookies    := TCollection.Create(TRequestParamItem);
-  FParams     := TCollection.Create(TRequestParamItem);
+  FHeaders    := TRequestParamList.Create;
+  FCookies    := TRequestParamList.Create;
+  FParams     := TRequestParamList.Create;
   FForm       := TCollection.Create(TFormParamItem);
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
@@ -192,6 +230,24 @@ begin
       ftiText: FormGrid.Cells[3, I + 1] := '';
       ftiFile: FormGrid.Cells[3, I + 1] := 'File';
     end;
+  end;
+end;
+
+procedure TRequestObject.AddHeader(AName, AValue: string; IsEnabled: Boolean);
+begin
+  with Headers.Add do begin
+    Enabled := IsEnabled;
+    Name := AName;
+    Value := AValue;
+  end;
+end;
+
+procedure TRequestObject.AddCookie(AName, AValue: string; IsEnabled: Boolean);
+begin
+  with Cookies.Add do begin
+    Enabled := IsEnabled;
+    Name := AName;
+    Value := AValue;
   end;
 end;
 
