@@ -20,17 +20,19 @@ object ImportForm: TImportForm
     OKButton.Name = 'OKButton'
     OKButton.Caption = '&Import'
     OKButton.DefaultCaption = False
+    OKButton.OnClick = OKButtonClick
     HelpButton.Name = 'HelpButton'
     HelpButton.DefaultCaption = True
     CloseButton.Name = 'CloseButton'
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
-    CancelButton.DefaultCaption = True
+    CancelButton.Caption = '&Cancel'
+    CancelButton.DefaultCaption = False
     TabOrder = 0
     ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
   end
-  object Panel1: TPanel
+  object MainPanel: TPanel
     Left = 4
     Height = 28
     Top = 4
@@ -65,7 +67,7 @@ object ImportForm: TImportForm
       TabOrder = 0
     end
   end
-  object memoData: TMemo
+  object input: TMemo
     Left = 4
     Height = 136
     Top = 52
@@ -73,6 +75,10 @@ object ImportForm: TImportForm
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Right = 4
+    Lines.Strings = (
+      'curl -X POST -H "Content-Type: application/json" \'
+      '        -H "Accept: application/json" http://localhost:8080'
+    )
     ScrollBars = ssAutoBoth
     TabOrder = 2
   end
