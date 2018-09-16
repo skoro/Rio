@@ -49,6 +49,18 @@ type
     property ElemType: TFormTypeItem read FElemType write FElemType;
   end;
 
+  { TFormParamList }
+
+  TFormParamList = class(TCollection)
+  private
+    function GetItems(Index: integer): TFormParamItem;
+    procedure SetItems(Index: integer; AValue: TFormParamItem);
+  public
+    constructor Create;
+    function Add: TFormParamItem;
+    property Items[Index: integer]: TFormParamItem read GetItems write SetItems;
+  end;
+
   { TAuthBasic }
 
   TAuthBasic = class
@@ -82,7 +94,7 @@ type
     FHeaders: TRequestParamList;
     FCookies: TRequestParamList;
     FParams: TRequestParamList; // GET params
-    FForm: TCollection;
+    FForm: TFormParamList;
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
     FAuthType: Integer;
@@ -96,13 +108,15 @@ type
     procedure GetForm(FormGrid: TStringGrid);
     procedure AddHeader(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
+    procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
+      AElemType: TFormTypeItem = ftiText);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
     property Body: string read FBody write FBody;
     property Json: string read FJson write FJson;
     property Headers: TRequestParamList read FHeaders;
-    property Form: TCollection read FForm;
+    property Form: TFormParamList read FForm;
     property Cookies: TRequestParamList read FCookies;
     property Params: TRequestParamList read FParams;
     property AuthType: Integer read FAuthType write FAuthType;
@@ -113,6 +127,28 @@ type
 implementation
 
 uses strutils;
+
+{ TFormParamList }
+
+function TFormParamList.GetItems(Index: integer): TFormParamItem;
+begin
+  Result := TFormParamItem(inherited Items[Index]);
+end;
+
+procedure TFormParamList.SetItems(Index: integer; AValue: TFormParamItem);
+begin
+  Items[Index].Assign(AValue);
+end;
+
+constructor TFormParamList.Create;
+begin
+  inherited Create(TFormParamItem);
+end;
+
+function TFormParamList.Add: TFormParamItem;
+begin
+  Result := inherited Add as TFormParamItem;
+end;
 
 { TRequestParamList }
 
@@ -163,7 +199,7 @@ begin
   FHeaders    := TRequestParamList.Create;
   FCookies    := TRequestParamList.Create;
   FParams     := TRequestParamList.Create;
-  FForm       := TCollection.Create(TFormParamItem);
+  FForm       := TFormParamList.Create;
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
 end;
@@ -248,6 +284,17 @@ begin
     Enabled := IsEnabled;
     Name := AName;
     Value := AValue;
+  end;
+end;
+
+procedure TRequestObject.AddForm(AName, AValue: string; IsEnabled: Boolean;
+  AElemType: TFormTypeItem);
+begin
+  with Form.Add do begin
+    Enabled := IsEnabled;
+    Name := AName;
+    Value := AValue;
+    ElemType := AElemType;
   end;
 end;
 
