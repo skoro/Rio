@@ -119,7 +119,7 @@ var
   line, cmd: string;
   RO: TRequestObject;
   KV: TKeyValuePair;
-
+  // Get a next token from the string buffer.
   function NextTok: string;
   begin
     if Buf.Count = 0 then
@@ -132,12 +132,13 @@ begin
   try
     Buf.Text := Input;
     Cmd := '';
-    //
+    // Remove trailing shell slashes.
     for n := 0 to Buf.Count - 1 do begin
       line := Trim(Buf.Strings[n]);
       line := TrimRightSet(line, ['\', ' ']);
       Cmd := Cmd + Line + ' ';
     end;
+    // Tokenize command line.
     Buf.Delimiter := ' ';
     Buf.DelimitedText := Cmd;
     if Buf.Strings[0] <> 'curl' then
@@ -155,6 +156,7 @@ begin
         '-F', '--form': begin
           KV := SplitKV(NextTok, '=');
           RO.AddForm(KV.Key, KV.Value);
+          // TODO: uploads ?
         end;
         '-b', '--cookie': begin
           line := NextTok;
