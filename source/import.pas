@@ -114,7 +114,7 @@ end;
 
 procedure TCurlImport.ParseCommandLine;
 var
-  Buf: TStringList;
+  Buf, tokens: TStringList;
   n: integer;
   line, cmd: string;
   RO: TRequestObject;
@@ -129,6 +129,7 @@ var
   end;
 begin
   Buf := TStringList.Create;
+  tokens := TStringList.Create;
   try
     Buf.Text := Input;
     Cmd := '';
@@ -159,7 +160,12 @@ begin
           // TODO: uploads ?
         end;
         '-b', '--cookie': begin
-          line := NextTok;
+          // The data should be in the format "NAME1=VALUE1; NAME2=VALUE2".
+          SplitStrings(NextTok, ';', tokens);
+          for line in Tokens do begin
+            KV := SplitKV(Trim(line), '=');
+            RO.AddCookie(KV.Key, KV.Value);
+          end;
         end
         else begin
           if line[1] = '-' then
@@ -170,6 +176,7 @@ begin
     end;
   finally
     Buf.Free;
+    tokens.Free;
   end;
 end;
 
