@@ -114,11 +114,13 @@ end;
 
 procedure TCurlImport.ParseCommandLine;
 var
-  Buf, tokens: TStringList;
+  Buf, tokens, data: TStringList;
   n: integer;
   line, cmd: string;
   RO: TRequestObject;
   KV: TKeyValuePair;
+  DataIsJson: Boolean;
+
   // Get a next token from the string buffer.
   function NextTok: string;
   begin
@@ -130,6 +132,8 @@ var
 begin
   Buf := TStringList.Create;
   tokens := TStringList.Create;
+  data := TStringList.Create;
+  DataIsJson := False;
   try
     Buf.Text := Input;
     Cmd := '';
@@ -153,6 +157,8 @@ begin
         '-H', '--header': begin
           KV := SplitKV(NextTok, ':');
           RO.AddHeader(KV.Key, KV.Value);
+          if (LowerCase(KV.Key) = 'content-type') and AnsiStartsText('application/json', KV.Value) then
+            DataIsJson := True;
         end;
         '-F', '--form': begin
           KV := SplitKV(NextTok, '=');
@@ -161,6 +167,9 @@ begin
           else
             RO.AddForm(KV.Key, KV.Value);
         end;
+        '-d', '--data': begin
+          data.Add(NextTok);
+        end;
         '-b', '--cookie': begin
           // The data should be in the format "NAME1=VALUE1; NAME2=VALUE2".
           SplitStrings(NextTok, ';', tokens);
@@ -168,17 +177,20 @@ begin
             KV := SplitKV(Trim(line), '=');
             RO.AddCookie(KV.Key, KV.Value);
           end;
-        end
+        end;
         else begin
           if line[1] = '-' then
             raise TImportException.Create(Format('Option "%s" is not supported.', [line]));
           RO.Url := line;
         end;
-      end;
+      end; // while
+      if data.Count > 0 then
+        if DataIsJson then RO.Json := data.Text else RO.Body := data.Text;
     end;
   finally
     Buf.Free;
     tokens.Free;
+    data.Free;
   end;
 end;
 
