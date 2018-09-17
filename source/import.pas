@@ -156,8 +156,10 @@ begin
         end;
         '-F', '--form': begin
           KV := SplitKV(NextTok, '=');
-          RO.AddForm(KV.Key, KV.Value);
-          // TODO: uploads ?
+          if KV.Value[1] = '@' then
+            RO.AddForm(KV.Key, MidStr(KV.Value, 2, Length(KV.Value) - 1), True, ftiFile)
+          else
+            RO.AddForm(KV.Key, KV.Value);
         end;
         '-b', '--cookie': begin
           // The data should be in the format "NAME1=VALUE1; NAME2=VALUE2".
