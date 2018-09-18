@@ -45,7 +45,7 @@ begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   cbImportFrom.Items.Add('Curl');
   cbImportFrom.ItemIndex := 0;
-  linfo.Caption := 'Curl command line:';
+  linfo.Caption := 'Put Curl command line here:'#13#10'(only limited set of options supported)';
   FImport := nil;
 end;
 
