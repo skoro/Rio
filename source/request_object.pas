@@ -97,15 +97,15 @@ type
     FForm: TFormParamList;
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
-    FAuthType: Integer;
+    FAuthType: Integer; // TODO: should be TAuthType
   protected
   public
     constructor Create;
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
-    procedure SetForm(FormGrid: TStringGrid);
-    procedure GetForm(FormGrid: TStringGrid);
+    procedure SetFormToGrid(FormGrid: TStringGrid);
+    procedure GetFormFromGrid(FormGrid: TStringGrid);
     procedure AddHeader(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
@@ -201,6 +201,7 @@ begin
   FCookies    := TRequestParamList.Create;
   FParams     := TRequestParamList.Create;
   FForm       := TFormParamList.Create;
+  FAuthType   := Ord(atNone);
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
 end;
@@ -231,7 +232,7 @@ begin
   end;
 end;
 
-procedure TRequestObject.SetForm(FormGrid: TStringGrid);
+procedure TRequestObject.GetFormFromGrid(FormGrid: TStringGrid);
 var
   Item: TFormParamItem;
   I: Integer;
@@ -252,7 +253,7 @@ begin
   end;
 end;
 
-procedure TRequestObject.GetForm(FormGrid: TStringGrid);
+procedure TRequestObject.SetFormToGrid(FormGrid: TStringGrid);
 var
   Item: TFormParamItem;
   I: Integer;
@@ -310,6 +311,7 @@ begin
     SetCollectionToGrid(Headers, requestHeaders);
     SetCollectionToGrid(Cookies, gridReqCookie);
     SetCollectionToGrid(Params, gridParams);
+    SetFormToGrid(gridForm);
 
     SelectAuthTab(TAuthTab(AuthType));
     editBasicLogin.Text    := AuthBasic.Login;
