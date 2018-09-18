@@ -674,7 +674,12 @@ end;
 procedure TForm1.miImportClick(Sender: TObject);
 begin
   with TImportForm.Create(Self) do begin
-    ShowModal;
+    if ShowModal = mrOK then begin
+      if RequestObjects.Count = 0 then
+        Application.MessageBox('Data not imported.', 'Error', MB_ICONERROR )
+      else
+        RequestObjects.Items[0].RequestObject.LoadToForm(Self);
+    end;
     Free;
   end;
 end;
@@ -869,7 +874,7 @@ begin
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
     obj.SetCollectionFromGrid(gridParams, obj.Params);
-    obj.SetForm(gridForm);
+    obj.GetFormFromGrid(gridForm);
 
     obj.AuthType := Integer(GetSelectedAuthTab);
     obj.AuthBasic.Login    := editBasicLogin.Text;
