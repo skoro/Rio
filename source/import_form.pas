@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ButtonPanel,
-  ExtCtrls, StdCtrls;
+  ExtCtrls, StdCtrls, import;
 
 type
 
@@ -22,16 +22,19 @@ type
     input: TMemo;
     MainPanel: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
   private
+    FImport: TImport;
+    function GetRequestObjects: TRequestObjectList;
     procedure ImportData;
   public
-
+    property RequestObjects: TRequestObjectList read GetRequestObjects;
   end;
 
 implementation
 
-uses import, LCLType;
+uses LCLType;
 
 {$R *.lfm}
 
@@ -43,25 +46,40 @@ begin
   cbImportFrom.Items.Add('Curl');
   cbImportFrom.ItemIndex := 0;
   linfo.Caption := 'Curl command line:';
+  FImport := nil;
+end;
+
+procedure TImportForm.FormDestroy(Sender: TObject);
+begin
+  if Assigned(FImport) then
+    FreeAndNil(FImport);
 end;
 
 procedure TImportForm.OKButtonClick(Sender: TObject);
 begin
-  ImportData;
-end;
-
-procedure TImportForm.ImportData;
-var
-  Engine: TImport;
-begin
   try
-    case TImportFrom(cbImportFrom.ItemIndex) of
-      ifCurl: Engine := TCurlImport.Create;
-    end;
-    Engine.Input := input.Text;
+    ImportData;
+    ModalResult := mrOK;
   except on E: Exception do
     Application.MessageBox(PChar(E.Message), 'Import error', MB_ICONERROR + MB_OK);
   end;
+end;
+
+procedure TImportForm.ImportData;
+begin
+  if Assigned(FImport) then
+    FreeAndNil(FImport);
+  case TImportFrom(cbImportFrom.ItemIndex) of
+    ifCurl: FImport := TCurlImport.Create;
+  end;
+  FImport.Input := input.Text;
+end;
+
+function TImportForm.GetRequestObjects: TRequestObjectList;
+begin
+  if not Assigned(FImport) then
+    raise Exception.Create('Data not imported.');
+  Result := FImport.RequestObjects;
 end;
 
 end.

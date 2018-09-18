@@ -10,6 +10,7 @@ object ImportForm: TImportForm
   Constraints.MinHeight = 200
   Constraints.MinWidth = 300
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object ButtonPanel: TButtonPanel
@@ -77,7 +78,8 @@ object ImportForm: TImportForm
     BorderSpacing.Right = 4
     Lines.Strings = (
       'curl -X POST -H "Content-Type: application/json" \'
-      '        -H "Accept: application/json" http://localhost:8080'
+      '        -H "Accept: application/json" http://localhost:8080 \'
+      '        -F "login=admin"'
     )
     ScrollBars = ssAutoBoth
     TabOrder = 2
