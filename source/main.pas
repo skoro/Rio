@@ -1435,22 +1435,7 @@ begin
   try
     streamer.JSONToObject(jsonStr, obj);
     StartNewRequest;
-    cbUrl.Text := obj.Url;
-    cbMethod.Text := obj.Method;
-    editOther.Text := obj.Body;
-    editJson.Text := obj.Json;
-
-    obj.SetCollectionToGrid(obj.Headers, requestHeaders);
-    obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
-    obj.SetCollectionToGrid(obj.Params, gridParams);
-    obj.GetForm(gridForm);
-
-    SelectAuthTab(TAuthTab(obj.AuthType));
-    editBasicLogin.Text    := obj.AuthBasic.Login;
-    editBasicPassword.Text := obj.AuthBasic.Password;
-    editBearerPrefix.Text  := obj.AuthBearer.Prefix;
-    editBearerToken.Text   := obj.AuthBearer.Token;
-
+    obj.LoadToForm(Self);
   except on E: Exception do
       ShowMessage(E.Message);
   end;

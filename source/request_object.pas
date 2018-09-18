@@ -5,7 +5,7 @@ unit request_object;
 interface
 
 uses
-  Classes, SysUtils, Grids;
+  Classes, SysUtils, Grids, main;
 
 type
 
@@ -110,6 +110,7 @@ type
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
+    procedure LoadToForm(form: TForm1);
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
@@ -295,6 +296,26 @@ begin
     Name := AName;
     Value := AValue;
     ElemType := AElemType;
+  end;
+end;
+
+procedure TRequestObject.LoadToForm(form: TForm1);
+begin
+  with form do begin
+    cbUrl.Text     := Url;
+    cbMethod.Text  := Method;
+    editOther.Text := Body;
+    editJson.Text  := Json;
+
+    SetCollectionToGrid(Headers, requestHeaders);
+    SetCollectionToGrid(Cookies, gridReqCookie);
+    SetCollectionToGrid(Params, gridParams);
+
+    SelectAuthTab(TAuthTab(AuthType));
+    editBasicLogin.Text    := AuthBasic.Login;
+    editBasicPassword.Text := AuthBasic.Password;
+    editBearerPrefix.Text  := AuthBearer.Prefix;
+    editBearerToken.Text   := AuthBearer.Token;
   end;
 end;
 
