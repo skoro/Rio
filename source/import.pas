@@ -184,9 +184,9 @@ begin
           RO.Url := line;
         end;
       end; // while
-      if data.Count > 0 then
-        if DataIsJson then RO.Json := data.Text else RO.Body := data.Text;
     end;
+    if data.Count > 0 then
+      if DataIsJson then RO.Json := data.Text else RO.Body := data.Text;
   finally
     Buf.Free;
     tokens.Free;
