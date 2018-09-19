@@ -23,6 +23,8 @@ type
     MainPanel: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
+    procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
   private
     FImport: TImport;
@@ -34,7 +36,7 @@ type
 
 implementation
 
-uses LCLType;
+uses LCLType, options;
 
 {$R *.lfm}
 
@@ -47,12 +49,23 @@ begin
   cbImportFrom.ItemIndex := 0;
   linfo.Caption := 'Put Curl command line here:'#13#10'(only limited set of options supported)';
   FImport := nil;
+  input.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
 procedure TImportForm.FormDestroy(Sender: TObject);
 begin
   if Assigned(FImport) then
     FreeAndNil(FImport);
+end;
+
+procedure TImportForm.FormKeyPress(Sender: TObject; var Key: char);
+begin
+  if Key = #27 then Close;
+end;
+
+procedure TImportForm.FormShow(Sender: TObject);
+begin
+  input.SetFocus;
 end;
 
 procedure TImportForm.OKButtonClick(Sender: TObject);

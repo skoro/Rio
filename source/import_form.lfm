@@ -9,8 +9,12 @@ object ImportForm: TImportForm
   ClientWidth = 394
   Constraints.MinHeight = 200
   Constraints.MinWidth = 300
+  KeyPreview = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
+  OnShow = FormShow
+  Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object ButtonPanel: TButtonPanel
