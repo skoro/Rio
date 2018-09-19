@@ -33,7 +33,7 @@ type
   public
     constructor Create;
     function Add: TRequestParamItem;
-    property Items[Index: integer]: TRequestParamItem read GetItems write SetItems;
+    property Items[Index: integer]: TRequestParamItem read GetItems write SetItems; default;
   end;
 
   { TFormTypeItem }
@@ -113,6 +113,7 @@ type
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
     procedure LoadToForm(form: TForm1);
+    function IsJson: Boolean;
   published
     property Method: string read FMethod write FMethod;
     property Url: string read FUrl write FUrl;
@@ -328,6 +329,17 @@ begin
     editBearerPrefix.Text  := AuthBearer.Prefix;
     editBearerToken.Text   := AuthBearer.Token;
   end;
+end;
+
+function TRequestObject.IsJson: Boolean;
+var
+  i: integer;
+begin
+  Result := False;
+  for i := 0 to FHeaders.Count - 1 do
+    if (LowerCase(FHeaders[i].Name) = 'content-type')
+       and (AnsiStartsText('application/json', FHeaders[i].Value)) then
+      Exit(True);
 end;
 
 end.

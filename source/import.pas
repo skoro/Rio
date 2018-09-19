@@ -29,7 +29,7 @@ type
   public
     constructor Create;
     function Add: TRequestObjectItem;
-    property Items[Index: integer]: TRequestObjectItem read GetItems write SetItems;
+    property Items[Index: integer]: TRequestObjectItem read GetItems write SetItems; default;
   end;
 
   { TImport }
@@ -119,7 +119,6 @@ var
   line, cmd: string;
   RO: TRequestObject;
   KV: TKeyValuePair;
-  DataIsJson: Boolean;
 
   // Get a next token from the string buffer.
   function NextTok: string;
@@ -133,7 +132,6 @@ begin
   Buf := TStringList.Create;
   tokens := TStringList.Create;
   data := TStringList.Create;
-  DataIsJson := False;
   try
     Buf.Text := Input;
     Cmd := '';
@@ -157,8 +155,6 @@ begin
         '-H', '--header': begin
           KV := SplitKV(NextTok, ':');
           RO.AddHeader(KV.Key, KV.Value);
-          if (LowerCase(KV.Key) = 'content-type') and AnsiStartsText('application/json', KV.Value) then
-            DataIsJson := True;
         end;
         '-F', '--form': begin
           KV := SplitKV(NextTok, '=');
@@ -186,7 +182,7 @@ begin
       end; // while
     end;
     if data.Count > 0 then
-      if DataIsJson then RO.Json := data.Text else RO.Body := data.Text;
+      if RO.IsJson then RO.Json := data.Text else RO.Body := data.Text;
   finally
     Buf.Free;
     tokens.Free;
