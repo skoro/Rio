@@ -639,10 +639,15 @@ begin
       maxy := 0;
       maxx := 0;
     end;
+    // Not found at all.
     if (FSearchPos.x = maxx) and (FSearchPos.y = maxy) and (FSearchNode = nil) then
       Exit(-1);
   end;
-  FSearchPos := FSynEdit.CaretXY;
+  // Set position for the next search.
+  if ssoBackwards in FSearchOptions then
+    FSearchPos := FSynEdit.BlockBegin
+  else
+    FSearchPos := FSynEdit.BlockEnd;
   if p = 0 then
     Exit(0);
   Result := p;
