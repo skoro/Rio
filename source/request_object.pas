@@ -78,6 +78,8 @@ type
   private
     FPrefix: string;
     FToken: string;
+  public
+    constructor Create;
   published
     property Prefix: string read FPrefix write FPrefix;
     property Token: string read FToken write FToken;
@@ -97,7 +99,7 @@ type
     FForm: TFormParamList;
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
-    FAuthType: Integer; // TODO: should be TAuthType
+    FAuthType: TAuthTab; // TODO: should be TAuthType
   protected
   public
     constructor Create;
@@ -120,7 +122,7 @@ type
     property Form: TFormParamList read FForm;
     property Cookies: TRequestParamList read FCookies;
     property Params: TRequestParamList read FParams;
-    property AuthType: Integer read FAuthType write FAuthType;
+    property AuthType: TAuthTab read FAuthType write FAuthType;
     property AuthBasic: TAuthBasic read FAuthBasic;
     property AuthBearer: TAuthBearer read FAuthBearer;
   end;
@@ -128,6 +130,13 @@ type
 implementation
 
 uses strutils;
+
+{ TAuthBearer }
+
+constructor TAuthBearer.Create;
+begin
+  FPrefix := 'Bearer';
+end;
 
 { TFormParamList }
 
@@ -201,7 +210,7 @@ begin
   FCookies    := TRequestParamList.Create;
   FParams     := TRequestParamList.Create;
   FForm       := TFormParamList.Create;
-  FAuthType   := Ord(atNone);
+  FAuthType   := atNone;
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
 end;
@@ -313,7 +322,7 @@ begin
     SetCollectionToGrid(Params, gridParams);
     SetFormToGrid(gridForm);
 
-    SelectAuthTab(TAuthTab(AuthType));
+    SelectAuthTab(AuthType);
     editBasicLogin.Text    := AuthBasic.Login;
     editBasicPassword.Text := AuthBasic.Password;
     editBearerPrefix.Text  := AuthBearer.Prefix;

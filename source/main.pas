@@ -876,7 +876,7 @@ begin
     obj.SetCollectionFromGrid(gridParams, obj.Params);
     obj.GetFormFromGrid(gridForm);
 
-    obj.AuthType := Integer(GetSelectedAuthTab);
+    obj.AuthType := GetSelectedAuthTab;
     obj.AuthBasic.Login    := editBasicLogin.Text;
     obj.AuthBasic.Password := editBasicPassword.Text;
     obj.AuthBearer.Prefix  := editBearerPrefix.Text;
