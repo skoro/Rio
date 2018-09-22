@@ -165,6 +165,9 @@ begin
             RO.AddCookie(KV.Key, KV.Value);
           end;
         end;
+        '--compressed': begin
+          // Just ignore this option.
+        end;
         else begin
           if line[1] = '-' then
             raise TImportException.Create(Format('Option "%s" is not supported.', [line]));
