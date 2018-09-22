@@ -214,6 +214,7 @@ begin
   FAuthType   := atNone;
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
+  FMethod     := 'GET';
 end;
 
 destructor TRequestObject.Destroy;
