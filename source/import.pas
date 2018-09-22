@@ -115,42 +115,33 @@ end;
 procedure TCurlImport.ParseCommandLine;
 var
   Buf, tokens, data: TStringList;
-  n: integer;
-  line, cmd: string;
+  line: string;
   RO: TRequestObject;
   KV: TKeyValuePair;
 
-  // Get a next token from the string buffer.
+  // Get a next token from the tokens list.
   function NextTok: string;
   begin
-    if Buf.Count = 0 then
+    if Tokens.Count = 0 then
       raise TImportException.Create('Command line error.');
-    Result := Buf.Strings[0];
-    Buf.Delete(0);
+    Result := Tokens.Strings[0];
+    Tokens.Delete(0);
   end;
+
 begin
-  Buf := TStringList.Create;
-  tokens := TStringList.Create;
-  data := TStringList.Create;
+  Buf := TStringList.Create; // Temporary buffer.
+  tokens := TStringList.Create; // Tokens list.
+  data := TStringList.Create; // Form data.
   try
-    Buf.Text := Input;
-    Cmd := '';
-    // Remove trailing shell slashes.
-    for n := 0 to Buf.Count - 1 do begin
-      line := Trim(Buf.Strings[n]);
-      line := TrimRightSet(line, ['\', ' ']);
-      Cmd := Cmd + Line + ' ';
-    end;
-    // Tokenize command line.
-    Buf.Delimiter := ' ';
-    Buf.DelimitedText := Cmd;
-    if Buf.Strings[0] <> 'curl' then
+    Tokenize(Input, Tokens);
+    if Tokens.Strings[0] <> 'curl' then
       raise TImportException.Create('Not a curl command line.');
-    Buf.Delete(0);
+    Tokens.Delete(0);
     RO := RequestObjects.Add.RequestObject;
-    while Buf.Count > 0 do begin
+    while Tokens.Count > 0 do begin
       line := NextTok;
       case line of
+        '\': Continue;
         '-X', '--request': RO.Method := NextTok;
         '-H', '--header': begin
           KV := SplitKV(NextTok, ':');
@@ -168,7 +159,7 @@ begin
         end;
         '-b', '--cookie': begin
           // The data should be in the format "NAME1=VALUE1; NAME2=VALUE2".
-          SplitStrings(NextTok, ';', tokens);
+          SplitStrings(NextTok, ';', buf);
           for line in Tokens do begin
             KV := SplitKV(Trim(line), '=');
             RO.AddCookie(KV.Key, KV.Value);
