@@ -80,11 +80,6 @@ object ImportForm: TImportForm
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Right = 4
-    Lines.Strings = (
-      'curl -X POST -H "Content-Type: application/json" \'
-      '        -H "Accept: application/json" http://localhost:8080 \'
-      '        -F "login=admin"'
-    )
     ScrollBars = ssAutoBoth
     TabOrder = 2
   end
