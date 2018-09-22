@@ -283,7 +283,22 @@ begin
 end;
 
 procedure TRequestObject.AddHeader(AName, AValue: string; IsEnabled: Boolean);
+var
+  Tokens: TStringArray;
 begin
+  // Parse Authorization header and set appropriate request object's auth type.
+  if LowerCase(AName) = 'authorization' then begin
+    Tokens := AValue.Split([' '], TStringSplitOptions.ExcludeEmpty);
+    if (Length(Tokens) = 2) and (Tokens[0] = FAuthBearer.Prefix) then
+    begin
+      if Tokens[1] = 'null' then // Don't set null token.
+        Exit; // =>
+      AuthBearer.Token := Tokens[1];
+      AuthType := atBearer;
+      // Don't add that as header it will be contained in auth object.
+      Exit; // =>
+    end;
+  end;
   with Headers.Add do begin
     Enabled := IsEnabled;
     Name := AName;
