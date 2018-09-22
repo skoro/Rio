@@ -172,8 +172,12 @@ begin
         end;
       end; // while
     end;
-    if data.Count > 0 then
+    if data.Count > 0 then begin
+      // the data always send by POST method.
+      if UpperCase(RO.Method) = 'GET' then
+        RO.Method := 'POST';
       if RO.IsJson then RO.Json := data.Text else RO.Body := data.Text;
+    end;
   finally
     Buf.Free;
     tokens.Free;
