@@ -47,7 +47,7 @@ begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   cbImportFrom.Items.Add('Curl');
   cbImportFrom.ItemIndex := 0;
-  linfo.Caption := 'Put Curl command line here:'#13#10'(only limited set of options supported)';
+  linfo.Caption := 'Put a Curl command line here:'#13#10'(only limited set of options is supported)';
   FImport := nil;
   input.Font := OptionsForm.GetFontItem(fiValue);
 end;

@@ -1,11 +1,11 @@
 object HelpForm: THelpForm
   Left = 404
-  Height = 290
+  Height = 321
   Top = 204
-  Width = 366
+  Width = 618
   Caption = 'HelpForm'
-  ClientHeight = 290
-  ClientWidth = 366
+  ClientHeight = 321
+  ClientWidth = 618
   KeyPreview = True
   OnKeyPress = FormKeyPress
   OnShow = FormShow
@@ -14,9 +14,9 @@ object HelpForm: THelpForm
   LCLVersion = '1.8.2.0'
   object bpButtons: TButtonPanel
     Left = 6
-    Height = 37
-    Top = 247
-    Width = 354
+    Height = 34
+    Top = 281
+    Width = 606
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
@@ -31,9 +31,9 @@ object HelpForm: THelpForm
   end
   object helpText: TMemo
     Left = 6
-    Height = 235
+    Height = 269
     Top = 6
-    Width = 354
+    Width = 606
     Align = alClient
     BorderSpacing.Around = 6
     Font.Pitch = fpFixed
