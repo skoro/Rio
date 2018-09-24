@@ -44,6 +44,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miImport: TMenuItem;
     miFindNext: TMenuItem;
     miSep1: TMenuItem;
     miFind: TMenuItem;
@@ -150,6 +151,7 @@ type
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
+    procedure miImportClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
     procedure JsonTreePopupMenuClick(Sender: TObject);
@@ -238,7 +240,7 @@ implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
-  Clipbrd;
+  import_form, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -669,6 +671,19 @@ begin
   end;
 end;
 
+procedure TForm1.miImportClick(Sender: TObject);
+begin
+  with TImportForm.Create(Self) do begin
+    if ShowModal = mrOK then begin
+      if RequestObjects.Count = 0 then
+        Application.MessageBox('Data not imported.', 'Error', MB_ICONERROR )
+      else
+        RequestObjects.Items[0].RequestObject.LoadToForm(Self);
+    end;
+    Free;
+  end;
+end;
+
 procedure TForm1.JsonTreeDblClick(Sender: TObject);
 var
   Node: TTreeNode;
@@ -859,9 +874,9 @@ begin
     obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
     obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
     obj.SetCollectionFromGrid(gridParams, obj.Params);
-    obj.SetForm(gridForm);
+    obj.GetFormFromGrid(gridForm);
 
-    obj.AuthType := Integer(GetSelectedAuthTab);
+    obj.AuthType := GetSelectedAuthTab;
     obj.AuthBasic.Login    := editBasicLogin.Text;
     obj.AuthBasic.Password := editBasicPassword.Text;
     obj.AuthBearer.Prefix  := editBearerPrefix.Text;
@@ -1425,22 +1440,7 @@ begin
   try
     streamer.JSONToObject(jsonStr, obj);
     StartNewRequest;
-    cbUrl.Text := obj.Url;
-    cbMethod.Text := obj.Method;
-    editOther.Text := obj.Body;
-    editJson.Text := obj.Json;
-
-    obj.SetCollectionToGrid(obj.Headers, requestHeaders);
-    obj.SetCollectionToGrid(obj.Cookies, gridReqCookie);
-    obj.SetCollectionToGrid(obj.Params, gridParams);
-    obj.GetForm(gridForm);
-
-    SelectAuthTab(TAuthTab(obj.AuthType));
-    editBasicLogin.Text    := obj.AuthBasic.Login;
-    editBasicPassword.Text := obj.AuthBasic.Password;
-    editBearerPrefix.Text  := obj.AuthBearer.Prefix;
-    editBearerToken.Text   := obj.AuthBearer.Token;
-
+    obj.LoadToForm(Self);
   except on E: Exception do
       ShowMessage(E.Message);
   end;

@@ -37,6 +37,7 @@ function NumberFormat(num: Int64; dot: string = '.'): string;
 procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
 
 function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 0): TFindPos;
+procedure Tokenize(txt: string; Tokens: TStrings);
 
 implementation
 
@@ -224,6 +225,50 @@ begin
     end
     else
       done := True;
+  end;
+end;
+
+procedure Tokenize(txt: string; Tokens: TStrings);
+var
+  Items: TStringArray;
+  Token, buf: string;
+  Quote: char;
+  isString: Boolean;
+
+  procedure AddStr(s: string);
+  begin
+    Tokens.Add(Copy(s, 2, s.Length - 2));
+  end;
+
+begin
+  Tokens.Clear;
+  Items := AnsiString(txt).Split([' ']);
+  isString := False;
+  for Token in Items do begin
+    if not isString and Token.IsEmpty then
+      Continue;
+    if (not isString) and (not Token.IsEmpty) and ((Token[1] = '"') or (Token[1] = '''')) then begin
+      Quote := Token[1];
+      Buf := Token.TrimRight;
+      if (Buf.Length > 1) and (Buf.EndsWith(Quote)) then begin
+        AddStr(Buf);
+        Continue;
+      end;
+      isString := True;
+      Buf := Token + ' ';
+      Continue;
+    end;
+    if isString then begin
+      Buf := Buf + IfThen(Token.IsEmpty, ' ', Token + ' ');
+      if Token.TrimRight.EndsWith(Quote) then begin
+        AddStr(Buf.TrimRight);
+        isString := False;
+      end;
+    end
+    else begin
+      if not Token.Trim.IsEmpty then
+        Tokens.Add(Token.TrimRight);
+    end;
   end;
 end;
 

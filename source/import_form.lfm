@@ -1,0 +1,97 @@
+object ImportForm: TImportForm
+  Left = 420
+  Height = 234
+  Top = 174
+  Width = 394
+  BorderIcons = [biSystemMenu, biMaximize]
+  Caption = 'Import'
+  ClientHeight = 234
+  ClientWidth = 394
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 300
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  OnKeyPress = FormKeyPress
+  OnShow = FormShow
+  Position = poMainFormCenter
+  ShowInTaskBar = stNever
+  LCLVersion = '1.8.2.0'
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 194
+    Width = 382
+    OKButton.Name = 'OKButton'
+    OKButton.Caption = '&Import'
+    OKButton.DefaultCaption = False
+    OKButton.OnClick = OKButtonClick
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.Caption = '&Cancel'
+    CancelButton.DefaultCaption = False
+    TabOrder = 0
+    ShowButtons = [pbOK, pbCancel]
+    ShowGlyphs = []
+  end
+  object MainPanel: TPanel
+    Left = 4
+    Height = 28
+    Top = 4
+    Width = 386
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Around = 4
+    BevelOuter = bvNone
+    ClientHeight = 28
+    ClientWidth = 386
+    TabOrder = 1
+    object lImport: TLabel
+      Left = 4
+      Height = 28
+      Top = 0
+      Width = 77
+      Align = alLeft
+      BorderSpacing.Left = 4
+      BorderSpacing.Right = 4
+      Caption = 'Import from:'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object cbImportFrom: TComboBox
+      Left = 85
+      Height = 28
+      Top = 0
+      Width = 301
+      Align = alClient
+      ItemHeight = 0
+      Style = csDropDownList
+      TabOrder = 0
+    end
+  end
+  object input: TMemo
+    Left = 4
+    Height = 136
+    Top = 52
+    Width = 386
+    Align = alClient
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    ScrollBars = ssAutoBoth
+    TabOrder = 2
+  end
+  object linfo: TLabel
+    Left = 4
+    Height = 16
+    Top = 36
+    Width = 386
+    Align = alTop
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    Caption = 'linfo'
+    ParentColor = False
+  end
+end
