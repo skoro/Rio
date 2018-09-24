@@ -27,7 +27,6 @@ type
     function CanFind: Boolean; virtual;
     procedure InitSearch(Search: string; Options: TFindOptions); virtual;
     function FindNext: Integer; virtual;
-    procedure CloseTab; virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -717,7 +716,7 @@ var
   Tab: Pointer;
 begin
   for Tab in FOpenedTabs do
-    TResponseTab(Tab).CloseTab;
+    TResponseTab(Tab).FreeTab;
   FOpenedTabs.Clear;
 end;
 
@@ -851,7 +850,8 @@ end;
 
 procedure TResponseTab.FreeTab;
 begin
-  FreeAndNil(FTabSheet);
+  if Assigned(FTabSheet) then
+    FreeAndNil(FTabSheet);
 end;
 
 procedure TResponseTab.Save(const AFileName: string);
@@ -872,11 +872,6 @@ end;
 function TResponseTab.FindNext: Integer;
 begin
   raise Exception.Create('Tab does not support search');
-end;
-
-procedure TResponseTab.CloseTab;
-begin
-  FreeAndNil(FTabSheet);
 end;
 
 end.
