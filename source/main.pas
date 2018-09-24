@@ -1751,6 +1751,7 @@ begin
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
   ResetGrid(gridParams);
+  SelectBodyTab(btForm);
 
   // Response fields.
   responseHeaders.RowCount := 1;
@@ -1773,6 +1774,7 @@ begin
   editBearerToken.Text := '';
   SelectAuthTab(atNone);
 
+  FResponseTabManager.CloseTabs;
   SetAppCaption;
 end;
 

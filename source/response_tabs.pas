@@ -27,6 +27,7 @@ type
     function CanFind: Boolean; virtual;
     procedure InitSearch(Search: string; Options: TFindOptions); virtual;
     function FindNext: Integer; virtual;
+    procedure CloseTab; virtual;
     property Name: string read FName;
     property TabSheet: TTabSheet read FTabSheet;
   end;
@@ -41,6 +42,7 @@ type
   TResponseTabManager = class
   private
     FPageControl: TPageControl;
+    { TODO : Convert FTabs and FOpenedTabs to TCollection }
     FTabs: TFPList;
     FOpenedTabs: TFPList;
     FOnOpenResponseTab: TOnOpenResponseTab;
@@ -51,6 +53,7 @@ type
     procedure RegisterTab(Tab: TResponseTab);
     procedure OpenTabs(ResponseInfo: TResponseInfo);
     procedure Save(const FileName: string);
+    procedure CloseTabs;
     function CanFind: TResponseTab; virtual;
     property PageControl: TPageControl read FPageControl write FPageControl;
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
@@ -709,6 +712,15 @@ begin
       FOnSaveTab(FileName, TResponseTab(Tab));
 end;
 
+procedure TResponseTabManager.CloseTabs;
+var
+  Tab: Pointer;
+begin
+  for Tab in FOpenedTabs do
+    TResponseTab(Tab).CloseTab;
+  FOpenedTabs.Clear;
+end;
+
 function TResponseTabManager.CanFind: TResponseTab;
 var
   Tab: Pointer;
@@ -860,6 +872,11 @@ end;
 function TResponseTab.FindNext: Integer;
 begin
   raise Exception.Create('Tab does not support search');
+end;
+
+procedure TResponseTab.CloseTab;
+begin
+  FreeAndNil(FTabSheet);
 end;
 
 end.
