@@ -327,6 +327,8 @@ begin
 end;
 
 procedure TRequestObject.LoadToForm(form: TForm1);
+var
+  bt: TBodyTab;
 begin
   with form do begin
     cbUrl.Text     := Url;
@@ -344,6 +346,16 @@ begin
     editBasicPassword.Text := AuthBasic.Password;
     editBearerPrefix.Text  := AuthBearer.Prefix;
     editBearerToken.Text   := AuthBearer.Token;
+
+    // Set body tab depending on data.
+    if IsJson then
+       bt := btJson
+    else
+      if not Body.Trim.IsEmpty then
+        bt := btOther
+    else
+      bt := btForm;
+    SelectBodyTab(bt);
   end;
 end;
 
