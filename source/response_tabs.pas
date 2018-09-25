@@ -135,6 +135,7 @@ type
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure ToggleFilterPanel;
+    procedure InitSearchParams;
     function FindInNode(Node: TTreeNode): TTreeNode;
   public
     constructor Create;
@@ -403,6 +404,18 @@ begin
     FFilter.SetFocus;
 end;
 
+procedure TResponseJsonTab.InitSearchParams;
+begin
+  FSearchNode := nil;
+  FSearchNodePos := 0;
+  if ssoBackwards in FSearchOptions then begin
+    FSearchPos.y := FSynEdit.Lines.Count;
+    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
+  end
+  else
+    FSearchPos := Point(0, 0);
+end;
+
 function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
 var
   Next: TTreeNode;
@@ -462,6 +475,8 @@ begin
   FTreeView   := nil;
   FJsonRoot   := nil;
   FJsonParser := nil;
+  FSearchOptions := [];
+  InitSearchParams;
 end;
 
 destructor TResponseJsonTab.Destroy;
@@ -529,6 +544,7 @@ begin
     ClearJsonData;
     LoadDocument(ResponseInfo.Content.DataString);
   end;
+  InitSearchParams;
 end;
 
 procedure TResponseJsonTab.FreeTab;
@@ -600,18 +616,13 @@ procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
 begin
   FSearchText := Search;
   FSearchOptions := [];
-  FSearchNodePos := 0;
-  FSearchNode := nil;
-  FSearchPos := Point(0, 0);
-  if not (frDown in Options) then begin
+  if not (frDown in Options) then
     Include(FSearchOptions, ssoBackwards);
-    FSearchPos.y := FSynEdit.Lines.Count;
-    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
-  end;
   if frMatchCase in Options then
     Include(FSearchOptions, ssoMatchCase);
   if frWholeWord in Options then
     Include(FSearchOptions, ssoWholeWord);
+  InitSearchParams;
 end;
 
 function TResponseJsonTab.FindNext: Integer;

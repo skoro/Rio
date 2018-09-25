@@ -215,7 +215,7 @@ type
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
-    procedure FindStart;
+    procedure FindStart(Search: Boolean = True);
   public
     procedure ApplyOptions;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
@@ -1317,16 +1317,20 @@ begin
     miJsonFilter.Enabled := False;
 end;
 
-procedure TForm1.FindStart;
+procedure TForm1.FindStart(Search: Boolean = True);
 var
   tab: TResponseTab;
+  IsText: Boolean;
 begin
   FFindTextPos := 0;
+  IsText := not dlgFind.FindText.Trim.IsEmpty;
   tab := FResponseTabManager.CanFind;
-  if tab <> nil then
+  if (tab <> nil) and (IsText) then
     tab.InitSearch(dlgFind.FindText, dlgFind.Options);
-  FindText;
-  miFindNext.Enabled := True;
+  if IsText then
+    miFindNext.Enabled := True;
+  if Search then
+    FindText;
 end;
 
 procedure TForm1.ApplyOptions;
@@ -1564,6 +1568,10 @@ begin
   miFind.Enabled := tabContent.TabVisible;
   if not miFind.Enabled then
     miFindNext.Enabled := False;
+
+  // Reset search: Find Next will search from start or from the end data with
+  // the parameters from the previous search (if it was happen).
+  FindStart(False);
 
   if tabContent.TabVisible then begin
     with responseRaw.Lines do begin
