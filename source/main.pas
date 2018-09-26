@@ -214,7 +214,6 @@ type
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
-    procedure JsonTab_OnJsonData(Root, Filtered: TJSONData);
     procedure FindStart(Search: Boolean = True);
   public
     procedure ApplyOptions;
@@ -498,7 +497,6 @@ begin
   FResponseTabManager.RegisterTab(TResponseImageTab.Create);
   FResponseJsonTab := TResponseJsonTab.Create;
   FResponseJsonTab.OnJsonFormat := @JsonTab_OnJsonFormat;
-  FResponseJsonTab.OnJsonData := @JsonTab_OnJsonData;
   FResponseTabManager.RegisterTab(FResponseJsonTab);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
   FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
@@ -1306,15 +1304,6 @@ end;
 procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
 begin
   Editor.Text := FormatJson(JsonData);
-end;
-
-procedure TForm1.JsonTab_OnJsonData(Root, Filtered: TJSONData);
-begin
-  // Cannot refilter already filtered json tree.
-  if Root = Filtered then
-    miJsonFilter.Enabled := True
-  else
-    miJsonFilter.Enabled := False;
 end;
 
 procedure TForm1.FindStart(Search: Boolean = True);

@@ -324,10 +324,10 @@ procedure TResponseJsonTab.ApplyFilter;
 var
   Filtered: TJSONData;
 begin
-  if not IsFilterActive then
-    Filtered := FJsonRoot
+  if IsFilterActive then
+    Filtered := FJsonRoot.FindPath(FFilter.Text)
   else
-    Filtered := FJsonRoot.FindPath(FFilter.Text);
+    Filtered := FJsonRoot;
 
   if Assigned(FOnJsonData) then
     FOnJsonData(FJsonRoot, Filtered);
@@ -336,8 +336,10 @@ begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
   end
-  else
+  else begin
     FSynEdit.Text := '';
+    BuildTree(nil);
+  end;
 end;
 
 procedure TResponseJsonTab.BuildTree(JsonData: TJSONData);
@@ -565,6 +567,7 @@ begin
   FilterList := TStringList.Create;
   FilterList.LineBreak := '';
 
+  // Find out a node path.
   try
     while Assigned(Node.Parent) do begin
       childJson  := TJSONData(Node.Data);
@@ -590,7 +593,11 @@ begin
     end;
 
     if FilterList.Count > 0 then begin
-      FFilter.Text := FilterList.Text;
+      if FFilter.Text.Trim.IsEmpty then
+        FFilter.Text := FilterList.Text
+      else
+        // Already filtered, chain next filter.
+        FFilter.Text := FFilter.Text + FilterList.Text;
       if not FFilter.Visible then
         ToggleFilterPanel;
       ApplyFilter;
