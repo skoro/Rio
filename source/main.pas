@@ -1268,6 +1268,7 @@ begin
       SynEdit.Font := OptionsForm.GetFontItem(fiEditor);
       ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
       ViewPage := OptionsForm.JsonView;
+      LineNumbers := OptionsForm.JsonLines;
     end;
   end
 
@@ -1297,8 +1298,10 @@ end;
 
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
-  if OptionsForm.ShowModalPage(opJson) = mrOK then
+  if OptionsForm.ShowModalPage(opJson) = mrOK then begin
     ApplyOptions;
+    FResponseJsonTab.LineNumbers := OptionsForm.JsonLines;
+  end;
 end;
 
 procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
