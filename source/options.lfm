@@ -12,7 +12,7 @@ object OptionsForm: TOptionsForm
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poMainFormCenter
-  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;Width'
+  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;Width;cbJsonLines.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
@@ -42,14 +42,14 @@ object OptionsForm: TOptionsForm
     Height = 328
     Top = 4
     Width = 312
-    ActivePage = tabAppearance
+    ActivePage = tabJson
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 1
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 295
+      ClientHeight = 298
       ClientWidth = 308
       object gbLayout: TGroupBox
         Left = 8
@@ -58,14 +58,14 @@ object OptionsForm: TOptionsForm
         Width = 296
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Layout'
-        ClientHeight = 76
+        ClientHeight = 79
         ClientWidth = 292
         TabOrder = 0
         object rbLayoutVert: TRadioButton
           Left = 8
           Height = 22
           Top = 8
-          Width = 70
+          Width = 68
           Caption = '&Vertical'
           Checked = True
           TabOrder = 0
@@ -75,7 +75,7 @@ object OptionsForm: TOptionsForm
           Left = 8
           Height = 22
           Top = 40
-          Width = 88
+          Width = 86
           Caption = '&Horizontal'
           TabOrder = 1
         end
@@ -84,7 +84,7 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 22
         Top = 112
-        Width = 279
+        Width = 266
         Caption = 'Hide &grid buttons: new, edit, delete, clear'
         TabOrder = 1
       end
@@ -95,12 +95,12 @@ object OptionsForm: TOptionsForm
         Width = 296
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Fonts'
-        ClientHeight = 99
+        ClientHeight = 102
         ClientWidth = 292
         TabOrder = 2
         object cboxFontItem: TComboBox
           Left = 8
-          Height = 31
+          Height = 28
           Top = 0
           Width = 276
           Align = alTop
@@ -113,7 +113,7 @@ object OptionsForm: TOptionsForm
         end
         object btnSelectFont: TButton
           Left = 8
-          Height = 29
+          Height = 26
           Top = 32
           Width = 38
           AutoSize = True
@@ -123,17 +123,17 @@ object OptionsForm: TOptionsForm
         end
         object lFontDemo: TLabel
           Left = 56
-          Height = 19
+          Height = 16
           Top = 32
-          Width = 69
+          Width = 67
           Caption = 'lFontDemo'
           ParentColor = False
         end
         object btnResetFont: TButton
           Left = 8
-          Height = 29
+          Height = 26
           Top = 64
-          Width = 45
+          Width = 43
           AutoSize = True
           Caption = '&Reset'
           Enabled = False
@@ -144,13 +144,13 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 295
+      ClientHeight = 298
       ClientWidth = 308
       object cbJsonExpanded: TCheckBox
         Left = 8
         Height = 22
         Top = 8
-        Width = 168
+        Width = 163
         Caption = 'JSON tree &expanded (*)'
         TabOrder = 0
       end
@@ -158,34 +158,36 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 22
         Top = 40
-        Width = 154
+        Width = 151
         Caption = '&Save formatted JSON'
         TabOrder = 1
       end
       object GroupBox1: TGroupBox
-        Left = 8
-        Height = 108
-        Top = 160
+        Left = 9
+        Height = 88
+        Top = 192
         Width = 296
         Anchors = [akTop, akLeft, akRight]
+        AutoSize = True
+        BorderSpacing.InnerBorder = 4
         Caption = 'Format options'
-        ClientHeight = 87
+        ClientHeight = 70
         ClientWidth = 292
         TabOrder = 2
         object Label1: TLabel
-          Left = 8
-          Height = 19
-          Top = 21
-          Width = 72
+          Left = 0
+          Height = 16
+          Top = 5
+          Width = 67
           BorderSpacing.Right = 4
           Caption = 'Indent size:'
           Layout = tlCenter
           ParentColor = False
         end
         object editIndentSize: TSpinEdit
-          Left = 88
+          Left = 80
           Height = 29
-          Top = 16
+          Top = 0
           Width = 50
           AutoSize = False
           MaxValue = 32
@@ -194,53 +196,63 @@ object OptionsForm: TOptionsForm
           Value = 2
         end
         object cbJsonFmtArray: TCheckBox
-          Left = 8
+          Left = 0
           Height = 22
-          Top = 56
-          Width = 122
+          Top = 40
+          Width = 117
           Caption = 'Single line &array'
           TabOrder = 1
         end
       end
       object GroupBox2: TGroupBox
         Left = 8
-        Height = 96
-        Top = 64
+        Height = 80
+        Top = 104
         Width = 297
         Anchors = [akTop, akLeft, akRight]
+        AutoSize = True
+        BorderSpacing.InnerBorder = 4
         Caption = 'Default view (*)'
-        ClientHeight = 75
+        ClientHeight = 62
         ClientWidth = 293
         TabOrder = 3
         object rbJsonTree: TRadioButton
-          Left = 8
+          Left = 0
           Height = 22
-          Top = 8
-          Width = 52
+          Top = 0
+          Width = 50
           Caption = '&Tree'
           Checked = True
           TabOrder = 0
           TabStop = True
         end
         object rbJsonFormatted: TRadioButton
-          Left = 8
+          Left = 0
           Height = 22
-          Top = 40
-          Width = 90
+          Top = 32
+          Width = 88
           Caption = '&Formatted'
           TabOrder = 1
         end
       end
       object Label2: TLabel
         Left = 0
-        Height = 16
-        Top = 279
+        Height = 14
+        Top = 284
         Width = 308
         Align = alBottom
         Caption = '(*) these options will be applied on next request.'
         Font.Height = -11
         ParentColor = False
         ParentFont = False
+      end
+      object cbJsonLines: TCheckBox
+        Left = 8
+        Height = 22
+        Top = 72
+        Width = 214
+        Caption = 'Line numbers in formatted view'
+        TabOrder = 4
       end
     end
   end

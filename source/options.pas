@@ -28,6 +28,7 @@ type
     cbJsonFmtArray: TCheckBox;
     cbHideGridButtons: TCheckBox;
     cboxFontItem: TComboBox;
+    cbJsonLines: TCheckBox;
     editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
     GroupBox1: TGroupBox;
@@ -58,6 +59,7 @@ type
     function GetJsonFormatOptions: TFormatOptions;
     function GetJsonIndentSize: Integer;
     function GetJsonExpanded: Boolean;
+    function GetJsonLines: Boolean;
     function GetJsonSaveFmt: Boolean;
     function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
@@ -78,6 +80,7 @@ type
     property JsonIndentSize: Integer read GetJsonIndentSize;
     property JsonView: TViewPage read GetJsonView;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
+    property JsonLines: Boolean read GetJsonLines;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
   end;
@@ -180,6 +183,11 @@ end;
 function TOptionsForm.GetJsonExpanded: Boolean;
 begin
   Result := cbJsonExpanded.Checked;
+end;
+
+function TOptionsForm.GetJsonLines: Boolean;
+begin
+  Result := cbJsonLines.Checked;
 end;
 
 function TOptionsForm.GetJsonSaveFmt: Boolean;
