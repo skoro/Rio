@@ -46,6 +46,7 @@ type
     FOpenedTabs: TFPList;
     FOnOpenResponseTab: TOnOpenResponseTab;
     FOnSaveTab: TOnSaveTab;
+    function GetActiveTab: TResponseTab;
   public
     constructor Create(APageControl: TPageControl);
     destructor Destroy; override;
@@ -58,6 +59,7 @@ type
     property OnOpenResponseTab: TOnOpenResponseTab read FOnOpenResponseTab write FOnOpenResponseTab;
     property OnSaveTab: TOnSaveTab read FOnSaveTab write FOnSaveTab;
     property OpenedTabs: TFPList read FOpenedTabs;
+    property ActiveTab: TResponseTab read GetActiveTab;
   end;
 
   { TResponseImageTab }
@@ -97,6 +99,7 @@ type
 
   TResponseJsonTab = class(TResponseTab)
   private
+    FLineNumbers: Boolean;
     FTreeView: TTreeView;
     FJsonRoot: TJSONData;
     FJsonParser: TJSONParser;
@@ -119,6 +122,7 @@ type
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
+    procedure SetLineNumbers(AValue: Boolean);
     procedure SetOnJsonFormat(AValue: TOnJsonFormat);
     procedure SetViewPage(AValue: TViewPage);
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
@@ -136,6 +140,7 @@ type
   protected
     procedure ToggleFilterPanel;
     procedure InitSearchParams;
+    procedure ShowLineNumbers;
     function FindInNode(Node: TTreeNode): TTreeNode;
   public
     constructor Create;
@@ -157,6 +162,7 @@ type
     property TreeExpanded: Boolean read FTreeExpanded write FTreeExpanded default True;
     property OnJsonFormat: TOnJsonFormat read FOnJsonFormat write SetOnJsonFormat;
     property OnJsonData: TOnJsonData read FOnJsonData write FOnJsonData;
+    property LineNumbers: Boolean read FLineNumbers write SetLineNumbers;
   end;
 
 implementation
@@ -186,6 +192,13 @@ begin
     end;
   end;
   FreeAndNil(S);
+end;
+
+procedure TResponseJsonTab.SetLineNumbers(AValue: Boolean);
+begin
+  if FLineNumbers = AValue then Exit;
+  FLineNumbers := AValue;
+  ShowLineNumbers;
 end;
 
 procedure TResponseJsonTab.SetOnJsonFormat(AValue: TOnJsonFormat);
@@ -418,6 +431,13 @@ begin
     FSearchPos := Point(0, 0);
 end;
 
+procedure TResponseJsonTab.ShowLineNumbers;
+begin
+  if not Assigned(FSynEdit) then
+    Exit; // =>
+  FSynEdit.Gutter.Parts.Part[1].Visible := FLineNumbers;
+end;
+
 function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
 var
   Next: TTreeNode;
@@ -478,6 +498,7 @@ begin
   FJsonRoot   := nil;
   FJsonParser := nil;
   FSearchOptions := [];
+  FLineNumbers := False;
   InitSearchParams;
 end;
 
@@ -538,6 +559,8 @@ begin
   FSynEdit.Gutter.Parts.Part[1].Visible := False;
   FSynEdit.Gutter.Parts.Part[2].Visible := False;
   FSynEdit.Gutter.Parts.Part[3].Visible := False;
+
+  ShowLineNumbers;
 end;
 
 procedure TResponseJsonTab.OnHttpResponse(ResponseInfo: TResponseInfo);
@@ -674,6 +697,15 @@ begin
 end;
 
 { TResponseTabManager }
+
+function TResponseTabManager.GetActiveTab: TResponseTab;
+var
+  Tab: pointer;
+begin
+  for Tab in FOpenedTabs do
+    if FPageControl.ActivePage = TResponseTab(Tab).TabSheet then
+      Exit(TResponseTab(Tab));
+end;
 
 constructor TResponseTabManager.Create(APageControl: TPageControl);
 begin
