@@ -120,6 +120,7 @@ type
     tabAuth: TTabSheet;
     tabAuthBasic: TTabSheet;
     tabAuthBearer: TTabSheet;
+    TimerRequest: TTimer;
     toolbarAuth: TToolBar;
     ToolButton1: TToolButton;
     tbtnManageHeaders: TToolButton;
@@ -182,12 +183,14 @@ type
     procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
+    procedure TimerRequestTimer(Sender: TObject);
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
     FResponseTabManager: TResponseTabManager;
     FResponseJsonTab: TResponseJsonTab;
     FFindTextPos: Integer;
+    FRequestSeconds: Integer;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -251,6 +254,8 @@ const
 procedure TForm1.btnSubmitClick(Sender: TObject);
 begin
   SubmitRequest;
+  FRequestSeconds := 0;
+  TimerRequest.Enabled := True;
 end;
 
 procedure TForm1.SubmitRequest;
@@ -1070,6 +1075,16 @@ begin
     HeadersEditorForm.Add(KV.Key, KV.Value);
 end;
 
+procedure TForm1.TimerRequestTimer(Sender: TObject);
+var
+  Min, Sec: Integer;
+begin
+  Inc(FRequestSeconds);
+  Min := FRequestSeconds div 60;
+  Sec := FRequestSeconds mod 60;
+  StatusTextInfo.Caption := Format('%.2d:%.2d', [Min, Sec]);
+end;
+
 // Synchronizes query parameters from the url.
 procedure TForm1.SyncURLQueryParams;
 var
@@ -1510,6 +1525,7 @@ var
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
+  TimerRequest.Enabled := False;
   SetAppCaption(cbUrl.Text);
 
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;

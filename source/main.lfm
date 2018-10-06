@@ -1896,4 +1896,10 @@ object Form1: TForm1
     left = 112
     top = 440
   end
+  object TimerRequest: TTimer
+    Enabled = False
+    OnTimer = TimerRequestTimer
+    left = 146
+    top = 185
+  end
 end
