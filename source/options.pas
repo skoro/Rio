@@ -15,7 +15,7 @@ type
 
   { TOptionsPage }
 
-  TOptionsPage = (opAppearance, opJson);
+  TOptionsPage = (opGeneral, opAppearance, opJson);
 
   { TOptionsForm }
 
@@ -37,6 +37,7 @@ type
     gbFonts: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
+    lTimeout: TLabel;
     lFontDemo: TLabel;
     pagesOptions: TPageControl;
     Panel1: TPanel;
@@ -45,8 +46,10 @@ type
     rbJsonFormatted: TRadioButton;
     rbLayoutVert: TRadioButton;
     rbLayoutHor: TRadioButton;
+    seTimeout: TSpinEdit;
     tabJson: TTabSheet;
     tabAppearance: TTabSheet;
+    tabGeneral: TTabSheet;
     TabSheet2: TTabSheet;
     procedure btnResetFontClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
@@ -65,6 +68,7 @@ type
     function GetPanelsLayout: TPairSplitterType;
     function GetFontIndexFromKeyName(AKeyName: string): integer;
     function GetDefaultFont(FontItem: TUIFontItem): TFont;
+    function GetRequestTimeout: Integer;
     procedure SetFontDemo;
     procedure InitFonts;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
@@ -83,6 +87,7 @@ type
     property JsonLines: Boolean read GetJsonLines;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
+    property Timeout: Integer read GetRequestTimeout;
   end;
 
 var
@@ -118,7 +123,7 @@ begin
     end;
 
   Props.Active := True;
-  pagesOptions.ActivePage := tabAppearance;
+  pagesOptions.ActivePage := tabGeneral;
 end;
 
 procedure TOptionsForm.FormShow(Sender: TObject);
@@ -228,6 +233,11 @@ begin
     end;
 end;
 
+function TOptionsForm.GetRequestTimeout: Integer;
+begin
+  Result := seTimeout.Value;
+end;
+
 procedure TOptionsForm.SetFontDemo;
 var
   FontObj: TFont;
@@ -329,6 +339,7 @@ begin
   case page of
     opAppearance: pagesOptions.ActivePage := tabAppearance;
     opJson:       pagesOptions.ActivePage := tabJson;
+    opGeneral:    pagesOptions.ActivePage := tabGeneral;
   end;
   Result := ShowModal;
 end;
