@@ -281,6 +281,7 @@ begin
   FHttpClient := TThreadHttpClient.Create(true);
   FHttpClient.OnRequestComplete := @OnRequestComplete;
   FHttpClient.OnException := @OnHttpException;
+  FHttpClient.Client.IOTimeout := OptionsForm.Timeout * TimerRequest.Interval;
 
   method := UpperCase(Trim(cbMethod.Text));
   if method = '' then method := 'GET';
@@ -1462,8 +1463,14 @@ end;
 
 procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
 begin
+  TimerRequest.Enabled := False;
   UpdateStatusLine;
-  ShowMessage(E.Message);
+  StatusTextInfo.Caption := '';
+  // Is this a timeout exception ?
+  if OptionsForm.Timeout = FRequestSeconds then
+    ShowMessage('Request is timeout.')
+  else
+    ShowMessage(E.Message);
   btnSubmit.Enabled := True;
 end;
 
