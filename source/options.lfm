@@ -69,6 +69,14 @@ object OptionsForm: TOptionsForm
         Caption = 'Request timeout (sec):'
         ParentColor = False
       end
+      object cbEditMethods: TCheckBox
+        Left = 8
+        Height = 22
+        Top = 64
+        Width = 178
+        Caption = '&Editable request methods'
+        TabOrder = 1
+      end
     end
     object tabAppearance: TTabSheet
       Caption = 'Appearance'

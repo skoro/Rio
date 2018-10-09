@@ -1377,6 +1377,8 @@ begin
   OptionsForm.ApplyControlFont(Self, 'TTreeView', fiJson);
   responseRaw.Font := OptionsForm.GetFontItem(fiContent);
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
+
+  cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
 end;
 
 function TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;

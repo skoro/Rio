@@ -29,6 +29,7 @@ type
     cbHideGridButtons: TCheckBox;
     cboxFontItem: TComboBox;
     cbJsonLines: TCheckBox;
+    cbEditMethods: TCheckBox;
     editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
     GroupBox1: TGroupBox;
@@ -58,6 +59,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     FFontItemList: TFontItemList;
+    function GetEditRequestMethods: Boolean;
     function GetGridButtonsHidden: Boolean;
     function GetJsonFormatOptions: TFormatOptions;
     function GetJsonIndentSize: Integer;
@@ -88,6 +90,7 @@ type
     property PanelsLayout: TPairSplitterType read GetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
     property Timeout: Integer read GetRequestTimeout;
+    property EditRequestMethods: Boolean read GetEditRequestMethods;
   end;
 
 var
@@ -171,6 +174,11 @@ end;
 function TOptionsForm.GetGridButtonsHidden: Boolean;
 begin
   Result := cbHideGridButtons.Checked;
+end;
+
+function TOptionsForm.GetEditRequestMethods: Boolean;
+begin
+  Result := cbEditMethods.Checked;
 end;
 
 function TOptionsForm.GetJsonFormatOptions: TFormatOptions;
