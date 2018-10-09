@@ -12,7 +12,7 @@ object OptionsForm: TOptionsForm
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poMainFormCenter
-  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;Width;seTimeout.Value'
+  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cbEditMethods.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
