@@ -5,8 +5,8 @@ unit key_value;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ValEdit;
+  SysUtils, Forms, Controls, ExtCtrls,
+  StdCtrls, ValEdit, ButtonPanel;
 
 const
   FocusKey = 1;
@@ -17,14 +17,13 @@ type
   { TKeyValueForm }
 
   TKeyValueForm = class(TForm)
-    btnOK: TButton;
-    btnCancel: TButton;
+    ButtonPanel: TButtonPanel;
+    cbEnabled: TCheckBox;
     editName: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
+    LabelName: TLabel;
+    LabelValue: TLabel;
     textValue: TMemo;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    PanelMain: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure textValueKeyPress(Sender: TObject; var Key: char);
@@ -105,9 +104,8 @@ begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
-  btnOK.AutoSize := False;
-  btnOK.Width := 67;
-  btnOK.Caption := '&OK';
+  cbEnabled.Visible := True;
+  ButtonPanel.OKButton.Caption := '&OK';
   case Focus of
     FocusKey: FFocusedComponent := editName;
     FocusVal: FFocusedComponent := textValue;
@@ -134,9 +132,9 @@ procedure TKeyValueForm.View(const AKey, AValue, Title: string);
 begin
   SetKey(AKey);
   SetValue(AValue);
+  cbEnabled.Visible := False;
   Caption := title;
-  btnOK.Caption := 'C&opy and Close';
-  btnOK.AutoSize := True;
+  ButtonPanel.OKButton.Caption := 'C&opy and Close';
   FFocusedComponent := textValue;
   if ShowModal = mrOk then
   begin

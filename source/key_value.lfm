@@ -1,69 +1,36 @@
 object KeyValueForm: TKeyValueForm
   Left = 454
-  Height = 245
+  Height = 254
   Top = 224
-  Width = 246
+  Width = 257
   BorderIcons = []
   Caption = 'KeyValueForm'
-  ClientHeight = 245
-  ClientWidth = 246
-  Constraints.MinHeight = 180
-  Constraints.MinWidth = 200
+  ClientHeight = 254
+  ClientWidth = 257
+  Constraints.MinHeight = 220
+  Constraints.MinWidth = 240
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
-  object Panel1: TPanel
+  object PanelMain: TPanel
     Left = 2
-    Height = 42
-    Top = 201
-    Width = 242
-    Align = alBottom
-    BorderSpacing.Around = 2
-    BevelOuter = bvNone
-    ClientHeight = 42
-    ClientWidth = 242
-    TabOrder = 0
-    object btnOK: TButton
-      Left = 0
-      Height = 42
-      Top = 0
-      Width = 67
-      Align = alLeft
-      Caption = '&OK'
-      ModalResult = 1
-      TabOrder = 0
-    end
-    object btnCancel: TButton
-      Left = 167
-      Height = 42
-      Top = 0
-      Width = 75
-      Align = alRight
-      Cancel = True
-      Caption = '&Cancel'
-      ModalResult = 2
-      TabOrder = 1
-    end
-  end
-  object Panel2: TPanel
-    Left = 2
-    Height = 197
+    Height = 206
     Top = 2
-    Width = 242
+    Width = 253
     Align = alClient
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 197
-    ClientWidth = 242
-    TabOrder = 1
+    ClientHeight = 206
+    ClientWidth = 253
+    TabOrder = 0
     object textValue: TMemo
       Left = 2
-      Height = 122
-      Top = 73
-      Width = 238
+      Height = 118
+      Top = 86
+      Width = 249
       Align = alClient
       OnKeyPress = textValueKeyPress
       ScrollBars = ssAutoBoth
@@ -71,30 +38,57 @@ object KeyValueForm: TKeyValueForm
     end
     object editName: TEdit
       Left = 2
-      Height = 29
-      Top = 21
-      Width = 238
+      Height = 26
+      Top = 40
+      Width = 249
       Align = alTop
       TabOrder = 0
     end
-    object Label1: TLabel
+    object LabelName: TLabel
       Left = 2
-      Height = 19
-      Top = 2
-      Width = 238
+      Height = 16
+      Top = 24
+      Width = 249
       Align = alTop
       Caption = 'Name'
       ParentColor = False
     end
-    object Label2: TLabel
+    object LabelValue: TLabel
       Left = 2
-      Height = 19
-      Top = 54
-      Width = 238
+      Height = 16
+      Top = 70
+      Width = 249
       Align = alTop
       BorderSpacing.Top = 4
       Caption = 'Value'
       ParentColor = False
     end
+    object cbEnabled: TCheckBox
+      Left = 2
+      Height = 22
+      Top = 2
+      Width = 249
+      Align = alTop
+      Caption = '&Enabled'
+      TabOrder = 2
+    end
+  end
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 214
+    Width = 245
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    ButtonOrder = boCloseOKCancel
+    TabOrder = 1
+    ShowButtons = [pbOK, pbClose]
+    ShowGlyphs = []
   end
 end
