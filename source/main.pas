@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miExport: TMenuItem;
     miImport: TMenuItem;
     miFindNext: TMenuItem;
     miSep1: TMenuItem;
@@ -148,6 +149,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miExportClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
@@ -241,7 +243,7 @@ implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
-  import_form, Clipbrd;
+  import_form, export_form, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -649,6 +651,16 @@ end;
 procedure TForm1.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TForm1.miExportClick(Sender: TObject);
+begin
+  with TExportForm.Create(Self) do begin
+    if ShowModal = mrOK then begin
+
+    end;
+    Free;
+  end;
 end;
 
 procedure TForm1.miFindClick(Sender: TObject);

@@ -1483,6 +1483,10 @@ object Form1: TForm1
         Caption = '&Import...'
         OnClick = miImportClick
       end
+      object miExport: TMenuItem
+        Caption = '&Export...'
+        OnClick = miExportClick
+      end
       object miSaveRequest: TMenuItem
         Caption = '&Save request...'
         ShortCut = 16467

@@ -1,0 +1,91 @@
+object ExportForm: TExportForm
+  Left = 427
+  Height = 278
+  Top = 247
+  Width = 401
+  BorderIcons = [biSystemMenu, biMaximize]
+  Caption = 'Export'
+  ClientHeight = 278
+  ClientWidth = 401
+  Constraints.MinHeight = 200
+  Constraints.MinWidth = 300
+  OnCreate = FormCreate
+  Position = poMainFormCenter
+  ShowInTaskBar = stNever
+  LCLVersion = '1.8.2.0'
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 34
+    Top = 238
+    Width = 389
+    OKButton.Name = 'OKButton'
+    OKButton.Caption = '&Export'
+    OKButton.DefaultCaption = False
+    HelpButton.Name = 'HelpButton'
+    HelpButton.Caption = '&Save'
+    HelpButton.DefaultCaption = False
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.Caption = '&Cancel'
+    CancelButton.DefaultCaption = False
+    TabOrder = 0
+    ShowButtons = [pbOK, pbCancel, pbHelp]
+    ShowGlyphs = []
+  end
+  object TopPanel: TPanel
+    Left = 4
+    Height = 28
+    Top = 4
+    Width = 393
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Around = 4
+    BevelOuter = bvNone
+    ClientHeight = 28
+    ClientWidth = 393
+    TabOrder = 1
+    object lExport: TLabel
+      Left = 4
+      Height = 28
+      Top = 0
+      Width = 59
+      Align = alLeft
+      BorderSpacing.Left = 4
+      BorderSpacing.Right = 4
+      Caption = 'Export to:'
+      Layout = tlCenter
+      ParentColor = False
+    end
+    object cbExport: TComboBox
+      Left = 67
+      Height = 28
+      Top = 0
+      Width = 326
+      Align = alClient
+      ItemHeight = 0
+      Style = csDropDownList
+      TabOrder = 0
+    end
+  end
+  object PanelMain: TPanel
+    Left = 4
+    Height = 196
+    Top = 36
+    Width = 393
+    Align = alClient
+    BorderSpacing.Around = 4
+    BevelOuter = bvNone
+    ClientHeight = 196
+    ClientWidth = 393
+    TabOrder = 2
+    object MemoResult: TMemo
+      Left = 0
+      Height = 196
+      Top = 0
+      Width = 393
+      Align = alClient
+      TabOrder = 0
+    end
+  end
+end
