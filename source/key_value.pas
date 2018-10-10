@@ -5,8 +5,8 @@ unit key_value;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ValEdit;
+  SysUtils, Forms, Controls, ExtCtrls,
+  StdCtrls, ButtonPanel;
 
 const
   FocusKey = 1;
@@ -14,17 +14,24 @@ const
 
 type
 
+  { TKeyValue }
+
+  TKeyValue = record
+    Key: string;
+    Value: string;
+    Enabled: Boolean;
+  end;
+
   { TKeyValueForm }
 
   TKeyValueForm = class(TForm)
-    btnOK: TButton;
-    btnCancel: TButton;
+    ButtonPanel: TButtonPanel;
+    cbEnabled: TCheckBox;
     editName: TEdit;
-    Label1: TLabel;
-    Label2: TLabel;
+    LabelName: TLabel;
+    LabelValue: TLabel;
     textValue: TMemo;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    PanelMain: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure textValueKeyPress(Sender: TObject; var Key: char);
@@ -40,11 +47,12 @@ type
     property Key: string read GetKey write SetKey;
     property Value: string read GetValue write SetValue;
     function Edit(const AKey, AValue, title: string;
-                        const Focus: Integer = FocusKey): TKeyValuePair;
-    function Edit(const KV: TKeyValuePair; const title: string;
-                        const Focus: Integer = FocusKey): TKeyValuePair;
+                        AEnabled: Boolean = False;
+                        const Focus: Integer = FocusKey): TKeyValue;
+    function Edit(const KV: TKeyValue; const title: string;
+                        const Focus: Integer = FocusKey): TKeyValue;
     procedure View(const AKey, AValue, Title: string);
-    procedure View(const KV: TKeyValuePair; const title: string);
+    procedure View(const KV: TKeyValue; const title: string);
   end;
 
 var
@@ -100,14 +108,15 @@ begin
 end;
 
 function TKeyValueForm.Edit(const AKey, AValue, title: string;
-  const Focus: Integer = FocusKey): TKeyValuePair;
+  AEnabled: Boolean = False;
+  const Focus: Integer = FocusKey): TKeyValue;
 begin
   SetKey(AKey);
   SetValue(AValue);
   Caption := title;
-  btnOK.AutoSize := False;
-  btnOK.Width := 67;
-  btnOK.Caption := '&OK';
+  cbEnabled.Visible := True;
+  cbEnabled.Checked := AEnabled;
+  ButtonPanel.OKButton.Caption := '&OK';
   case Focus of
     FocusKey: FFocusedComponent := editName;
     FocusVal: FFocusedComponent := textValue;
@@ -116,6 +125,7 @@ begin
   begin
     Result.Key := GetKey;
     Result.Value := GetValue;
+    Result.Enabled := cbEnabled.Checked;
   end
   else
   begin
@@ -124,19 +134,19 @@ begin
   end;
 end;
 
-function TKeyValueForm.Edit(const KV: TKeyValuePair; const title: string;
-  const Focus: Integer = FocusKey): TKeyValuePair;
+function TKeyValueForm.Edit(const KV: TKeyValue; const title: string;
+  const Focus: Integer = FocusKey): TKeyValue;
 begin
-  Result := Edit(KV.Key, KV.Value, title, Focus);
+  Result := Edit(KV.Key, KV.Value, title, KV.Enabled, Focus);
 end;
 
 procedure TKeyValueForm.View(const AKey, AValue, Title: string);
 begin
   SetKey(AKey);
   SetValue(AValue);
+  cbEnabled.Visible := False;
   Caption := title;
-  btnOK.Caption := 'C&opy and Close';
-  btnOK.AutoSize := True;
+  ButtonPanel.OKButton.Caption := 'C&opy and Close';
   FFocusedComponent := textValue;
   if ShowModal = mrOk then
   begin
@@ -144,7 +154,7 @@ begin
   end;
 end;
 
-procedure TKeyValueForm.View(const KV: TKeyValuePair; const title: string);
+procedure TKeyValueForm.View(const KV: TKeyValue; const title: string);
 begin
   View(KV.Key, KV.Value, title);
 end;

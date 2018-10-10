@@ -5,11 +5,10 @@ unit main;
 interface
 
 uses
-  Classes, Forms, Dialogs, StdCtrls,
-  ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
+  Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
-  SynHighlighterJScript, thread_http_client, response_tabs, GridNavigator,
-  SysUtils, jsonparser;
+  SynHighlighterJScript, thread_http_client, response_tabs, key_value,
+  GridNavigator, SysUtils, jsonparser;
 
 type
 
@@ -211,7 +210,7 @@ type
     procedure SyncGridQueryParams;
     function FormatJson(json: TJSONData): string;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
-    function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValuePair;
+    function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
@@ -241,7 +240,7 @@ var
 implementation
 
 uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
-  app_helpers, fpjsonrtti, key_value, strutils, options, help_form, cmdline,
+  app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
   import_form, Clipbrd;
 
 const
@@ -262,7 +261,7 @@ procedure TForm1.SubmitRequest;
 var
   url, method, formData, contentType: string;
   i: integer;
-  KV: TKeyValuePair;
+  KV: TKeyValue;
   FileNames, FormValues: TStringList;
 begin
   try
@@ -620,7 +619,7 @@ procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
   aRow: Integer; aState: TCheckboxState);
 var
   Params: TQueryParams;
-  KV: TKeyValuePair;
+  KV: TKeyValue;
   I: Integer;
 begin
   Params:=nil;
@@ -1069,7 +1068,7 @@ end;
 
 procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
 var
-  KV: TKeyValuePair;
+  KV: TKeyValue;
 begin
   KV := GetRowKV(requestHeaders);
   if KV.Key <> '' then
@@ -1091,7 +1090,7 @@ procedure TForm1.SyncURLQueryParams;
 var
   Params, Keep: TQueryParams;
   I, Idx: Integer;
-  KV: TKeyValuePair;
+  KV: TKeyValue;
 begin
   Params:=nil;
   try
@@ -1123,7 +1122,7 @@ end;
 procedure TForm1.SyncGridQueryParams;
 var
   Params: TQueryParams;
-  KV: TKeyValuePair;
+  KV: TKeyValue;
   I: Integer;
 begin
   if not IsRowEnabled(gridParams) then Exit;
@@ -1147,13 +1146,18 @@ begin
   Result := grid.Cells[0, aRow] = '1';
 end;
 
-function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValuePair;
+function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
 var
   Offset: ShortInt;
 begin
   if aRow = -1 then aRow := grid.Row;
   // Grids with more two columns should have first column with checkboxes.
-  if grid.ColCount = 2 then Offset:=0 else Offset:=1;
+  if grid.ColCount = 2 then
+    Offset := 0
+  else begin
+    Offset := 1;
+    Result.Enabled := (grid.Cells[0, aRow] = '1');
+  end;
   Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
   Result.Value:=grid.Cells[Offset+1, aRow];
 end;
@@ -1514,7 +1518,7 @@ end;
 function TForm1.EncodeFormData: string;
 var
   i: integer;
-  KV: TKeyValuePair;
+  KV: TKeyValue;
 begin
   Result := '';
   for i := 1 to gridForm.RowCount - 1 do
@@ -1866,7 +1870,7 @@ end;
 function TForm1.EditGridRow(Grid: TStringGrid;
   const ValueFocused: Boolean): TModalResult;
 var
-  kv: TKeyValuePair;
+  kv: TKeyValue;
   focus: Integer = FocusKey;
 begin
   if ValueFocused then
@@ -1875,6 +1879,7 @@ begin
     kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', focus);
     Result := KeyValueForm.ModalResult;
     if Result = mrOK then begin
+      Cells[0, Row] := IfThen(kv.Enabled, '1', '0');
       Cells[1, Row] := kv.Key;
       Cells[2, Row] := kv.Value;
       // Force to update url after editing query params.
