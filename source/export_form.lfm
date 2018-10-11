@@ -21,9 +21,11 @@ object ExportForm: TExportForm
     OKButton.Name = 'OKButton'
     OKButton.Caption = '&Export'
     OKButton.DefaultCaption = False
+    OKButton.OnClick = OKButtonClick
     HelpButton.Name = 'HelpButton'
     HelpButton.Caption = '&Save'
     HelpButton.DefaultCaption = False
+    HelpButton.OnClick = HelpButtonClick
     CloseButton.Name = 'CloseButton'
     CloseButton.DefaultCaption = True
     CancelButton.Name = 'CancelButton'
@@ -87,5 +89,9 @@ object ExportForm: TExportForm
       Align = alClient
       TabOrder = 0
     end
+  end
+  object SaveDialog: TSaveDialog
+    left = 179
+    top = 81
   end
 end
