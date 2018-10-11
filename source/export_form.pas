@@ -28,9 +28,6 @@ type
 
   end;
 
-var
-  ExportForm: TExportForm;
-
 implementation
 
 uses options;
