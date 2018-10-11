@@ -60,6 +60,7 @@ end;
 
 procedure TImportForm.FormKeyPress(Sender: TObject; var Key: char);
 begin
+  // Close form even when focus in text area.
   if Key = #27 then Close;
 end;
 
