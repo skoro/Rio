@@ -877,26 +877,10 @@ var
   streamer: TJSONStreamer;
   json: string;
 begin
-  obj := TRequestObject.Create;
   streamer := TJSONStreamer.Create(nil);
 
   try
-    obj.Url := cbUrl.Text;
-    obj.Method := cbMethod.Text;
-    obj.Body := editOther.Text;
-    obj.Json := editJson.Text;
-
-    obj.SetCollectionFromGrid(requestHeaders, obj.Headers);
-    obj.SetCollectionFromGrid(gridReqCookie, obj.Cookies);
-    obj.SetCollectionFromGrid(gridParams, obj.Params);
-    obj.GetFormFromGrid(gridForm);
-
-    obj.AuthType := GetSelectedAuthTab;
-    obj.AuthBasic.Login    := editBasicLogin.Text;
-    obj.AuthBasic.Password := editBasicPassword.Text;
-    obj.AuthBearer.Prefix  := editBearerPrefix.Text;
-    obj.AuthBearer.Token   := editBearerToken.Text;
-
+    obj := TRequestObject.Create(Self);
     json := streamer.ObjectToJSONString(obj);
 
     try

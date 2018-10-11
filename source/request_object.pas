@@ -103,6 +103,7 @@ type
   protected
   public
     constructor Create;
+    constructor Create(form: TForm1); overload;
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
@@ -215,6 +216,26 @@ begin
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
   FMethod     := 'GET';
+end;
+
+constructor TRequestObject.Create(form: TForm1);
+begin
+  Create;
+  with form do begin
+    FUrl := cbUrl.Text;
+    FMethod := cbMethod.Text;
+    FBody := editOther.Text;
+    FJson := editJson.Text;
+    SetCollectionFromGrid(requestHeaders, FHeaders);
+    SetCollectionFromGrid(gridReqCookie, FCookies);
+    SetCollectionFromGrid(gridParams, FParams);
+    GetFormFromGrid(gridForm);
+    FAuthType := GetSelectedAuthTab;
+    FAuthBasic.Login    := editBasicLogin.Text;
+    FAuthBasic.Password := editBasicPassword.Text;
+    FAuthBearer.Prefix  := editBearerPrefix.Text;
+    FAuthBearer.Token   := editBearerToken.Text;
+  end;
 end;
 
 destructor TRequestObject.Destroy;
