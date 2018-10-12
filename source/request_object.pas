@@ -24,6 +24,14 @@ type
     property Value: string read FValue write FValue;
   end;
 
+  { TRequestParamsEnumerator }
+
+  TRequestParamsEnumerator = class(TCollectionEnumerator)
+  public
+    function GetCurrent: TRequestParamItem;
+    property Current: TRequestParamItem read GetCurrent;
+  end;
+
   { TRequestParamList }
 
   TRequestParamList = class(TCollection)
@@ -33,6 +41,7 @@ type
   public
     constructor Create;
     function Add: TRequestParamItem;
+    function GetEnumerator: TRequestParamsEnumerator;
     property Items[Index: integer]: TRequestParamItem read GetItems write SetItems; default;
   end;
 
@@ -133,6 +142,13 @@ implementation
 
 uses strutils;
 
+{ TRequestParamsEnumerator }
+
+function TRequestParamsEnumerator.GetCurrent: TRequestParamItem;
+begin
+  Result := inherited GetCurrent as TRequestParamItem;
+end;
+
 { TAuthBearer }
 
 constructor TAuthBearer.Create;
@@ -182,6 +198,11 @@ end;
 function TRequestParamList.Add: TRequestParamItem;
 begin
   Result := inherited Add as TRequestParamItem;
+end;
+
+function TRequestParamList.GetEnumerator: TRequestParamsEnumerator;
+begin
+  Result := TRequestParamsEnumerator.Create(Self);
 end;
 
 { TRequestParamItem }
