@@ -65,7 +65,7 @@ end;
 
 constructor TExport.Create;
 begin
-
+  FRequestObject := nil;
 end;
 
 destructor TExport.Destroy;
