@@ -96,6 +96,7 @@ begin
         Application.MessageBox(PChar(E.Message), 'Export error', MB_ICONERROR + MB_OK);
         btnCopy.Enabled := False;
         btnSave.Enabled := False;
+        MemoResult.Text := '';
       end;
     end;
 
