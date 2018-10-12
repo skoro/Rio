@@ -5,7 +5,7 @@ unit export_form;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ButtonPanel,
+  Classes, SysUtils, Forms, Dialogs, ButtonPanel,
   ExtCtrls, StdCtrls;
 
 type
@@ -15,6 +15,8 @@ type
   { TExportForm }
 
   TExportForm = class(TForm)
+    btnCopy: TButton;
+    btnSave: TButton;
     ButtonPanel: TButtonPanel;
     cbExport: TComboBox;
     lExport: TLabel;
@@ -22,9 +24,11 @@ type
     PanelMain: TPanel;
     SaveDialog: TSaveDialog;
     TopPanel: TPanel;
+    procedure btnCopyClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
+    procedure cbExportChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure HelpButtonClick(Sender: TObject);
-    procedure OKButtonClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     procedure ExportRequest;
   public
@@ -41,28 +45,32 @@ uses options, export_req, request_object, main, LCLType;
 
 procedure TExportForm.FormCreate(Sender: TObject);
 begin
-  ButtonPanel.HelpButton.Enabled := False; // Help button acts as Save button.
-  ButtonPanel.OKButton.ModalResult := mrNone;
   cbExport.Items.Add('Curl');
+  cbExport.Items.Add('PHP (curl)');
   cbExport.ItemIndex := 0;
   MemoResult.Font := OptionsForm.GetFontItem(fiValue);
 end;
 
-procedure TExportForm.HelpButtonClick(Sender: TObject);
+procedure TExportForm.btnSaveClick(Sender: TObject);
 begin
   if SaveDialog.Execute then
     // TODO: generate file name depending on export type.
     MemoResult.Lines.SaveToFile(SaveDialog.FileName);
 end;
 
-procedure TExportForm.OKButtonClick(Sender: TObject);
+procedure TExportForm.btnCopyClick(Sender: TObject);
 begin
-  try
-    ExportRequest;
-    ButtonPanel.HelpButton.Enabled := True;
-  except on E: Exception do
-    Application.MessageBox(PChar(E.Message), 'Export error', MB_ICONERROR + MB_OK);
-  end;
+  //
+end;
+
+procedure TExportForm.cbExportChange(Sender: TObject);
+begin
+  ExportRequest;
+end;
+
+procedure TExportForm.FormShow(Sender: TObject);
+begin
+  ExportRequest;
 end;
 
 procedure TExportForm.ExportRequest;
@@ -70,9 +78,13 @@ var
   exp: TExport;
   req: TRequestObject;
 begin
+  btnCopy.Enabled := True;
+  btnSave.Enabled := True;
+
   try
     case TExportType(cbExport.ItemIndex) of
-      etCurl: exp := TCurlExport.Create;
+      etCurl:    exp := TCurlExport.Create;
+      etPHPCurl: exp := TExport.Create;
     end;
 
     req := TRequestObject.Create(Form1);
@@ -81,11 +93,12 @@ begin
       MemoResult.Text := exp.Output;
     except on E: Exception do
       begin
-        FreeAndNil(exp);
-        FreeAndNil(req);
-        raise E;
+        Application.MessageBox(PChar(E.Message), 'Export error', MB_ICONERROR + MB_OK);
+        btnCopy.Enabled := False;
+        btnSave.Enabled := False;
       end;
     end;
+
   finally
     FreeAndNil(exp);
     FreeAndNil(req);
