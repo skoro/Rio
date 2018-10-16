@@ -58,6 +58,14 @@ type
     property ElemType: TFormTypeItem read FElemType write FElemType;
   end;
 
+  { TFormParamsEnumerator }
+
+  TFormParamsEnumerator = class(TCollectionEnumerator)
+  public
+    function GetCurrent: TFormParamItem;
+    property Current: TFormParamItem read GetCurrent;
+  end;
+
   { TFormParamList }
 
   TFormParamList = class(TCollection)
@@ -66,6 +74,7 @@ type
     procedure SetItems(Index: integer; AValue: TFormParamItem);
   public
     constructor Create;
+    function GetEnumerator: TFormParamsEnumerator;
     function Add: TFormParamItem;
     property Items[Index: integer]: TFormParamItem read GetItems write SetItems;
   end;
@@ -109,6 +118,7 @@ type
     FAuthBasic: TAuthBasic;
     FAuthBearer: TAuthBearer;
     FAuthType: TAuthTab; // TODO: should be TAuthType
+    FDataType: TBodyTab;
   protected
   public
     constructor Create;
@@ -136,11 +146,19 @@ type
     property AuthType: TAuthTab read FAuthType write FAuthType;
     property AuthBasic: TAuthBasic read FAuthBasic;
     property AuthBearer: TAuthBearer read FAuthBearer;
+    property DataType: TBodyTab read FDataType;
   end;
 
 implementation
 
 uses strutils;
+
+{ TFormParamsEnumerator }
+
+function TFormParamsEnumerator.GetCurrent: TFormParamItem;
+begin
+  Result := inherited GetCurrent as TFormParamItem;
+end;
 
 { TRequestParamsEnumerator }
 
@@ -171,6 +189,11 @@ end;
 constructor TFormParamList.Create;
 begin
   inherited Create(TFormParamItem);
+end;
+
+function TFormParamList.GetEnumerator: TFormParamsEnumerator;
+begin
+  Result := TFormParamsEnumerator.Create(Self);
 end;
 
 function TFormParamList.Add: TFormParamItem;
@@ -256,6 +279,7 @@ begin
     FAuthBasic.Password := editBasicPassword.Text;
     FAuthBearer.Prefix  := editBearerPrefix.Text;
     FAuthBearer.Token   := editBearerToken.Text;
+    FDataType := GetSelectedBodyTab;
   end;
 end;
 
