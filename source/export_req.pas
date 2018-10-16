@@ -114,16 +114,13 @@ begin
 
   // Format the command line.
   FOutput := Format('%s %s %s', [
-          FCurlName, GetOptionsStr, FRequestObject.Url
+          FCurlName, GetOptionsStr, QuotedStr(FRequestObject.Url)
   ]);
 end;
 
 procedure TCurlExport.AddOption(Option: string; Value: string = '');
 begin
-  if Pos(' ', Value) <> 0 then
-    // TODO: need a more reliable quoting method.
-    Value := '''' + Value + '''';
-  FOptions.AddStrings([Option, Value]);
+  FOptions.AddStrings([Option, QuotedStr(Value)]);
 end;
 
 function TCurlExport.GetOptionsStr: string;
