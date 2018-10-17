@@ -655,10 +655,12 @@ end;
 
 procedure TForm1.miExportClick(Sender: TObject);
 begin
+  if Trim(cbUrl.Text) = '' then begin
+    Application.MessageBox('Request url is missing.', 'Export', MB_ICONSTOP + MB_OK);
+    Exit;
+  end;
   with TExportForm.Create(Self) do begin
-    if ShowModal = mrOK then begin
-
-    end;
+    ShowModal;
     Free;
   end;
 end;
