@@ -119,6 +119,7 @@ type
     FAuthBearer: TAuthBearer;
     FAuthType: TAuthTab; // TODO: should be TAuthType
     FDataType: TBodyTab;
+    procedure SetMethod(AValue: string);
   protected
   public
     constructor Create;
@@ -135,7 +136,7 @@ type
     procedure LoadToForm(form: TForm1);
     function IsJson: Boolean;
   published
-    property Method: string read FMethod write FMethod;
+    property Method: string read FMethod write SetMethod;
     property Url: string read FUrl write FUrl;
     property Body: string read FBody write FBody;
     property Json: string read FJson write FJson;
@@ -249,6 +250,13 @@ begin
   end;
 end;
 
+procedure TRequestObject.SetMethod(AValue: string);
+begin
+  if FMethod = AValue then
+    Exit;
+  FMethod := UpperCase(AValue);
+end;
+
 constructor TRequestObject.Create;
 begin
   inherited Create;
@@ -266,10 +274,10 @@ constructor TRequestObject.Create(form: TForm1);
 begin
   Create;
   with form do begin
-    FUrl := cbUrl.Text;
-    FMethod := cbMethod.Text;
-    FBody := editOther.Text;
-    FJson := editJson.Text;
+    Method := cbMethod.Text;
+    Url    := cbUrl.Text;
+    Body   := editOther.Text;
+    Json   := editJson.Text;
     SetCollectionFromGrid(requestHeaders, FHeaders);
     SetCollectionFromGrid(gridReqCookie, FCookies);
     SetCollectionFromGrid(gridParams, FParams);
