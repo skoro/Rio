@@ -58,18 +58,25 @@ var
   Param: TRequestParamItem;
   FormParam: TFormParamItem;
   cookies, formValue: string;
+  isGet: Boolean;
 begin
   FOptions.Clear;
+  isGet := FRequestObject.Method = 'GET';
 
   // Request method.
-  if LowerCase(FRequestObject.Method) <> 'get' then
+  if not isGet then
     AddOption('-X', UpperCase(FRequestObject.Method));
 
   // Create curl header options.
   for Param in FRequestObject.Headers do
-    if Param.Enabled then
-      AddOption('-H', Format('%s: %s', [Param.Name, Param.Value]));
-  if (not FRequestObject.IsJson) and (FRequestObject.DataType = btJson) then
+    if Param.Enabled then begin
+      // Don't add content-type for GET requests.
+      if (isGet) and (LowerCase(Param.Name) = 'content-type') then
+        continue
+      else
+        AddOption('-H', Format('%s: %s', [Param.Name, Param.Value]));
+    end;
+  if (not isGet) and (not FRequestObject.IsJson) and (FRequestObject.DataType = btJson) then
     AddOption('-H', 'Content-Type: application/json');
 
   // Cookie option.
@@ -81,25 +88,26 @@ begin
     AddOption('--cookie', cookies);
 
   // Form data: form, json, other.
-  case FRequestObject.DataType of
-    btForm: begin
-      for FormParam in FRequestObject.Form do
-        if FormParam.Enabled then begin
-          case FormParam.ElemType of
-            ftiText: formValue := FormParam.Value;
-            ftiFile: formValue := '@' + FormParam.Value;
+  if not isGet then // Passing the data except GET requests.
+    case FRequestObject.DataType of
+      btForm: begin
+        for FormParam in FRequestObject.Form do
+          if FormParam.Enabled then begin
+            case FormParam.ElemType of
+              ftiText: formValue := FormParam.Value;
+              ftiFile: formValue := '@' + FormParam.Value;
+            end;
+            AddOption('-F', Format('%s=%s', [FormParam.Name, formValue]));
           end;
-          AddOption('-F', Format('%s=%s', [FormParam.Name, formValue]));
-        end;
+      end;
+      btJson: begin
+        // Compact json data by removing line breaks.
+        formValue := AnsiReplaceStr(FRequestObject.Json, #13, '');
+        formValue := AnsiReplaceStr(FRequestObject.Json, #10, '');
+        AddOption('--data', formValue);
+      end;
+      btOther: AddOption('--data', FRequestObject.Body);
     end;
-    btJson: begin
-      // Compact json data by removing line breaks.
-      formValue := AnsiReplaceStr(FRequestObject.Json, #13, '');
-      formValue := AnsiReplaceStr(FRequestObject.Json, #10, '');
-      AddOption('--data', formValue);
-    end;
-    btOther: AddOption('--data', FRequestObject.Body);
-  end;
 
   // Auth options.
   case FRequestObject.AuthType of
