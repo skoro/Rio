@@ -120,7 +120,10 @@ end;
 
 procedure TCurlExport.AddOption(Option: string; Value: string = '');
 begin
-  FOptions.AddStrings([Option, QuotedStr(Value)]);
+  if Value = '' then
+    FOptions.Add(Option)
+  else
+    FOptions.AddStrings([Option, QuotedStr(Value)]);
 end;
 
 function TCurlExport.GetOptionsStr: string;
