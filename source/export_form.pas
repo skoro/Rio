@@ -37,7 +37,7 @@ type
 
 implementation
 
-uses options, export_req, request_object, main, LCLType;
+uses options, export_req, request_object, main, LCLType, Clipbrd;
 
 {$R *.lfm}
 
@@ -52,15 +52,28 @@ begin
 end;
 
 procedure TExportForm.btnSaveClick(Sender: TObject);
+var
+  ext: string;
+  ro: TRequestObject;
 begin
-  if SaveDialog.Execute then
-    // TODO: generate file name depending on export type.
-    MemoResult.Lines.SaveToFile(SaveDialog.FileName);
+  try
+    ro := TRequestObject.Create(Form1);
+    ext := '';
+    case TExportType(cbExport.ItemIndex) of
+      etCurl:    ext := '.sh';
+      etPHPCurl: ext := '.php';
+    end;
+    SaveDialog.FileName := ro.Filename + ext;
+    if SaveDialog.Execute then
+      MemoResult.Lines.SaveToFile(SaveDialog.FileName);
+  finally
+    FreeAndNil(ro);
+  end;
 end;
 
 procedure TExportForm.btnCopyClick(Sender: TObject);
 begin
-  //
+  Clipboard.AsText := MemoResult.Text;
 end;
 
 procedure TExportForm.cbExportChange(Sender: TObject);

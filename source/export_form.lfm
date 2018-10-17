@@ -56,7 +56,7 @@ object ExportForm: TExportForm
       Width = 115
       Align = alRight
       AutoSize = True
-      Caption = 'Copy to clipboard'
+      Caption = 'Copy &to clipboard'
       OnClick = btnCopyClick
       TabOrder = 1
     end
