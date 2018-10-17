@@ -119,6 +119,7 @@ type
     FAuthBearer: TAuthBearer;
     FAuthType: TAuthTab; // TODO: should be TAuthType
     FDataType: TBodyTab;
+    function GetFilename: string;
     procedure SetMethod(AValue: string);
   protected
   public
@@ -148,11 +149,12 @@ type
     property AuthBasic: TAuthBasic read FAuthBasic;
     property AuthBearer: TAuthBearer read FAuthBearer;
     property DataType: TBodyTab read FDataType;
+    property Filename: string read GetFilename;
   end;
 
 implementation
 
-uses strutils;
+uses strutils, URIParser;
 
 { TFormParamsEnumerator }
 
@@ -255,6 +257,16 @@ begin
   if FMethod = AValue then
     Exit;
   FMethod := UpperCase(AValue);
+end;
+
+function TRequestObject.GetFilename: string;
+var
+  U: TURI;
+begin
+  U := ParseURI(FUrl);
+  Result := TrimSet(U.Document, ['/']);
+  if Result = '' then
+    Result := U.Host;
 end;
 
 constructor TRequestObject.Create;
