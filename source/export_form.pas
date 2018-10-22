@@ -97,7 +97,7 @@ begin
   try
     case TExportType(cbExport.ItemIndex) of
       etCurl:    exp := TCurlExport.Create;
-      etPHPCurl: exp := TExport.Create;
+      etPHPCurl: exp := TPHPCurlExport.Create;
     end;
 
     req := TRequestObject.Create(Form1);
