@@ -65,7 +65,7 @@ type
 
 implementation
 
-uses strutils, ValEdit, app_helpers;
+uses strutils, ValEdit, app_helpers, main;
 
 { TRequestObjectItem }
 
@@ -118,6 +118,7 @@ var
   line: string;
   RO: TRequestObject;
   KV: TKeyValuePair;
+  Auth: TAuthTab;
 
   // Get a next token from the tokens list.
   function NextTok: string;
@@ -132,6 +133,7 @@ begin
   Buf := TStringList.Create; // Temporary buffer.
   tokens := TStringList.Create; // Tokens list.
   data := TStringList.Create; // Form data.
+  Auth := atNone;
   try
     Tokenize(Input, Tokens);
     if Tokens.Strings[0] <> 'curl' then
@@ -168,6 +170,18 @@ begin
         '--compressed': begin
           // Just ignore this option.
         end;
+        '--basic': auth := atBasic;
+        '--user': begin
+          if Auth = atNone then
+            Auth := atBasic;
+          // This is pointless because no other auth methods are parsed.
+          if Auth <> atBasic then
+            raise TImportException.Create('Only Basic auth is supported.');
+          KV := SplitKV(NextTok, ':');
+          RO.AuthType := Auth;
+          RO.AuthBasic.Login := KV.Key;
+          RO.AuthBasic.Password := KV.Value;
+        end
         else begin
           if line[1] = '-' then
             raise TImportException.Create(Format('Option "%s" is not supported.', [line]));
