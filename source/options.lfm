@@ -47,6 +47,7 @@ object OptionsForm: TOptionsForm
     BorderSpacing.Around = 4
     TabIndex = 0
     TabOrder = 1
+    Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
       Caption = 'General'
       ClientHeight = 298
@@ -282,7 +283,7 @@ object OptionsForm: TOptionsForm
         Height = 22
         Top = 72
         Width = 214
-        Caption = 'Line numbers in formatted view'
+        Caption = '&Line numbers in formatted view'
         TabOrder = 4
       end
     end
