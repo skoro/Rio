@@ -171,7 +171,8 @@ end;
 
 procedure TPHPCurlExport.Finish;
 begin
-  Lines.Add(Format('curl_exec(%s);', [FCurlVar]));
+  SetCurlOpt('CURLOPT_RETURNTRANSFER', 'true');
+  Lines.Add(Format('echo curl_exec(%s);', [FCurlVar]));
   Lines.Add(Format('curl_close(%s);', [FCurlVar]));
 end;
 
