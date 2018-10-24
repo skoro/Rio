@@ -5,7 +5,7 @@ unit import_form;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ButtonPanel,
+  SysUtils, Forms, Controls, ButtonPanel,
   ExtCtrls, StdCtrls, import;
 
 type
