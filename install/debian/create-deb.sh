@@ -3,7 +3,7 @@
 # Script is for creating Debian package.
 #
 # ./create-deb.sh [arch]
-# Where arch is one of "amd64", "x86_64", "i386".
+# Where arch is one of "amd64", "x86_64", "i386", "arm".
 # Argument arch is optional, current host architecture will be
 # used for package creation.
 
@@ -22,7 +22,7 @@ case $ARCH in
           bin=i386
           ;;
      arm)
-          ARCH=armel
+          ARCH=armhf
           bin=arm
           ;;
      *)
