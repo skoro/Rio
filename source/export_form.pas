@@ -5,8 +5,8 @@ unit export_form;
 interface
 
 uses
-  Classes, SysUtils, Forms, Dialogs, ButtonPanel,
-  ExtCtrls, StdCtrls;
+  SysUtils, Forms, Dialogs, ButtonPanel,
+  ExtCtrls, StdCtrls, Controls;
 
 type
 
@@ -28,6 +28,7 @@ type
     procedure btnSaveClick(Sender: TObject);
     procedure cbExportChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
   private
     procedure ExportRequest;
@@ -49,6 +50,13 @@ begin
   cbExport.Items.Add('PHP (curl)');
   cbExport.ItemIndex := 0;
   MemoResult.Font := OptionsForm.GetFontItem(fiValue);
+end;
+
+procedure TExportForm.FormKeyPress(Sender: TObject; var Key: char);
+begin
+  // Close form even when focus in text area.
+  if Key = #27 then
+    Close;
 end;
 
 procedure TExportForm.btnSaveClick(Sender: TObject);

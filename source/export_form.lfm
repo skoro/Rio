@@ -9,7 +9,9 @@ object ExportForm: TExportForm
   ClientWidth = 401
   Constraints.MinHeight = 200
   Constraints.MinWidth = 300
+  KeyPreview = True
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
