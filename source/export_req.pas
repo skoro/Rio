@@ -415,6 +415,7 @@ function TExport.MinimizeJson: string;
 begin
   Result := AnsiReplaceStr(FRequestObject.Json, #13, '');
   Result := AnsiReplaceStr(FRequestObject.Json, #10, '');
+  Result := Trim(Result);
 end;
 
 function TExport.FormatAuthBearer: string;
