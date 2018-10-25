@@ -416,7 +416,7 @@ function TExport.FormatAuthBearer: string;
 begin
   Result := '';
   with FRequestObject do
-    Result := 'Authorization ' + Format('%s %s', [AuthBearer.Prefix, AuthBearer.Token]);
+    Result := 'Authorization: ' + Format('%s %s', [AuthBearer.Prefix, AuthBearer.Token]);
 end;
 
 end.
