@@ -91,6 +91,7 @@ object ExportForm: TExportForm
       Top = 0
       Width = 393
       Align = alClient
+      ScrollBars = ssAutoBoth
       TabOrder = 0
     end
   end
