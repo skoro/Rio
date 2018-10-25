@@ -129,6 +129,7 @@ type
     tbtnBodyFormat: TToolButton;
     tbtnFormUpload: TToolButton;
     tbtnAuthType: TToolButton;
+    tbtnJsonLoad: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -181,6 +182,7 @@ type
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
     procedure tbtnFormUploadClick(Sender: TObject);
+    procedure tbtnJsonLoadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
@@ -1049,6 +1051,30 @@ begin
   end;
 end;
 
+procedure TForm1.tbtnJsonLoadClick(Sender: TObject);
+var
+  fs: TStream;
+  parser: TJSONParser;
+begin
+  if dlgOpen.Execute then begin
+    try
+      // Load and validate a json file.
+      fs := TFileStream.Create(dlgOpen.FileName, fmOpenRead);
+      Parser := TJSONParser.Create(fs);
+      try
+        Parser.Parse;
+        fs.Position := 0; // Stream should be resetted to the beginning after json parser
+        editJson.Lines.LoadFromStream(fs);
+      except on E: Exception do
+        Application.MessageBox(PChar(E.Message), 'Load error', MB_ICONERROR + MB_OK);
+      end;
+    finally
+      FreeAndNil(Parser);
+      FreeAndNil(fs);
+    end;
+  end;
+end;
+
 procedure TForm1.tbtnManageHeadersClick(Sender: TObject);
 begin
   miManageHeadersClick(requestHeaders);
@@ -1170,6 +1196,7 @@ begin
   tbtnFormUpload.Visible  := False;
   tbtnBodyFormat.Visible  := False;
   tbtnBodyType.Visible    := False;
+  tbtnJsonLoad.Visible    := False;
   gnavBody.ShowNavButtons := False;
 
   case tab of
@@ -1193,6 +1220,7 @@ begin
         tbtnBodyType.Visible:=True;
         tbtnBodyType.Caption:='JSON';
         tbtnBodyFormat.Visible:=True;
+        tbtnJsonLoad.Visible:=True;
       end;
     btOther:
       begin

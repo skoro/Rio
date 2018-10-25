@@ -183,10 +183,10 @@ object Form1: TForm1
           Height = 212
           Top = 0
           Width = 557
-          ActivePage = tabHeaders
+          ActivePage = tabBody
           Align = alClient
           Anchors = [akLeft, akRight, akBottom]
-          TabIndex = 0
+          TabIndex = 2
           TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
@@ -333,21 +333,21 @@ object Form1: TForm1
             ClientWidth = 553
             object pagesBody: TPageControl
               Left = 0
-              Height = 153
+              Height = 156
               Top = 26
               Width = 553
-              ActivePage = tabBodyOther
+              ActivePage = tabBodyJson
               Align = alClient
               ShowTabs = False
-              TabIndex = 2
+              TabIndex = 0
               TabOrder = 0
               object tabBodyJson: TTabSheet
                 Caption = 'tabBodyJson'
-                ClientHeight = 149
+                ClientHeight = 152
                 ClientWidth = 549
                 inline editJson: TSynEdit
                   Left = 0
-                  Height = 149
+                  Height = 152
                   Top = 0
                   Width = 549
                   Align = alClient
@@ -822,7 +822,7 @@ object Form1: TForm1
               end
               object tabBodyForm: TTabSheet
                 Caption = 'tabBodyForm'
-                ClientHeight = 149
+                ClientHeight = 152
                 ClientWidth = 549
                 object gridForm: TStringGrid
                   Left = 0
@@ -878,11 +878,11 @@ object Form1: TForm1
               end
               object tabBodyOther: TTabSheet
                 Caption = 'tabBodyOther'
-                ClientHeight = 149
+                ClientHeight = 152
                 ClientWidth = 549
                 object editOther: TMemo
                   Left = 0
-                  Height = 149
+                  Height = 152
                   Top = 0
                   Width = 549
                   Align = alClient
@@ -908,23 +908,29 @@ object Form1: TForm1
               OnGridClear = OnGridClear
               ShowNavButtons = True
               object tbtnBodyType: TToolButton
-                Left = 158
+                Left = 150
                 Top = 0
                 Caption = 'tbtnBodyType'
                 DropdownMenu = pmBodyType
                 Style = tbsButtonDrop
               end
               object tbtnBodyFormat: TToolButton
-                Left = 267
+                Left = 255
                 Top = 0
                 Caption = 'Format'
                 OnClick = tbtnBodyFormatClick
               end
               object tbtnFormUpload: TToolButton
-                Left = 320
+                Left = 307
                 Top = 0
                 Caption = 'Upload'
                 OnClick = tbtnFormUploadClick
+              end
+              object tbtnJsonLoad: TToolButton
+                Left = 358
+                Top = 0
+                Caption = 'Load'
+                OnClick = tbtnJsonLoadClick
               end
             end
           end
