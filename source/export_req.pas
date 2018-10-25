@@ -290,9 +290,14 @@ begin
     if Param.Enabled then begin
       // Don't add content-type for GET requests.
       if (IsGet) and (LowerCase(Param.Name) = 'content-type') then
-        continue
-      else
-        AddOption('-H', Format('%s: %s', [Param.Name, Param.Value]));
+        Continue;
+      // Don't expose 'application/x-www-form-urlencoded' for a form.
+      // It'll be added by curl -F option automatically.
+      if (FRequestObject.Method = 'POST') and (LowerCase(Param.Name) = 'content-type')
+          and (LowerCase(Param.Value) = 'application/x-www-form-urlencoded')
+      then
+        Continue;
+      AddOption('-H', Format('%s: %s', [Param.Name, Param.Value]));
     end;
   if (not IsGet) and (not FRequestObject.IsJson) and (FRequestObject.DataType = btJson) then
     AddOption('-H', 'Content-Type: application/json');
