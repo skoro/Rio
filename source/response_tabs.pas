@@ -103,9 +103,10 @@ type
     FTreeView: TTreeView;
     FJsonRoot: TJSONData;
     FJsonParser: TJSONParser;
-    FBtnView: TToolButton;
     FBtnOptions: TToolButton;
     FBtnFilter: TToolButton;
+    FBtnTree: TToolButton;
+    FBtnFormatted: TToolButton;
     FPageControl: TPageControl;
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
@@ -154,6 +155,7 @@ type
     function CanFind: Boolean; override;
     procedure InitSearch(Search: string; Options: TFindOptions); override;
     function FindNext: Integer; override;
+    procedure ViewNextPage;
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -213,11 +215,13 @@ begin
   case AValue of
     vpTree: begin
       FPageControl.ActivePage := FTreeSheet;
-      FBtnView.Caption := 'Tree';
+      FBtnTree.Down := True;
+      FBtnFormatted.Down := False;
     end;
     vpFormatted: begin
       FPageControl.ActivePage := FFormatSheet;
-      FBtnView.Caption := 'Formatted';
+      FBtnTree.Down := False;
+      FBtnFormatted.Down := True;
     end;
   end;
 end;
@@ -297,33 +301,26 @@ end;
 procedure TResponseJsonTab.CreateToolbar(Parent: TWinControl);
 var
   Toolbar: TToolBar;
-  pm: TPopupMenu;
-  itemTree: TMenuItem;
-  itemFmt: TMenuItem;
 begin
   Toolbar := TToolBar.Create(Parent);
   Toolbar.Parent := Parent;
   Toolbar.EdgeBorders := [];
   Toolbar.ShowCaptions := True;
-  pm := TPopupMenu.Create(Parent);
-  pm.Parent := Parent;
-  itemTree := TMenuItem.Create(pm);
-  itemTree.Caption := 'Tree';
-  itemTree.OnClick := @OnChangeTreeMode;
-  itemFmt := TMenuItem.Create(pm);
-  itemFmt.Caption := 'Formatted';
-  itemFmt.OnClick := @OnChangeFormatMode;
-  pm.Items.Add(itemTree);
-  pm.Items.Add(itemFmt);
-  FBtnView := TToolButton.Create(Toolbar);
-  with FBtnView do begin
-    Parent := Toolbar;
-    Style := tbsButtonDrop;
-    DropdownMenu := pm;
-  end;
+
+  FBtnTree := TToolButton.Create(Toolbar);
+  FBtnTree.Parent := Toolbar;
+  FBtnTree.Caption := 'Tree';
+  FBtnTree.OnClick := @OnChangeTreeMode;
+
+  FBtnFormatted := TToolButton.Create(Toolbar);
+  FBtnFormatted.Parent := Toolbar;
+  FBtnFormatted.Caption := 'Formatted';
+  FBtnFormatted.OnClick := @OnChangeFormatMode;
+
   FBtnOptions := TToolButton.Create(Toolbar);
   FBtnOptions.Parent := Toolbar;
   FBtnOptions.Caption := 'Options';
+
   FBtnFilter := TToolButton.Create(Toolbar);
   with FBtnFilter do begin
     Parent  := Toolbar;
@@ -408,7 +405,10 @@ procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
 begin
   // Control-E show/hide filter panel.
   if (Shift = [ssCtrl]) and (Key = 69) then
-     InternalOnSwitchFilter(Sender);
+    InternalOnSwitchFilter(Sender);
+  // F3 - switch tree/formatted view.
+  if (Shift = []) and (Key = 114) then
+    ViewNextPage;
 end;
 
 procedure TResponseJsonTab.ToggleFilterPanel;
@@ -416,7 +416,7 @@ begin
   FFilter.Visible := not FFilter.Visible;
   FBtnFilter.Down := FFilter.Visible;
   if FFilter.Visible then
-    FFilter.SetFocus;
+    FFilter.Input.SetFocus;
 end;
 
 procedure TResponseJsonTab.InitSearchParams;
@@ -518,6 +518,8 @@ begin
   inherited CreateUI(ATabSheet);
 
   CreateToolbar(ATabSheet);
+
+  ATabSheet.OnKeyDown := @InternalOnKeyDown;
 
   FFilter := TInputButtons.Create(ATabSheet);
   FFilter.Parent := ATabSheet;
@@ -694,6 +696,14 @@ begin
   if p = 0 then
     Exit(0);
   Result := p;
+end;
+
+procedure TResponseJsonTab.ViewNextPage;
+begin
+  if ViewPage = vpFormatted then
+    ViewPage := vpTree
+  else
+    ViewPage := vpFormatted;
 end;
 
 { TResponseTabManager }
