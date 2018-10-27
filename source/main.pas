@@ -705,6 +705,7 @@ begin
     ln('Control-O', 'Open a request data.') +
     ln('Control-F', 'Find text in the response body.') +
     ln('Control-E', 'Switch JSON filter panel on the JSON tab.') +
+    ln('Control-Q', 'Quit the application.') +
     ln('F2', 'Save the response body to a file.') +
     ln('F3', 'Find next occurience of the text in the response body.') +
     ln('F4', 'Change JSON view between Tree and Formatted.') +
