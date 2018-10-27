@@ -2225,15 +2225,15 @@ object AboutForm: TAboutForm
     end
     object LabelVersion: TLabel
       Left = 120
-      Height = 19
+      Height = 16
       Top = 128
-      Width = 51
+      Width = 48
       Caption = 'Version:'
       ParentColor = False
     end
     object Edit1: TEdit
       Left = 8
-      Height = 20
+      Height = 18
       Top = 104
       Width = 224
       BorderStyle = bsNone

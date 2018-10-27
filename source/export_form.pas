@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, Dialogs, ButtonPanel,
-  ExtCtrls, StdCtrls, Controls;
+  ExtCtrls, StdCtrls;
 
 type
 
