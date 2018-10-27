@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    miHelpKeyboard: TMenuItem;
     miExport: TMenuItem;
     miImport: TMenuItem;
     miFindNext: TMenuItem;
@@ -154,6 +155,7 @@ type
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
     procedure miHelpCmdClick(Sender: TObject);
+    procedure miHelpKeyboardClick(Sender: TObject);
     procedure miImportClick(Sender: TObject);
     procedure miManageHeadersClick(Sender: TObject);
     procedure JsonTreeDblClick(Sender: TObject);
@@ -683,11 +685,31 @@ end;
 
 procedure TForm1.miHelpCmdClick(Sender: TObject);
 begin
-  with THelpForm.Create(Self) do begin
-    helpText.Font := OptionsForm.GetFontItem(fiHelp);
-    ShowModal('Command line help', Trim(Usage));
-    Free;
+  THelpForm.HelpModal(Self, 'Command line help', Trim(Usage));
+end;
+
+procedure TForm1.miHelpKeyboardClick(Sender: TObject);
+  function Ln(key, desc: string): string;
+  begin
+    Result := key + #13#10 + '      ' + desc + #13#10;
   end;
+begin
+  THelpForm.HelpModal(Self, 'Keyboard shortcuts',
+    ln('Control-L', 'Move focus to the request URL field.') +
+    ln('Control-P', 'Move focus to the request methods list.') +
+    ln('Control-I', 'Manage request headers.') +
+    ln('Control-S', 'Save the request data.') +
+    ln('Control-,', 'Open application options.') +
+    ln('Control-N', 'Start a new request.') +
+    ln('Control-Shift-N', 'Open a new window.') +
+    ln('Control-O', 'Open a request data.') +
+    ln('Control-F', 'Find text in the response body.') +
+    ln('Control-E', 'Switch JSON filter panel on the JSON tab.') +
+    ln('F2', 'Save the response body to a file.') +
+    ln('F3', 'Find next occurience of the text in the response body.') +
+    ln('F4', 'Change JSON view between Tree and Formatted.') +
+    ln('F9', 'Submit a request.')
+  );
 end;
 
 procedure TForm1.miImportClick(Sender: TObject);

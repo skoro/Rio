@@ -251,7 +251,7 @@ object Form1: TForm1
               ShowNavButtons = True
               object ToolButton1: TToolButton
                 Left = 150
-                Height = 22
+                Height = 5
                 Top = 0
                 Caption = 'ToolButton1'
                 Style = tbsDivider
@@ -1543,6 +1543,10 @@ object Form1: TForm1
       object miHelpCmd: TMenuItem
         Caption = '&Command line...'
         OnClick = miHelpCmdClick
+      end
+      object miHelpKeyboard: TMenuItem
+        Caption = '&Keyboard...'
+        OnClick = miHelpKeyboardClick
       end
       object miAbout: TMenuItem
         Caption = '&About...'

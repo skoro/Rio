@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  StdCtrls, Classes, Controls;
+  StdCtrls, Classes;
 
 type
 
@@ -21,9 +21,12 @@ type
 
   public
     function ShowModal(ACaption, AHelpText: string): TModalResult; overload;
+    class procedure HelpModal(TheOwner: TComponent; ACaption, AHelpText: string);
   end;
 
 implementation
+
+uses options;
 
 {$R *.lfm}
 
@@ -45,6 +48,15 @@ begin
   Caption := ACaption;
   helpText.Text := AHelpText;
   Result := inherited ShowModal;
+end;
+
+class procedure THelpForm.HelpModal(TheOwner: TComponent; ACaption, AHelpText: string);
+begin
+  with THelpForm.Create(TheOwner) do begin
+    helpText.Font := OptionsForm.GetFontItem(fiHelp);
+    ShowModal(ACaption, AHelpText);
+    Free;
+  end;
 end;
 
 end.
