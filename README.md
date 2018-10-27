@@ -1,33 +1,28 @@
 ## HTTP request inspector
 
-The crossplatform desktop tool for inspecting http requests.
+A crossplatform desktop tool for inspecting http requests.
 The application allows you to send http requests GET, POST, PUT, etc and
 analyse its responses.
 
-<img src="https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-json.png" alt="Linux" width="320">
-<img src="https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-hor_layout.png" alt="Linux horizonal layout" width="400">
-<img src="https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot-0.3-win-json.png" alt="Windows" width="320">
+### Screenshots
 
-### Usage
+Main window
 
-Keyboard:
+![Main window](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-json.png)
 
-* `F9` submits a request.
-* `F2` saves a request content to a file.
-* `Control-N` starts a new request.
-* `Control-L` moves focus to the url text field.
-* `Control-P` moves focus to the request methods dropdown list.
-* `Control-E` collapses or expands tree node and its children recursively (
-  in case of json response only).
-* `Control-I` inserts a request header and value from the predefined headers
-  list.
-* `Control-Q` exits application.
+Vertical layout
+
+![Vertical layout](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-json.png)
+
+JSON response
+
+![JSON response](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot-0.3-win-json.png)
 
 ### Compile from sources
 
 For compiling from sources you need the following requirements:
-- Lazarus 1.8
-- FreePascal 3.0.4
+- [Lazarus](http://www.lazarus-ide.org/) 1.8
+- [FreePascal](https://www.freepascal.org/) 3.0.4
 
 Before compiling the application you need to install a components package
 from the `components/rest_explorer` folder. In Lazarus open in main
@@ -42,6 +37,9 @@ For example:
 - `make deb-linux32` creates a deb package for i386
 
 For more targets see output of `make`.
+
+Refer to `install/windows/Readme.txt` for information how to compile on
+Windows and to create Windows binary installers.
 
 ### Notes for Windows
 
