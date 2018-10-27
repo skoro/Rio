@@ -2,10 +2,22 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Http Inspector"
-#define MyAppVersion "0.3"
+#define MyAppVersion "0.4"
 #define MyAppPublisher "Skorobogatko Alexei"
 #define MyAppURL "https://github.com/skoro/http_inspector"
 #define MyAppExeName "http-inspector.exe"
+
+; WIN32 or WIN64 is passed via command line compiler.
+; Please see build-release.bat file.
+#ifdef WIN32
+  #define PLATFORM "i386-win32"
+  #define OS_ARCH "win32"
+#endif
+
+#ifdef WIN64
+  #define PLATFORM "x86_64-win64"
+  #define OS_ARCH "win64"
+#endif
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -22,7 +34,7 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=..\..\dist
-OutputBaseFilename=http-inspector-setup-{#MyAppVersion}-win32
+OutputBaseFilename=http-inspector-setup-{#MyAppVersion}-{#OS_ARCH}
 Compression=lzma
 SolidCompression=yes
 
@@ -33,10 +45,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\bin\i386-win32\http-inspector.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "openssl_win32\libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "openssl_win32\ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\bin\{#PLATFORM}\http-inspector.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "openssl_{#OS_ARCH}\libeay32.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "openssl_{#OS_ARCH}\ssleay32.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "openssl_{#OS_ARCH}\HashInfo.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "OpenSSL License.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\docs\curl.txt"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
