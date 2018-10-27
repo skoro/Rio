@@ -169,7 +169,7 @@ type
 
 implementation
 
-uses Menus, app_helpers, strutils;
+uses app_helpers, strutils;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -406,8 +406,8 @@ begin
   // Control-E show/hide filter panel.
   if (Shift = [ssCtrl]) and (Key = 69) then
     InternalOnSwitchFilter(Sender);
-  // F3 - switch tree/formatted view.
-  if (Shift = []) and (Key = 114) then
+  // F4 - switch tree/formatted view.
+  if (Shift = []) and (Key = 115) then
     ViewNextPage;
 end;
 
