@@ -8,15 +8,19 @@ analyse its responses.
 
 Main window
 
-![Main window](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-json.png)
+![Main window](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-xfce-json.png)
 
-Vertical layout
+Vertical layout and filtered JSON
 
-![Vertical layout](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.3-xfce-json.png)
+![Vertical layout](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-xfce-hor_layout_filtered.png)
 
-JSON response
+Windows
 
-![JSON response](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot-0.3-win-json.png)
+![Windows](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-win-json-tree.png)
+
+Formatted JSON
+
+![Formatted JSON](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-win-json-formatted.png)
 
 ### Compile from sources
 
