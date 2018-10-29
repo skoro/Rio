@@ -33,7 +33,7 @@ var
 implementation
 
 {$R *.lfm}
-{$I version.inc}
+const {$I version.inc};
 
 { TAboutForm }
 

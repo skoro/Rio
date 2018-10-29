@@ -1,2 +1,1 @@
-const
-  APP_VER = '0.4';
+APP_VER='0.4'

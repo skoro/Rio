@@ -35,9 +35,9 @@ if [ ! -f ../../bin/${bin}-linux/http-inspector ]; then
     exit 1
 fi
 
+. ../../source/version.inc
 TMP=$(mktemp -d)
-VER=$(grep APP_VER ../../source/version.inc|grep -o "'.*'"|sed "s/'//g")
-DEB=http-inspector_${VER}_${ARCH}.deb
+DEB=http-inspector_${APP_VER}_${ARCH}.deb
 
 mkdir -p $TMP/usr/bin
 mkdir -p $TMP/usr/share/applications
@@ -54,7 +54,7 @@ SIZE=$(du -ks $TMP | awk '{ print $1 }')
 cat control |               \
     sed "s/@size@/$SIZE/" | \
     sed "s/@arch@/$ARCH/" | \
-    sed "s/@version@/$VER/" > $TMP/DEBIAN/control
+    sed "s/@version@/$APP_VER/" > $TMP/DEBIAN/control
 
 dpkg-deb --build $TMP ../../dist/$DEB
 

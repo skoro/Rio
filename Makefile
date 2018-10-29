@@ -1,10 +1,12 @@
 
+include ./source/version.inc
 PROJECT=source/http_inspector.lpr
-VER=$(shell grep APP_VER source/version.inc|grep -o "'.*'"|sed "s/'//g")
 LAZBUILD?=lazbuild
 APP=http-inspector
 
 all:
+	@echo ""
+	@echo "Current app version is ${APP_VER}"
 	@echo ""
 	@echo "Select target:"
 	@echo ""
@@ -89,7 +91,7 @@ deb-package:
 
 bin-package:
 	mkdir -p ./dist
-	$(eval DIST=./dist/$(APP)_$(VER)-$(OS)-$(CPU)-bin)
+	$(eval DIST=./dist/$(APP)_$(APP_VER)-$(OS)-$(CPU)-bin)
 	rm -f $(DIST)
 	cp ./bin/$(CPU)-$(OS)/$(APP) $(DIST)
 	chmod +x $(DIST)
