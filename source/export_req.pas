@@ -214,7 +214,8 @@ begin
   for Cookie in FRequestObject.Cookies do
     if Cookie.Enabled then
       Buf := Buf + Format('%s=%s; ', [Cookie.Name, Cookie.Value]);
-  SetCurlOpt('CURLOPT_COOKIE', Trim(Buf));
+  if Length(Buf) > 0 then
+    SetCurlOpt('CURLOPT_COOKIE', Trim(Buf));
 end;
 
 procedure TPHPCurlExport.RenderForm;
