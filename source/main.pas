@@ -236,7 +236,7 @@ type
     function GetSelectedAuthTab: TAuthTab;
     procedure StartNewRequest;
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
-    procedure SubmitRequest;
+    function SubmitRequest: Boolean;
     procedure FindText;
   end;
 
@@ -258,18 +258,20 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 begin
-  SubmitRequest;
+  TimerRequest.Enabled := False;
   FRequestSeconds := 0;
-  TimerRequest.Enabled := True;
+  if SubmitRequest then
+    TimerRequest.Enabled := True;
 end;
 
-procedure TForm1.SubmitRequest;
+function TForm1.SubmitRequest: Boolean;
 var
   url, method, formData, contentType: string;
   i: integer;
   KV: TKeyValue;
   FileNames, FormValues: TStringList;
 begin
+  Result := False;
   try
     url := NormalizeUrl;
   except on E: Exception do
@@ -407,6 +409,8 @@ begin
   FHttpClient.Url := url;
   FHttpClient.Method := method;
   FHttpClient.Start;
+
+  Result := True;
 end;
 
 procedure TForm1.FindText;
