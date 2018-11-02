@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    editNotes: TMemo;
     miHelpKeyboard: TMenuItem;
     miExport: TMenuItem;
     miImport: TMenuItem;
@@ -121,6 +122,7 @@ type
     tabAuth: TTabSheet;
     tabAuthBasic: TTabSheet;
     tabAuthBearer: TTabSheet;
+    tabNotes: TTabSheet;
     TimerRequest: TTimer;
     toolbarAuth: TToolBar;
     ToolButton1: TToolButton;

@@ -183,10 +183,10 @@ object Form1: TForm1
           Height = 212
           Top = 0
           Width = 557
-          ActivePage = tabBody
+          ActivePage = tabNotes
           Align = alClient
           Anchors = [akLeft, akRight, akBottom]
-          TabIndex = 2
+          TabIndex = 5
           TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
@@ -251,7 +251,7 @@ object Form1: TForm1
               ShowNavButtons = True
               object ToolButton1: TToolButton
                 Left = 150
-                Height = 5
+                Height = 22
                 Top = 0
                 Caption = 'ToolButton1'
                 Style = tbsDivider
@@ -276,7 +276,7 @@ object Form1: TForm1
             ClientWidth = 553
             object gridParams: TStringGrid
               Left = 0
-              Height = 153
+              Height = 156
               Top = 26
               Width = 553
               Align = alClient
@@ -951,7 +951,7 @@ object Form1: TForm1
             ClientWidth = 553
             object gridReqCookie: TStringGrid
               Left = 0
-              Height = 153
+              Height = 156
               Top = 26
               Width = 553
               Align = alClient
@@ -1026,7 +1026,7 @@ object Form1: TForm1
             end
             object pagesAuth: TPageControl
               Left = 0
-              Height = 153
+              Height = 156
               Top = 26
               Width = 553
               ActivePage = tabAuthBearer
@@ -1036,7 +1036,7 @@ object Form1: TForm1
               TabOrder = 1
               object tabAuthBasic: TTabSheet
                 Caption = 'Basic'
-                ClientHeight = 149
+                ClientHeight = 152
                 ClientWidth = 549
                 object ScrollBox1: TScrollBox
                   Left = 0
@@ -1101,25 +1101,25 @@ object Form1: TForm1
               end
               object tabAuthBearer: TTabSheet
                 Caption = 'tabAuthBearer'
-                ClientHeight = 149
+                ClientHeight = 152
                 ClientWidth = 549
                 object ScrollBox2: TScrollBox
                   Left = 0
-                  Height = 149
+                  Height = 152
                   Top = 0
                   Width = 549
                   HorzScrollBar.Page = 208
-                  VertScrollBar.Page = 104
+                  VertScrollBar.Page = 106
                   Align = alClient
                   BorderStyle = bsNone
-                  ClientHeight = 149
+                  ClientHeight = 152
                   ClientWidth = 549
                   Color = clNone
                   ParentColor = False
                   TabOrder = 0
                   object editBearerToken: TLabeledEdit
                     Left = 8
-                    Height = 27
+                    Height = 26
                     Top = 80
                     Width = 536
                     Anchors = [akTop, akLeft, akRight]
@@ -1128,8 +1128,8 @@ object Form1: TForm1
                     EditLabel.AnchorSideRight.Side = asrBottom
                     EditLabel.AnchorSideBottom.Control = editBearerToken
                     EditLabel.Left = 8
-                    EditLabel.Height = 19
-                    EditLabel.Top = 58
+                    EditLabel.Height = 16
+                    EditLabel.Top = 61
                     EditLabel.Width = 536
                     EditLabel.Caption = 'Token:'
                     EditLabel.ParentColor = False
@@ -1137,7 +1137,7 @@ object Form1: TForm1
                   end
                   object editBearerPrefix: TLabeledEdit
                     Left = 8
-                    Height = 27
+                    Height = 26
                     Top = 24
                     Width = 200
                     EditLabel.AnchorSideLeft.Control = editBearerPrefix
@@ -1145,8 +1145,8 @@ object Form1: TForm1
                     EditLabel.AnchorSideRight.Side = asrBottom
                     EditLabel.AnchorSideBottom.Control = editBearerPrefix
                     EditLabel.Left = 8
-                    EditLabel.Height = 19
-                    EditLabel.Top = 2
+                    EditLabel.Height = 16
+                    EditLabel.Top = 5
                     EditLabel.Width = 200
                     EditLabel.Caption = 'Prefix:'
                     EditLabel.ParentColor = False
@@ -1155,6 +1155,21 @@ object Form1: TForm1
                   end
                 end
               end
+            end
+          end
+          object tabNotes: TTabSheet
+            Caption = 'Notes'
+            ClientHeight = 182
+            ClientWidth = 553
+            object editNotes: TMemo
+              Left = 0
+              Height = 182
+              Top = 0
+              Width = 553
+              Align = alClient
+              BorderStyle = bsNone
+              ScrollBars = ssAutoBoth
+              TabOrder = 0
             end
           end
         end
