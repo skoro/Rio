@@ -1371,10 +1371,8 @@ end;
 
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
-  if OptionsForm.ShowModalPage(opJson) = mrOK then begin
+  if OptionsForm.ShowModalPage(opJson) = mrOK then
     ApplyOptions;
-    FResponseJsonTab.LineNumbers := OptionsForm.JsonLines;
-  end;
 end;
 
 procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
@@ -1402,6 +1400,7 @@ procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
   FResponseJsonTab.TreeExpanded := OptionsForm.JsonExpanded;
+  FResponseJsonTab.LineNumbers  := OptionsForm.JsonLines;
 
   // Adjust window size before change layout.
   if (LayoutSplitter.SplitterType = pstVertical) and
@@ -1436,6 +1435,8 @@ begin
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 
   cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
+
+  editJson.Gutter.Parts.Part[1].Visible := OptionsForm.JsonLines;
 end;
 
 function TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;

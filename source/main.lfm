@@ -817,6 +817,17 @@ object Form1: TForm1
                       MouseActionsExpanded = <>
                       MouseActionsCollapsed = <>
                     end
+                    object SynGutterLineNumber1: TSynGutterLineNumber
+                      Width = 17
+                      Visible = False
+                      MouseActions = <>
+                      MarkupInfo.Background = clBtnFace
+                      MarkupInfo.Foreground = clNone
+                      DigitCount = 2
+                      ShowOnlyLineNumbersMultiplesOf = 1
+                      ZeroStart = False
+                      LeadingZeros = False
+                    end
                   end
                 end
               end
