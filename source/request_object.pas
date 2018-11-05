@@ -119,6 +119,7 @@ type
     FAuthBearer: TAuthBearer;
     FAuthType: TAuthTab; // TODO: should be TAuthType
     FDataType: TBodyTab;
+    FNotes: string;
     function GetFilename: string;
     procedure SetMethod(AValue: string);
   protected
@@ -150,6 +151,7 @@ type
     property AuthBearer: TAuthBearer read FAuthBearer;
     property DataType: TBodyTab read FDataType;
     property Filename: string read GetFilename;
+    property Notes: string read FNotes write FNotes;
   end;
 
 implementation
@@ -280,6 +282,7 @@ begin
   FAuthBasic  := TAuthBasic.Create;
   FAuthBearer := TAuthBearer.Create;
   FMethod     := 'GET';
+  FNotes      := '';
 end;
 
 constructor TRequestObject.Create(form: TForm1);
@@ -300,6 +303,7 @@ begin
     FAuthBearer.Prefix  := editBearerPrefix.Text;
     FAuthBearer.Token   := editBearerToken.Text;
     FDataType := GetSelectedBodyTab;
+    FNotes := editNotes.Text;
   end;
 end;
 
@@ -421,6 +425,7 @@ begin
     cbMethod.Text  := Method;
     editOther.Text := Body;
     editJson.Text  := Json;
+    editNotes.Text := Notes;
 
     SetCollectionToGrid(Headers, requestHeaders);
     SetCollectionToGrid(Cookies, gridReqCookie);
