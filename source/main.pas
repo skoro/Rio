@@ -43,6 +43,7 @@ type
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
+    editNotes: TMemo;
     miHelpKeyboard: TMenuItem;
     miExport: TMenuItem;
     miImport: TMenuItem;
@@ -121,6 +122,7 @@ type
     tabAuth: TTabSheet;
     tabAuthBasic: TTabSheet;
     tabAuthBearer: TTabSheet;
+    tabNotes: TTabSheet;
     TimerRequest: TTimer;
     toolbarAuth: TToolBar;
     ToolButton1: TToolButton;
@@ -1430,8 +1432,8 @@ begin
   // Apply fonts
   OptionsForm.ApplyControlFont(Self, 'TStringGrid', fiGrids);
   OptionsForm.ApplyControlFont(Self, 'TSynEdit', fiEditor);
+  OptionsForm.ApplyControlFont(Self, 'TMemo', fiEditor);
   OptionsForm.ApplyControlFont(Self, 'TTreeView', fiJson);
-  responseRaw.Font := OptionsForm.GetFontItem(fiContent);
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
 
   cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
@@ -1826,10 +1828,11 @@ procedure TForm1.StartNewRequest;
 
 begin
   // Request fields.
-  cbUrl.Text := '';
-  cbMethod.Text := 'GET';
+  cbUrl.Text     := '';
+  cbMethod.Text  := 'GET';
   editOther.Text := '';
-  editJson.Text := '';
+  editJson.Text  := '';
+  editNotes.Text := '';
   ResetGrid(requestHeaders);
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
