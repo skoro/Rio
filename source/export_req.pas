@@ -246,7 +246,8 @@ begin
     btJson:  Val := MinimizeJson;
     btOther: Val := FRequestObject.Body;
   end;
-  SetCurlOpt('CURLOPT_POSTFIELDS', Val);
+  if Val <> '' then
+    SetCurlOpt('CURLOPT_POSTFIELDS', Val);
 end;
 
 procedure TPHPCurlExport.RenderAuth;
