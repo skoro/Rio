@@ -1828,10 +1828,11 @@ procedure TForm1.StartNewRequest;
 
 begin
   // Request fields.
-  cbUrl.Text := '';
-  cbMethod.Text := 'GET';
+  cbUrl.Text     := '';
+  cbMethod.Text  := 'GET';
   editOther.Text := '';
-  editJson.Text := '';
+  editJson.Text  := '';
+  editNotes.Text := '';
   ResetGrid(requestHeaders);
   ResetGrid(gridForm);
   ResetGrid(gridReqCookie);
