@@ -95,7 +95,7 @@ type
 
 implementation
 
-uses main, strutils;
+uses main, strutils, fphttpclient;
 
 { TTextExport }
 
@@ -233,7 +233,10 @@ begin
         Buf := TStringList.Create;
         for FormParam in FRequestObject.Form do
           if FormParam.Enabled then
-            Buf.Add(FormParam.Name + '=' + IfThen(FormParam.ElemType = ftiFile, '@', '') + FormParam.Value);
+            Buf.Add(
+              EncodeURLElement(FormParam.Name) + '=' +
+              IfThen(FormParam.ElemType = ftiFile, '@' + FormParam.Value, EncodeURLElement(FormParam.Value))
+            );
         Buf.Delimiter := '&';
         Val := Buf.DelimitedText;
       finally
