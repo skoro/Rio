@@ -1881,6 +1881,14 @@ object Form1: TForm1
       ShortCut = 24643
       OnClick = JsonTreePopupMenuClick
     end
+    object miJsonCollapse: TMenuItem
+      Caption = 'Collapse children'
+      OnClick = JsonTreePopupMenuClick
+    end
+    object miJsonExpand: TMenuItem
+      Caption = 'Expand children'
+      OnClick = JsonTreePopupMenuClick
+    end
     object miJsonView: TMenuItem
       Caption = 'View...'
       ShortCut = 13

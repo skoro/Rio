@@ -156,6 +156,7 @@ type
     procedure InitSearch(Search: string; Options: TFindOptions); override;
     function FindNext: Integer; override;
     procedure ViewNextPage;
+    procedure ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
     property TreeView: TTreeView read GetTreeView;
     property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
@@ -710,6 +711,23 @@ begin
     ViewPage := vpTree
   else
     ViewPage := vpFormatted;
+end;
+
+procedure TResponseJsonTab.ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
+var
+  N: Integer;
+begin
+  if not Node.HasChildren then
+    Exit;
+  // Expand root node.
+  if (not Node.Expanded) and (not Collapse) then
+    Node.Expanded := True;
+  // Expand/collapse child nodes.
+  for N := 0 to Node.Count - 1 do
+    if Collapse then
+      Node.Items[N].Collapse(True)
+    else
+      Node.Items[N].Expand(True);
 end;
 
 { TResponseTabManager }

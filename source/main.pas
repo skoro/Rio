@@ -44,6 +44,8 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    miJsonExpand: TMenuItem;
+    miJsonCollapse: TMenuItem;
     miHelpKeyboard: TMenuItem;
     miExport: TMenuItem;
     miImport: TMenuItem;
@@ -809,6 +811,11 @@ begin
 
   if MenuItem = miJsonFilter then
     FResponseJsonTab.Filter(Node);
+
+  if MenuItem = miJsonCollapse then
+    FResponseJsonTab.ExpandChildren(Node, True);
+  if MenuItem = miJsonExpand then
+    FResponseJsonTab.ExpandChildren(Node);
 end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
