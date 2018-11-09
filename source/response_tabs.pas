@@ -168,14 +168,74 @@ type
     property LineNumbers: Boolean read FLineNumbers write SetLineNumbers;
   end;
 
+  { TResponseXMLTab }
+
+  TResponseXMLTab = class(TResponseTab)
+  private
+    FSynEdit: TSynEdit;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure CreateUI(ATabSheet: TTabSheet); override;
+    function OpenOnMimeType(const MimeType: string): boolean; override;
+    procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
+  end;
+
 implementation
 
-uses app_helpers, strutils;
+uses app_helpers, strutils, SynHighlighterXML;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
   // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
   (-1, 3, 2, 4, 5, 0, 1);
+
+{ TResponseXMLTab }
+
+constructor TResponseXMLTab.Create;
+begin
+  inherited;
+  FSynEdit := nil;
+  FName := 'XML';
+end;
+
+destructor TResponseXMLTab.Destroy;
+begin
+  FreeAndNil(FSynEdit);
+  inherited Destroy;
+end;
+
+procedure TResponseXMLTab.CreateUI(ATabSheet: TTabSheet);
+begin
+  inherited CreateUI(ATabSheet);
+
+  // Init editor.
+  FSynEdit := TSynEdit.Create(ATabSheet);
+  FSynEdit.Parent := ATabSheet;
+  FSynEdit.Align := alClient;
+  FSynEdit.BorderStyle := bsNone;
+  FSynEdit.ReadOnly := True;
+
+  // Init highlighter.
+  FSynEdit.Highlighter := TSynXMLSyn.Create(FSynEdit);
+
+  // Hide all the gutters except code folding.
+  FSynEdit.Gutter.Parts.Part[0].Visible := False;
+  FSynEdit.Gutter.Parts.Part[1].Visible := False;
+  FSynEdit.Gutter.Parts.Part[2].Visible := False;
+  FSynEdit.Gutter.Parts.Part[3].Visible := False;
+end;
+
+function TResponseXMLTab.OpenOnMimeType(const MimeType: string): boolean;
+begin
+  Result := (MimeType = 'application/rss+xml');
+end;
+
+procedure TResponseXMLTab.OnHttpResponse(ResponseInfo: TResponseInfo);
+begin
+  if Assigned(FSynEdit) then
+    FSynEdit.Text := ResponseInfo.Content.DataString;
+end;
 
 { TResponseJsonTab }
 
