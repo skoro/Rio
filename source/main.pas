@@ -519,6 +519,7 @@ begin
   FResponseTabManager.RegisterTab(FResponseJsonTab);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
   FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
+  FResponseTabManager.RegisterTab(TResponseXMLTab.Create);
 
   UpdateHeadersPickList;
 
