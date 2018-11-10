@@ -1367,16 +1367,15 @@ end;
 
 procedure TForm1.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
 begin
-  if Tab is TResponseImageTab then begin
-    TResponseImageTab(Tab).Save(FileName);
-  end
-
-  else if Tab is TResponseJsonTab then begin
+  if Tab is TResponseJsonTab then begin
     if OptionsForm.JsonSaveFormatted then
       FilePutContents(FileName, FormatJson(TResponseJsonTab(Tab).JsonRoot))
     else
       responseRaw.Lines.SaveToFile(FileName)
-  end;
+  end
+
+  else
+    Tab.Save(FileName);
 end;
 
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
