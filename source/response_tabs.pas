@@ -88,11 +88,15 @@ type
   TResponseFormattedTab = class(TResponseTab)
   private
     FSynEdit: TSynEdit;
+    FAutoCreate: Boolean; // Whether to create editor or it will be created
+                          // in descent classes ?
   protected
     FSearchText: string;
     FSearchOptions: TSynSearchOptions;
     FSearchPos: TPoint;
+    procedure InitSearchParams; virtual;
   public
+    constructor Create;
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     function CanFind: Boolean; override;
@@ -117,7 +121,7 @@ type
 
   { TResponseJsonTab }
 
-  TResponseJsonTab = class(TResponseTab)
+  TResponseJsonTab = class(TResponseFormattedTab)
   private
     FLineNumbers: Boolean;
     FTreeView: TTreeView;
@@ -130,16 +134,12 @@ type
     FPageControl: TPageControl;
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
-    FSynEdit: TSynEdit;
     FFilter: TInputButtons;
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
     FOnJsonData: TOnJsonData;
-    FSearchText: string;
-    FSearchOptions: TSynSearchOptions;
     FSearchNode: TTreeNode;
     FSearchNodePos: Integer;
-    FSearchPos: TPoint;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -160,7 +160,7 @@ type
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   protected
     procedure ToggleFilterPanel;
-    procedure InitSearchParams;
+    procedure InitSearchParams; override;
     procedure ShowLineNumbers;
     function FindInNode(Node: TTreeNode): TTreeNode;
   public
@@ -172,13 +172,10 @@ type
     procedure FreeTab; override;
     procedure Filter(Node: TTreeNode); virtual;
     function IsFilterActive: Boolean;
-    function CanFind: Boolean; override;
-    procedure InitSearch(Search: string; Options: TFindOptions); override;
     function FindNext: Integer; override;
     procedure ViewNextPage;
     procedure ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
     property TreeView: TTreeView read GetTreeView;
-    property SynEdit: TSynEdit read FSynEdit;
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
     property ButtonOptions: TToolButton read FBtnOptions;
@@ -208,9 +205,27 @@ const
 
 { TResponseFormattedTab }
 
+procedure TResponseFormattedTab.InitSearchParams;
+begin
+  if ssoBackwards in FSearchOptions then begin
+    FSearchPos.y := FSynEdit.Lines.Count;
+    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
+  end
+  else
+    FSearchPos := Point(0, 0);
+end;
+
+constructor TResponseFormattedTab.Create;
+begin
+  FAutoCreate := True;
+end;
+
 procedure TResponseFormattedTab.CreateUI(ATabSheet: TTabSheet);
 begin
   inherited CreateUI(ATabSheet);
+
+  if not FAutoCreate then
+    Exit; // =>
 
   // Init editor.
   FSynEdit := TSynEdit.Create(ATabSheet);
@@ -228,8 +243,10 @@ end;
 
 procedure TResponseFormattedTab.OnHttpResponse(ResponseInfo: TResponseInfo);
 begin
-  if Assigned(FSynEdit) then
+  if Assigned(FSynEdit) then begin
     SynEdit.Text := ResponseInfo.Content.DataString;
+    InitSearchParams;
+  end;
 end;
 
 function TResponseFormattedTab.CanFind: Boolean;
@@ -249,12 +266,7 @@ begin
   if frWholeWord in Options then
     Include(FSearchOptions, ssoWholeWord);
 
-  if ssoBackwards in FSearchOptions then begin
-    FSearchPos.y := FSynEdit.Lines.Count;
-    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
-  end
-  else
-    FSearchPos := Point(0, 0);
+  InitSearchParams;
 end;
 
 function TResponseFormattedTab.FindNext: Integer;
@@ -569,14 +581,9 @@ end;
 
 procedure TResponseJsonTab.InitSearchParams;
 begin
+  inherited;
   FSearchNode := nil;
   FSearchNodePos := 0;
-  if ssoBackwards in FSearchOptions then begin
-    FSearchPos.y := FSynEdit.Lines.Count;
-    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
-  end
-  else
-    FSearchPos := Point(0, 0);
 end;
 
 procedure TResponseJsonTab.ShowLineNumbers;
@@ -647,6 +654,7 @@ begin
   FJsonParser := nil;
   FSearchOptions := [];
   FLineNumbers := False;
+  FAutoCreate  := False;
   InitSearchParams;
 end;
 
@@ -663,7 +671,7 @@ end;
 
 procedure TResponseJsonTab.CreateUI(ATabSheet: TTabSheet);
 begin
-  inherited CreateUI(ATabSheet);
+  inherited;
 
   CreateToolbar(ATabSheet);
 
@@ -715,11 +723,11 @@ end;
 
 procedure TResponseJsonTab.OnHttpResponse(ResponseInfo: TResponseInfo);
 begin
+  inherited;
   if Assigned(FTreeView) then begin
     ClearJsonData;
     LoadDocument(ResponseInfo.Content.DataString);
   end;
-  InitSearchParams;
 end;
 
 procedure TResponseJsonTab.FreeTab;
@@ -787,27 +795,7 @@ begin
   Result := FFilter.Visible and (Trim(FFilter.Text) <> '');
 end;
 
-function TResponseJsonTab.CanFind: Boolean;
-begin
-  Result := True;
-end;
-
-procedure TResponseJsonTab.InitSearch(Search: string; Options: TFindOptions);
-begin
-  FSearchText := Search;
-  FSearchOptions := [];
-  if not (frDown in Options) then
-    Include(FSearchOptions, ssoBackwards);
-  if frMatchCase in Options then
-    Include(FSearchOptions, ssoMatchCase);
-  if frWholeWord in Options then
-    Include(FSearchOptions, ssoWholeWord);
-  InitSearchParams;
-end;
-
 function TResponseJsonTab.FindNext: Integer;
-var
-  p, maxx, maxy: Integer;
 begin
   if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
     if ssoBackwards in FSearchOptions then begin
@@ -822,28 +810,7 @@ begin
   FSearchNode := FindInNode(FSearchNode);
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
-  p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
-  if (p = 0) then begin
-    if (ssoBackwards in FSearchOptions) then begin
-      maxy := FSynEdit.Lines.Count;
-      maxx := FSynEdit.Lines[maxy - 1].Length;
-    end
-    else begin
-      maxy := 0;
-      maxx := 0;
-    end;
-    // Not found at all.
-    if (FSearchPos.x = maxx) and (FSearchPos.y = maxy) and (FSearchNode = nil) then
-      Exit(-1);
-  end;
-  // Set position for the next search.
-  if ssoBackwards in FSearchOptions then
-    FSearchPos := FSynEdit.BlockBegin
-  else
-    FSearchPos := FSynEdit.BlockEnd;
-  if p = 0 then
-    Exit(0);
-  Result := p;
+  Result := inherited;
 end;
 
 procedure TResponseJsonTab.ViewNextPage;
