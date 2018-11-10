@@ -327,7 +327,9 @@ end;
 
 function TResponseXMLTab.OpenOnMimeType(const MimeType: string): boolean;
 begin
-  Result := (MimeType = 'application/rss+xml');
+  Result := (MimeType = 'application/rss+xml') or
+            (MimeType = 'application/atom+xml') or
+            (MimeType = 'application/xml');
 end;
 
 { TResponseJsonTab }
