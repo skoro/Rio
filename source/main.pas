@@ -1774,8 +1774,11 @@ var
   basename: string;
 begin
   uri := ParseURI(NormalizeUrl);
-  if ext = '' then
+  if ext = '' then begin
     ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
+    // Get extension name from strings like 'rss+xml', etc.
+    ext := RightStr(ext, Length(ext) - Pos('+', ext));
+  end;
   basename := TrimSet(uri.Document, ['/']);
   if basename = '' then
     basename := uri.Host;
