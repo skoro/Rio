@@ -83,6 +83,26 @@ type
     property ImageType: string read FImageType;
   end;
 
+  { TResponseFormattedTab }
+
+  TResponseFormattedTab = class(TResponseTab)
+  private
+    FSynEdit: TSynEdit;
+  protected
+    FSearchText: string;
+    FSearchOptions: TSynSearchOptions;
+    FSearchPos: TPoint;
+  public
+    procedure CreateUI(ATabSheet: TTabSheet); override;
+    procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
+    function CanFind: Boolean; override;
+    procedure InitSearch(Search: string; Options: TFindOptions); override;
+    function FindNext: Integer; override;
+    procedure FreeTab; override;
+    property SynEdit: TSynEdit read FSynEdit;
+    procedure Save(const AFileName: string); override;
+  end;
+
   { TViewPage }
 
   TViewPage = (vpTree, vpFormatted);
@@ -170,15 +190,11 @@ type
 
   { TResponseXMLTab }
 
-  TResponseXMLTab = class(TResponseTab)
-  private
-    FSynEdit: TSynEdit;
+  TResponseXMLTab = class(TResponseFormattedTab)
   public
     constructor Create;
-    destructor Destroy; override;
     procedure CreateUI(ATabSheet: TTabSheet); override;
     function OpenOnMimeType(const MimeType: string): boolean; override;
-    procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
   end;
 
 implementation
@@ -190,22 +206,9 @@ const
   // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
   (-1, 3, 2, 4, 5, 0, 1);
 
-{ TResponseXMLTab }
+{ TResponseFormattedTab }
 
-constructor TResponseXMLTab.Create;
-begin
-  inherited;
-  FSynEdit := nil;
-  FName := 'XML';
-end;
-
-destructor TResponseXMLTab.Destroy;
-begin
-  FreeAndNil(FSynEdit);
-  inherited Destroy;
-end;
-
-procedure TResponseXMLTab.CreateUI(ATabSheet: TTabSheet);
+procedure TResponseFormattedTab.CreateUI(ATabSheet: TTabSheet);
 begin
   inherited CreateUI(ATabSheet);
 
@@ -216,9 +219,6 @@ begin
   FSynEdit.BorderStyle := bsNone;
   FSynEdit.ReadOnly := True;
 
-  // Init highlighter.
-  FSynEdit.Highlighter := TSynXMLSyn.Create(FSynEdit);
-
   // Hide all the gutters except code folding.
   FSynEdit.Gutter.Parts.Part[0].Visible := False;
   FSynEdit.Gutter.Parts.Part[1].Visible := False;
@@ -226,15 +226,96 @@ begin
   FSynEdit.Gutter.Parts.Part[3].Visible := False;
 end;
 
+procedure TResponseFormattedTab.OnHttpResponse(ResponseInfo: TResponseInfo);
+begin
+  if Assigned(FSynEdit) then
+    SynEdit.Text := ResponseInfo.Content.DataString;
+end;
+
+function TResponseFormattedTab.CanFind: Boolean;
+begin
+  Result := True;
+end;
+
+procedure TResponseFormattedTab.InitSearch(Search: string; Options: TFindOptions);
+begin
+  FSearchText := Search;
+  FSearchOptions := [];
+
+  if not (frDown in Options) then
+    Include(FSearchOptions, ssoBackwards);
+  if frMatchCase in Options then
+    Include(FSearchOptions, ssoMatchCase);
+  if frWholeWord in Options then
+    Include(FSearchOptions, ssoWholeWord);
+
+  if ssoBackwards in FSearchOptions then begin
+    FSearchPos.y := FSynEdit.Lines.Count;
+    FSearchPos.x := FSynEdit.Lines[FSearchPos.y - 1].Length;
+  end
+  else
+    FSearchPos := Point(0, 0);
+end;
+
+function TResponseFormattedTab.FindNext: Integer;
+var
+  p, maxx, maxy: Integer;
+begin
+  p := FSynEdit.SearchReplaceEx(FSearchText, '', FSearchOptions, FSearchPos);
+  if (p = 0) then begin
+    if (ssoBackwards in FSearchOptions) then begin
+      maxy := FSynEdit.Lines.Count;
+      maxx := FSynEdit.Lines[maxy - 1].Length;
+    end
+    else begin
+      maxy := 0;
+      maxx := 0;
+    end;
+    // Not found at all.
+    if (FSearchPos.x = maxx) and (FSearchPos.y = maxy) then
+      Exit(-1);
+  end;
+  // Set position for the next search.
+  if ssoBackwards in FSearchOptions then
+    FSearchPos := FSynEdit.BlockBegin
+  else
+    FSearchPos := FSynEdit.BlockEnd;
+  if p = 0 then
+    Exit(0);
+  Result := p;
+end;
+
+procedure TResponseFormattedTab.FreeTab;
+begin
+  if Assigned(FSynEdit) then
+    FreeAndNil(FSynEdit);
+  inherited FreeTab;
+end;
+
+procedure TResponseFormattedTab.Save(const AFileName: string);
+begin
+  if Assigned(FSynEdit) then
+    FilePutContents(AFileName, FSynEdit.Text);
+end;
+
+{ TResponseXMLTab }
+
+constructor TResponseXMLTab.Create;
+begin
+  inherited;
+  FName := 'XML';
+end;
+
+procedure TResponseXMLTab.CreateUI(ATabSheet: TTabSheet);
+begin
+  inherited CreateUI(ATabSheet);
+  // Init highlighter.
+  SynEdit.Highlighter := TSynXMLSyn.Create(FSynEdit);
+end;
+
 function TResponseXMLTab.OpenOnMimeType(const MimeType: string): boolean;
 begin
   Result := (MimeType = 'application/rss+xml');
-end;
-
-procedure TResponseXMLTab.OnHttpResponse(ResponseInfo: TResponseInfo);
-begin
-  if Assigned(FSynEdit) then
-    FSynEdit.Text := ResponseInfo.Content.DataString;
 end;
 
 { TResponseJsonTab }
