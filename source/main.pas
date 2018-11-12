@@ -262,6 +262,10 @@ const
 
 procedure TForm1.btnSubmitClick(Sender: TObject);
 begin
+  // Don't submit a request when the current request is in progress by pressing
+  // shortcut key.
+  if not btnSubmit.Enabled then
+    Exit; // =>
   TimerRequest.Enabled := False;
   FRequestSeconds := 0;
   if SubmitRequest then
