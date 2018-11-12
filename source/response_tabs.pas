@@ -373,19 +373,19 @@ begin
       FPageControl.ActivePage := FTreeSheet;
       FBtnTree.Down := True;
       FBtnFormatted.Down := False;
-      // Force to set focus to the control (WIN fix when focus losed).
-      if FTabSheet.Showing then
-        FTreeView.SetFocus;
     end;
     vpFormatted: begin
       FPageControl.ActivePage := FFormatSheet;
       FBtnTree.Down := False;
       FBtnFormatted.Down := True;
-      // Force to set focus to the control (WIN fix when focus losed).
-      if FTabSheet.Showing then
-        FSynEdit.SetFocus;
     end;
   end;
+  // Force focus the control (this fixes focus lose on WIN).
+  if TPageControl(FTabSheet.Parent).ActivePage = FTabSheet then
+    if AValue = vpTree then
+      FTreeView.SetFocus
+    else
+      FSynEdit.SetFocus;
 end;
 
 procedure TResponseJsonTab.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
