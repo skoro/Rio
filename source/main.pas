@@ -523,6 +523,7 @@ begin
   FResponseTabManager.RegisterTab(FResponseJsonTab);
   FResponseTabManager.OnOpenResponseTab := @OnOpenResponseTab;
   FResponseTabManager.OnSaveTab := @OnSaveResponseTab;
+  FResponseTabManager.RegisterTab(TResponseXMLTab.Create);
 
   UpdateHeadersPickList;
 
@@ -1370,16 +1371,15 @@ end;
 
 procedure TForm1.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
 begin
-  if Tab is TResponseImageTab then begin
-    TResponseImageTab(Tab).Save(FileName);
-  end
-
-  else if Tab is TResponseJsonTab then begin
+  if Tab is TResponseJsonTab then begin
     if OptionsForm.JsonSaveFormatted then
       FilePutContents(FileName, FormatJson(TResponseJsonTab(Tab).JsonRoot))
     else
       responseRaw.Lines.SaveToFile(FileName)
-  end;
+  end
+
+  else
+    Tab.Save(FileName);
 end;
 
 procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
@@ -1778,8 +1778,11 @@ var
   basename: string;
 begin
   uri := ParseURI(NormalizeUrl);
-  if ext = '' then
+  if ext = '' then begin
     ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
+    // Get extension name from strings like 'rss+xml', etc.
+    ext := RightStr(ext, Length(ext) - Pos('+', ext));
+  end;
   basename := TrimSet(uri.Document, ['/']);
   if basename = '' then
     basename := uri.Host;
