@@ -1962,11 +1962,11 @@ end;
 
 function TForm1.NormalizeUrl: string;
 begin
-  Result := LowerCase(Trim(cbUrl.Text));
+  Result := Trim(cbUrl.Text);
   if Result = '' then
     raise Exception.Create('Url is empty.');
-  if Pos('http://', Result) = 0 then
-    if Pos('https://', Result) = 0 then
+  if not AnsiStartsText('http://', Result) then
+    if not AnsiStartsText('https://', Result) then
       Result := 'http://' + Result;
 end;
 
