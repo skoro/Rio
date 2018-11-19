@@ -62,6 +62,18 @@ type
     property ActiveTab: TResponseTab read GetActiveTab;
   end;
 
+  { ETabException }
+
+  ETabException = class(Exception)
+  private
+    FTabName: string;
+    function GetTabMessage: string;
+  public
+    constructor Create(ATabName, Msg: string);
+    property TabName: string read FTabName;
+    property TabMessage: string read GetTabMessage;
+  end;
+
   { TResponseImageTab }
 
   TResponseImageTab = class(TResponseTab)
@@ -202,6 +214,19 @@ const
   ImageTypeMap: array[TJSONtype] of Integer =
   // (jtUnknown, jtNumber, jtString, jtBoolean, jtNull, jtArray, jtObject)
   (-1, 3, 2, 4, 5, 0, 1);
+
+{ ETabException }
+
+function ETabException.GetTabMessage: string;
+begin
+  Result := Format('%s: %s', [FTabName, Message]);
+end;
+
+constructor ETabException.Create(ATabName, Msg: string);
+begin
+  inherited Create(msg);
+  FTabName := ATabName;
+end;
 
 { TResponseFormattedTab }
 
@@ -886,10 +911,18 @@ begin
     begin
       if not Assigned(Tab.TabSheet) then
         Tab.CreateUI(FPageControl.AddTabSheet);
-      Tab.OnHttpResponse(ResponseInfo);
-      if Assigned(FOnOpenResponseTab) then
-        FOnOpenResponseTab(Tab, ResponseInfo);
-      FOpenedTabs.Add(Tab);
+      try
+        Tab.OnHttpResponse(ResponseInfo);
+        if Assigned(FOnOpenResponseTab) then
+          FOnOpenResponseTab(Tab, ResponseInfo);
+        FOpenedTabs.Add(Tab);
+      except on E: Exception do
+        begin
+          // On error don't open the tab at all.
+          Tab.FreeTab;
+          raise ETabException.Create(Tab.Name, E.Message);
+        end;
+      end; // try
     end
     else
       Tab.FreeTab;

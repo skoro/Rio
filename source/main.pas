@@ -1645,7 +1645,12 @@ begin
   responseRaw.Clear;
   mime := SplitMimeType(Info.ContentType);
 
-  FResponseTabManager.OpenTabs(Info);
+  // Open a special content tab.
+  try
+    FResponseTabManager.OpenTabs(Info);
+  except on E: ETabException do
+    Application.MessageBox(PChar(E.TabMessage), 'Error', MB_ICONERROR + MB_OK);
+  end;
 
   if (mime.MimeType = 'text') or ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
     tabContent.TabVisible := True
