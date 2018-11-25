@@ -789,7 +789,16 @@ begin
   // Get json node key.
   Key := '';
   ParentNode := Node.Parent;
+
+  // Expand/collapse children.
+  if MenuItem = miJsonCollapse then
+    FResponseJsonTab.ExpandChildren(Node, True);
+  if MenuItem = miJsonExpand then
+    FResponseJsonTab.ExpandChildren(Node);
+
+  // The items that require a key don't work without the parent.
   if not Assigned(ParentNode) then Exit;
+
   ParentData := TJSONData(ParentNode.Data);
   case ParentData.JSONType of
     jtObject:
@@ -816,11 +825,6 @@ begin
 
   if MenuItem = miJsonFilter then
     FResponseJsonTab.Filter(Node);
-
-  if MenuItem = miJsonCollapse then
-    FResponseJsonTab.ExpandChildren(Node, True);
-  if MenuItem = miJsonExpand then
-    FResponseJsonTab.ExpandChildren(Node);
 end;
 
 procedure TForm1.miManageHeadersClick(Sender: TObject);
