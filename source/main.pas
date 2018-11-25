@@ -1443,9 +1443,9 @@ begin
   // Apply fonts
   OptionsForm.ApplyControlFont(Self, 'TStringGrid', fiGrids);
   OptionsForm.ApplyControlFont(Self, 'TSynEdit', fiEditor);
-  OptionsForm.ApplyControlFont(Self, 'TMemo', fiEditor);
   OptionsForm.ApplyControlFont(Self, 'TTreeView', fiJson);
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
+  responseRaw.Font := OptionsForm.GetFontItem(fiContent);
 
   cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
 
