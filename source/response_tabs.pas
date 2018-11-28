@@ -1,6 +1,7 @@
 unit response_tabs;
 
 {$mode objfpc}{$H+}
+{$Interfaces corba}
 
 interface
 
@@ -95,9 +96,16 @@ type
     property ImageType: string read FImageType;
   end;
 
+  { ISelectedText }
+
+  IEditorSelectedText = interface
+    ['{A7059F84-814F-47CC-B38A-ED49DD8BAFA7}']
+    function SelectedText: string;
+  end;
+
   { TResponseFormattedTab }
 
-  TResponseFormattedTab = class(TResponseTab)
+  TResponseFormattedTab = class(TResponseTab, IEditorSelectedText)
   private
     FSynEdit: TSynEdit;
     FAutoCreate: Boolean; // Whether to create editor or it will be created
@@ -117,6 +125,7 @@ type
     procedure FreeTab; override;
     property SynEdit: TSynEdit read FSynEdit;
     procedure Save(const AFileName: string); override;
+    function SelectedText: string;
   end;
 
   { TViewPage }
@@ -333,6 +342,13 @@ procedure TResponseFormattedTab.Save(const AFileName: string);
 begin
   if Assigned(FSynEdit) then
     FilePutContents(AFileName, FSynEdit.Text);
+end;
+
+function TResponseFormattedTab.SelectedText: string;
+begin
+  Result := '';
+  if Assigned(FSynEdit) then
+    Result := FSynEdit.SelText;
 end;
 
 { TResponseXMLTab }
