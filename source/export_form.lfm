@@ -76,18 +76,18 @@ object ExportForm: TExportForm
   end
   object PanelMain: TPanel
     Left = 4
-    Height = 196
+    Height = 204
     Top = 36
     Width = 393
     Align = alClient
     BorderSpacing.Around = 4
     BevelOuter = bvNone
-    ClientHeight = 196
+    ClientHeight = 204
     ClientWidth = 393
     TabOrder = 1
     object MemoResult: TMemo
       Left = 0
-      Height = 196
+      Height = 204
       Top = 0
       Width = 393
       Align = alClient
@@ -97,8 +97,8 @@ object ExportForm: TExportForm
   end
   object ButtonPanel: TButtonPanel
     Left = 6
-    Height = 34
-    Top = 238
+    Height = 26
+    Top = 246
     Width = 389
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -111,6 +111,7 @@ object ExportForm: TExportForm
     TabOrder = 2
     ShowButtons = [pbClose]
     ShowGlyphs = [pbOK, pbCancel, pbHelp]
+    ShowBevel = False
   end
   object SaveDialog: TSaveDialog
     Options = [ofOverwritePrompt, ofEnableSizing, ofViewDetail]

@@ -19,8 +19,8 @@ object ImportForm: TImportForm
   LCLVersion = '1.8.2.0'
   object ButtonPanel: TButtonPanel
     Left = 6
-    Height = 34
-    Top = 194
+    Height = 26
+    Top = 202
     Width = 382
     OKButton.Name = 'OKButton'
     OKButton.Caption = '&Import'
@@ -36,6 +36,7 @@ object ImportForm: TImportForm
     TabOrder = 0
     ShowButtons = [pbOK, pbCancel]
     ShowGlyphs = []
+    ShowBevel = False
   end
   object MainPanel: TPanel
     Left = 4
@@ -74,7 +75,7 @@ object ImportForm: TImportForm
   end
   object input: TMemo
     Left = 4
-    Height = 136
+    Height = 144
     Top = 52
     Width = 386
     Align = alClient
