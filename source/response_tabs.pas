@@ -125,7 +125,7 @@ type
     procedure FreeTab; override;
     property SynEdit: TSynEdit read FSynEdit;
     procedure Save(const AFileName: string); override;
-    function SelectedText: string;
+    function SelectedText: string; virtual;
   end;
 
   { TViewPage }
@@ -196,6 +196,7 @@ type
     function FindNext: Integer; override;
     procedure ViewNextPage;
     procedure ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
+    function SelectedText: string; override;
     property TreeView: TTreeView read GetTreeView;
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
@@ -879,6 +880,29 @@ begin
       Node.Items[N].Collapse(True)
     else
       Node.Items[N].Expand(True);
+end;
+
+function TResponseJsonTab.SelectedText: string;
+var
+  Sel: TTreeNode;
+  key: string;
+begin
+  if ViewPage = vpFormatted then
+    Exit(inherited);
+  key := '';
+  Sel := FTreeView.Selected;
+  if Sel <> Nil then begin
+    // Use a node key as the selected value.
+    case TJSONData(Sel.Data).JSONType of
+      jtNumber,
+      jtString,
+      jtBoolean: key := LeftStr(Sel.Text, Pos(':', Sel.Text) - 1);
+      jtNull:    key := Sel.Text;
+      jtArray:   key := LeftStr(Sel.Text, Pos('[', Sel.Text) - 1);
+      jtObject:  key := Sel.Text;
+    end;
+  end;
+  Result := Key;
 end;
 
 { TResponseTabManager }
