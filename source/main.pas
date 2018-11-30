@@ -683,10 +683,25 @@ begin
 end;
 
 procedure TForm1.miFindClick(Sender: TObject);
+var
+  tab: TResponseTab;
+  Sel: string;
+  Page: TTabSheet;
 begin
-  if pagesResponse.ActivePage = tabContent then begin
+  Page := pagesResponse.ActivePage;
+  if Page = tabContent then begin
+    // Autofill find text from the raw content tab.
     if responseRaw.SelText <> '' then
       dlgFind.FindText := responseRaw.SelText;
+  end
+  else begin
+    // Autofill find text from the response tab.
+    tab := FResponseTabManager.CanFind;
+    if (tab <> Nil) and (Page = tab.TabSheet) and (tab is IEditorSelectedText) then begin
+      Sel := (tab as IEditorSelectedText).SelectedText;
+      if Sel <> '' then
+        dlgFind.FindText := Sel;
+    end;
   end;
   dlgFind.Execute;
 end;

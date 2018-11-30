@@ -1,6 +1,7 @@
 unit response_tabs;
 
 {$mode objfpc}{$H+}
+{$Interfaces corba}
 
 interface
 
@@ -95,9 +96,16 @@ type
     property ImageType: string read FImageType;
   end;
 
+  { ISelectedText }
+
+  IEditorSelectedText = interface
+    ['{A7059F84-814F-47CC-B38A-ED49DD8BAFA7}']
+    function SelectedText: string;
+  end;
+
   { TResponseFormattedTab }
 
-  TResponseFormattedTab = class(TResponseTab)
+  TResponseFormattedTab = class(TResponseTab, IEditorSelectedText)
   private
     FSynEdit: TSynEdit;
     FAutoCreate: Boolean; // Whether to create editor or it will be created
@@ -117,6 +125,7 @@ type
     procedure FreeTab; override;
     property SynEdit: TSynEdit read FSynEdit;
     procedure Save(const AFileName: string); override;
+    function SelectedText: string; virtual;
   end;
 
   { TViewPage }
@@ -187,6 +196,7 @@ type
     function FindNext: Integer; override;
     procedure ViewNextPage;
     procedure ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
+    function SelectedText: string; override;
     property TreeView: TTreeView read GetTreeView;
     property JsonRoot: TJSONData read FJsonRoot;
     property ViewPage: TViewPage read GetViewPage write SetViewPage;
@@ -333,6 +343,13 @@ procedure TResponseFormattedTab.Save(const AFileName: string);
 begin
   if Assigned(FSynEdit) then
     FilePutContents(AFileName, FSynEdit.Text);
+end;
+
+function TResponseFormattedTab.SelectedText: string;
+begin
+  Result := '';
+  if Assigned(FSynEdit) then
+    Result := FSynEdit.SelText;
 end;
 
 { TResponseXMLTab }
@@ -863,6 +880,29 @@ begin
       Node.Items[N].Collapse(True)
     else
       Node.Items[N].Expand(True);
+end;
+
+function TResponseJsonTab.SelectedText: string;
+var
+  Sel: TTreeNode;
+  key: string;
+begin
+  if ViewPage = vpFormatted then
+    Exit(inherited);
+  key := '';
+  Sel := FTreeView.Selected;
+  if Sel <> Nil then begin
+    // Use a node key as the selected value.
+    case TJSONData(Sel.Data).JSONType of
+      jtNumber,
+      jtString,
+      jtBoolean: key := LeftStr(Sel.Text, Pos(':', Sel.Text) - 1);
+      jtNull:    key := Sel.Text;
+      jtArray:   key := LeftStr(Sel.Text, Pos('[', Sel.Text) - 1);
+      jtObject:  key := Sel.Text;
+    end;
+  end;
+  Result := Key;
 end;
 
 { TResponseTabManager }
