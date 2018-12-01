@@ -50,7 +50,7 @@ var
 
 implementation
 
-uses LCLType;
+uses app_helpers;
 
 {$R *.lfm}
 
@@ -94,11 +94,9 @@ begin
 end;
 
 procedure THeadersEditorForm.btnRestoreClick(Sender: TObject);
-var
-  answer: integer;
 begin
-  answer := Application.MessageBox('Are you sure to restore defaults headers ?', 'Restore headers', MB_ICONQUESTION + MB_YESNO);
-  if answer = IDYES then RestoreDefaults;
+  if ConfirmDlg('Restore headers', 'Are you sure to restore defaults headers ?') = mrOK then
+    RestoreDefaults;
 end;
 
 procedure THeadersEditorForm.FormCreate(Sender: TObject);
