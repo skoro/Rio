@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses options, export_req, request_object, main, LCLType, Clipbrd;
+uses options, export_req, request_object, main, app_helpers, Clipbrd;
 
 {$R *.lfm}
 
@@ -114,7 +114,7 @@ begin
       MemoResult.Text := exp.Output;
     except on E: Exception do
       begin
-        Application.MessageBox(PChar(E.Message), 'Export error', MB_ICONERROR + MB_OK);
+        ERRMsg('Export error', E.Message);
         btnCopy.Enabled := False;
         btnSave.Enabled := False;
         MemoResult.Text := '';

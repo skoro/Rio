@@ -6,7 +6,7 @@ interface
 
 uses
   Forms,
-  ExtCtrls, StdCtrls, Classes, Grids, Buttons;
+  ExtCtrls, StdCtrls, Classes, Grids, Buttons, Controls;
 
 type
 
@@ -49,7 +49,7 @@ var
 
 implementation
 
-uses SysUtils, strutils, LCLType;
+uses SysUtils, strutils, app_helpers;
 
 {$R *.lfm}
 
@@ -75,7 +75,7 @@ end;
 procedure TCookieForm.btnAddClick(Sender: TObject);
 var
   CName: string;
-  I, A: Integer;
+  I: Integer;
   Replaced: boolean = false;
 begin
   CName := editName.Text;
@@ -83,8 +83,8 @@ begin
   // Check for already exist cookie.
   for I := 1 to FRequestGrid.RowCount - 1 do
     if FRequestGrid.Cells[1, I] = CName then begin
-      A := Application.MessageBox(PChar('Replace cookie ' + CName + ' ?'), 'Replace ?', MB_ICONQUESTION + MB_YESNO);
-      if A = IDNO then Exit;
+      if ConfirmDlg('Replace ?', 'Replace cookie ' + CName + ' ?') <> mrOK then
+        Exit;
       FRequestGrid.Cells[2, I] := memoValue.Text;
       Replaced := True;
     end;

@@ -36,7 +36,7 @@ type
 
 implementation
 
-uses LCLType, options;
+uses options, app_helpers;
 
 {$R *.lfm}
 
@@ -75,7 +75,7 @@ begin
     ImportData;
     ModalResult := mrOK;
   except on E: Exception do
-    Application.MessageBox(PChar(E.Message), 'Import error', MB_ICONERROR + MB_OK);
+    ERRMsg('Import error', E.Message);
   end;
 end;
 
