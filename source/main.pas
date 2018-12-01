@@ -456,12 +456,12 @@ begin
     // Not found at all.
     -1: begin
       miFindNext.Enabled := False;
-      Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'), 'Not found', MB_ICONERROR + MB_OK);
+      ERRMsg('Not found', 'Search string "' + dlgFind.FindText + '" not found.');
     end;
     // Not found but previous search was successful.
     0: begin
-      Ans := Application.MessageBox(PChar('Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?'), 'Not found', MB_ICONQUESTION + MB_YESNO);
-      if Ans = ID_YES then
+      Ans := ConfirmDlg('Not found', 'Search string "' + dlgFind.FindText + '" not found.'#13'Continue search from the beginning ?');
+      if Ans = mrOK then
         FindStart
       else
         miFindNext.Enabled := False;
@@ -673,7 +673,7 @@ end;
 procedure TForm1.miExportClick(Sender: TObject);
 begin
   if Trim(cbUrl.Text) = '' then begin
-    Application.MessageBox('Request url is missing.', 'Export', MB_ICONSTOP + MB_OK);
+    OKMsg('Export', 'Request url is missing.');
     Exit;
   end;
   with TExportForm.Create(Self) do begin
@@ -746,7 +746,7 @@ begin
   with TImportForm.Create(Self) do begin
     if ShowModal = mrOK then begin
       if RequestObjects.Count = 0 then
-        Application.MessageBox('Data not imported.', 'Error', MB_ICONERROR )
+        ERRMsg('Error', 'Data not imported.')
       else
         RequestObjects.Items[0].RequestObject.LoadToForm(Self);
     end;
@@ -1099,8 +1099,8 @@ begin
   Row := gridForm.Row;
 
   if gridForm.Cells[3, Row] <> 'File' then begin
-    A := Application.MessageBox('To upload a file the form element must be the file type.'#13'Do you want to change it to the file type ?', 'Upload', MB_ICONQUESTION + MB_YESNO);
-    if A = IDYES then
+    A := ConfirmDlg('Upload', 'To upload a file the form element must be the file type.'#13'Do you want to change it to the file type ?');
+    if A = mrOK then
       gridForm.Cells[3, Row] := 'File';
   end;
 
@@ -1126,7 +1126,7 @@ begin
         fs.Position := 0; // Stream should be resetted to the beginning after json parser
         editJson.Lines.LoadFromStream(fs);
       except on E: Exception do
-        Application.MessageBox(PChar(E.Message), 'Load error', MB_ICONERROR + MB_OK);
+        ERRMsg('Load error', E.Message);
       end;
     finally
       FreeAndNil(Parser);
@@ -1668,7 +1668,7 @@ begin
   try
     FResponseTabManager.OpenTabs(Info);
   except on E: ETabException do
-    Application.MessageBox(PChar(E.TabMessage), 'Error', MB_ICONERROR + MB_OK);
+    ERRMsg('Error', E.TabMessage);
   end;
 
   if (mime.MimeType = 'text') or ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
@@ -1818,7 +1818,6 @@ end;
 
 function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
 var
-  I: Integer;
   Need: Boolean = False;
 
   function IsEmpty(Grid: TStringGrid): Boolean;
@@ -1848,10 +1847,8 @@ begin
   if not Need then
     Need := Length(Trim(editJson.Text)) > 0;
 
-  if Need then begin
-    I := Application.MessageBox(PChar(prompt), PChar(promptTitle), MB_ICONQUESTION + MB_YESNO);
-    if I <> IDYES then Exit(False); // =>
-  end;
+  if Need and (ConfirmDlg(promptTitle, prompt) <> mrOK) then
+    Exit(False); // =>
   Result := True;
 end;
 
