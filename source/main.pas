@@ -249,7 +249,7 @@ var
 
 implementation
 
-uses lcltype, about, headers_editor, cookie_form, uriparser, request_object,
+uses about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
   import_form, export_form, Clipbrd;
 
