@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit, Dialogs;
+  Classes, SysUtils, Controls, ValEdit, Dialogs, Forms;
 
 type
 
@@ -38,6 +38,13 @@ procedure EnumControls(const Owner: TWinControl; const ControlName: string; Cont
 
 function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 0): TFindPos;
 procedure Tokenize(txt: string; Tokens: TStrings);
+
+// Show the confirmation dialog.
+// Returns mrOK on Yes and mrCancel on No.
+function ConfirmDlg(Caption, Txt: string): TModalResult;
+
+procedure OKMsg(Caption, Txt: string);
+procedure ERRMsg(Caption, Txt: string);
 
 implementation
 
@@ -270,6 +277,21 @@ begin
         Tokens.Add(Token.TrimRight);
     end;
   end;
+end;
+
+function ConfirmDlg(Caption, Txt: string): TModalResult;
+begin
+  Result := QuestionDlg(Caption, Txt, mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+end;
+
+procedure OKMsg(Caption, Txt: string);
+begin
+  MessageDlg(Caption, Txt, mtInformation, [mbOK], 0);
+end;
+
+procedure ERRMsg(Caption, Txt: string);
+begin
+  MessageDlg(Caption, Txt, mtError, [mbOK], 0);
 end;
 
 end.
