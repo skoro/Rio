@@ -147,7 +147,12 @@ begin
         '-X', '--request': RO.Method := NextTok;
         '-H', '--header': begin
           KV := SplitKV(NextTok, ':');
-          RO.AddHeader(KV.Key, KV.Value);
+          if LowerCase(KV.Key) = 'cookie' then begin // Cookie header.
+            KV := SplitKV(KV.Value, '=');
+            RO.AddCookie(KV.Key, KV.Value)
+          end
+          else
+            RO.AddHeader(KV.Key, KV.Value);
         end;
         '-F', '--form': begin
           KV := SplitKV(NextTok, '=');
