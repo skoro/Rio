@@ -6,11 +6,16 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
-  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes, PropertyStorage;
+  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes,
+  PropertyStorage, Grids;
 
 type
 
   TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue, fiHelp);
+  // Keyboard shortcut item.
+  TShortCut = (scFocusUrl, scFocusMethod, scManageHeaders, scSaveRequest,
+    scOptions, scNewRequest, scNewWindow, scOpenRequest, scFind, scFindNext,
+    scJsonFilter, csSaveBody, scSwitchView, scSubmit, scQuit);
   TFontItemList = array of TFont;
 
   { TOptionsPage }
@@ -48,9 +53,11 @@ type
     rbLayoutVert: TRadioButton;
     rbLayoutHor: TRadioButton;
     seTimeout: TSpinEdit;
+    gridShortcuts: TStringGrid;
     tabJson: TTabSheet;
     tabAppearance: TTabSheet;
     tabGeneral: TTabSheet;
+    tabShortcuts: TTabSheet;
     TabSheet2: TTabSheet;
     procedure btnResetFontClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
@@ -73,6 +80,7 @@ type
     function GetRequestTimeout: Integer;
     procedure SetFontDemo;
     procedure InitFonts;
+    procedure InitShortcuts;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
 
@@ -111,6 +119,8 @@ var
 begin
   SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
   InitFonts;
+
+  InitShortcuts;
 
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
@@ -305,6 +315,29 @@ begin
     'Help text'
   ]);
   cboxFontItem.ItemIndex := 0;
+end;
+
+procedure TOptionsForm.InitShortcuts;
+var i:integer;
+begin
+  with gridShortcuts do begin
+    RowCount := Ord(High(TShortCut)) + 2; // enum is zero based.
+    Cells[0, 1]  := 'Go to URL field';
+    Cells[0, 2]  := 'Go to methods list';
+    Cells[0, 3]  := 'Manage headers';
+    Cells[0, 4]  := 'Save request';
+    Cells[0, 5]  := 'Options';
+    Cells[0, 6]  := 'New request';
+    Cells[0, 7]  := 'New window';
+    Cells[0, 8]  := 'Open request';
+    Cells[0, 9]  := 'Find text';
+    Cells[0, 10] := 'Find next';
+    Cells[0, 11] := 'Switch Json filter';
+    Cells[0, 12] := 'Save response body';
+    Cells[0, 13] := 'Switch views';
+    Cells[0, 14] := 'Submit the request';
+    Cells[0, 15] := 'Quit';
+  end;
 end;
 
 procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;

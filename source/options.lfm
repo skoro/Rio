@@ -42,10 +42,10 @@ object OptionsForm: TOptionsForm
     Height = 328
     Top = 4
     Width = 312
-    ActivePage = tabGeneral
+    ActivePage = tabShortcuts
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 0
+    TabIndex = 3
     TabOrder = 1
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -285,6 +285,53 @@ object OptionsForm: TOptionsForm
         Width = 214
         Caption = '&Line numbers in formatted view'
         TabOrder = 4
+      end
+    end
+    object tabShortcuts: TTabSheet
+      Caption = 'Shortcuts'
+      ClientHeight = 298
+      ClientWidth = 308
+      object gridShortcuts: TStringGrid
+        Left = 0
+        Height = 298
+        Top = 0
+        Width = 308
+        Align = alClient
+        AutoEdit = False
+        AutoFillColumns = True
+        BorderStyle = bsNone
+        ColCount = 3
+        Columns = <        
+          item
+            Title.Font.Style = [fsBold]
+            Title.Caption = 'Action'
+            Width = 170
+          end        
+          item
+            SizePriority = 0
+            Title.Font.Style = [fsBold]
+            Title.Caption = 'Shortcut'
+            Width = 100
+          end        
+          item
+            ButtonStyle = cbsButtonColumn
+            MaxSize = 32
+            ReadOnly = False
+            SizePriority = 0
+            Title.Font.Style = [fsBold]
+            Title.Caption = 'New'
+            Width = 38
+          end>
+        ExtendedSelect = False
+        FixedCols = 0
+        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goTabs, goSmoothScroll, goRowHighlight]
+        TabOrder = 0
+        TitleStyle = tsNative
+        ColWidths = (
+          170
+          100
+          38
+        )
       end
     end
   end
