@@ -1,7 +1,7 @@
 object OptionsForm: TOptionsForm
-  Left = 374
+  Left = 379
   Height = 380
-  Top = 141
+  Top = 170
   Width = 320
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
@@ -9,7 +9,9 @@ object OptionsForm: TOptionsForm
   ClientWidth = 320
   Constraints.MinHeight = 380
   Constraints.MinWidth = 320
+  KeyPreview = True
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   OnShow = FormShow
   Position = poMainFormCenter
   SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cbEditMethods.Checked'
@@ -42,10 +44,10 @@ object OptionsForm: TOptionsForm
     Height = 328
     Top = 4
     Width = 312
-    ActivePage = tabShortcuts
+    ActivePage = tabGeneral
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 1
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -316,7 +318,6 @@ object OptionsForm: TOptionsForm
           item
             ButtonStyle = cbsButtonColumn
             MaxSize = 32
-            ReadOnly = False
             SizePriority = 0
             Title.Font.Style = [fsBold]
             Title.Caption = 'New'
@@ -327,6 +328,7 @@ object OptionsForm: TOptionsForm
         Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goTabs, goSmoothScroll, goRowHighlight]
         TabOrder = 0
         TitleStyle = tsNative
+        OnButtonClick = gridShortcutsButtonClick
         ColWidths = (
           170
           100

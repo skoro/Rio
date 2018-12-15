@@ -12,10 +12,22 @@ uses
 type
 
   TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue, fiHelp);
+
   // Keyboard shortcut item.
-  TShortCut = (scFocusUrl, scFocusMethod, scManageHeaders, scSaveRequest,
-    scOptions, scNewRequest, scNewWindow, scOpenRequest, scFind, scFindNext,
-    scJsonFilter, csSaveBody, scSwitchView, scSubmit, scQuit);
+  TShortCutItem = (sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
+    sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
+
+  TShortCut = record
+    Item: TShortCutItem;
+    Shift: Boolean;
+    Control: Boolean;
+    Alt: Boolean;
+    key: Word;
+  end;
+
+  TShortCuts = array of TShortCut;
+
   TFontItemList = array of TFont;
 
   { TOptionsPage }
@@ -58,14 +70,19 @@ type
     tabAppearance: TTabSheet;
     tabGeneral: TTabSheet;
     tabShortcuts: TTabSheet;
-    TabSheet2: TTabSheet;
+    //TabSheet2: TTabSheet;
     procedure btnResetFontClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure gridShortcutsButtonClick(Sender: TObject; aCol, aRow: Integer);
   private
     FFontItemList: TFontItemList;
+    FKeyCatch: TPanel; // Panel for new shortcut.
+    FKeySet: TShortCutItem; //
+    FShortCuts: TShortCuts; // List of application shortcuts.
     function GetEditRequestMethods: Boolean;
     function GetGridButtonsHidden: Boolean;
     function GetJsonFormatOptions: TFormatOptions;
@@ -81,9 +98,10 @@ type
     procedure SetFontDemo;
     procedure InitFonts;
     procedure InitShortcuts;
+    procedure SetShortCut(Item: TShortCutItem; AKey: Word; ShiftState: TShiftState);
+    function GetKeyNameByCode(AKey: Word): string;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
-
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -121,6 +139,7 @@ begin
   InitFonts;
 
   InitShortcuts;
+  FKeyCatch := nil;
 
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
@@ -139,9 +158,35 @@ begin
   pagesOptions.ActivePage := tabGeneral;
 end;
 
+procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Assigned(FKeyCatch) then begin
+    //if (Key = 46) and (Shift = []) then
+    FreeAndNil(FKeyCatch);
+    tabShortcuts.Enabled := True;
+  end;
+end;
+
 procedure TOptionsForm.FormShow(Sender: TObject);
 begin
   SetFontDemo;
+end;
+
+procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
+  aRow: Integer);
+begin
+  tabShortcuts.Enabled := False;
+  FKeySet := TShortCutItem(aRow - 1);
+  FKeyCatch := TPanel.Create(tabShortcuts);
+  with FKeyCatch do begin
+    Parent := tabShortcuts;
+    Caption := 'Press key combination or Del to delete.';
+    Height := tabShortcuts.Height div 2;
+    Width := tabShortcuts.Width - 80;
+    Top := (tabShortcuts.Height - Height) div 2;
+    Left := (tabShortcuts.Width - Width) div 2;
+  end;
 end;
 
 function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -318,26 +363,110 @@ begin
 end;
 
 procedure TOptionsForm.InitShortcuts;
-var i:integer;
+var
+  max: ShortInt;
 begin
-  with gridShortcuts do begin
-    RowCount := Ord(High(TShortCut)) + 2; // enum is zero based.
-    Cells[0, 1]  := 'Go to URL field';
-    Cells[0, 2]  := 'Go to methods list';
-    Cells[0, 3]  := 'Manage headers';
-    Cells[0, 4]  := 'Save request';
-    Cells[0, 5]  := 'Options';
-    Cells[0, 6]  := 'New request';
-    Cells[0, 7]  := 'New window';
-    Cells[0, 8]  := 'Open request';
-    Cells[0, 9]  := 'Find text';
-    Cells[0, 10] := 'Find next';
-    Cells[0, 11] := 'Switch Json filter';
-    Cells[0, 12] := 'Save response body';
-    Cells[0, 13] := 'Switch views';
-    Cells[0, 14] := 'Submit the request';
-    Cells[0, 15] := 'Quit';
+  max := Ord(High(TShortCutItem)) + 1;
+  SetLength(FShortCuts, max);
+  gridShortcuts.RowCount := max + 1;
+  // For key scan codes see docs/key_codes.txt
+  SetShortCut(sciFocusUrl,      76, [ssCtrl]); // L
+  SetShortCut(sciFocusMethod,   80, [ssCtrl]); // P
+  SetShortCut(sciManageHeaders, 73, [ssCtrl]); // I
+  SetShortCut(sciSaveRequest,   83, [ssCtrl]); // S
+  SetShortCut(sciOptions,       188, [ssCtrl]); // ,
+  SetShortCut(sciNewRequest,    78, [ssCtrl]); // N
+  SetShortCut(sciNewWindow,     78, [ssCtrl, ssShift]); // N
+  SetShortCut(sciOpenRequest,   79, [ssCtrl]); // O
+  SetShortCut(sciFind,          70, [ssCtrl]); // F
+  SetShortCut(sciFindNext,      114, []); // F3
+  SetShortCut(sciJsonFilter,    69, [ssCtrl]); // E
+  SetShortCut(sciSaveBody,      113, []); // F2
+  SetShortCut(sciSwitchView,    115, []); // F4
+  SetShortCut(sciSubmit,        120, []); // F9
+  SetShortCut(sciQuit,          81, [ssCtrl]); // Q
+end;
+
+procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; ShiftState: TShiftState);
+var
+  txt: String;
+  sc: TShortCut;
+  idx: ShortInt;
+begin
+  with FShortCuts[Ord(Item)] do begin
+    key := AKey;
+    Alt := ssAlt in ShiftState;
+    Control := ssCtrl in ShiftState;
+    Shift := ssShift in ShiftState;
   end;
+
+  idx := Ord(Item);
+
+  case Item of
+    sciFocusUrl:      txt := 'Go to URL field';
+    sciFocusMethod:   txt := 'Go to methods list';
+    sciManageHeaders: txt := 'Manage headers';
+    sciSaveRequest:   txt := 'Save request';
+    sciOptions:       txt := 'Options';
+    sciNewRequest:    txt := 'New request';
+    sciNewWindow:     txt := 'New window';
+    sciOpenRequest:   txt := 'Open request';
+    sciFind:          txt := 'Find text';
+    sciFindNext:      txt := 'Find next';
+    sciJsonFilter:    txt := 'Switch Json filter';
+    sciSaveBody:      txt := 'Save response body';
+    sciSwitchView:    txt := 'Switch views';
+    sciSubmit:        txt := 'Submit the request';
+    sciQuit:          txt := 'Quit';
+  end;
+
+  gridShortcuts.Cells[0, idx + 1] := txt;
+
+  sc := FShortCuts[idx];
+  txt := '';
+  if sc.Control then
+    txt := txt + 'Ctrl-';
+  if sc.Shift then
+    txt := txt + 'Shift-';
+  if sc.Alt then
+    txt := txt + 'Alt-';
+  txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
+
+  gridShortcuts.Cells[1, idx + 1] := txt;
+end;
+
+function TOptionsForm.GetKeyNameByCode(AKey: Word): string;
+begin
+  if (AKey >= 48) and (AKey <= 90) then
+    Exit(chr(AKey));
+  if (AKey >= 112) and (AKey <= 123) then
+    Exit('F' + IntToStr(AKey - 111));
+  if (AKey >= 96) and (AKey <= 105) then
+    Exit('numpad ' + IntToStr(AKey - 96));
+  case AKey of
+    33:  Exit('PageUp');
+    34:  Exit('PageDown');
+    35:  Exit('End');
+    36:  Exit('Home');
+    45:  Exit('Insert');
+    106: Exit('*');
+    107: Exit('+');
+    109: Exit('-');
+    110: Exit('.');
+    111: Exit('/');
+    186: Exit(';');
+    187: Exit('=');
+    188: Exit(',');
+    189: Exit('-');
+    190: Exit('.');
+    191: Exit('/');
+    192: Exit('`');
+    219: Exit('(');
+    220: Exit('\');
+    221: Exit(')');
+    222: Exit('''');
+  end;
+  raise Exception.Create('Cannot use key.');
 end;
 
 procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;
