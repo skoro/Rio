@@ -166,8 +166,11 @@ begin
         SetShortCut(FKeySet, 0, [])
       else
         // Skip empty combinations (only Ctrl, Alt or Shift pressed).
-        if (Key <> 16) and (Key <> 17) and (Key <> 18) then
-          SetShortCut(FKeySet, Key, Shift)
+        if (Key <> 16) and (Key <> 17) and (Key <> 18) then begin
+          // Escape cancels reading keys.
+          if (Key <> 27) and (Shift <> []) then
+            SetShortCut(FKeySet, Key, Shift)
+        end
         else
           Exit; // =>
       FreeAndNil(FKeyCatch);
