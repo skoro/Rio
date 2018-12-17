@@ -28,7 +28,7 @@ object OptionsForm: TOptionsForm
     ClientHeight = 42
     ClientWidth = 316
     TabOrder = 0
-    object Button1: TButton
+    object btnClose: TButton
       Left = 0
       Height = 42
       Top = 0

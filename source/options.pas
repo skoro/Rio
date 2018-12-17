@@ -34,7 +34,7 @@ type
   { TOptionsForm }
 
   TOptionsForm = class(TForm)
-    Button1: TButton;
+    btnClose: TButton;
     btnSelectFont: TButton;
     btnResetFont: TButton;
     cbJsonExpanded: TCheckBox;
@@ -175,6 +175,7 @@ begin
           Exit; // =>
       FreeAndNil(FKeyCatch);
       tabShortcuts.Enabled := True;
+      btnClose.Enabled := True;
     except on E: Exception do
       WarnMsg('Warning', E.Message);
     end;
@@ -190,6 +191,7 @@ procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
   aRow: Integer);
 begin
   tabShortcuts.Enabled := False;
+  btnClose.Enabled := False;
   FKeySet := TShortCutItem(aRow - 1);
   FKeyCatch := TPanel.Create(tabShortcuts);
   with FKeyCatch do begin
