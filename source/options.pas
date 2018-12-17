@@ -97,6 +97,7 @@ type
     procedure InitShortcuts;
     procedure SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
     function GetKeyNameByCode(AKey: Word): string;
+    function GetShortCutName(Item: TShortCutItem): string;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
   public
@@ -401,41 +402,21 @@ var
   txt: String;
   sc: TShortCut;
   idx: ShortInt;
-  i: Integer;
 begin
-  for I := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
-    if (I <> Ord(Item)) and (FShortCuts[I].Key = AKey)
-       and (FShortCuts[I].ShiftState = AShiftState) then
-      raise Exception.Create('This combination has been already assigned.');
+  for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
+    if (idx <> Ord(Item)) and (FShortCuts[idx].Key = AKey)
+       and (FShortCuts[idx].ShiftState = AShiftState) then
+      raise Exception.Create('The combination has been already assigned in: "' + GetShortCutName(Item) + '"');
 
   with FShortCuts[Ord(Item)] do begin
     key := AKey;
     ShiftState := AShiftState;
   end;
 
-  idx := Ord(Item);
+  idx := Ord(Item) + 1;
+  gridShortcuts.Cells[0, idx] := GetShortCutName(Item);
 
-  case Item of
-    sciFocusUrl:      txt := 'Go to URL field';
-    sciFocusMethod:   txt := 'Go to methods list';
-    sciManageHeaders: txt := 'Manage headers';
-    sciSaveRequest:   txt := 'Save request';
-    sciOptions:       txt := 'Options';
-    sciNewRequest:    txt := 'New request';
-    sciNewWindow:     txt := 'New window';
-    sciOpenRequest:   txt := 'Open request';
-    sciFind:          txt := 'Find text';
-    sciFindNext:      txt := 'Find next';
-    sciJsonFilter:    txt := 'Switch Json filter';
-    sciSaveBody:      txt := 'Save response body';
-    sciSwitchView:    txt := 'Switch views';
-    sciSubmit:        txt := 'Submit the request';
-    sciQuit:          txt := 'Quit';
-  end;
-
-  gridShortcuts.Cells[0, idx + 1] := txt;
-
-  sc := FShortCuts[idx];
+  sc := FShortCuts[idx - 1];
   txt := '';
   if ssCtrl in sc.ShiftState then
     txt := txt + 'Ctrl-';
@@ -446,7 +427,7 @@ begin
   if sc.key <> 0 then
     txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
 
-  gridShortcuts.Cells[1, idx + 1] := txt;
+  gridShortcuts.Cells[1, idx] := txt;
 end;
 
 function TOptionsForm.GetKeyNameByCode(AKey: Word): string;
@@ -458,6 +439,7 @@ begin
   if (AKey >= 96) and (AKey <= 105) then
     Exit('numpad ' + IntToStr(AKey - 96));
   case AKey of
+    32:  Exit('Space');
     33:  Exit('PageUp');
     34:  Exit('PageDown');
     35:  Exit('End');
@@ -481,6 +463,27 @@ begin
     222: Exit('''');
   end;
   raise Exception.Create('Cannot use the key.');
+end;
+
+function TOptionsForm.GetShortCutName(Item: TShortCutItem): string;
+begin
+  case Item of
+    sciFocusUrl:      Result := 'Go to URL field';
+    sciFocusMethod:   Result := 'Go to methods list';
+    sciManageHeaders: Result := 'Manage headers';
+    sciSaveRequest:   Result := 'Save request';
+    sciOptions:       Result := 'Options';
+    sciNewRequest:    Result := 'New request';
+    sciNewWindow:     Result := 'New window';
+    sciOpenRequest:   Result := 'Open request';
+    sciFind:          Result := 'Find text';
+    sciFindNext:      Result := 'Find next';
+    sciJsonFilter:    Result := 'Switch Json filter';
+    sciSaveBody:      Result := 'Save response body';
+    sciSwitchView:    Result := 'Switch views';
+    sciSubmit:        Result := 'Submit the request';
+    sciQuit:          Result := 'Quit';
+  end;
 end;
 
 procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;
