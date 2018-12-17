@@ -43,8 +43,10 @@ procedure Tokenize(txt: string; Tokens: TStrings);
 // Returns mrOK on Yes and mrCancel on No.
 function ConfirmDlg(Caption, Txt: string): TModalResult;
 
+// Dialogs.
 procedure OKMsg(Caption, Txt: string);
 procedure ERRMsg(Caption, Txt: string);
+procedure WarnMsg(Caption, Txt: string);
 
 implementation
 
@@ -292,6 +294,11 @@ end;
 procedure ERRMsg(Caption, Txt: string);
 begin
   MessageDlg(Caption, Txt, mtError, [mbOK], 0);
+end;
+
+procedure WarnMsg(Caption, Txt: string);
+begin
+  MessageDlg(Caption, Txt, mtWarning, [mbOK], 0);
 end;
 
 end.
