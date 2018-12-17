@@ -19,10 +19,8 @@ type
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
 
   TShortCut = record
-    Shift: Boolean;
-    Control: Boolean;
-    Alt: Boolean;
-    key: Word;
+    ShiftState: TShiftState;
+    Key: Word;
   end;
 
   TShortCuts = array of TShortCut;
@@ -97,7 +95,7 @@ type
     procedure SetFontDemo;
     procedure InitFonts;
     procedure InitShortcuts;
-    procedure SetShortCut(Item: TShortCutItem; AKey: Word; ShiftState: TShiftState);
+    procedure SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
     function GetKeyNameByCode(AKey: Word): string;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
@@ -161,17 +159,21 @@ procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Assigned(FKeyCatch) then begin
-    // Del key is pressed. Reset the current shortcut.
-    if (Key = 46) and (Shift = []) then
-      SetShortCut(FKeySet, 0, [])
-    else
-      // Skip empty combinations (only Ctrl, Alt or Shift pressed).
-      if (Key <> 16) and (Key <> 17) and (Key <> 18) then
-        SetShortCut(FKeySet, Key, Shift)
+    try
+      // Del key is pressed. Reset the current shortcut.
+      if (Key = 46) and (Shift = []) then
+        SetShortCut(FKeySet, 0, [])
       else
-        Exit; // =>
-    FreeAndNil(FKeyCatch);
-    tabShortcuts.Enabled := True;
+        // Skip empty combinations (only Ctrl, Alt or Shift pressed).
+        if (Key <> 16) and (Key <> 17) and (Key <> 18) then
+          SetShortCut(FKeySet, Key, Shift)
+        else
+          Exit; // =>
+      FreeAndNil(FKeyCatch);
+      tabShortcuts.Enabled := True;
+    except on E: Exception do
+      WarnMsg('Warning', E.Message);
+    end;
   end;
 end;
 
@@ -394,17 +396,21 @@ begin
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
 end;
 
-procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; ShiftState: TShiftState);
+procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
 var
   txt: String;
   sc: TShortCut;
   idx: ShortInt;
+  i: Integer;
 begin
+  for I := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
+    if (I <> Ord(Item)) and (FShortCuts[I].Key = AKey)
+       and (FShortCuts[I].ShiftState = AShiftState) then
+      raise Exception.Create('This combination has been already assigned.');
+
   with FShortCuts[Ord(Item)] do begin
     key := AKey;
-    Alt := ssAlt in ShiftState;
-    Control := ssCtrl in ShiftState;
-    Shift := ssShift in ShiftState;
+    ShiftState := AShiftState;
   end;
 
   idx := Ord(Item);
@@ -431,11 +437,11 @@ begin
 
   sc := FShortCuts[idx];
   txt := '';
-  if sc.Control then
+  if ssCtrl in sc.ShiftState then
     txt := txt + 'Ctrl-';
-  if sc.Shift then
+  if ssShift in sc.ShiftState then
     txt := txt + 'Shift-';
-  if sc.Alt then
+  if ssAlt in sc.ShiftState then
     txt := txt + 'Alt-';
   if sc.key <> 0 then
     txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
