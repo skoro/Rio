@@ -19,7 +19,6 @@ type
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
 
   TShortCut = record
-    Item: TShortCutItem;
     Shift: Boolean;
     Control: Boolean;
     Alt: Boolean;
@@ -162,7 +161,15 @@ procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if Assigned(FKeyCatch) then begin
-    //if (Key = 46) and (Shift = []) then
+    // Del key is pressed. Reset the current shortcut.
+    if (Key = 46) and (Shift = []) then
+      SetShortCut(FKeySet, 0, [])
+    else
+      // Skip empty combinations (only Ctrl, Alt or Shift pressed).
+      if (Key <> 16) and (Key <> 17) and (Key <> 18) then
+        SetShortCut(FKeySet, Key, Shift)
+      else
+        Exit; // =>
     FreeAndNil(FKeyCatch);
     tabShortcuts.Enabled := True;
   end;
@@ -430,7 +437,8 @@ begin
     txt := txt + 'Shift-';
   if sc.Alt then
     txt := txt + 'Alt-';
-  txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
+  if sc.key <> 0 then
+    txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
 
   gridShortcuts.Cells[1, idx + 1] := txt;
 end;
@@ -466,7 +474,7 @@ begin
     221: Exit(')');
     222: Exit('''');
   end;
-  raise Exception.Create('Cannot use key.');
+  raise Exception.Create('Cannot use the key.');
 end;
 
 procedure TOptionsForm.OnPropsFontSave(Sender: TStoredValue;
