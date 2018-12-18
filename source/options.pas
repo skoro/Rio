@@ -431,9 +431,10 @@ var
   idx: ShortInt;
 begin
   for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
-    if (idx <> Ord(Item)) and (FShortCuts[idx].Key = AKey)
+    if (idx <> 0) and (idx <> Ord(Item)) and (FShortCuts[idx].Key = AKey)
        and (FShortCuts[idx].ShiftState = AShiftState) then
-      raise Exception.Create('The combination has been already assigned in: "' + GetShortCutName(Item) + '"');
+      raise Exception.Create('The combination has been already assigned in: "' +
+            GetShortCutName(TShortCutItem(idx)) + '"');
 
   with FShortCuts[Ord(Item)] do begin
     key := AKey;
