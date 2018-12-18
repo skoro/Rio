@@ -562,17 +562,10 @@ end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
-  //showmessage(inttostr(key));
-  // F9 submit request
-  if (key = 120) and (shift = []) then btnSubmitClick(Sender);
-  if Shift = [ssCtrl] then
-  begin
-    case Key of
-      // Control-L focus to url field.
-      76: cbUrl.SetFocus;
-      // Control-P focus to methods field.
-      80: cbMethod.SetFocus;
-    end;
+  case OptionsForm.GetShortCutItem(Key, Shift) of
+    sciFocusUrl:    cbUrl.SetFocus;
+    sciFocusMethod: cbMethod.SetFocus;
+    sciSubmit:      btnSubmitClick(Sender);
   end;
 end;
 
@@ -1469,6 +1462,18 @@ begin
   cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
 
   editJson.Gutter.Parts.Part[1].Visible := OptionsForm.JsonLines;
+
+  // Redefine shortcuts.
+  miManageHeaders.ShortCut := OptionsForm.GetShortCutValue(sciManageHeaders);
+  miOptions.ShortCut       := OptionsForm.GetShortCutValue(sciOptions);
+  miFind.ShortCut          := OptionsForm.GetShortCutValue(sciFind);
+  miFindNext.ShortCut      := OptionsForm.GetShortCutValue(sciFindNext);
+  miNewWindow.ShortCut     := OptionsForm.GetShortCutValue(sciNewWindow);
+  miNew.ShortCut           := OptionsForm.GetShortCutValue(sciNewRequest);
+  miOpenRequest.ShortCut   := OptionsForm.GetShortCutValue(sciOpenRequest);
+  miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
+  miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
+  miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 
 function TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
