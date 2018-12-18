@@ -14,7 +14,7 @@ type
   TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue, fiHelp);
 
   // Keyboard shortcut item.
-  TShortCutItem = (sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
+  TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
 
@@ -103,6 +103,7 @@ type
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
+    function GetShortCutItem(AKey: Word; AShiftState: TShiftState): TShortCutItem;
     procedure SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
     procedure ApplyControlFont(const ParentControl: TWinControl; const AClassName: string; AFontItem: TUIFontItem);
     property JsonExpanded: Boolean read GetJsonExpanded;
@@ -207,6 +208,19 @@ end;
 function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
 begin
   Result := FFontItemList[Ord(AFontItem)];
+end;
+
+function TOptionsForm.GetShortCutItem(AKey: Word; AShiftState: TShiftState
+  ): TShortCutItem;
+var
+  idx: Integer;
+begin
+  Result := sciNone;
+  if AKey < 48 then // one of control (ctrl,alt,shift,etc) key pressed.
+    Exit;
+  for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
+    if (FShortCuts[idx].Key = AKey) and (FShortCuts[idx].ShiftState = AShiftState) then
+      Exit(TShortCutItem(idx));
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
@@ -383,7 +397,7 @@ var
 begin
   max := Ord(High(TShortCutItem)) + 1;
   SetLength(FShortCuts, max);
-  gridShortcuts.RowCount := max + 1;
+  gridShortcuts.RowCount := max; // without sciNone.
   // For key scan codes see docs/key_codes.txt
   SetShortCut(sciFocusUrl,      76, [ssCtrl]); // L
   SetShortCut(sciFocusMethod,   80, [ssCtrl]); // P
@@ -418,10 +432,10 @@ begin
     ShiftState := AShiftState;
   end;
 
-  idx := Ord(Item) + 1;
+  idx := Ord(Item);
   gridShortcuts.Cells[0, idx] := GetShortCutName(Item);
 
-  sc := FShortCuts[idx - 1];
+  sc := FShortCuts[idx];
   txt := '';
   if ssCtrl in sc.ShiftState then
     txt := txt + 'Ctrl-';
