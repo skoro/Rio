@@ -104,6 +104,8 @@ type
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
     function GetShortCutItem(AKey: Word; AShiftState: TShiftState): TShortCutItem;
+    // Convert our shortcut to menus.shortcut compatible.
+    function GetShortCutValue(Item: TShortCutItem): Classes.TShortCut;
     procedure SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
     procedure ApplyControlFont(const ParentControl: TWinControl; const AClassName: string; AFontItem: TUIFontItem);
     property JsonExpanded: Boolean read GetJsonExpanded;
@@ -123,7 +125,7 @@ var
 
 implementation
 
-uses app_helpers, SynEdit, fpjsonrtti;
+uses app_helpers, SynEdit, Menus, fpjsonrtti;
 
 {$R *.lfm}
 
@@ -193,7 +195,7 @@ procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
 begin
   tabShortcuts.Enabled := False;
   btnClose.Enabled := False;
-  FKeySet := TShortCutItem(aRow - 1);
+  FKeySet := TShortCutItem(aRow);
   FKeyCatch := TPanel.Create(tabShortcuts);
   with FKeyCatch do begin
     Parent := tabShortcuts;
@@ -221,6 +223,12 @@ begin
   for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
     if (FShortCuts[idx].Key = AKey) and (FShortCuts[idx].ShiftState = AShiftState) then
       Exit(TShortCutItem(idx));
+end;
+
+function TOptionsForm.GetShortCutValue(Item: TShortCutItem): Classes.TShortCut;
+begin
+  with FShortCuts[Ord(Item)] do
+    Result := ShortCut(Key, ShiftState);
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
