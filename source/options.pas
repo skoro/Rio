@@ -18,12 +18,7 @@ type
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
 
-  TShortCut = record
-    ShiftState: TShiftState;
-    Key: Word;
-  end;
-
-  TShortCuts = array of TShortCut;
+  TShortCuts = array of Classes.TShortCut;
 
   TFontItemList = array of TFont;
 
@@ -105,7 +100,7 @@ type
     function GetFontItem(AFontItem: TUIFontItem): TFont;
     function GetShortCutItem(AKey: Word; AShiftState: TShiftState): TShortCutItem;
     // Convert our shortcut to menus.shortcut compatible.
-    function GetShortCutValue(Item: TShortCutItem): Classes.TShortCut;
+    function GetShortCutValue(Item: TShortCutItem): TShortCut;
     procedure SetFontItem(AFontItem: TUIFontItem; AFont: TFont);
     procedure ApplyControlFont(const ParentControl: TWinControl; const AClassName: string; AFontItem: TUIFontItem);
     property JsonExpanded: Boolean read GetJsonExpanded;
@@ -237,14 +232,13 @@ begin
   if AKey < 48 then // one of control (ctrl,alt,shift,etc) key pressed.
     Exit;
   for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
-    if (FShortCuts[idx].Key = AKey) and (FShortCuts[idx].ShiftState = AShiftState) then
+    if (ShortCut(AKey, AShiftState) = FShortCuts[idx]) then
       Exit(TShortCutItem(idx));
 end;
 
-function TOptionsForm.GetShortCutValue(Item: TShortCutItem): Classes.TShortCut;
+function TOptionsForm.GetShortCutValue(Item: TShortCutItem): TShortCut;
 begin
-  with FShortCuts[Ord(Item)] do
-    Result := ShortCut(Key, ShiftState);
+  Result := FShortCuts[ord(Item)];
 end;
 
 procedure TOptionsForm.btnSelectFontClick(Sender: TObject);
@@ -443,33 +437,30 @@ end;
 procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
 var
   txt: String;
-  sc: TShortCut;
+  key: Word;
+  Shift: TShiftState;
   idx: ShortInt;
 begin
   for idx := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
-    if (idx <> 0) and (idx <> Ord(Item)) and (FShortCuts[idx].Key = AKey)
-       and (FShortCuts[idx].ShiftState = AShiftState) then
+    if (idx <> 0) and (idx <> Ord(Item))
+       and (ShortCut(AKey, AShiftState) = FShortCuts[idx]) then
       raise Exception.Create('The combination has been already assigned in: "' +
             GetShortCutName(TShortCutItem(idx)) + '"');
 
-  with FShortCuts[Ord(Item)] do begin
-    key := AKey;
-    ShiftState := AShiftState;
-  end;
-
   idx := Ord(Item);
+  FShortCuts[idx] := ShortCut(AKey, AShiftState);
   gridShortcuts.Cells[0, idx] := GetShortCutName(Item);
 
-  sc := FShortCuts[idx];
+  ShortCutToKey(FShortCuts[idx], key, shift);
   txt := '';
-  if ssCtrl in sc.ShiftState then
+  if ssCtrl in Shift then
     txt := txt + 'Ctrl-';
-  if ssShift in sc.ShiftState then
+  if ssShift in Shift then
     txt := txt + 'Shift-';
-  if ssAlt in sc.ShiftState then
+  if ssAlt in Shift then
     txt := txt + 'Alt-';
-  if sc.key <> 0 then
-    txt := txt + UpperCase(GetKeyNameByCode(sc.Key));
+  if key <> 0 then
+    txt := txt + UpperCase(GetKeyNameByCode(Key));
 
   gridShortcuts.Cells[1, idx] := txt;
 end;
