@@ -77,8 +77,8 @@ type
     procedure gridShortcutsButtonClick(Sender: TObject; aCol, aRow: Integer);
   private
     FFontItemList: TFontItemList;
-    FKeyCatch: TPanel; // Panel for new shortcut.
-    FKeySet: TShortCutItem; //
+    FKeyCatch: TPanel; // Panel for reading a new shortcut.
+    FKeySet: TShortCutItem; // Current reading they shortcut item.
     FShortCuts: TShortCuts; // List of application shortcuts.
     function GetEditRequestMethods: Boolean;
     function GetGridButtonsHidden: Boolean;
@@ -162,6 +162,9 @@ end;
 procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  // When reading shortcut panel is active then handle shortcuts.
+  // Del - erases current shortcut.
+  // Esc - cancels reading shortcut.
   if Assigned(FKeyCatch) then begin
     try
       // Del key is pressed. Reset the current shortcut.
@@ -199,11 +202,24 @@ begin
   FKeyCatch := TPanel.Create(tabShortcuts);
   with FKeyCatch do begin
     Parent := tabShortcuts;
-    Caption := 'Press key combination or Del to delete.';
     Height := tabShortcuts.Height div 2;
     Width := tabShortcuts.Width - 80;
     Top := (tabShortcuts.Height - Height) div 2;
     Left := (tabShortcuts.Width - Width) div 2;
+  end;
+  with TLabel.Create(FKeyCatch) do begin
+    Parent := FKeyCatch;
+    Align := alBottom;
+    Alignment := taCenter;
+    Caption := 'Del - delete shortcut, Esc - cancel.';
+  end;
+  with TLabel.Create(FKeyCatch) do begin
+    Parent := FKeyCatch;
+    Align := alClient;
+    Layout := tlCenter;
+    Alignment := taCenter;
+    Font.Style := [fsBold];
+    Caption := 'Press key combination.';
   end;
 end;
 
