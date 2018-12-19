@@ -218,7 +218,7 @@ type
 
 implementation
 
-uses app_helpers, strutils, SynHighlighterXML;
+uses app_helpers, options, strutils, SynHighlighterXML;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -607,12 +607,10 @@ end;
 procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  // Control-E show/hide filter panel.
-  if (Shift = [ssCtrl]) and (Key = 69) then
-    InternalOnSwitchFilter(Sender);
-  // F4 - switch tree/formatted view.
-  if (Shift = []) and (Key = 115) then
-    ViewNextPage;
+  case OptionsForm.GetShortCutItem(Key, Shift) of
+    sciJsonFilter: InternalOnSwitchFilter(Sender);
+    sciSwitchView: ViewNextPage;
+  end;
 end;
 
 procedure TResponseJsonTab.ToggleFilterPanel;
