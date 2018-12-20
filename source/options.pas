@@ -24,7 +24,7 @@ type
 
   { TOptionsPage }
 
-  TOptionsPage = (opGeneral, opAppearance, opJson);
+  TOptionsPage = (opGeneral, opAppearance, opJson, opShortcuts);
 
   { TOptionsForm }
 
@@ -603,6 +603,7 @@ begin
     opAppearance: pagesOptions.ActivePage := tabAppearance;
     opJson:       pagesOptions.ActivePage := tabJson;
     opGeneral:    pagesOptions.ActivePage := tabGeneral;
+    opShortcuts:  pagesOptions.ActivePage := tabShortcuts;
   end;
   Result := ShowModal;
 end;
