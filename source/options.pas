@@ -84,7 +84,7 @@ type
     function GetJsonSaveFmt: Boolean;
     function GetJsonView: TViewPage;
     function GetPanelsLayout: TPairSplitterType;
-    function GetFontIndexFromKeyName(AKeyName: string): integer;
+    function GetPropIndexFromKeyName(AKeyName, Prop: string): integer;
     function GetDefaultFont(FontItem: TUIFontItem): TFont;
     function GetRequestTimeout: Integer;
     procedure SetFontDemo;
@@ -95,6 +95,8 @@ type
     function GetShortCutName(Item: TShortCutItem): string;
     procedure OnPropsFontSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
+    procedure OnPropsShortcutSave(Sender: TStoredValue; var Value: TStoredType);
+    procedure OnPropsShortcutRestore(Sender: TStoredValue; var Value: TStoredType);
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -136,6 +138,14 @@ begin
 
   InitShortcuts;
   FKeyCatch := nil;
+  // Save/restore shortcuts.
+  for I := Ord(Low(TShortCutItem)) to Ord(High(TShortCutItem)) do
+    with TStoredValue(Props.StoredValues.Add) do begin
+      Name := 'ShortCut_' + IntToStr(I);
+      KeyString := 'ShortCut_' + IntToStr(I);
+      OnSave := @OnPropsShortcutSave;
+      OnRestore := @OnPropsShortcutRestore;
+    end;
 
   CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
   Props.JSONFileName := CF;
@@ -326,9 +336,9 @@ begin
     Result := pstVertical;
 end;
 
-function TOptionsForm.GetFontIndexFromKeyName(AKeyName: string): integer;
+function TOptionsForm.GetPropIndexFromKeyName(AKeyName, Prop: string): integer;
 begin
-  Result := StrToInt(StringReplace(AKeyName, 'Font_', '', []));
+  Result := StrToInt(StringReplace(AKeyName, Prop + '_', '', []));
 end;
 
 function TOptionsForm.GetDefaultFont(FontItem: TUIFontItem): TFont;
@@ -529,7 +539,7 @@ var
 begin
   jStr := TJSONStreamer.Create(nil);
   try
-    Idx := GetFontIndexFromKeyName(Sender.KeyString);
+    Idx := GetPropIndexFromKeyName(Sender.KeyString, 'Font');
     if FFontItemList[Idx].Name = 'default' then
       Value := ''
     else
@@ -549,10 +559,41 @@ begin
     Exit;
   jStr := TJSONDeStreamer.Create(nil);
   try
-    Idx := GetFontIndexFromKeyName(Sender.KeyString);
+    Idx := GetPropIndexFromKeyName(Sender.KeyString, 'Font');
     jStr.JSONToObject(Value, FFontItemList[Idx]);
   finally
     jStr.Free;
+  end;
+end;
+
+procedure TOptionsForm.OnPropsShortcutSave(Sender: TStoredValue;
+  var Value: TStoredType);
+var
+  Idx: ShortInt;
+begin
+  try
+    Idx := GetPropIndexFromKeyName(Sender.KeyString, 'ShortCut');
+    Value := IntToStr(FShortCuts[Idx]);
+  finally
+    // FIXME: log ?
+  end;
+end;
+
+procedure TOptionsForm.OnPropsShortcutRestore(Sender: TStoredValue;
+  var Value: TStoredType);
+var
+  Idx: ShortInt;
+  Key: Word;
+  Shift: TShiftState;
+begin
+  if Trim(Value) = '' then
+    Exit;
+  try
+    Idx := GetPropIndexFromKeyName(Sender.KeyString, 'ShortCut');
+    ShortCutToKey(StrToInt(Value), Key, Shift);
+    SetShortCut(TShortCutItem(Idx), Key, Shift);
+  finally
+    // FIXME: log ?
   end;
 end;
 
