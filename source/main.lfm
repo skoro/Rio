@@ -1570,10 +1570,6 @@ object Form1: TForm1
         Caption = '&Command line...'
         OnClick = miHelpCmdClick
       end
-      object miHelpKeyboard: TMenuItem
-        Caption = '&Keyboard...'
-        OnClick = miHelpKeyboardClick
-      end
       object miAbout: TMenuItem
         Caption = '&About...'
         OnClick = miAboutClick
