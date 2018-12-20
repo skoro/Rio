@@ -295,7 +295,7 @@ object OptionsForm: TOptionsForm
       ClientWidth = 308
       object gridShortcuts: TStringGrid
         Left = 0
-        Height = 298
+        Height = 256
         Top = 0
         Width = 308
         Align = alClient
@@ -336,6 +336,31 @@ object OptionsForm: TOptionsForm
           100
           38
         )
+      end
+      object panRestore: TPanel
+        Left = 4
+        Height = 34
+        Top = 260
+        Width = 304
+        Align = alBottom
+        BorderSpacing.Left = 4
+        BorderSpacing.Top = 4
+        BorderSpacing.Bottom = 4
+        BevelOuter = bvNone
+        ClientHeight = 34
+        ClientWidth = 304
+        TabOrder = 1
+        object btnSCRestore: TButton
+          Left = 0
+          Height = 34
+          Top = 0
+          Width = 108
+          Align = alLeft
+          AutoSize = True
+          Caption = 'Restore defaults'
+          OnClick = btnSCRestoreClick
+          TabOrder = 0
+        end
       end
     end
   end

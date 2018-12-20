@@ -32,6 +32,7 @@ type
     btnClose: TButton;
     btnSelectFont: TButton;
     btnResetFont: TButton;
+    btnSCRestore: TButton;
     cbJsonExpanded: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
     cbJsonFmtArray: TCheckBox;
@@ -51,6 +52,7 @@ type
     lFontDemo: TLabel;
     pagesOptions: TPageControl;
     Panel1: TPanel;
+    panRestore: TPanel;
     Props: TJSONPropStorage;
     rbJsonTree: TRadioButton;
     rbJsonFormatted: TRadioButton;
@@ -64,6 +66,7 @@ type
     tabShortcuts: TTabSheet;
     //TabSheet2: TTabSheet;
     procedure btnResetFontClick(Sender: TObject);
+    procedure btnSCRestoreClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -276,6 +279,12 @@ begin
   Idx := cboxFontItem.ItemIndex;
   FFontItemList[Idx] := GetDefaultFont(TUIFontItem(Idx));
   SetFontDemo;
+end;
+
+procedure TOptionsForm.btnSCRestoreClick(Sender: TObject);
+begin
+  if ConfirmDlg('Restore shortcuts ?', 'Are you sure you want to restore default shortcuts ?') = mrOK then
+    InitShortcuts;
 end;
 
 procedure TOptionsForm.cboxFontItemChange(Sender: TObject);
