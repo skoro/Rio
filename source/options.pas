@@ -227,7 +227,7 @@ begin
     Layout := tlCenter;
     Alignment := taCenter;
     Font.Style := [fsBold];
-    Caption := 'Press key combination.';
+    Caption := 'Press a key combination.';
   end;
 end;
 
