@@ -40,6 +40,7 @@ type
     cboxFontItem: TComboBox;
     cbJsonLines: TCheckBox;
     cbEditMethods: TCheckBox;
+    cbFitImages: TCheckBox;
     editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
     GroupBox1: TGroupBox;
@@ -79,6 +80,7 @@ type
     FKeySet: TShortCutItem; // Current reading they shortcut item.
     FShortCuts: TShortCuts; // List of application shortcuts.
     function GetEditRequestMethods: Boolean;
+    function GetFitImages: Boolean;
     function GetGridButtonsHidden: Boolean;
     function GetJsonFormatOptions: TFormatOptions;
     function GetJsonIndentSize: Integer;
@@ -118,6 +120,7 @@ type
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
     property Timeout: Integer read GetRequestTimeout;
     property EditRequestMethods: Boolean read GetEditRequestMethods;
+    property FitImages: Boolean read GetFitImages;
   end;
 
 var
@@ -300,6 +303,11 @@ end;
 function TOptionsForm.GetEditRequestMethods: Boolean;
 begin
   Result := cbEditMethods.Checked;
+end;
+
+function TOptionsForm.GetFitImages: Boolean;
+begin
+  Result := cbFitImages.Checked;
 end;
 
 function TOptionsForm.GetJsonFormatOptions: TFormatOptions;

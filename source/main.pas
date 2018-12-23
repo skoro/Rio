@@ -1346,6 +1346,8 @@ begin
 
   else if Tab is TResponseImageTab then begin
     ImageTab := TResponseImageTab(Tab);
+    if OptionsForm.FitImages then
+      ImageTab.ResizeImage(True);
     StatusTextInfo.Caption := Format('%s: %d x %d', [
       ImageTab.ImageType,
       ImageTab.Image.Picture.Width,

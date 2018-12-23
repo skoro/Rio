@@ -83,7 +83,6 @@ type
     FImageType: string;
     function GetImage: TImage;
     procedure OnDblClickResize(Sender: TObject);
-    procedure ResizeImage(ToStretch: boolean);
     function ParseImageType(const ContentType: string): string;
   public
     constructor Create;
@@ -92,6 +91,7 @@ type
     procedure CreateUI(ATabSheet: TTabSheet); override;
     procedure OnHttpResponse(ResponseInfo: TResponseInfo); override;
     procedure Save(const AFileName: string); override;
+    procedure ResizeImage(ToStretch: boolean);
     property Image: TImage read GetImage;
     property ImageType: string read FImageType;
   end;

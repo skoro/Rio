@@ -14,7 +14,7 @@ object OptionsForm: TOptionsForm
   OnKeyUp = FormKeyUp
   OnShow = FormShow
   Position = poMainFormCenter
-  SessionProperties = 'cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cbEditMethods.Checked'
+  SessionProperties = 'cbEditMethods.Checked;cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cbFitImages.Checked'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.2.0'
   object Panel1: TPanel
@@ -44,10 +44,10 @@ object OptionsForm: TOptionsForm
     Height = 328
     Top = 4
     Width = 312
-    ActivePage = tabShortcuts
+    ActivePage = tabGeneral
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 1
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -79,6 +79,14 @@ object OptionsForm: TOptionsForm
         Width = 178
         Caption = '&Editable request methods'
         TabOrder = 1
+      end
+      object cbFitImages: TCheckBox
+        Left = 8
+        Height = 22
+        Top = 96
+        Width = 85
+        Caption = '&Fit images'
+        TabOrder = 2
       end
     end
     object tabAppearance: TTabSheet
