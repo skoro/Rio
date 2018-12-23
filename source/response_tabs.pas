@@ -708,7 +708,12 @@ end;
 
 function TResponseJsonTab.OpenOnMimeType(const MimeType: string): boolean;
 begin
-  Result := MimeType = 'application/json';
+  Result := False;
+  case MimeType of
+    'application/json',
+    'application/vnd.api+json':
+       Result := True;
+  end;
 end;
 
 procedure TResponseJsonTab.CreateUI(ATabSheet: TTabSheet);
