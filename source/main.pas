@@ -1175,7 +1175,6 @@ var
   KV: TKeyValue;
   I: Integer;
 begin
-  if not IsRowEnabled(gridParams) then Exit;
   Params := TQueryParams.Create;
   try
     for I:=1 to gridParams.RowCount-1 do begin
