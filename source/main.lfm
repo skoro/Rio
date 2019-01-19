@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 339
+  Left = 326
   Height = 614
-  Top = 55
+  Top = 41
   Width = 565
   Caption = 'HTTP request inspector'
   ClientHeight = 594
@@ -183,10 +183,10 @@ object Form1: TForm1
           Height = 212
           Top = 0
           Width = 557
-          ActivePage = tabNotes
+          ActivePage = tabAuth
           Align = alClient
           Anchors = [akLeft, akRight, akBottom]
-          TabIndex = 5
+          TabIndex = 4
           TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
@@ -194,9 +194,9 @@ object Form1: TForm1
             ClientWidth = 551
             object requestHeaders: TStringGrid
               Left = 0
-              Height = 156
+              Height = 152
               Top = 26
-              Width = 553
+              Width = 551
               Align = alClient
               BorderStyle = bsNone
               ColCount = 3
@@ -238,7 +238,7 @@ object Form1: TForm1
               Left = 0
               Height = 26
               Top = 0
-              Width = 553
+              Width = 551
               Caption = 'gnavHeaders'
               EdgeBorders = []
               ShowCaptions = True
@@ -251,7 +251,7 @@ object Form1: TForm1
               ShowNavButtons = True
               object ToolButton1: TToolButton
                 Left = 150
-                Height = 5
+                Height = 22
                 Top = 0
                 Caption = 'ToolButton1'
                 Style = tbsDivider
@@ -263,7 +263,7 @@ object Form1: TForm1
                 OnClick = tbtnManageHeadersClick
               end
               object tbtnSaveHeader: TToolButton
-                Left = 212
+                Left = 209
                 Top = 0
                 Caption = 'Save header'
                 OnClick = tbtnSaveHeaderClick
@@ -276,9 +276,9 @@ object Form1: TForm1
             ClientWidth = 551
             object gridParams: TStringGrid
               Left = 0
-              Height = 156
+              Height = 152
               Top = 26
-              Width = 553
+              Width = 551
               Align = alClient
               BorderStyle = bsNone
               ColCount = 3
@@ -314,7 +314,7 @@ object Form1: TForm1
               Left = 0
               Height = 26
               Top = 0
-              Width = 553
+              Width = 551
               Caption = 'gnavParams'
               EdgeBorders = []
               ShowCaptions = True
@@ -333,9 +333,9 @@ object Form1: TForm1
             ClientWidth = 551
             object pagesBody: TPageControl
               Left = 0
-              Height = 156
+              Height = 152
               Top = 26
-              Width = 553
+              Width = 551
               ActivePage = tabBodyJson
               Align = alClient
               ShowTabs = False
@@ -343,13 +343,13 @@ object Form1: TForm1
               TabOrder = 0
               object tabBodyJson: TTabSheet
                 Caption = 'tabBodyJson'
-                ClientHeight = 152
-                ClientWidth = 549
+                ClientHeight = 146
+                ClientWidth = 545
                 inline editJson: TSynEdit
                   Left = 0
-                  Height = 152
+                  Height = 146
                   Top = 0
-                  Width = 549
+                  Width = 545
                   Align = alClient
                   Font.Height = 13
                   Font.Name = 'DejaVu Sans Mono'
@@ -833,8 +833,8 @@ object Form1: TForm1
               end
               object tabBodyForm: TTabSheet
                 Caption = 'tabBodyForm'
-                ClientHeight = 152
-                ClientWidth = 549
+                ClientHeight = 146
+                ClientWidth = 545
                 object gridForm: TStringGrid
                   Left = 0
                   Height = 149
@@ -889,8 +889,8 @@ object Form1: TForm1
               end
               object tabBodyOther: TTabSheet
                 Caption = 'tabBodyOther'
-                ClientHeight = 152
-                ClientWidth = 549
+                ClientHeight = 146
+                ClientWidth = 545
                 object editOther: TMemo
                   Left = 0
                   Height = 152
@@ -907,7 +907,7 @@ object Form1: TForm1
               Left = 0
               Height = 26
               Top = 0
-              Width = 553
+              Width = 551
               Caption = 'gnavBody'
               EdgeBorders = []
               ShowCaptions = True
@@ -926,19 +926,19 @@ object Form1: TForm1
                 Style = tbsButtonDrop
               end
               object tbtnBodyFormat: TToolButton
-                Left = 255
+                Left = 254
                 Top = 0
                 Caption = 'Format'
                 OnClick = tbtnBodyFormatClick
               end
               object tbtnFormUpload: TToolButton
-                Left = 307
+                Left = 305
                 Top = 0
                 Caption = 'Upload'
                 OnClick = tbtnFormUploadClick
               end
               object tbtnJsonLoad: TToolButton
-                Left = 358
+                Left = 356
                 Top = 0
                 Caption = 'Load'
                 OnClick = tbtnJsonLoadClick
@@ -951,9 +951,9 @@ object Form1: TForm1
             ClientWidth = 551
             object gridReqCookie: TStringGrid
               Left = 0
-              Height = 156
+              Height = 152
               Top = 26
-              Width = 553
+              Width = 551
               Align = alClient
               BorderStyle = bsNone
               ColCount = 3
@@ -991,7 +991,7 @@ object Form1: TForm1
               Left = 0
               Height = 26
               Top = 0
-              Width = 553
+              Width = 551
               Caption = 'gnavCookie'
               EdgeBorders = []
               ShowCaptions = True
@@ -1012,7 +1012,7 @@ object Form1: TForm1
               Left = 0
               Height = 26
               Top = 0
-              Width = 553
+              Width = 551
               EdgeBorders = []
               ShowCaptions = True
               TabOrder = 0
@@ -1026,9 +1026,9 @@ object Form1: TForm1
             end
             object pagesAuth: TPageControl
               Left = 0
-              Height = 156
+              Height = 152
               Top = 26
-              Width = 553
+              Width = 551
               ActivePage = tabAuthBearer
               Align = alClient
               ShowTabs = False
@@ -1036,8 +1036,8 @@ object Form1: TForm1
               TabOrder = 1
               object tabAuthBasic: TTabSheet
                 Caption = 'Basic'
-                ClientHeight = 152
-                ClientWidth = 549
+                ClientHeight = 146
+                ClientWidth = 545
                 object ScrollBox1: TScrollBox
                   Left = 0
                   Height = 149
@@ -1101,19 +1101,19 @@ object Form1: TForm1
               end
               object tabAuthBearer: TTabSheet
                 Caption = 'tabAuthBearer'
-                ClientHeight = 152
-                ClientWidth = 549
+                ClientHeight = 146
+                ClientWidth = 545
                 object ScrollBox2: TScrollBox
                   Left = 0
-                  Height = 152
+                  Height = 146
                   Top = 0
-                  Width = 549
+                  Width = 545
                   HorzScrollBar.Page = 208
-                  VertScrollBar.Page = 104
+                  VertScrollBar.Page = 106
                   Align = alClient
                   BorderStyle = bsNone
-                  ClientHeight = 152
-                  ClientWidth = 549
+                  ClientHeight = 146
+                  ClientWidth = 545
                   Color = clNone
                   ParentColor = False
                   TabOrder = 0
@@ -1121,7 +1121,7 @@ object Form1: TForm1
                     Left = 8
                     Height = 26
                     Top = 80
-                    Width = 536
+                    Width = 532
                     Anchors = [akTop, akLeft, akRight]
                     EditLabel.AnchorSideLeft.Control = editBearerToken
                     EditLabel.AnchorSideRight.Control = editBearerToken
@@ -1130,7 +1130,7 @@ object Form1: TForm1
                     EditLabel.Left = 8
                     EditLabel.Height = 16
                     EditLabel.Top = 61
-                    EditLabel.Width = 536
+                    EditLabel.Width = 532
                     EditLabel.Caption = 'Token:'
                     EditLabel.ParentColor = False
                     TabOrder = 0
@@ -1207,40 +1207,89 @@ object Form1: TForm1
             Caption = 'Response'
             ClientHeight = 264
             ClientWidth = 551
-            object responseHeaders: TStringGrid
+            object toolbarResponse: TToolBar
               Left = 0
-              Height = 264
+              Height = 26
               Top = 0
               Width = 551
-              Align = alClient
-              AutoEdit = False
-              BorderStyle = bsNone
-              ColCount = 2
-              ColumnClickSorts = True
-              Columns = <              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Header'
-                  Width = 273
-                end              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Value'
-                  Width = 274
-                end>
-              FixedCols = 0
-              MouseWheelOption = mwGrid
-              Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goTabs, goSmoothScroll]
-              RowCount = 1
+              EdgeBorders = []
+              ShowCaptions = True
               TabOrder = 0
-              TitleFont.Height = -13
-              TitleFont.Name = 'Sans'
-              TitleStyle = tsNative
-              OnDblClick = gridEditDblClick
-              ColWidths = (
-                273
-                274
-              )
+              object tbtnRespList: TToolButton
+                Left = 1
+                Top = 0
+                Caption = 'List'
+              end
+              object tbtnText: TToolButton
+                Left = 30
+                Top = 0
+                Caption = 'Text'
+              end
+            end
+            object pagesRespView: TPageControl
+              Left = 0
+              Height = 238
+              Top = 26
+              Width = 551
+              ActivePage = tabRespList
+              Align = alClient
+              ShowTabs = False
+              TabIndex = 0
+              TabOrder = 1
+              object tabRespList: TTabSheet
+                Caption = 'tabRespList'
+                ClientHeight = 232
+                ClientWidth = 545
+                object responseHeaders: TStringGrid
+                  Left = 0
+                  Height = 232
+                  Top = 0
+                  Width = 545
+                  Align = alClient
+                  AutoEdit = False
+                  BorderStyle = bsNone
+                  ColCount = 2
+                  ColumnClickSorts = True
+                  Columns = <                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Header'
+                      Width = 273
+                    end                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Value'
+                      Width = 274
+                    end>
+                  FixedCols = 0
+                  MouseWheelOption = mwGrid
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goTabs, goSmoothScroll]
+                  RowCount = 1
+                  TabOrder = 0
+                  TitleFont.Height = -13
+                  TitleFont.Name = 'Sans'
+                  TitleStyle = tsNative
+                  OnDblClick = gridEditDblClick
+                  ColWidths = (
+                    273
+                    274
+                  )
+                end
+              end
+              object tabRespText: TTabSheet
+                Caption = 'tabRespText'
+                ClientHeight = 232
+                ClientWidth = 545
+                object textResp: TMemo
+                  Left = 0
+                  Height = 232
+                  Top = 0
+                  Width = 545
+                  Align = alClient
+                  BorderStyle = bsNone
+                  TabOrder = 0
+                end
+              end
             end
           end
           object tabRespCookie: TTabSheet

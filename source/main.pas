@@ -44,6 +44,7 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    textResp: TMemo;
     miJsonExpand: TMenuItem;
     miJsonCollapse: TMenuItem;
     miExport: TMenuItem;
@@ -53,6 +54,8 @@ type
     miFind: TMenuItem;
     miHelpCmd: TMenuItem;
     miJsonFilter: TMenuItem;
+    pagesRespView: TPageControl;
+    responseHeaders: TStringGrid;
     StatusImageSize: TImage;
     StatusTextInfo: TLabel;
     StatusTextSize: TLabel;
@@ -101,7 +104,6 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
-    responseHeaders: TStringGrid;
     responseRaw: TMemo;
     ScrollBox1: TScrollBox;
     ScrollBox2: TScrollBox;
@@ -124,7 +126,10 @@ type
     tabAuthBasic: TTabSheet;
     tabAuthBearer: TTabSheet;
     tabNotes: TTabSheet;
+    tabRespList: TTabSheet;
+    tabRespText: TTabSheet;
     TimerRequest: TTimer;
+    toolbarResponse: TToolBar;
     toolbarAuth: TToolBar;
     ToolButton1: TToolButton;
     tbtnManageHeaders: TToolButton;
@@ -134,6 +139,8 @@ type
     tbtnFormUpload: TToolButton;
     tbtnAuthType: TToolButton;
     tbtnJsonLoad: TToolButton;
+    tbtnRespList: TToolButton;
+    tbtnText: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
