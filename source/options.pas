@@ -7,7 +7,7 @@ interface
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
   PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes,
-  PropertyStorage, Grids;
+  PropertyStorage, Grids, ButtonPanel;
 
 type
 
@@ -18,6 +18,7 @@ type
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
 
+  // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
 
   TFontItemList = array of TFont;
@@ -29,10 +30,10 @@ type
   { TOptionsForm }
 
   TOptionsForm = class(TForm)
-    btnClose: TButton;
     btnSelectFont: TButton;
     btnResetFont: TButton;
     btnSCRestore: TButton;
+    ButtonPanel: TButtonPanel;
     cbJsonExpanded: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
     cbJsonFmtArray: TCheckBox;
@@ -52,7 +53,6 @@ type
     lTimeout: TLabel;
     lFontDemo: TLabel;
     pagesOptions: TPageControl;
-    Panel1: TPanel;
     panRestore: TPanel;
     Props: TJSONPropStorage;
     rbJsonTree: TRadioButton;
@@ -70,6 +70,7 @@ type
     procedure btnSCRestoreClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
+    procedure CloseButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
@@ -192,7 +193,7 @@ begin
           Exit; // =>
       FreeAndNil(FKeyCatch);
       tabShortcuts.Enabled := True;
-      btnClose.Enabled := True;
+      ButtonPanel.CloseButton.Enabled := True;
     except on E: Exception do
       WarnMsg('Warning', E.Message);
     end;
@@ -208,7 +209,7 @@ procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
   aRow: Integer);
 begin
   tabShortcuts.Enabled := False;
-  btnClose.Enabled := False;
+  ButtonPanel.CloseButton.Enabled := False;
   FKeySet := TShortCutItem(aRow);
   FKeyCatch := TPanel.Create(tabShortcuts);
   with FKeyCatch do begin
@@ -293,6 +294,11 @@ end;
 procedure TOptionsForm.cboxFontItemChange(Sender: TObject);
 begin
   SetFontDemo;
+end;
+
+procedure TOptionsForm.CloseButtonClick(Sender: TObject);
+begin
+  ModalResult := mrOK;
 end;
 
 function TOptionsForm.GetGridButtonsHidden: Boolean;

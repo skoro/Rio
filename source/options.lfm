@@ -1,7 +1,7 @@
 object OptionsForm: TOptionsForm
-  Left = 379
+  Left = 388
   Height = 380
-  Top = 170
+  Top = 162
   Width = 320
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
@@ -16,44 +16,22 @@ object OptionsForm: TOptionsForm
   Position = poMainFormCenter
   SessionProperties = 'cbEditMethods.Checked;cbHideGridButtons.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cbFitImages.Checked'
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
-  object Panel1: TPanel
-    Left = 2
-    Height = 42
-    Top = 336
-    Width = 316
-    Align = alBottom
-    BorderSpacing.Around = 2
-    BevelOuter = bvNone
-    ClientHeight = 42
-    ClientWidth = 316
-    TabOrder = 0
-    object btnClose: TButton
-      Left = 0
-      Height = 42
-      Top = 0
-      Width = 75
-      Align = alLeft
-      Caption = '&Close'
-      ModalResult = 1
-      TabOrder = 0
-    end
-  end
+  LCLVersion = '1.8.4.0'
   object pagesOptions: TPageControl
     Left = 4
-    Height = 328
+    Height = 338
     Top = 4
     Width = 312
     ActivePage = tabGeneral
     Align = alClient
     BorderSpacing.Around = 4
     TabIndex = 0
-    TabOrder = 1
+    TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
       Caption = 'General'
-      ClientHeight = 298
-      ClientWidth = 308
+      ClientHeight = 304
+      ClientWidth = 306
       object seTimeout: TSpinEdit
         Left = 8
         Height = 26
@@ -68,31 +46,31 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 16
         Top = 8
-        Width = 133
+        Width = 130
         Caption = 'Request timeout (sec):'
         ParentColor = False
       end
       object cbEditMethods: TCheckBox
         Left = 8
-        Height = 22
+        Height = 21
         Top = 64
-        Width = 178
+        Width = 174
         Caption = '&Editable request methods'
         TabOrder = 1
       end
       object cbFitImages: TCheckBox
         Left = 8
-        Height = 22
+        Height = 21
         Top = 96
-        Width = 85
+        Width = 82
         Caption = '&Fit images'
         TabOrder = 2
       end
     end
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 298
-      ClientWidth = 308
+      ClientHeight = 304
+      ClientWidth = 306
       object gbLayout: TGroupBox
         Left = 8
         Height = 97
@@ -186,8 +164,8 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 298
-      ClientWidth = 308
+      ClientHeight = 304
+      ClientWidth = 306
       object cbJsonExpanded: TCheckBox
         Left = 8
         Height = 22
@@ -299,8 +277,8 @@ object OptionsForm: TOptionsForm
     end
     object tabShortcuts: TTabSheet
       Caption = 'Shortcuts'
-      ClientHeight = 298
-      ClientWidth = 308
+      ClientHeight = 304
+      ClientWidth = 306
       object gridShortcuts: TStringGrid
         Left = 0
         Height = 256
@@ -372,6 +350,26 @@ object OptionsForm: TOptionsForm
       end
     end
   end
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 26
+    Top = 348
+    Width = 308
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CloseButton.OnClick = CloseButtonClick
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 1
+    DefaultButton = pbClose
+    ShowButtons = [pbClose]
+    ShowGlyphs = [pbOK, pbCancel, pbHelp]
+    ShowBevel = False
+  end
   object Props: TJSONPropStorage
     StoredValues = <>
     JSONFileName = 'options.json'
@@ -384,6 +382,6 @@ object OptionsForm: TOptionsForm
     MinFontSize = 0
     MaxFontSize = 0
     left = 257
-    top = 303
+    top = 248
   end
 end
