@@ -594,6 +594,14 @@ begin
     sciFocusUrl:    cbUrl.SetFocus;
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
+    sciSwitchView: begin
+      // Switch views in the response tab (list or text view).
+      if pagesResponse.ActivePage = tabResponse then
+        case GetSelectedResponseViewTab of
+          rvList: SelectResponseViewTab(rvText);
+          rvText: SelectResponseViewTab(rvList);
+        end;
+    end;
   end;
 end;
 
@@ -1346,9 +1354,9 @@ end;
 
 function TForm1.GetSelectedResponseViewTab: TResponseView;
 begin
-  if pagesResponse.ActivePage = tabRespText then
+  if pagesRespView.ActivePage = tabRespText then
     Exit(rvText);
-  if pagesResponse.ActivePage = tabRespList then
+  if pagesRespView.ActivePage = tabRespList then
     Exit(rvList);
   raise Exception.Create('Cannot get value for response view active page.');
 end;
