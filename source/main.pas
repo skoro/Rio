@@ -15,6 +15,7 @@ type
   TBodyTab = (btForm, btJson, btOther);
   TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
+  TResponseView = (rvList, rvText);
 
   { TForm1 }
 
@@ -140,7 +141,7 @@ type
     tbtnAuthType: TToolButton;
     tbtnJsonLoad: TToolButton;
     tbtnRespList: TToolButton;
-    tbtnText: TToolButton;
+    tbtnRespText: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -196,6 +197,7 @@ type
     procedure tbtnJsonLoadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
+    procedure tbtnRespViewClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
   private
@@ -241,8 +243,10 @@ type
     procedure OpenRequestFile(jsonStr: string);
     procedure SelectBodyTab(const tab: tbodytab);
     procedure SelectAuthTab(const tab: TAuthTab);
+    procedure SelectResponseViewTab(rView: TResponseView);
     function GetSelectedBodyTab: TBodyTab;
     function GetSelectedAuthTab: TAuthTab;
+    function GetSelectedResponseViewTab: TResponseView;
     procedure StartNewRequest;
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
     function SubmitRequest: Boolean;
@@ -474,6 +478,22 @@ begin
   end;
 end;
 
+procedure TForm1.SelectResponseViewTab(rView: TResponseView);
+begin
+  case rView of
+    rvList: begin
+      tbtnRespList.Down := True;
+      tbtnRespText.Down := False;
+      pagesRespView.ActivePage := tabRespList;
+    end;
+    rvText: begin
+      tbtnRespList.Down := False;
+      tbtnRespText.Down := True;
+      pagesRespView.ActivePage := tabRespText;
+    end;
+  end;
+end;
+
 procedure TForm1.cbBasicShowPasswordClick(Sender: TObject);
 begin
   if cbBasicShowPassword.Checked then
@@ -503,6 +523,9 @@ var
   C: string;
 begin
   inherited;
+
+  // Defaults. Before configuration is read.
+  SelectResponseViewTab(rvList);
 
   // Init app configuration.
   C := GetAppConfigFile(False, True);
@@ -1123,6 +1146,19 @@ begin
     ShowMessage(ErrMsg);
 end;
 
+procedure TForm1.tbtnRespViewClick(Sender: TObject);
+var
+  btn: TToolButton;
+begin
+  if not (Sender is TToolButton) then
+    Exit; // =>
+  btn := TToolButton(Sender);
+  if btn = tbtnRespList then
+    SelectResponseViewTab(rvList)
+  else if btn = tbtnRespText then
+    SelectResponseViewTab(rvText);
+end;
+
 procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
 var
   KV: TKeyValue;
@@ -1308,6 +1344,15 @@ begin
     Result := atNone;
 end;
 
+function TForm1.GetSelectedResponseViewTab: TResponseView;
+begin
+  if pagesResponse.ActivePage = tabRespText then
+    Exit(rvText);
+  if pagesResponse.ActivePage = tabRespList then
+    Exit(rvList);
+  raise Exception.Create('Cannot get value for response view active page.');
+end;
+
 procedure TForm1.DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
 var
   toolbar: TGridNavigator;
@@ -1439,6 +1484,7 @@ begin
   OptionsForm.ApplyControlFont(Self, 'TTreeView', fiJson);
   KeyValueForm.textValue.Font := OptionsForm.GetFontItem(fiValue);
   responseRaw.Font := OptionsForm.GetFontItem(fiContent);
+  textResp.Font := OptionsForm.GetFontItem(fiContent);
 
   cbMethod.ReadOnly := not OptionsForm.EditRequestMethods;
 
@@ -1608,23 +1654,28 @@ var
   i, p: integer;
   h: string;
   mime: TMimeType;
+  kv: TKeyValuePair;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
   SetAppCaption(cbUrl.Text);
 
+  // Response headers.
+  textResp.Clear;
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
   for i := 0 to Info.ResponseHeaders.Count - 1 do
   begin
     h := Info.ResponseHeaders.Strings[i];
     p := Pos(':', h);
-    responseHeaders.Cells[0, i + 1] := LeftStr(h, p - 1);
-    responseHeaders.Cells[1, i + 1] := trim(RightStr(h, Length(h) - p));
+    kv.Key := LeftStr(h, p - 1);
+    kv.Value := Trim(RightStr(h, Length(h) - p));
+    responseHeaders.Cells[0, i + 1] := kv.Key;
+    responseHeaders.Cells[1, i + 1] := kv.Value;
+    textResp.Lines.Add(Format('%s: %s', [kv.Key, kv.Value]));
   end;
   ParseContentType(Info.ResponseHeaders);
 
   UpdateStatusLine(Info);
-
 
   if (Info.StatusCode <> 404) then
   begin

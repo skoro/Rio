@@ -1219,11 +1219,13 @@ object Form1: TForm1
                 Left = 1
                 Top = 0
                 Caption = 'List'
+                OnClick = tbtnRespViewClick
               end
-              object tbtnText: TToolButton
+              object tbtnRespText: TToolButton
                 Left = 30
                 Top = 0
                 Caption = 'Text'
+                OnClick = tbtnRespViewClick
               end
             end
             object pagesRespView: TPageControl
@@ -1231,10 +1233,10 @@ object Form1: TForm1
               Height = 238
               Top = 26
               Width = 551
-              ActivePage = tabRespList
+              ActivePage = tabRespText
               Align = alClient
               ShowTabs = False
-              TabIndex = 0
+              TabIndex = 1
               TabOrder = 1
               object tabRespList: TTabSheet
                 Caption = 'tabRespList'
@@ -1287,6 +1289,8 @@ object Form1: TForm1
                   Width = 545
                   Align = alClient
                   BorderStyle = bsNone
+                  ReadOnly = True
+                  ScrollBars = ssAutoBoth
                   TabOrder = 0
                 end
               end
