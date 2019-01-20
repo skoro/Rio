@@ -45,6 +45,7 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    toolbarIcons: TImageList;
     textResp: TMemo;
     miJsonExpand: TMenuItem;
     miJsonCollapse: TMenuItem;
