@@ -22,6 +22,8 @@ type
 
   { TRequestInfo }
 
+  { TResponseInfo }
+
   TResponseInfo = class
   private
     FContent: TStringStream;
@@ -34,6 +36,7 @@ type
     FStatusText: string;
     FTime: Int64;
     FUrl: string;
+    function GetLocation: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -47,6 +50,7 @@ type
     property Content: TStringStream read FContent;
     property ContentType: string read FContentType write FContentType;
     property Time: Int64 read FTime write FTime;
+    property Location: string read GetLocation;
   end;
 
   TOnRequestComplete = procedure(ResponseInfo: TResponseInfo) of object;
@@ -178,11 +182,25 @@ end;
 
 { TResponseInfo }
 
+function TResponseInfo.GetLocation: string;
+var
+  I: Integer;
+begin
+  Result := '';
+  if not ((FStatusCode >= 300) and (FStatusCode < 400)) then
+    Exit; // =>
+  for I := 0 to FResponseHeaders.Count - 1 do
+    if LowerCase(FResponseHeaders.Names[I]) = 'location' then
+      Exit(FResponseHeaders.ValueFromIndex[I]);
+end;
+
 constructor TResponseInfo.Create;
 begin
   FContent := TStringStream.Create('');
   FRequestHeaders := TStringList.Create;
+  FRequestHeaders.NameValueSeparator := ':';
   FResponseHeaders := TStringList.Create;
+  FResponseHeaders.NameValueSeparator := ':';
 end;
 
 destructor TResponseInfo.Destroy;
