@@ -22,17 +22,31 @@ type
 
   { TRequestInfo }
 
-  TResponseInfo = record
-    StatusCode: integer;
-    StatusText: string;
-    HttpVersion: string;
-    Url: string;
-    Method: string;
-    RequestHeaders: TStrings;
-    ResponseHeaders: TStrings;
-    Content: TStringStream;
-    ContentType: string;
-    Time: int64; // time of request execution in milliseconds
+  TResponseInfo = class
+  private
+    FContent: TStringStream;
+    FContentType: string;
+    FHttpVersion: string;
+    FMethod: string;
+    FRequestHeaders: TStrings;
+    FResponseHeaders: TStrings;
+    FStatusCode: Integer;
+    FStatusText: string;
+    FTime: Int64;
+    FUrl: string;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    property StatusCode: Integer read FStatusCode write FStatusCode;
+    property StatusText: string read FStatusText write FStatusText;
+    property HttpVersion: string read FHttpVersion write FHttpVersion;
+    property Url: string read FUrl write FUrl;
+    property Method: string read FMethod write FMethod;
+    property RequestHeaders: TStrings read FRequestHeaders;
+    property ResponseHeaders: TStrings read FResponseHeaders;
+    property Content: TStringStream read FContent;
+    property ContentType: string read FContentType write FContentType;
+    property Time: Int64 read FTime write FTime;
   end;
 
   TOnRequestComplete = procedure(ResponseInfo: TResponseInfo) of object;
@@ -162,6 +176,23 @@ begin
   Result.Subtype  := LowerCase(RightStr(ContentType, Length(ContentType) - P));
 end;
 
+{ TResponseInfo }
+
+constructor TResponseInfo.Create;
+begin
+  FContent := TStringStream.Create('');
+  FRequestHeaders := TStringList.Create;
+  FResponseHeaders := TStringList.Create;
+end;
+
+destructor TResponseInfo.Destroy;
+begin
+  FreeAndNil(FContent);
+  FreeAndNil(FRequestHeaders);
+  FreeAndNil(FResponseHeaders);
+  inherited Destroy;
+end;
+
 { TCustomHttpClient }
 
 procedure TCustomHttpClient.MultiFileStreamFormPost(FormData, FileNames: TStrings);
@@ -250,14 +281,15 @@ var
 begin
   if Assigned(FOnRequestComplete) then
   begin
+    info := TResponseInfo.Create;
     info.Method := FHttpMethod;
     info.Url := FUrl;
-    info.RequestHeaders := FHttpClient.RequestHeaders;
-    info.ResponseHeaders := FHttpClient.ResponseHeaders;
+    info.RequestHeaders.Assign(FHttpClient.RequestHeaders);
+    info.ResponseHeaders.Assign(FHttpClient.ResponseHeaders);
     info.StatusCode := FHttpClient.ResponseStatusCode;
     info.StatusText := FHttpClient.ResponseStatusText;
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
-    info.Content := FResponseData;
+    info.Content.WriteString(FResponseData.DataString);
     info.Time := MilliSecondsBetween(FFinishTime, FStartTime);
     info.ContentType := ParseContentType;
     FOnRequestComplete(info);

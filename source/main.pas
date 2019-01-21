@@ -1742,6 +1742,9 @@ begin
     end;
     responseRaw.CaretPos := Point(0, 0);
   end;
+
+  // Finally, dispose response info data.
+  Info.Free;
 end;
 
 procedure TForm1.UpdateStatusLine(Main: string);
