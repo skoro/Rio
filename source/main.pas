@@ -143,6 +143,7 @@ type
     tbtnJsonLoad: TToolButton;
     tbtnRespList: TToolButton;
     tbtnRespText: TToolButton;
+    tbtnRespFollow: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -198,6 +199,7 @@ type
     procedure tbtnJsonLoadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
     procedure tbtnBodyFormatClick(Sender: TObject);
+    procedure tbtnRespFollowClick(Sender: TObject);
     procedure tbtnRespViewClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
@@ -1155,6 +1157,18 @@ begin
     ShowMessage(ErrMsg);
 end;
 
+procedure TForm1.tbtnRespFollowClick(Sender: TObject);
+var
+  I: Integer;
+begin
+  for I := 1 to responseHeaders.RowCount do
+    if (LowerCase(responseHeaders.Cells[0, I]) = 'location') then begin
+      cbUrl.Text := responseHeaders.Cells[1, I];
+      btnSubmitClick(btnSubmit);
+      Exit;
+    end;
+end;
+
 procedure TForm1.tbtnRespViewClick(Sender: TObject);
 var
   btn: TToolButton;
@@ -1727,8 +1741,8 @@ begin
   if not miFind.Enabled then
     miFindNext.Enabled := False;
 
-  // Reset search: Find Next will search from start or from the end data with
-  // the parameters from the previous search (if it was happen).
+  // Reset search: Find Next will search from the start or from the end of
+  // the data with the parameters from the previous search (if it happened).
   FindStart(False);
 
   if tabContent.TabVisible then begin
@@ -1742,6 +1756,8 @@ begin
     end;
     responseRaw.CaretPos := Point(0, 0);
   end;
+
+  tbtnRespFollow.Visible := (Info.Location <> '');
 
   // Finally, dispose response info data.
   Info.Free;
