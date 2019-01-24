@@ -439,30 +439,41 @@ var
   tab: TResponseTab;
   FindSucc: Integer;
   Ans: Integer;
+  ActiveTab: TTabSheet;
+  Txt: TMemo = nil;
+  i, row, col: Integer;
+  chr: Char;
 begin
+  ActiveTab := pagesResponse.ActivePage;
   tab := FResponseTabManager.CanFind;
-  if (tab <> nil) and (pagesResponse.ActivePage <> tabContent) then begin
+  if (tab <> nil) and ((ActiveTab <> tabContent) and (ActiveTab <> tabResponse)) then begin
     pagesResponse.ActivePage := tab.TabSheet;
     FindSucc := tab.FindNext;
   end
-  else
-    if tabContent.TabVisible then begin
-      pagesResponse.ActivePage := tabContent;
-      fp := FindInText(responseRaw.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+  else begin
+    if ActiveTab = tabResponse then
+      Txt := textResp
+    else if tabContent.TabVisible then
+      Txt := responseRaw;
+    if Txt <> nil then begin
+      pagesResponse.ActivePage := ActiveTab;
+      fp := FindInText(Txt.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
       if (fp.Pos = -1) and (FFindTextPos = 0) then
         FindSucc := -1 // Not found at all.
       else
         FindSucc := fp.Pos + 1;
       if fp.Pos > 0 then begin
-        responseRaw.SelStart  := fp.SelStart;
-        responseRaw.SelLength := fp.SelLength;
-        responseRaw.SetFocus;
+        Txt.SelStart  := fp.SelStart;
+        Txt.SelLength := fp.SelLength;
+        if Txt.Parent.Focused then
+          Txt.SetFocus;
         if frDown in dlgFind.Options then
-          FFindTextPos := fp.Pos + responseRaw.SelLength
+          FFindTextPos := fp.Pos + Txt.SelLength
         else
-          FFindTextPos := fp.Pos - responseRaw.SelLength;
+          FFindTextPos := fp.Pos - Txt.SelLength;
       end;
     end;
+  end;
 
   case FindSucc of
     // Not found at all.
@@ -477,6 +488,25 @@ begin
         FindStart
       else
         miFindNext.Enabled := False;
+    end;
+    else begin
+      // On active header response tab set selection in the grid.
+      if (ActiveTab = tabResponse) then begin
+        // Calculate grid row and col for navigation of the search result.
+        Row := 1;
+        Col := 0;
+        for i := 1 to Length(textResp.Text) do begin
+          chr := textResp.Text[i];
+          if (i = fp.Pos) then break
+          else if (chr = #10) then begin
+            Inc(Row);
+            Col := 0;
+          end
+          else if Chr = ':' then Inc(Col);
+        end;
+        responseHeaders.Row := Row;
+        responseHeaders.Col := Col;
+      end;
     end;
   end;
 end;
@@ -719,12 +749,17 @@ var
   tab: TResponseTab;
   Sel: string;
   Page: TTabSheet;
+  Txt: TMemo;
 begin
   Page := pagesResponse.ActivePage;
-  if Page = tabContent then begin
-    // Autofill find text from the raw content tab.
-    if responseRaw.SelText <> '' then
-      dlgFind.FindText := responseRaw.SelText;
+  // Autofill find text from the raw content tab.
+  if (Page = tabContent) or (Page = tabResponse) then begin
+    if Page = tabContent then
+      Txt := responseRaw;
+    if Page = tabResponse then
+      Txt := textResp;
+    if Txt.SelText <> '' then
+      dlgFind.FindText := txt.SelText;
   end
   else begin
     // Autofill find text from the response tab.
