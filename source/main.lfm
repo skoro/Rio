@@ -1247,10 +1247,10 @@ object Form1: TForm1
               Height = 242
               Top = 22
               Width = 551
-              ActivePage = tabRespText
+              ActivePage = tabRespList
               Align = alClient
               ShowTabs = False
-              TabIndex = 1
+              TabIndex = 0
               TabOrder = 1
               object tabRespList: TTabSheet
                 Caption = 'tabRespList'
@@ -1258,7 +1258,7 @@ object Form1: TForm1
                 ClientWidth = 545
                 object responseHeaders: TStringGrid
                   Left = 0
-                  Height = 232
+                  Height = 236
                   Top = 0
                   Width = 545
                   Align = alClient
@@ -1279,7 +1279,7 @@ object Form1: TForm1
                     end>
                   FixedCols = 0
                   MouseWheelOption = mwGrid
-                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRowSizing, goColSizing, goEditing, goTabs, goSmoothScroll]
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goEditing, goTabs, goSmoothScroll, goRowHighlight]
                   RowCount = 1
                   TabOrder = 0
                   TitleFont.Height = -13
