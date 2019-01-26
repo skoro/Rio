@@ -518,11 +518,15 @@ begin
       tbtnRespList.Down := True;
       tbtnRespText.Down := False;
       pagesRespView.ActivePage := tabRespList;
+      if Showing then // Don't focus the component when form is creating.
+        responseHeaders.SetFocus;
     end;
     rvText: begin
       tbtnRespList.Down := False;
       tbtnRespText.Down := True;
       pagesRespView.ActivePage := tabRespText;
+      if Showing then
+        textResp.SetFocus;
     end;
   end;
 end;
