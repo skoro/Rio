@@ -446,32 +446,36 @@ var
 begin
   ActiveTab := pagesResponse.ActivePage;
   tab := FResponseTabManager.CanFind;
+  // Priority of the search:
+  // Dynamic tab (from the response_tabs unit) when no "Content" or "Response"
+  // tab is selected.
   if (tab <> nil) and ((ActiveTab <> tabContent) and (ActiveTab <> tabResponse)) then begin
     pagesResponse.ActivePage := tab.TabSheet;
     FindSucc := tab.FindNext;
   end
   else begin
-    if ActiveTab = tabResponse then
-      Txt := textResp
-    else if tabContent.TabVisible then
-      Txt := responseRaw;
-    if Txt <> nil then begin
-      pagesResponse.ActivePage := ActiveTab;
-      fp := FindInText(Txt.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
-      if (fp.Pos = -1) and (FFindTextPos = 0) then
-        FindSucc := -1 // Not found at all.
+    // Next, "Content" tab priority.
+    if (ActiveTab = tabContent) and tabContent.TabVisible then
+      Txt := responseRaw
+    else begin // And finally fallback to the "Response" tab.
+      Txt := textResp;
+      ActiveTab := tabResponse;
+    end;
+    pagesResponse.ActivePage := ActiveTab;
+    fp := FindInText(Txt.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+    if (fp.Pos = -1) and (FFindTextPos = 0) then
+      FindSucc := -1 // Not found at all.
+    else
+      FindSucc := fp.Pos + 1;
+    if fp.Pos > 0 then begin
+      Txt.SelStart  := fp.SelStart;
+      Txt.SelLength := fp.SelLength;
+      if Txt.Parent.Focused then
+        Txt.SetFocus;
+      if frDown in dlgFind.Options then
+        FFindTextPos := fp.Pos + Txt.SelLength
       else
-        FindSucc := fp.Pos + 1;
-      if fp.Pos > 0 then begin
-        Txt.SelStart  := fp.SelStart;
-        Txt.SelLength := fp.SelLength;
-        if Txt.Parent.Focused then
-          Txt.SetFocus;
-        if frDown in dlgFind.Options then
-          FFindTextPos := fp.Pos + Txt.SelLength
-        else
-          FFindTextPos := fp.Pos - Txt.SelLength;
-      end;
+        FFindTextPos := fp.Pos - Txt.SelLength;
     end;
   end;
 
@@ -1775,10 +1779,8 @@ begin
   else
     tabContent.TabVisible := False;
 
-  // Find always enabled when Content tab is visible.
-  miFind.Enabled := tabContent.TabVisible;
-  if not miFind.Enabled then
-    miFindNext.Enabled := False;
+  miFind.Enabled := True;
+  miFindNext.Enabled := True;
 
   // Reset search: Find Next will search from the start or from the end of
   // the data with the parameters from the previous search (if it happened).
