@@ -187,6 +187,7 @@ type
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
+    procedure pagesResponseChange(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
     procedure pmBodyTypeClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
@@ -1053,6 +1054,14 @@ begin
   Grid.Cells[0, aRow] := '1';
   if EditGridRow(Grid) <> mrOK then
     Grid.DeleteRow(aRow);
+end;
+
+procedure TForm1.pagesResponseChange(Sender: TObject);
+begin
+  // Switching between tabs resets FindNext search.
+  // This behaviour doesn't affect the search from the response_tabs unit
+  // in case when a response tab implements find methods with the internal next position.
+  FFindTextPos := 0;
 end;
 
 procedure TForm1.pmAuthTypeClick(Sender: TObject);
