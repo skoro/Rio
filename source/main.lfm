@@ -4,7 +4,7 @@ object Form1: TForm1
   Top = 41
   Width = 565
   Caption = 'HTTP request inspector'
-  ClientHeight = 594
+  ClientHeight = 593
   ClientWidth = 565
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
@@ -153,8 +153,8 @@ object Form1: TForm1
   object LayoutSplitter: TPairSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 531
-    Top = 33
+    Height = 526
+    Top = 37
     Width = 565
     Align = alClient
     Position = 220
@@ -190,11 +190,11 @@ object Form1: TForm1
           TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object requestHeaders: TStringGrid
               Left = 0
-              Height = 152
+              Height = 151
               Top = 26
               Width = 551
               Align = alClient
@@ -250,20 +250,20 @@ object Form1: TForm1
               OnGridClear = OnGridClear
               ShowNavButtons = True
               object ToolButton1: TToolButton
-                Left = 150
+                Left = 146
                 Height = 22
                 Top = 0
                 Caption = 'ToolButton1'
                 Style = tbsDivider
               end
               object tbtnManageHeaders: TToolButton
-                Left = 155
+                Left = 151
                 Top = 0
                 Caption = 'Manage'
                 OnClick = tbtnManageHeadersClick
               end
               object tbtnSaveHeader: TToolButton
-                Left = 209
+                Left = 205
                 Top = 0
                 Caption = 'Save header'
                 OnClick = tbtnSaveHeaderClick
@@ -272,7 +272,7 @@ object Form1: TForm1
           end
           object tabQuery: TTabSheet
             Caption = 'Query'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object gridParams: TStringGrid
               Left = 0
@@ -329,7 +329,7 @@ object Form1: TForm1
           end
           object tabBody: TTabSheet
             Caption = 'Body'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object pagesBody: TPageControl
               Left = 0
@@ -947,7 +947,7 @@ object Form1: TForm1
           end
           object tabReqCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object gridReqCookie: TStringGrid
               Left = 0
@@ -1006,7 +1006,7 @@ object Form1: TForm1
           end
           object tabAuth: TTabSheet
             Caption = 'Auth'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object toolbarAuth: TToolBar
               Left = 0
@@ -1109,7 +1109,7 @@ object Form1: TForm1
                   Top = 0
                   Width = 545
                   HorzScrollBar.Page = 208
-                  VertScrollBar.Page = 104
+                  VertScrollBar.Page = 105
                   Align = alClient
                   BorderStyle = bsNone
                   ClientHeight = 146
@@ -1159,7 +1159,7 @@ object Form1: TForm1
           end
           object tabNotes: TTabSheet
             Caption = 'Notes'
-            ClientHeight = 178
+            ClientHeight = 177
             ClientWidth = 551
             object editNotes: TMemo
               Left = 0
@@ -1178,25 +1178,25 @@ object Form1: TForm1
     object splitterSideResponse: TPairSplitterSide
       Cursor = crArrow
       Left = 0
-      Height = 306
+      Height = 301
       Top = 225
       Width = 565
       ClientWidth = 565
-      ClientHeight = 306
+      ClientHeight = 301
       object panelResponse: TPanel
         Left = 4
-        Height = 298
+        Height = 293
         Top = 4
         Width = 557
         Align = alClient
         BorderSpacing.Around = 4
         BevelOuter = bvNone
-        ClientHeight = 298
+        ClientHeight = 293
         ClientWidth = 557
         TabOrder = 0
         object pagesResponse: TPageControl
           Left = 0
-          Height = 298
+          Height = 293
           Top = 0
           Width = 557
           ActivePage = tabResponse
@@ -1205,7 +1205,7 @@ object Form1: TForm1
           TabOrder = 0
           object tabResponse: TTabSheet
             Caption = 'Response'
-            ClientHeight = 264
+            ClientHeight = 258
             ClientWidth = 551
             object toolbarResponse: TToolBar
               Left = 0
@@ -1227,14 +1227,14 @@ object Form1: TForm1
                 OnClick = tbtnRespViewClick
               end
               object tbtnRespText: TToolButton
-                Left = 48
+                Left = 46
                 Top = 0
                 Caption = 'Text'
                 ImageIndex = 1
                 OnClick = tbtnRespViewClick
               end
               object tbtnRespFollow: TToolButton
-                Left = 98
+                Left = 95
                 Top = 0
                 Caption = 'Follow'
                 ImageIndex = 2
@@ -1244,7 +1244,7 @@ object Form1: TForm1
             end
             object pagesRespView: TPageControl
               Left = 0
-              Height = 242
+              Height = 236
               Top = 22
               Width = 551
               ActivePage = tabRespList
@@ -1254,11 +1254,11 @@ object Form1: TForm1
               TabOrder = 1
               object tabRespList: TTabSheet
                 Caption = 'tabRespList'
-                ClientHeight = 236
+                ClientHeight = 230
                 ClientWidth = 545
                 object responseHeaders: TStringGrid
                   Left = 0
-                  Height = 236
+                  Height = 230
                   Top = 0
                   Width = 545
                   Align = alClient
@@ -1294,7 +1294,7 @@ object Form1: TForm1
               end
               object tabRespText: TTabSheet
                 Caption = 'tabRespText'
-                ClientHeight = 236
+                ClientHeight = 230
                 ClientWidth = 545
                 object textResp: TMemo
                   Left = 0
@@ -1312,7 +1312,7 @@ object Form1: TForm1
           end
           object tabRespCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 264
+            ClientHeight = 258
             ClientWidth = 551
             TabVisible = False
             object gridRespCookie: TStringGrid
@@ -1384,7 +1384,7 @@ object Form1: TForm1
           end
           object tabContent: TTabSheet
             Caption = 'Content'
-            ClientHeight = 264
+            ClientHeight = 258
             ClientWidth = 551
             object responseRaw: TMemo
               Left = 0
@@ -1403,20 +1403,23 @@ object Form1: TForm1
     end
   end
   object panelUrl: TPanel
-    Left = 0
+    Left = 4
     Height = 29
-    Top = 0
-    Width = 565
+    Top = 4
+    Width = 557
     Align = alTop
     AutoSize = True
+    BorderSpacing.Left = 4
+    BorderSpacing.Top = 4
+    BorderSpacing.Right = 4
     BorderSpacing.Bottom = 4
     BevelOuter = bvNone
     ClientHeight = 29
-    ClientWidth = 565
+    ClientWidth = 557
     TabOrder = 1
     object cbMethod: TComboBox
       Left = 0
-      Height = 26
+      Height = 27
       Top = 0
       Width = 100
       AutoComplete = True
@@ -1436,9 +1439,9 @@ object Form1: TForm1
     end
     object cbUrl: TComboBox
       Left = 104
-      Height = 26
+      Height = 27
       Top = 0
-      Width = 381
+      Width = 373
       Anchors = [akTop, akLeft, akRight]
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
@@ -1448,7 +1451,7 @@ object Form1: TForm1
       TabOrder = 1
     end
     object btnSubmit: TButton
-      Left = 488
+      Left = 480
       Height = 29
       Top = 0
       Width = 75
@@ -1461,7 +1464,7 @@ object Form1: TForm1
   object StatusPanel: TPanel
     Left = 4
     Height = 30
-    Top = 564
+    Top = 563
     Width = 557
     Align = alBottom
     BorderSpacing.Left = 4
@@ -1476,7 +1479,7 @@ object Form1: TForm1
       Left = 0
       Height = 30
       Top = 0
-      Width = 137
+      Width = 131
       Align = alLeft
       Caption = 'HTTP request inspector'
       Layout = tlCenter
@@ -1507,7 +1510,7 @@ object Form1: TForm1
       Height = 30
       Hint = 'Request time'
       Top = 0
-      Width = 89
+      Width = 86
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextTime'
@@ -1540,7 +1543,7 @@ object Form1: TForm1
       Height = 30
       Hint = 'Response body size'
       Top = 0
-      Width = 84
+      Width = 81
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextSize'
@@ -1550,10 +1553,10 @@ object Form1: TForm1
       ShowHint = True
     end
     object StatusTextInfo: TLabel
-      Left = 473
+      Left = 477
       Height = 30
       Top = 0
-      Width = 84
+      Width = 80
       Align = alRight
       Caption = 'StatusTextInfo'
       Layout = tlCenter
