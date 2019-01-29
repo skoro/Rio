@@ -9,9 +9,35 @@ uses
 
 type
 
+  TTimeMSec = Int64;
+
+  { TTimeProfiler }
+
+  TTimeProfiler = class
+  private
+    function GetTimer(T: string): TTimeMSec;
+  protected
+    type
+      TCheckPoint = record
+        Start: TDateTime;
+        Finish: TDateTime;
+      end;
+      TTimeMap = specialize TFPGMap<string, TCheckPoint>;
+    protected var
+    FTimeMap: TTimeMap;
+  public
+    constructor Create; virtual;
+    destructor Destory; virtual;
+    procedure Start(Timer: string);
+    procedure Stop(Timer: string);
+    property Timer[T: string]: TTimeMSec read GetTimer;
+  end;
+
   { TCustomHttpClient }
 
   TCustomHttpClient = class(TFPHTTPClient)
+  protected
+    procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
   public
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
   end;
@@ -19,8 +45,6 @@ type
   { TQueryParams }
 
   TQueryParams = specialize TFPGMap<string, string>;
-
-  { TRequestInfo }
 
   { TResponseInfo }
 
@@ -180,6 +204,45 @@ begin
   Result.Subtype  := LowerCase(RightStr(ContentType, Length(ContentType) - P));
 end;
 
+{ TTimeProfiler }
+
+function TTimeProfiler.GetTimer(T: string): TTimeMSec;
+var
+  cp: TCheckPoint;
+begin
+  cp := FTimeMap.KeyData[T];
+  Result := MilliSecondsBetween(cp.Finish, cp.Start);
+end;
+
+constructor TTimeProfiler.Create;
+begin
+  inherited;
+  FTimeMap := TTimeMap.Create;
+end;
+
+destructor TTimeProfiler.Destory;
+begin
+  FTimeMap.Destroy;
+  inherited;
+end;
+
+procedure TTimeProfiler.Start(Timer: string);
+var
+  cp: TCheckPoint;
+begin
+  cp.Start := Now;
+  cp.Finish := 0;
+  FTimeMap.AddOrSetData(Timer, cp);
+end;
+
+procedure TTimeProfiler.Stop(Timer: string);
+var
+  cp: TCheckPoint;
+begin
+  cp := FTimeMap.KeyData[Timer];
+  cp.Finish := Now;
+end;
+
 { TResponseInfo }
 
 function TResponseInfo.GetLocation: string;
@@ -212,6 +275,12 @@ begin
 end;
 
 { TCustomHttpClient }
+
+procedure TCustomHttpClient.ConnectToServer(const AHost: String;
+  APort: Integer; UseSSL: Boolean);
+begin
+  inherited;
+end;
 
 procedure TCustomHttpClient.MultiFileStreamFormPost(FormData, FileNames: TStrings);
 var
