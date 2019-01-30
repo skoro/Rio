@@ -5,11 +5,13 @@ unit thread_http_client;
 interface
 
 uses
-  Classes, SysUtils, fphttpclient, fgl;
+  Classes, SysUtils, fphttpclient, fgl, URIParser;
 
 type
 
   TTimeMSec = Int64;
+
+  TTimeProfilerResults = specialize TFPGMap<string, TTimeMSec>;
 
   { TTimeProfiler }
 
@@ -23,23 +25,34 @@ type
         Finish: TDateTime;
       end;
       TTimeMap = specialize TFPGMap<string, TCheckPoint>;
+      TLabels = array of string;
     protected var
     FTimeMap: TTimeMap;
+    function GetLabels: TLabels;
   public
     constructor Create; virtual;
     destructor Destory; virtual;
     procedure Start(Timer: string);
     procedure Stop(Timer: string);
+    function Results: TTimeProfilerResults;
     property Timer[T: string]: TTimeMSec read GetTimer;
+    property Labels: TLabels read GetLabels;
   end;
 
   { TCustomHttpClient }
 
   TCustomHttpClient = class(TFPHTTPClient)
+  private
+    FTimeProfiler: TTimeProfiler;
   protected
     procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
+    procedure SendRequest(const AMethod: String; URI: TURI); override;
+    function ReadResponseHeaders: integer; override;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
+    property TimeProfiler: TTimeProfiler read FTimeProfiler;
   end;
 
   { TQueryParams }
@@ -60,6 +73,7 @@ type
     FStatusText: string;
     FTime: Int64;
     FUrl: string;
+    FTimeProfilerResults: TTimeProfilerResults;
     function GetLocation: string;
   public
     constructor Create;
@@ -73,7 +87,8 @@ type
     property ResponseHeaders: TStrings read FResponseHeaders;
     property Content: TStringStream read FContent;
     property ContentType: string read FContentType write FContentType;
-    property Time: Int64 read FTime write FTime;
+    property Time: TTimeMSec read FTime write FTime;
+    property TimeProfilerResults: TTimeProfilerResults read FTimeProfilerResults write FTimeProfilerResults;
     property Location: string read GetLocation;
   end;
 
@@ -131,7 +146,7 @@ function SplitMimeType(const ContentType: string): TMimeType;
 
 implementation
 
-uses dateutils, strutils, URIParser, app_helpers;
+uses dateutils, strutils, app_helpers;
 
 const
   CRLF = #13#10;
@@ -206,6 +221,15 @@ end;
 
 { TTimeProfiler }
 
+function TTimeProfiler.GetLabels: TLabels;
+var
+  I: Integer;
+begin
+  SetLength(Result, FTimeMap.Count);
+  for I := 0 to FTimeMap.Count - 1 do
+    Result[I] := FTimeMap.Keys[I];
+end;
+
 function TTimeProfiler.GetTimer(T: string): TTimeMSec;
 var
   cp: TCheckPoint;
@@ -241,6 +265,18 @@ var
 begin
   cp := FTimeMap.KeyData[Timer];
   cp.Finish := Now;
+  FTimeMap.KeyData[Timer] := cp;
+end;
+
+function TTimeProfiler.Results: TTimeProfilerResults;
+var
+  I: Integer;
+  Labs: TLabels;
+begin
+  Result := TTimeProfilerResults.Create;
+  Labs := Labels;
+  for I := Low(Labs) to High(Labs) do
+    Result.AddOrSetData(Labs[I], Timer[Labs[I]]);
 end;
 
 { TResponseInfo }
@@ -264,6 +300,7 @@ begin
   FRequestHeaders.NameValueSeparator := ':';
   FResponseHeaders := TStringList.Create;
   FResponseHeaders.NameValueSeparator := ':';
+  FTimeProfilerResults := nil;
 end;
 
 destructor TResponseInfo.Destroy;
@@ -271,6 +308,8 @@ begin
   FreeAndNil(FContent);
   FreeAndNil(FRequestHeaders);
   FreeAndNil(FResponseHeaders);
+  if Assigned(FTimeProfilerResults) then
+    FreeAndNil(FTimeProfilerResults);
   inherited Destroy;
 end;
 
@@ -279,7 +318,35 @@ end;
 procedure TCustomHttpClient.ConnectToServer(const AHost: String;
   APort: Integer; UseSSL: Boolean);
 begin
+  FTimeProfiler.Start('ConnectToServer');
   inherited;
+  FTimeProfiler.Stop('ConnectToServer');
+end;
+
+procedure TCustomHttpClient.SendRequest(const AMethod: String; URI: TURI);
+begin
+  FTimeProfiler.Start('SendRequest');
+  inherited SendRequest(AMethod, URI);
+  FTimeProfiler.Stop('SendRequest');
+end;
+
+function TCustomHttpClient.ReadResponseHeaders: integer;
+begin
+  FTimeProfiler.Start('ReadResponseHeaders');
+  Result := inherited ReadResponseHeaders;
+  FTimeProfiler.Stop('ReadResponseHeaders');
+end;
+
+constructor TCustomHttpClient.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FTimeProfiler := TTimeProfiler.Create;
+end;
+
+destructor TCustomHttpClient.Destroy;
+begin
+  FTimeProfiler.Destory;
+  inherited Destroy;
 end;
 
 procedure TCustomHttpClient.MultiFileStreamFormPost(FormData, FileNames: TStrings);
@@ -379,6 +446,7 @@ begin
     info.Content.WriteString(FResponseData.DataString);
     info.Time := MilliSecondsBetween(FFinishTime, FStartTime);
     info.ContentType := ParseContentType;
+    info.TimeProfilerResults := FHttpClient.TimeProfiler.Results;
     FOnRequestComplete(info);
   end;
 end;
