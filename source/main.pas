@@ -15,7 +15,7 @@ type
   TBodyTab = (btForm, btJson, btOther);
   TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
-  TResponseView = (rvList, rvText);
+  TResponseView = (rvList, rvText, rvTimings);
 
   { TForm1 }
 
@@ -45,6 +45,7 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
     miJsonExpand: TMenuItem;
@@ -144,6 +145,7 @@ type
     tbtnRespList: TToolButton;
     tbtnRespText: TToolButton;
     tbtnRespFollow: TToolButton;
+    tbtnRespTime: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -522,6 +524,7 @@ begin
     rvList: begin
       tbtnRespList.Down := True;
       tbtnRespText.Down := False;
+      tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespList;
       if Showing then // Don't focus the component when form is creating.
         responseHeaders.SetFocus;
@@ -529,9 +532,16 @@ begin
     rvText: begin
       tbtnRespList.Down := False;
       tbtnRespText.Down := True;
+      tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespText;
       if Showing then
         textResp.SetFocus;
+    end;
+    rvTimings: begin
+      tbtnRespList.Down := False;
+      tbtnRespText.Down := False;
+      tbtnRespTime.Down := True;
+      pagesRespView.ActivePage := tabRespTime;
     end;
   end;
 end;
@@ -640,8 +650,9 @@ begin
       // Switch views in the response tab (list or text view).
       if pagesResponse.ActivePage = tabResponse then
         case GetSelectedResponseViewTab of
-          rvList: SelectResponseViewTab(rvText);
-          rvText: SelectResponseViewTab(rvList);
+          rvList:    SelectResponseViewTab(rvText);
+          rvText:    SelectResponseViewTab(rvTimings);
+          rvTimings: SelectResponseViewTab(rvList);
         end;
     end;
   end;
@@ -1231,7 +1242,9 @@ begin
   if btn = tbtnRespList then
     SelectResponseViewTab(rvList)
   else if btn = tbtnRespText then
-    SelectResponseViewTab(rvText);
+    SelectResponseViewTab(rvText)
+  else if btn = tbtnRespTime then
+    SelectResponseViewTab(rvTimings);
 end;
 
 procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
@@ -1425,6 +1438,8 @@ begin
     Exit(rvText);
   if pagesRespView.ActivePage = tabRespList then
     Exit(rvList);
+  if pagesRespView.ActivePage = tabRespTime then
+    Exit(rvTimings);
   raise Exception.Create('Cannot get value for response view active page.');
 end;
 
@@ -1730,6 +1745,7 @@ var
   h: string;
   mime: TMimeType;
   kv: TKeyValuePair;
+  t:TTimeMSec;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
@@ -1805,6 +1821,11 @@ begin
       end;
     end;
     responseRaw.CaretPos := Point(0, 0);
+  end;
+
+  for i:=0 to info.TimeProfilerResults.Count-1 do begin
+    h:=info.TimeProfilerResults.Keys[i];
+    t:=info.TimeProfilerResults.KeyData[h];
   end;
 
   tbtnRespFollow.Visible := (Info.Location <> '');
