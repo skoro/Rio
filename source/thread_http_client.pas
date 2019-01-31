@@ -48,6 +48,7 @@ type
     procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
     procedure SendRequest(const AMethod: String; URI: TURI); override;
     function ReadResponseHeaders: integer; override;
+    function ReadResponse(Stream: TStream;  const AllowedResponseCodes: array of Integer; HeadersOnly: Boolean = False): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -335,6 +336,14 @@ begin
   FTimeProfiler.Start('ReadResponseHeaders');
   Result := inherited ReadResponseHeaders;
   FTimeProfiler.Stop('ReadResponseHeaders');
+end;
+
+function TCustomHttpClient.ReadResponse(Stream: TStream;
+  const AllowedResponseCodes: array of Integer; HeadersOnly: Boolean): Boolean;
+begin
+  FTimeProfiler.Start('ReadResponse');
+  Result := inherited ReadResponse(Stream, AllowedResponseCodes, HeadersOnly);
+  FTimeProfiler.Stop('ReadResponse');
 end;
 
 constructor TCustomHttpClient.Create(AOwner: TComponent);
