@@ -8,7 +8,7 @@ uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
   SynHighlighterJScript, thread_http_client, response_tabs, key_value,
-  GridNavigator, SysUtils, jsonparser;
+  profiler_graph, GridNavigator, SysUtils, jsonparser;
 
 type
 
@@ -213,6 +213,7 @@ type
     FResponseJsonTab: TResponseJsonTab;
     FFindTextPos: Integer;
     FRequestSeconds: Integer;
+    FProfilerGraph: TProfilerGraph;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -266,7 +267,7 @@ implementation
 
 uses about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
-  import_form, export_form, Clipbrd;
+  import_form, export_form, Clipbrd, TAGraph;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -1823,10 +1824,9 @@ begin
     responseRaw.CaretPos := Point(0, 0);
   end;
 
-  for i:=0 to info.TimeProfilerResults.Count-1 do begin
-    h:=info.TimeProfilerResults.Keys[i];
-    t:=info.TimeProfilerResults.KeyData[h];
-  end;
+  if not Assigned(FProfilerGraph) then
+    FProfilerGraph := TProfilerGraph.Create(tabRespTime);
+  FProfilerGraph.TimeCheckPoints := info.TimeCheckPoints;
 
   tbtnRespFollow.Visible := (Info.Location <> '');
 
