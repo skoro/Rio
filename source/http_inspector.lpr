@@ -7,7 +7,9 @@ uses
   cthreads,
   cmem,
   {$ENDIF}
-  Forms, sysutils, Interfaces, main, options, cmdline;
+  Forms, sysutils, Interfaces, main, options, cmdline,
+  tachartlazaruspkg // Don't remove! Chart initialization.
+  ;
 
 {$R *.res}
 
