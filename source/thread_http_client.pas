@@ -25,6 +25,7 @@ type
   TTimeProfiler = class
   private
     function GetCheckPoint(T: string): TTimeCheckPoint;
+    function GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
   protected
     type
       TLabels = array of string;
@@ -41,6 +42,7 @@ type
     property CheckPoint[T: string]: TTimeCheckPoint read GetCheckPoint;
     property Labels: TLabels read GetLabels;
     property CheckPoints: TTimeCheckPointList read FCheckPoints;
+    property CheckPointIndex[AIndex: Integer]: TTimeCheckPoint read GetCheckPointByIndex;
   end;
 
   { TCustomHttpClient }
@@ -152,7 +154,7 @@ function SplitMimeType(const ContentType: string): TMimeType;
 
 implementation
 
-uses dateutils, strutils, app_helpers;
+uses dateutils, strutils, RtlConsts, app_helpers;
 
 const
   CRLF = #13#10;
@@ -230,6 +232,16 @@ end;
 function TTimeProfiler.GetCheckPoint(T: string): TTimeCheckPoint;
 begin
   Result := FCheckPoints[T];
+end;
+
+function TTimeProfiler.GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
+var
+  I: Integer;
+begin
+  for I := 0 to FCheckPoints.Count - 1 do
+    if FCheckPoints.Data[I].CheckPoint = AIndex then
+      Exit(FCheckPoints.Data[I]);
+  FCheckPoints.Error(SListIndexError, AIndex)
 end;
 
 function TTimeProfiler.GetLabels: TLabels;
