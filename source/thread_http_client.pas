@@ -281,6 +281,7 @@ begin
   cp.CheckPoint := FCurrentPoint;
   cp.Duration   := 0;
   FCheckPoints.AddOrSetData(Timer, cp);
+  Inc(FCurrentPoint);
 end;
 
 procedure TTimeProfiler.Stop(Timer: string);
@@ -291,7 +292,6 @@ begin
   cp.Finish := Now;
   cp.Duration := MilliSecondsBetween(cp.Finish, cp.Start);
   FCheckPoints.KeyData[Timer] := cp;
-  Inc(FCurrentPoint);
 end;
 
 { TResponseInfo }
