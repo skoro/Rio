@@ -53,6 +53,7 @@ begin
   FChart.Parent := AParent;
   FChart.Align := alClient;
   FChart.Frame.Visible := False;
+  FChart.AllowZoom := False;
   FListChartSource := TListChartSource.Create(FChart);
   FListChartSource.YCount := 5;
   FListChartSourceLABELS := TListChartSource.Create(FChart);
