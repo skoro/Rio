@@ -79,10 +79,10 @@ type
     FResponseHeaders: TStrings;
     FStatusCode: Integer;
     FStatusText: string;
-    FTime: Int64;
     FUrl: string;
     FTimeCheckPoints: TTimeCheckPointList;
     function GetLocation: string;
+    function GetRequestTime: TTimeMSec;
   public
     constructor Create;
     destructor Destroy; override;
@@ -95,8 +95,8 @@ type
     property ResponseHeaders: TStrings read FResponseHeaders;
     property Content: TStringStream read FContent;
     property ContentType: string read FContentType write FContentType;
-    property Time: TTimeMSec read FTime write FTime;
     property TimeCheckPoints: TTimeCheckPointList read FTimeCheckPoints;
+    property RequestTime: TTimeMSec read GetRequestTime;
     property Location: string read GetLocation;
   end;
 
@@ -114,8 +114,6 @@ type
     FResponseData: TStringStream;
     FOnClientException: TOnException;
     FException: Exception;
-    FStartTime: TDateTime;
-    FFinishTime: TDateTime;
     FCookies: TStrings;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
@@ -308,6 +306,11 @@ begin
       Exit(FResponseHeaders.ValueFromIndex[I]);
 end;
 
+function TResponseInfo.GetRequestTime: TTimeMSec;
+begin
+  Result := FTimeCheckPoints.KeyData['Total'].Duration;
+end;
+
 constructor TResponseInfo.Create;
 begin
   FContent := TStringStream.Create('');
@@ -475,7 +478,6 @@ begin
     info.StatusText := FHttpClient.ResponseStatusText;
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
     info.Content.WriteString(FResponseData.DataString);
-    info.Time := MilliSecondsBetween(FFinishTime, FStartTime);
     info.ContentType := ParseContentType;
     info.TimeCheckPoints.Assign(FHttpClient.TimeProfiler.CheckPoints);
     FOnRequestComplete(info);
@@ -493,9 +495,7 @@ begin
   try
     if Assigned(FCookies) then
       FHttpClient.Cookies := FCookies;
-    FStartTime := Now;
     FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
-    FFinishTime := Now;
     Synchronize(@RequestComplete);
   except
     on E: Exception do

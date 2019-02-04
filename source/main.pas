@@ -1846,15 +1846,18 @@ end;
 procedure TForm1.UpdateStatusLine(Info: TResponseInfo);
 var
   w: Integer;
+  tm: TTimeMSec;
 begin
   StatusTextMain.Caption := Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]);
 
   StatusImageTime.Visible := True;
   StatusImageSize.Visible := True;
 
-  StatusTextTime.Caption := IfThen(Info.Time > 1000,
-      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
-      Format('%d ms',      [Info.Time]));
+  tm := Info.RequestTime;
+
+  StatusTextTime.Caption := IfThen(tm > 1000,
+      Format('%d ms (%s)', [tm, FormatMsApprox(tm)]),
+      Format('%d ms',      [tm]));
 
   StatusTextSize.Caption := NumberFormat(Info.Content.Size) + ' bytes';
 
