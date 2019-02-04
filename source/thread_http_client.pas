@@ -51,7 +51,6 @@ type
   private
     FTimeProfiler: TTimeProfiler;
   protected
-    procedure HTTPMethod(Const AMethod,AURL : String; Stream : TStream; Const AllowedResponseCodes : Array of Integer); override;
     procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
     procedure SendRequest(const AMethod: String; URI: TURI); override;
     function ReadResponseHeaders: integer; override;
@@ -59,6 +58,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure HTTPMethod(Const AMethod,AURL : String; Stream : TStream; Const AllowedResponseCodes : Array of Integer); override;
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
     property TimeProfiler: TTimeProfiler read FTimeProfiler;
   end;
