@@ -1952,6 +1952,10 @@ begin
   // Strip extension from a document name (mainly for images).
   if RightStr(basename, Length(ext) + 1) = '.' + ext then
     basename := LeftStr(basename, Length(basename) - Length(ext) - 1);
+  // Don't append a content type extension to a jpeg image if the image
+  // already contains the extension.
+  if (FContentType = 'image/jpeg') and (RightStr(basename, 4) = '.jpg') then
+    Exit(basename);
   Result := Format('%s.%s', [basename, ext]);
 end;
 
