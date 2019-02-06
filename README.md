@@ -33,6 +33,7 @@ from the `components/rest_explorer` folder. In Lazarus open in main
 menu `Package / Open package file (.lpk)...` and open the file
 `components/rest_explorer/rest_explorer.lpk` then compile and install the
 package.
+Please ensure that the package *TAChart* is also installed.
 
 On Linux you can compile and create the install package (deb) by Makefile.
 For example:

@@ -8,14 +8,14 @@ uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
   SynHighlighterJScript, thread_http_client, response_tabs, key_value,
-  GridNavigator, SysUtils, jsonparser;
+  profiler_graph, GridNavigator, SysUtils, jsonparser;
 
 type
 
   TBodyTab = (btForm, btJson, btOther);
   TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
-  TResponseView = (rvList, rvText);
+  TResponseView = (rvList, rvText, rvTimings);
 
   { TForm1 }
 
@@ -45,6 +45,7 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
     miJsonExpand: TMenuItem;
@@ -144,6 +145,7 @@ type
     tbtnRespList: TToolButton;
     tbtnRespText: TToolButton;
     tbtnRespFollow: TToolButton;
+    tbtnRespTime: TToolButton;
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -211,6 +213,7 @@ type
     FResponseJsonTab: TResponseJsonTab;
     FFindTextPos: Integer;
     FRequestSeconds: Integer;
+    FProfilerGraph: TProfilerGraph;
     procedure OnHttpException(Url, Method: string; E: Exception);
     procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -264,7 +267,7 @@ implementation
 
 uses about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
-  import_form, export_form, Clipbrd;
+  import_form, export_form, Clipbrd, TAGraph;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -522,6 +525,7 @@ begin
     rvList: begin
       tbtnRespList.Down := True;
       tbtnRespText.Down := False;
+      tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespList;
       if Showing then // Don't focus the component when form is creating.
         responseHeaders.SetFocus;
@@ -529,9 +533,16 @@ begin
     rvText: begin
       tbtnRespList.Down := False;
       tbtnRespText.Down := True;
+      tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespText;
       if Showing then
         textResp.SetFocus;
+    end;
+    rvTimings: begin
+      tbtnRespList.Down := False;
+      tbtnRespText.Down := False;
+      tbtnRespTime.Down := True;
+      pagesRespView.ActivePage := tabRespTime;
     end;
   end;
 end;
@@ -640,8 +651,9 @@ begin
       // Switch views in the response tab (list or text view).
       if pagesResponse.ActivePage = tabResponse then
         case GetSelectedResponseViewTab of
-          rvList: SelectResponseViewTab(rvText);
-          rvText: SelectResponseViewTab(rvList);
+          rvList:    SelectResponseViewTab(rvText);
+          rvText:    SelectResponseViewTab(rvTimings);
+          rvTimings: SelectResponseViewTab(rvList);
         end;
     end;
   end;
@@ -1231,7 +1243,9 @@ begin
   if btn = tbtnRespList then
     SelectResponseViewTab(rvList)
   else if btn = tbtnRespText then
-    SelectResponseViewTab(rvText);
+    SelectResponseViewTab(rvText)
+  else if btn = tbtnRespTime then
+    SelectResponseViewTab(rvTimings);
 end;
 
 procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
@@ -1425,6 +1439,8 @@ begin
     Exit(rvText);
   if pagesRespView.ActivePage = tabRespList then
     Exit(rvList);
+  if pagesRespView.ActivePage = tabRespTime then
+    Exit(rvTimings);
   raise Exception.Create('Cannot get value for response view active page.');
 end;
 
@@ -1730,6 +1746,7 @@ var
   h: string;
   mime: TMimeType;
   kv: TKeyValuePair;
+  t:TTimeMSec;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
@@ -1807,6 +1824,10 @@ begin
     responseRaw.CaretPos := Point(0, 0);
   end;
 
+  if not Assigned(FProfilerGraph) then
+    FProfilerGraph := TProfilerGraph.Create(tabRespTime);
+  FProfilerGraph.TimeCheckPoints := info.TimeCheckPoints;
+
   tbtnRespFollow.Visible := (Info.Location <> '');
 
   // Finally, dispose response info data.
@@ -1825,15 +1846,18 @@ end;
 procedure TForm1.UpdateStatusLine(Info: TResponseInfo);
 var
   w: Integer;
+  tm: TTimeMSec;
 begin
   StatusTextMain.Caption := Format('HTTP/%s %d %s', [Info.HttpVersion, Info.StatusCode, Info.StatusText]);
 
   StatusImageTime.Visible := True;
   StatusImageSize.Visible := True;
 
-  StatusTextTime.Caption := IfThen(Info.Time > 1000,
-      Format('%d ms (%s)', [Info.Time, FormatMsApprox(Info.Time)]),
-      Format('%d ms',      [Info.Time]));
+  tm := Info.RequestTime;
+
+  StatusTextTime.Caption := IfThen(tm > 1000,
+      Format('%d ms (%s)', [tm, FormatMsApprox(tm)]),
+      Format('%d ms',      [tm]));
 
   StatusTextSize.Caption := NumberFormat(Info.Content.Size) + ' bytes';
 

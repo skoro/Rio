@@ -5,22 +5,67 @@ unit thread_http_client;
 interface
 
 uses
-  Classes, SysUtils, fphttpclient, fgl;
+  Classes, SysUtils, fphttpclient, fgl, URIParser;
 
 type
+
+  TTimeMSec = Int64;
+
+  TTimeCheckPoint = record
+    CheckPoint: Integer;
+    Start: TDateTime;
+    Finish: TDateTime;
+    Duration: TTimeMSec;
+  end;
+
+  TTimeCheckPointList = specialize TFPGMap<string, TTimeCheckPoint>;
+
+  { TTimeProfiler }
+
+  TTimeProfiler = class
+  private
+    function GetCheckPoint(T: string): TTimeCheckPoint;
+    function GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
+  protected
+    type
+      TLabels = array of string;
+    protected var
+    FCheckPoints: TTimeCheckPointList;
+    FCurrentPoint: Integer;
+    function GetLabels: TLabels;
+  public
+    constructor Create; virtual;
+    destructor Destory; virtual;
+    procedure Reset;
+    procedure Start(Timer: string);
+    procedure Stop(Timer: string);
+    property CheckPoint[T: string]: TTimeCheckPoint read GetCheckPoint;
+    property Labels: TLabels read GetLabels;
+    property CheckPoints: TTimeCheckPointList read FCheckPoints;
+    property CheckPointIndex[AIndex: Integer]: TTimeCheckPoint read GetCheckPointByIndex;
+  end;
 
   { TCustomHttpClient }
 
   TCustomHttpClient = class(TFPHTTPClient)
+  private
+    FTimeProfiler: TTimeProfiler;
+  protected
+    procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
+    procedure SendRequest(const AMethod: String; URI: TURI); override;
+    function ReadResponseHeaders: integer; override;
+    function ReadResponse(Stream: TStream;  const AllowedResponseCodes: array of Integer; HeadersOnly: Boolean = False): Boolean; override;
   public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure HTTPMethod(Const AMethod,AURL : String; Stream : TStream; Const AllowedResponseCodes : Array of Integer); override;
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
+    property TimeProfiler: TTimeProfiler read FTimeProfiler;
   end;
 
   { TQueryParams }
 
   TQueryParams = specialize TFPGMap<string, string>;
-
-  { TRequestInfo }
 
   { TResponseInfo }
 
@@ -34,9 +79,10 @@ type
     FResponseHeaders: TStrings;
     FStatusCode: Integer;
     FStatusText: string;
-    FTime: Int64;
     FUrl: string;
+    FTimeCheckPoints: TTimeCheckPointList;
     function GetLocation: string;
+    function GetRequestTime: TTimeMSec;
   public
     constructor Create;
     destructor Destroy; override;
@@ -49,7 +95,8 @@ type
     property ResponseHeaders: TStrings read FResponseHeaders;
     property Content: TStringStream read FContent;
     property ContentType: string read FContentType write FContentType;
-    property Time: Int64 read FTime write FTime;
+    property TimeCheckPoints: TTimeCheckPointList read FTimeCheckPoints;
+    property RequestTime: TTimeMSec read GetRequestTime;
     property Location: string read GetLocation;
   end;
 
@@ -67,8 +114,6 @@ type
     FResponseData: TStringStream;
     FOnClientException: TOnException;
     FException: Exception;
-    FStartTime: TDateTime;
-    FFinishTime: TDateTime;
     FCookies: TStrings;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
@@ -107,7 +152,7 @@ function SplitMimeType(const ContentType: string): TMimeType;
 
 implementation
 
-uses dateutils, strutils, URIParser, app_helpers;
+uses dateutils, strutils, RtlConsts, app_helpers;
 
 const
   CRLF = #13#10;
@@ -180,6 +225,73 @@ begin
   Result.Subtype  := LowerCase(RightStr(ContentType, Length(ContentType) - P));
 end;
 
+{ TTimeProfiler }
+
+function TTimeProfiler.GetCheckPoint(T: string): TTimeCheckPoint;
+begin
+  Result := FCheckPoints[T];
+end;
+
+function TTimeProfiler.GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
+var
+  I: Integer;
+begin
+  for I := 0 to FCheckPoints.Count - 1 do
+    if FCheckPoints.Data[I].CheckPoint = AIndex then
+      Exit(FCheckPoints.Data[I]);
+  FCheckPoints.Error(SListIndexError, AIndex)
+end;
+
+function TTimeProfiler.GetLabels: TLabels;
+var
+  I: Integer;
+begin
+  SetLength(Result, FCheckPoints.Count);
+  for I := 0 to FCheckPoints.Count - 1 do
+    Result[I] := FCheckPoints.Keys[I];
+end;
+
+constructor TTimeProfiler.Create;
+begin
+  inherited;
+  FCurrentPoint := 0;
+  FCheckPoints := TTimeCheckPointList.Create;
+end;
+
+destructor TTimeProfiler.Destory;
+begin
+  FCheckPoints.Destroy;
+  inherited;
+end;
+
+procedure TTimeProfiler.Reset;
+begin
+  FCurrentPoint := 0;
+  FCheckPoints.Clear;
+end;
+
+procedure TTimeProfiler.Start(Timer: string);
+var
+  cp: TTimeCheckPoint;
+begin
+  cp.Start      := Now;
+  cp.Finish     := 0;
+  cp.CheckPoint := FCurrentPoint;
+  cp.Duration   := 0;
+  FCheckPoints.AddOrSetData(Timer, cp);
+  Inc(FCurrentPoint);
+end;
+
+procedure TTimeProfiler.Stop(Timer: string);
+var
+  cp: TTimeCheckPoint;
+begin
+  cp := FCheckPoints.KeyData[Timer];
+  cp.Finish := Now;
+  cp.Duration := MilliSecondsBetween(cp.Finish, cp.Start);
+  FCheckPoints.KeyData[Timer] := cp;
+end;
+
 { TResponseInfo }
 
 function TResponseInfo.GetLocation: string;
@@ -194,6 +306,11 @@ begin
       Exit(FResponseHeaders.ValueFromIndex[I]);
 end;
 
+function TResponseInfo.GetRequestTime: TTimeMSec;
+begin
+  Result := FTimeCheckPoints.KeyData['Total'].Duration;
+end;
+
 constructor TResponseInfo.Create;
 begin
   FContent := TStringStream.Create('');
@@ -201,6 +318,7 @@ begin
   FRequestHeaders.NameValueSeparator := ':';
   FResponseHeaders := TStringList.Create;
   FResponseHeaders.NameValueSeparator := ':';
+  FTimeCheckPoints := TTimeCheckPointList.Create;
 end;
 
 destructor TResponseInfo.Destroy;
@@ -208,10 +326,62 @@ begin
   FreeAndNil(FContent);
   FreeAndNil(FRequestHeaders);
   FreeAndNil(FResponseHeaders);
+  FreeAndNil(FTimeCheckPoints);
   inherited Destroy;
 end;
 
 { TCustomHttpClient }
+
+procedure TCustomHttpClient.HTTPMethod(const AMethod, AURL: String;
+  Stream: TStream; const AllowedResponseCodes: array of Integer);
+begin
+  FTimeProfiler.Reset;
+  FTimeProfiler.Start('Total');
+  inherited HTTPMethod(AMethod, AURL, Stream, AllowedResponseCodes);
+  FTimeProfiler.Stop('Total');
+end;
+
+procedure TCustomHttpClient.ConnectToServer(const AHost: String;
+  APort: Integer; UseSSL: Boolean);
+begin
+  FTimeProfiler.Start('Connect');
+  inherited;
+  FTimeProfiler.Stop('Connect');
+end;
+
+procedure TCustomHttpClient.SendRequest(const AMethod: String; URI: TURI);
+begin
+  FTimeProfiler.Start('Send request');
+  inherited SendRequest(AMethod, URI);
+  FTimeProfiler.Stop('Send request');
+end;
+
+function TCustomHttpClient.ReadResponseHeaders: integer;
+begin
+  FTimeProfiler.Start('Response headers');
+  Result := inherited ReadResponseHeaders;
+  FTimeProfiler.Stop('Response headers');
+end;
+
+function TCustomHttpClient.ReadResponse(Stream: TStream;
+  const AllowedResponseCodes: array of Integer; HeadersOnly: Boolean): Boolean;
+begin
+  FTimeProfiler.Start('Read response');
+  Result := inherited ReadResponse(Stream, AllowedResponseCodes, HeadersOnly);
+  FTimeProfiler.Stop('Read response');
+end;
+
+constructor TCustomHttpClient.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FTimeProfiler := TTimeProfiler.Create;
+end;
+
+destructor TCustomHttpClient.Destroy;
+begin
+  FTimeProfiler.Destory;
+  inherited Destroy;
+end;
 
 procedure TCustomHttpClient.MultiFileStreamFormPost(FormData, FileNames: TStrings);
 var
@@ -308,8 +478,8 @@ begin
     info.StatusText := FHttpClient.ResponseStatusText;
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
     info.Content.WriteString(FResponseData.DataString);
-    info.Time := MilliSecondsBetween(FFinishTime, FStartTime);
     info.ContentType := ParseContentType;
+    info.TimeCheckPoints.Assign(FHttpClient.TimeProfiler.CheckPoints);
     FOnRequestComplete(info);
   end;
 end;
@@ -325,9 +495,7 @@ begin
   try
     if Assigned(FCookies) then
       FHttpClient.Cookies := FCookies;
-    FStartTime := Now;
     FHttpClient.HTTPMethod(FHttpMethod, FUrl, FResponseData, []);
-    FFinishTime := Now;
     Synchronize(@RequestComplete);
   except
     on E: Exception do
