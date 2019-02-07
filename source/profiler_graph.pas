@@ -65,7 +65,8 @@ begin
   FChart.AddSeries(FTimeSeries);
   FChart.LeftAxis.Marks.Source := FListChartSourceLABELS;
   FChart.LeftAxis.Marks.Style := smsLabel;
-  with FChart.AxisList.Add do begin
+  with FChart.AxisList.Add do
+  begin
     Alignment := calRight;
     Marks.Source := FListChartSourceVALUES;
     Marks.Style := smsLabel;
@@ -76,7 +77,8 @@ procedure TProfilerGraph.SetProfilerData;
 var
   cp, total, hdr: TTimeCheckPoint;
   s, f: comp;
-  function GetOffset(t: TTimeCheckPoint): Comp;
+
+  function GetOffset(t: TTimeCheckPoint): comp;
   begin
     Result := TimeStampToMSecs(DateTimeToTimeStamp(t.Start)) - s;
   end;
@@ -112,7 +114,8 @@ begin
 
   // Response is a response body + the response headers.
   cp := FTimeCheckPoints.KeyData['Read response'];
-  FListChartSource.AddXYList(3, [0, f + hdr.Duration, 0, f + hdr.Duration + (cp.Duration - hdr.Duration), total.Duration]);
+  FListChartSource.AddXYList(3, [0, f + hdr.Duration, 0, f + hdr.Duration +
+    (cp.Duration - hdr.Duration), total.Duration]);
   FListChartSourceLABELS.Add(0, 3, 'Response');
   FListChartSourceVALUES.Add(0, 3, Format('%d ms', [cp.Duration - hdr.Duration]));
 end;
@@ -130,4 +133,3 @@ begin
 end;
 
 end.
-
