@@ -5,7 +5,7 @@ unit profiler_graph;
 interface
 
 uses
-  Classes, SysUtils, TAGraph, TASources, TAMultiSeries, Controls,
+  SysUtils, TAGraph, TASources, TAMultiSeries, Controls,
   thread_http_client;
 
 type
@@ -34,7 +34,7 @@ type
 
 implementation
 
-uses dateutils, TAChartUtils, TAChartAxisUtils;
+uses TAChartUtils, TAChartAxisUtils;
 
 
 { TProfilerGraph }
