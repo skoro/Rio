@@ -228,7 +228,6 @@ type
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     function EditGridRow(Grid: TStringGrid;
       const ValueFocused: Boolean = False): TModalResult;
-    function NormalizeUrl: string;
     procedure SetAppCaption(const AValue: String = '');
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
@@ -297,7 +296,7 @@ var
 begin
   Result := False;
   try
-    url := NormalizeUrl;
+    url := NormalizeUrl(cbUrl.Text);
   except on E: Exception do
     begin
       cbUrl.SetFocus;
@@ -1940,7 +1939,7 @@ var
   uri: TURI;
   basename: string;
 begin
-  uri := ParseURI(NormalizeUrl);
+  uri := ParseURI(NormalizeUrl(cbUrl.Text));
   if ext = '' then begin
     ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
     // Get extension name from strings like 'rss+xml', etc.
@@ -2122,16 +2121,6 @@ begin
         SyncGridQueryParams;
     end;
   end;
-end;
-
-function TForm1.NormalizeUrl: string;
-begin
-  Result := Trim(cbUrl.Text);
-  if Result = '' then
-    raise Exception.Create('Url is empty.');
-  if not AnsiStartsText('http://', Result) then
-    if not AnsiStartsText('https://', Result) then
-      Result := 'http://' + Result;
 end;
 
 procedure TForm1.SetAppCaption(const AValue: String);

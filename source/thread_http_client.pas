@@ -149,6 +149,8 @@ function DecodeUrl(const url: string): string;
 function GetURLQueryParams(const url: string): TQueryParams;
 function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
 function SplitMimeType(const ContentType: string): TMimeType;
+// Appends 'http:' proto to the url if it missing.
+function NormalizeUrl(Url: string): string;
 
 implementation
 
@@ -223,6 +225,16 @@ begin
     Exit;
   Result.MimeType := LowerCase(LeftStr(ContentType, P - 1));
   Result.Subtype  := LowerCase(RightStr(ContentType, Length(ContentType) - P));
+end;
+
+function NormalizeUrl(Url: string): string;
+begin
+  Result := Trim(Url);
+  if Result = '' then
+    raise Exception.Create('Url is empty');
+  if not AnsiStartsText('http://', Url) then
+    if not AnsiStartsText('https://', Url) then
+      Result := 'http://' + Result;
 end;
 
 { TTimeProfiler }
