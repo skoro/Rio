@@ -45,6 +45,7 @@ type
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
     editNotes: TMemo;
+    lblDesc: TLabel;
     tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
