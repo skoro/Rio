@@ -462,6 +462,9 @@ begin
     if (ActiveTab = tabContent) and tabContent.TabVisible then
       Txt := responseRaw
     else begin // And finally fallback to the "Response" tab.
+      // Don't find if response timings tab is opened.
+      if (ActiveTab = tabResponse) and (pagesRespView.ActivePage = tabRespTime) then
+        Exit;;
       Txt := textResp;
       ActiveTab := tabResponse;
     end;
@@ -777,8 +780,12 @@ begin
   if (Page = tabContent) or (Page = tabResponse) then begin
     if Page = tabContent then
       Txt := responseRaw;
-    if Page = tabResponse then
+    if Page = tabResponse then begin
+      // Don't show find dialog if response timing tab is opened.
+      if pagesRespView.ActivePage = tabRespTime then
+        Exit;
       Txt := textResp;
+    end;
     if Txt.SelText <> '' then
       dlgFind.FindText := txt.SelText;
   end
