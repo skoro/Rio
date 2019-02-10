@@ -44,8 +44,8 @@ mkdir -p $TMP/usr/share/applications
 mkdir -p $TMP/usr/share/pixmaps
 mkdir -p $TMP/DEBIAN
 
-cp ../resources/http-inspector.desktop $TMP/usr/share/applications
-cp ../resources/http-inspector.png $TMP/usr/share/pixmaps
+cp ../../resources/http-inspector.desktop $TMP/usr/share/applications
+cp ../../resources/icons/http-inspector.png $TMP/usr/share/pixmaps
 cp ../../bin/${bin}-linux/http-inspector $TMP/usr/bin
 
 SIZE=$(du -ks $TMP | awk '{ print $1 }')
