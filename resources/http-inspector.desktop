@@ -2,11 +2,11 @@
 Encoding=UTF-8
 Name=Http Inspector
 Comment=Send http requests and analyze its responses
-Icon=http-inspector.png
+Icon=http-inspector
 Exec=http-inspector
 Terminal=false
 Type=Application
-Categories=Development;Network
+Categories=Development;Network;
 GenericName=Http Inspector
 
 Comment[ru]=Инструмент для анализа Http запросов
