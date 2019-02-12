@@ -3,5 +3,10 @@
 /bin/
 /build/
 /source/backup/
+
+# IDE session
 /source/http_inspector.lps
+
+# AppImage temporary dir.
+/AppDir/
 

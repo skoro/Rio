@@ -2,7 +2,9 @@
 include ./source/version.inc
 PROJECT=source/http_inspector.lpr
 LAZBUILD?=lazbuild
+LINUXDEPLOY?=linuxdeploy-x86_64.AppImage
 APP=http-inspector
+APPDIR=AppDir
 
 all:
 	@echo ""
@@ -25,6 +27,7 @@ all:
 	@echo "  bin-linux64      Create a binary app archive for amd64"
 	@echo "  bin-linuxarm     Create a binary app archive for ARM"
 	@echo "  bin-all          Create binary app archives for all the archs"
+	@echo "  appimage         Create an AppImage bundle"
 	@echo ""
 
 clean: clean-build
@@ -35,11 +38,14 @@ clean-build:
 clean-backup:
 	rm -rf source/backup
 
+clean-appdir:
+	rm -rf $(APPDIR)
+
 .PHONY: linux32 linux64-debug deb-linux32 bin-linux32 linux-arch-32 \
 	linux64 linux64-debug deb-linux64 bin-linux64 linux-arch-64 \
 	linuxarm linuxarm-debug deb-linuxarm bin-linuxarm linux-arch-arm \
 	os-linux release-mode debug-mode bin build \
-	deb-package linux-all deb-all bin-all
+	deb-package linux-all deb-all bin-all appimage
 
 linux-all:
 	make linux32
@@ -96,3 +102,15 @@ bin-package:
 	cp ./bin/$(CPU)-$(OS)/$(APP) $(DIST)
 	chmod +x $(DIST)
 	gzip $(DIST)
+
+appimage: linux64 $(APPDIR) Http_Inspector-x86_64.AppImage 
+$(APPDIR):
+	mkdir -p $(APPDIR)/usr/bin
+	cp bin/x86_64-linux/http-inspector-x64 $(APPDIR)/usr/bin/$(APP)
+Http_Inspector-x86_64.AppImage:
+	$(LINUXDEPLOY) --appdir=$(APPDIR) \
+		--desktop-file=./resources/http-inspector.desktop \
+		--icon-file=./resources/icons/http-inspector.png \
+		--output appimage
+	mv Http_Inspector-x86_64.AppImage ./dist
+
