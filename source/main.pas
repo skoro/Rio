@@ -46,6 +46,14 @@ type
     gaSeparator: TMenuItem;
     editNotes: TMemo;
     lblDesc: TLabel;
+    miTabNotes: TMenuItem;
+    miTabAuth: TMenuItem;
+    miTabs: TMenuItem;
+    miTabHeaders: TMenuItem;
+    miTabQuery: TMenuItem;
+    miTabBody: TMenuItem;
+    miTabCookie: TMenuItem;
+    miView: TMenuItem;
     tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
@@ -207,6 +215,7 @@ type
     procedure tbtnRespViewClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
+    procedure ViewSwitchTabs(Sender: TObject);
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
@@ -1272,6 +1281,25 @@ begin
   Min := FRequestSeconds div 60;
   Sec := FRequestSeconds mod 60;
   StatusTextInfo.Caption := Format('%.2d:%.2d', [Min, Sec]);
+end;
+
+procedure TForm1.ViewSwitchTabs(Sender: TObject);
+var
+  mi: TMenuItem;
+  tab: TTabSheet;
+begin
+  tab := Nil;
+  mi := TMenuItem(Sender);
+  if mi = miTabHeaders     then tab := tabHeaders
+  else if mi = miTabQuery  then tab := tabQuery
+  else if mi = miTabBody   then tab := tabBody
+  else if mi = miTabCookie then tab := tabReqCookie
+  else if mi = miTabAuth   then tab := tabAuth
+  else if mi = miTabNotes  then tab := tabNotes;
+  if tab <> nil then begin
+    mi.Checked := not mi.Checked;
+    tab.TabVisible := mi.Checked;
+  end;
 end;
 
 // Synchronizes query parameters from the url.
