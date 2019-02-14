@@ -1149,6 +1149,15 @@ begin
   SetColumns(gridReqCookie);
   SetColumns(gridRespCookie);
   SetColumns(gridParams);
+  with PSMAIN do begin
+    miTabHeaders.Checked := ReadBoolean('tabHeaders', True);
+    miTabQuery.Checked := ReadBoolean('tabQuery', True);
+    miTabCookie.Checked := ReadBoolean('tabCookie', True);
+    miTabBody.Checked := ReadBoolean('tabBody', True);
+    miTabAuth.Checked := ReadBoolean('tabAuth', True);
+    miTabNotes.Checked := ReadBoolean('tabNotes', True);
+  end;
+  ViewSwitchTabs(nil);
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -1166,6 +1175,14 @@ begin
   SaveColumns(gridReqCookie);
   SaveColumns(gridRespCookie);
   SaveColumns(gridParams);
+  with PSMAIN do begin
+    WriteBoolean('tabHeaders', miTabHeaders.Checked);
+    WriteBoolean('tabQuery', miTabQuery.Checked);
+    WriteBoolean('tabCookie', miTabCookie.Checked);
+    WriteBoolean('tabBody', miTabBody.Checked);
+    WriteBoolean('tabAuth', miTabAuth.Checked);
+    WriteBoolean('tabNotes', miTabNotes.Checked);
+  end;
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -1286,20 +1303,40 @@ end;
 procedure TForm1.ViewSwitchTabs(Sender: TObject);
 var
   mi: TMenuItem;
-  tab: TTabSheet;
+  I: Byte;
+  Restore: Boolean; // Need to restore Request splitter side ?
 begin
-  tab := Nil;
-  mi := TMenuItem(Sender);
-  if mi = miTabHeaders     then tab := tabHeaders
-  else if mi = miTabQuery  then tab := tabQuery
-  else if mi = miTabBody   then tab := tabBody
-  else if mi = miTabCookie then tab := tabReqCookie
-  else if mi = miTabAuth   then tab := tabAuth
-  else if mi = miTabNotes  then tab := tabNotes;
-  if tab <> nil then begin
+  if (Sender <> Nil) and (Sender is TMenuItem) then begin
+    mi := TMenuItem(Sender);
     mi.Checked := not mi.Checked;
-    tab.TabVisible := mi.Checked;
   end;
+  // Should the splitter side restored ?
+  Restore := True;
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then
+      Restore := False;
+  // Switch tabs visibility.
+  tabHeaders.TabVisible := miTabHeaders.Checked;
+  tabQuery.TabVisible := miTabQuery.Checked;
+  tabBody.TabVisible := miTabBody.Checked;
+  tabReqCookie.TabVisible := miTabCookie.Checked;
+  tabAuth.TabVisible := miTabAuth.Checked;
+  tabNotes.TabVisible := miTabNotes.Checked;
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then begin
+      if Restore then begin
+        if LayoutSplitter.SplitterType = pstVertical then
+          splitterSideRequest.Height := LayoutSplitter.Height div 2
+        else
+          splitterSideRequest.Width := LayoutSplitter.Width div 2;
+      end;
+      Exit; //=>
+    end;
+  // Hide request splitter side.
+  if LayoutSplitter.SplitterType = pstVertical then
+    splitterSideRequest.Height := 0
+  else
+    splitterSideRequest.Width := 0;
 end;
 
 // Synchronizes query parameters from the url.
