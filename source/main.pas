@@ -1325,18 +1325,28 @@ begin
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
       if Restore then begin
-        if LayoutSplitter.SplitterType = pstVertical then
-          splitterSideRequest.Height := LayoutSplitter.Height div 2
-        else
+        LayoutSplitter.Cursor := crVSplit;
+        if LayoutSplitter.SplitterType = pstVertical then begin
+          splitterSideRequest.Constraints.MaxHeight := 0;
+          splitterSideRequest.Height := LayoutSplitter.Height div 2;
+        end
+        else begin
+          splitterSideRequest.Constraints.MaxWidth := 0;
           splitterSideRequest.Width := LayoutSplitter.Width div 2;
+        end;
       end;
       Exit; //=>
     end;
   // Hide request splitter side.
-  if LayoutSplitter.SplitterType = pstVertical then
-    splitterSideRequest.Height := 0
-  else
+  LayoutSplitter.Cursor := crDefault;
+  if LayoutSplitter.SplitterType = pstVertical then begin
+    splitterSideRequest.Height := 0;
+    splitterSideRequest.Constraints.MaxHeight := 1;
+  end
+  else begin
     splitterSideRequest.Width := 0;
+    splitterSideRequest.Constraints.MaxWidth := 1;
+  end;
 end;
 
 // Synchronizes query parameters from the url.
