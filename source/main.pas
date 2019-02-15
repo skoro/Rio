@@ -1335,15 +1335,16 @@ begin
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
       if Restore then begin
-        LayoutSplitter.Cursor := crVSplit;
         OptionsForm.LayoutEnable := True;
         if LayoutSplitter.SplitterType = pstVertical then begin
           splitterSideRequest.Constraints.MaxHeight := 0;
           splitterSideRequest.Height := LayoutSplitter.Height div 2;
+          LayoutSplitter.Cursor := crVSplit;
         end
         else begin
           splitterSideRequest.Constraints.MaxWidth := 0;
           splitterSideRequest.Width := LayoutSplitter.Width div 2;
+          LayoutSplitter.Cursor := crHSplit;
         end;
       end;
       Exit; //=>
