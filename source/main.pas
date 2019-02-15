@@ -1133,6 +1133,9 @@ begin
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
+var
+  I: Byte;
+
   procedure SetColumns(grid: TStringGrid);
   var
     Val, col: Integer;
@@ -1142,6 +1145,7 @@ procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
       if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
     end;
   end;
+
 begin
   SetColumns(requestHeaders);
   SetColumns(responseHeaders);
@@ -1158,6 +1162,12 @@ begin
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
   end;
   ViewSwitchTabs(nil);
+  // Show active tab.
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then begin
+      pagesRequest.ActivePageIndex := I;
+      break;
+    end;
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
