@@ -106,7 +106,7 @@ bin-package:
 appimage: linux64 $(APPDIR) Http_Inspector-x86_64.AppImage 
 $(APPDIR):
 	mkdir -p $(APPDIR)/usr/bin
-	cp bin/x86_64-linux/http-inspector-x64 $(APPDIR)/usr/bin/$(APP)
+	cp bin/x86_64-linux/http-inspector $(APPDIR)/usr/bin/$(APP)
 Http_Inspector-x86_64.AppImage:
 	$(LINUXDEPLOY) --appdir=$(APPDIR) \
 		--desktop-file=./resources/http-inspector.desktop \
