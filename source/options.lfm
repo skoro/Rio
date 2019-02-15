@@ -19,22 +19,22 @@ object OptionsForm: TOptionsForm
   LCLVersion = '1.8.4.0'
   object pagesOptions: TPageControl
     Left = 4
-    Height = 338
+    Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabGeneral
+    ActivePage = tabAppearance
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
       Caption = 'General'
-      ClientHeight = 304
+      ClientHeight = 302
       ClientWidth = 306
       object seTimeout: TSpinEdit
         Left = 8
-        Height = 26
+        Height = 27
         Top = 28
         Width = 80
         MaxValue = 500
@@ -44,9 +44,9 @@ object OptionsForm: TOptionsForm
       end
       object lTimeout: TLabel
         Left = 8
-        Height = 16
+        Height = 17
         Top = 8
-        Width = 130
+        Width = 124
         Caption = 'Request timeout (sec):'
         ParentColor = False
       end
@@ -54,7 +54,7 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 21
         Top = 64
-        Width = 174
+        Width = 166
         Caption = '&Editable request methods'
         TabOrder = 1
       end
@@ -62,14 +62,14 @@ object OptionsForm: TOptionsForm
         Left = 8
         Height = 21
         Top = 96
-        Width = 82
+        Width = 80
         Caption = '&Fit images'
         TabOrder = 2
       end
     end
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 304
+      ClientHeight = 302
       ClientWidth = 306
       object gbLayout: TGroupBox
         Left = 8
@@ -78,14 +78,14 @@ object OptionsForm: TOptionsForm
         Width = 296
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Layout'
-        ClientHeight = 79
+        ClientHeight = 78
         ClientWidth = 292
         TabOrder = 0
         object rbLayoutVert: TRadioButton
           Left = 8
-          Height = 22
+          Height = 21
           Top = 8
-          Width = 68
+          Width = 65
           Caption = '&Vertical'
           Checked = True
           TabOrder = 0
@@ -93,18 +93,18 @@ object OptionsForm: TOptionsForm
         end
         object rbLayoutHor: TRadioButton
           Left = 8
-          Height = 22
+          Height = 21
           Top = 40
-          Width = 86
+          Width = 81
           Caption = '&Horizontal'
           TabOrder = 1
         end
       end
       object cbHideGridButtons: TCheckBox
         Left = 8
-        Height = 22
+        Height = 21
         Top = 112
-        Width = 266
+        Width = 250
         Caption = 'Hide &grid buttons: new, edit, delete, clear'
         TabOrder = 1
       end
@@ -115,12 +115,12 @@ object OptionsForm: TOptionsForm
         Width = 296
         Anchors = [akTop, akLeft, akRight]
         Caption = 'Fonts'
-        ClientHeight = 102
+        ClientHeight = 101
         ClientWidth = 292
         TabOrder = 2
         object cboxFontItem: TComboBox
           Left = 8
-          Height = 28
+          Height = 29
           Top = 0
           Width = 276
           Align = alTop
@@ -133,9 +133,9 @@ object OptionsForm: TOptionsForm
         end
         object btnSelectFont: TButton
           Left = 8
-          Height = 26
+          Height = 27
           Top = 32
-          Width = 38
+          Width = 34
           AutoSize = True
           Caption = '&Font'
           OnClick = btnSelectFontClick
@@ -143,17 +143,17 @@ object OptionsForm: TOptionsForm
         end
         object lFontDemo: TLabel
           Left = 56
-          Height = 16
+          Height = 17
           Top = 32
-          Width = 67
+          Width = 61
           Caption = 'lFontDemo'
           ParentColor = False
         end
         object btnResetFont: TButton
           Left = 8
-          Height = 26
+          Height = 27
           Top = 64
-          Width = 43
+          Width = 41
           AutoSize = True
           Caption = '&Reset'
           Enabled = False
@@ -164,7 +164,7 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 304
+      ClientHeight = 302
       ClientWidth = 306
       object cbJsonExpanded: TCheckBox
         Left = 8
@@ -191,7 +191,7 @@ object OptionsForm: TOptionsForm
         AutoSize = True
         BorderSpacing.InnerBorder = 4
         Caption = 'Format options'
-        ClientHeight = 70
+        ClientHeight = 69
         ClientWidth = 292
         TabOrder = 2
         object Label1: TLabel
@@ -233,7 +233,7 @@ object OptionsForm: TOptionsForm
         AutoSize = True
         BorderSpacing.InnerBorder = 4
         Caption = 'Default view (*)'
-        ClientHeight = 62
+        ClientHeight = 61
         ClientWidth = 293
         TabOrder = 3
         object rbJsonTree: TRadioButton
@@ -277,7 +277,7 @@ object OptionsForm: TOptionsForm
     end
     object tabShortcuts: TTabSheet
       Caption = 'Shortcuts'
-      ClientHeight = 304
+      ClientHeight = 302
       ClientWidth = 306
       object gridShortcuts: TStringGrid
         Left = 0
@@ -352,8 +352,8 @@ object OptionsForm: TOptionsForm
   end
   object ButtonPanel: TButtonPanel
     Left = 6
-    Height = 26
-    Top = 348
+    Height = 27
+    Top = 347
     Width = 308
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True

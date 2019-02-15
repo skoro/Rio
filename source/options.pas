@@ -96,6 +96,7 @@ type
     procedure SetFontDemo;
     procedure InitFonts;
     procedure InitShortcuts;
+    procedure SetLayoutEnable(AValue: Boolean);
     procedure SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
     function GetKeyNameByCode(AKey: Word): string;
     function GetShortCutName(Item: TShortCutItem): string;
@@ -122,6 +123,7 @@ type
     property Timeout: Integer read GetRequestTimeout;
     property EditRequestMethods: Boolean read GetEditRequestMethods;
     property FitImages: Boolean read GetFitImages;
+    property LayoutEnable: Boolean write SetLayoutEnable;
   end;
 
 var
@@ -465,6 +467,11 @@ begin
   SetShortCut(sciSwitchView,    115, []); // F4
   SetShortCut(sciSubmit,        120, []); // F9
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
+end;
+
+procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
+begin
+  gbLayout.Enabled := AValue;
 end;
 
 procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
