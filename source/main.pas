@@ -46,6 +46,8 @@ type
     gaSeparator: TMenuItem;
     editNotes: TMemo;
     lblDesc: TLabel;
+    miTabSep: TMenuItem;
+    miTabToggle: TMenuItem;
     miTabNotes: TMenuItem;
     miTabAuth: TMenuItem;
     miTabs: TMenuItem;
@@ -163,6 +165,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
@@ -216,6 +219,7 @@ type
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
     procedure ViewSwitchTabs(Sender: TObject);
+    procedure ViewToggleTabs(Sender: TObject);
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
@@ -250,6 +254,7 @@ type
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
+    procedure ToggleRequestSide(VisibleSide: Boolean);
   public
     procedure ApplyOptions;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
@@ -669,6 +674,21 @@ begin
         end;
     end;
   end;
+end;
+
+procedure TForm1.FormShow(Sender: TObject);
+var
+  I: Byte;
+begin
+  // Restore tabs visibility.
+  ViewSwitchTabs(nil);
+  ViewToggleTabs(nil);
+  // Select and show active visible tab.
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then begin
+      pagesRequest.ActivePageIndex := I;
+      break;
+    end;
 end;
 
 procedure TForm1.gaClearRowsClick(Sender: TObject);
@@ -1133,9 +1153,6 @@ begin
 end;
 
 procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
-var
-  I: Byte;
-
   procedure SetColumns(grid: TStringGrid);
   var
     Val, col: Integer;
@@ -1160,14 +1177,8 @@ begin
     miTabBody.Checked := ReadBoolean('tabBody', True);
     miTabAuth.Checked := ReadBoolean('tabAuth', True);
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
+    miTabToggle.Checked := ReadBoolean('tabToggle', True);
   end;
-  ViewSwitchTabs(nil);
-  // Show active tab.
-  for I := 0 to pagesRequest.PageCount - 1 do
-    if pagesRequest.Pages[I].TabVisible then begin
-      pagesRequest.ActivePageIndex := I;
-      break;
-    end;
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -1192,6 +1203,7 @@ begin
     WriteBoolean('tabBody', miTabBody.Checked);
     WriteBoolean('tabAuth', miTabAuth.Checked);
     WriteBoolean('tabNotes', miTabNotes.Checked);
+    WriteBoolean('tabToggle', miTabToggle.Checked);
   end;
 end;
 
@@ -1323,8 +1335,11 @@ begin
   // Should the splitter side restored ?
   Restore := True;
   for I := 0 to pagesRequest.PageCount - 1 do
-    if pagesRequest.Pages[I].TabVisible then
+    // Don't restore if one of tabs is visible.
+    if pagesRequest.Pages[I].TabVisible then begin
       Restore := False;
+      Break;
+    end;
   // Switch tabs visibility.
   tabHeaders.TabVisible := miTabHeaders.Checked;
   tabQuery.TabVisible := miTabQuery.Checked;
@@ -1334,32 +1349,29 @@ begin
   tabNotes.TabVisible := miTabNotes.Checked;
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
-      if Restore then begin
-        OptionsForm.LayoutEnable := True;
-        if LayoutSplitter.SplitterType = pstVertical then begin
-          splitterSideRequest.Constraints.MaxHeight := 0;
-          splitterSideRequest.Height := LayoutSplitter.Height div 2;
-          LayoutSplitter.Cursor := crVSplit;
-        end
-        else begin
-          splitterSideRequest.Constraints.MaxWidth := 0;
-          splitterSideRequest.Width := LayoutSplitter.Width div 2;
-          LayoutSplitter.Cursor := crHSplit;
-        end;
-      end;
+      if Restore then
+        ToggleRequestSide(True);
       Exit; //=>
     end;
   // Hide request splitter side.
-  OptionsForm.LayoutEnable := False;
-  LayoutSplitter.Cursor := crDefault;
-  if LayoutSplitter.SplitterType = pstVertical then begin
-    splitterSideRequest.Height := 0;
-    splitterSideRequest.Constraints.MaxHeight := 1;
-  end
-  else begin
-    splitterSideRequest.Width := 0;
-    splitterSideRequest.Constraints.MaxWidth := 1;
-  end;
+  ToggleRequestSide(False);
+end;
+
+procedure TForm1.ViewToggleTabs(Sender: TObject);
+var
+  Chk: Boolean;
+begin
+  if Sender <> nil then
+    miTabToggle.Checked := not miTabToggle.Checked;
+  Chk := miTabToggle.Checked;
+  pagesRequest.Visible := Chk;
+  miTabHeaders.Enabled := Chk;
+  miTabQuery.Enabled := Chk;
+  miTabBody.Enabled := Chk;
+  miTabCookie.Enabled := Chk;
+  miTabAuth.Enabled := Chk;
+  miTabNotes.Enabled := Chk;
+  ToggleRequestSide(Chk);
 end;
 
 // Synchronizes query parameters from the url.
@@ -1631,6 +1643,34 @@ begin
     miFindNext.Enabled := True;
   if Search then
     FindText;
+end;
+
+procedure TForm1.ToggleRequestSide(VisibleSide: Boolean);
+begin
+  OptionsForm.LayoutEnable := VisibleSide;
+  if not VisibleSide then begin
+    LayoutSplitter.Cursor := crDefault;
+    if LayoutSplitter.SplitterType = pstVertical then begin
+      splitterSideRequest.Height := 0;
+      splitterSideRequest.Constraints.MaxHeight := 1;
+    end
+    else begin
+      splitterSideRequest.Width := 0;
+      splitterSideRequest.Constraints.MaxWidth := 1;
+    end;
+  end
+  else begin
+    if LayoutSplitter.SplitterType = pstVertical then begin
+      splitterSideRequest.Constraints.MaxHeight := 0;
+      splitterSideRequest.Height := LayoutSplitter.Height div 2;
+      LayoutSplitter.Cursor := crVSplit;
+    end
+    else begin
+      splitterSideRequest.Constraints.MaxWidth := 0;
+      splitterSideRequest.Width := LayoutSplitter.Width div 2;
+      LayoutSplitter.Cursor := crHSplit;
+    end;
+  end;
 end;
 
 procedure TForm1.ApplyOptions;

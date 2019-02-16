@@ -148,6 +148,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;Left;Top;Width;LayoutSplitter.Position'
   LCLVersion = '1.8.4.0'
   object LayoutSplitter: TPairSplitter
@@ -1664,6 +1665,14 @@ object Form1: TForm1
           Caption = '&Notes'
           Checked = True
           OnClick = ViewSwitchTabs
+        end
+        object miTabSep: TMenuItem
+          Caption = '-'
+        end
+        object miTabToggle: TMenuItem
+          Caption = '&Toggle'
+          Checked = True
+          OnClick = ViewToggleTabs
         end
       end
     end
