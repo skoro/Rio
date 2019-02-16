@@ -22,10 +22,10 @@ object OptionsForm: TOptionsForm
     Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabAppearance
+    ActivePage = tabShortcuts
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 1
+    TabIndex = 3
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -281,9 +281,9 @@ object OptionsForm: TOptionsForm
       ClientWidth = 306
       object gridShortcuts: TStringGrid
         Left = 0
-        Height = 256
+        Height = 260
         Top = 0
-        Width = 308
+        Width = 306
         Align = alClient
         AutoEdit = False
         AutoFillColumns = True
@@ -294,7 +294,7 @@ object OptionsForm: TOptionsForm
           item
             Title.Font.Style = [fsBold]
             Title.Caption = 'Action'
-            Width = 170
+            Width = 168
           end        
           item
             SizePriority = 0
@@ -318,7 +318,7 @@ object OptionsForm: TOptionsForm
         TitleStyle = tsNative
         OnButtonClick = gridShortcutsButtonClick
         ColWidths = (
-          170
+          168
           100
           38
         )
@@ -326,21 +326,21 @@ object OptionsForm: TOptionsForm
       object panRestore: TPanel
         Left = 4
         Height = 34
-        Top = 260
-        Width = 304
+        Top = 264
+        Width = 302
         Align = alBottom
         BorderSpacing.Left = 4
         BorderSpacing.Top = 4
         BorderSpacing.Bottom = 4
         BevelOuter = bvNone
         ClientHeight = 34
-        ClientWidth = 304
+        ClientWidth = 302
         TabOrder = 1
         object btnSCRestore: TButton
           Left = 0
           Height = 34
           Top = 0
-          Width = 108
+          Width = 101
           Align = alLeft
           AutoSize = True
           Caption = 'Restore defaults'

@@ -1726,6 +1726,7 @@ begin
   miOpenRequest.ShortCut   := OptionsForm.GetShortCutValue(sciOpenRequest);
   miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
+  miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 

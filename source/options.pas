@@ -16,7 +16,7 @@ type
   // Keyboard shortcut item.
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
-    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciToggleTabs, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -466,6 +466,7 @@ begin
   SetShortCut(sciSaveBody,      113, []); // F2
   SetShortCut(sciSwitchView,    115, []); // F4
   SetShortCut(sciSubmit,        120, []); // F9
+  SetShortCut(sciToggleTabs,    84, [ssAlt, ssShift]); // T
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
 end;
 
@@ -558,6 +559,7 @@ begin
     sciSaveBody:      Result := 'Save response body';
     sciSwitchView:    Result := 'Switch views';
     sciSubmit:        Result := 'Submit the request';
+    sciToggleTabs:    Result := 'Toggle request pane';
     sciQuit:          Result := 'Quit';
   end;
 end;
