@@ -67,7 +67,7 @@ begin
     raise Exception.Create(ErrorMsg);
   // Starts a new request.
   if Application.HasOption('new') then begin
-    Form1.StartNewRequest;
+    MainForm.StartNewRequest;
     Exit;
   end;
   // A request method.
@@ -79,7 +79,7 @@ begin
     Values := Application.GetOptionValues('H', 'header');
     for I := Length(Values) - 1 downto 0 do begin
       KV := SplitKV(Values[I], ':');
-      Form1.AddRequestHeader(KV.Key, KV.Value);
+      MainForm.AddRequestHeader(KV.Key, KV.Value);
     end;
   end;
   // Form data.
@@ -90,27 +90,27 @@ begin
     for I := Length(Values) - 1 downto 0 do begin
       KV := SplitKV(Values[I], '=');
       if LeftStr(KV.Value, 1) = '@' then
-        Form1.AddFormData(KV.Key, RightStr(KV.Value, Length(KV.Value) - 1), True)
+        MainForm.AddFormData(KV.Key, RightStr(KV.Value, Length(KV.Value) - 1), True)
       else
-        Form1.AddFormData(KV.Key, KV.Value);
+        MainForm.AddFormData(KV.Key, KV.Value);
     end;
-    Form1.SelectBodyTab(btForm);
+    MainForm.SelectBodyTab(btForm);
   end;
   // Cookies.
   if Application.HasOption('C', 'cookie') then begin
     Values := Application.GetOptionValues('C', 'cookie');
     for I := Length(Values) - 1 downto 0 do
-      Form1.SetRowKV(Form1.gridReqCookie, SplitKV(Values[I], '='));
+      MainForm.SetRowKV(MainForm.gridReqCookie, SplitKV(Values[I], '='));
   end;
   // Body data.
   if Application.HasOption('d', 'data') then
-    with Form1 do begin
+    with MainForm do begin
       editOther.Text := Application.GetOptionValue('d', 'data');
       SelectBodyTab(btOther);
     end;
   // Json data.
   if Application.HasOption('j', 'json') then
-    with Form1 do begin
+    with MainForm do begin
       if not SetJsonBody(Application.GetOptionValue('j', 'json'), ErrorMsg) then
         raise Exception.Create(ErrorMsg);
       SelectBodyTab(btJson);
@@ -120,16 +120,16 @@ begin
     FileName := Application.GetOptionValue('f', 'file');
     if not FileGetContents(FileName, Value) then
       raise Exception.Create('cannot read file: ' + FileName);
-    Form1.OpenRequestFile(Value);
+    MainForm.OpenRequestFile(Value);
   end;
   // Set request method.
   if ReqMethod <> '' then
-    Form1.cbMethod.Text := UpperCase(ReqMethod);
+    MainForm.cbMethod.Text := UpperCase(ReqMethod);
   // Non options values are for url but we need only one url so use
   // the first value.
   Values := Application.GetNonOptions(ShortOpts, LongOpts);
   if Length(Values) > 0 then
-    with Form1 do begin
+    with MainForm do begin
       cbUrl.Text := Values[0];
       SubmitRequest;
     end;

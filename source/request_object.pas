@@ -125,7 +125,7 @@ type
   protected
   public
     constructor Create;
-    constructor Create(form: TForm1); overload;
+    constructor Create(form: TMainForm); overload;
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
@@ -135,7 +135,7 @@ type
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
-    procedure LoadToForm(form: TForm1);
+    procedure LoadToForm(form: TMainForm);
     function IsJson: Boolean;
   published
     property Method: string read FMethod write SetMethod;
@@ -285,7 +285,7 @@ begin
   FNotes      := '';
 end;
 
-constructor TRequestObject.Create(form: TForm1);
+constructor TRequestObject.Create(form: TMainForm);
 begin
   Create;
   with form do begin
@@ -416,7 +416,7 @@ begin
   end;
 end;
 
-procedure TRequestObject.LoadToForm(form: TForm1);
+procedure TRequestObject.LoadToForm(form: TMainForm);
 var
   bt: TBodyTab;
 begin

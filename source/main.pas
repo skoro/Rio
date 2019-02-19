@@ -17,9 +17,9 @@ type
   TGridOperation = (goNew, goEdit, goDelete, goClear);
   TResponseView = (rvList, rvText, rvTimings);
 
-  { TForm1 }
+  { TMainForm }
 
-  TForm1 = class(TForm)
+  TMainForm = class(TForm)
     btnSubmit: TButton;
     cbBasicShowPassword: TCheckBox;
     cbMethod: TComboBox;
@@ -275,7 +275,7 @@ type
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation
 
@@ -288,9 +288,9 @@ const
 
 {$R *.lfm}
 
-{ TForm1 }
+{ TMainForm }
 
-procedure TForm1.btnSubmitClick(Sender: TObject);
+procedure TMainForm.btnSubmitClick(Sender: TObject);
 begin
   // Don't submit a request when the current request is in progress by pressing
   // shortcut key.
@@ -302,7 +302,7 @@ begin
     TimerRequest.Enabled := True;
 end;
 
-function TForm1.SubmitRequest: Boolean;
+function TMainForm.SubmitRequest: Boolean;
 var
   url, method, formData, contentType: string;
   i: integer;
@@ -451,7 +451,7 @@ begin
   Result := True;
 end;
 
-procedure TForm1.FindText;
+procedure TMainForm.FindText;
 var
   fp: TFindPos;
   tab: TResponseTab;
@@ -536,7 +536,7 @@ begin
   end;
 end;
 
-procedure TForm1.SelectResponseViewTab(rView: TResponseView);
+procedure TMainForm.SelectResponseViewTab(rView: TResponseView);
 begin
   case rView of
     rvList: begin
@@ -564,7 +564,7 @@ begin
   end;
 end;
 
-procedure TForm1.cbBasicShowPasswordClick(Sender: TObject);
+procedure TMainForm.cbBasicShowPasswordClick(Sender: TObject);
 begin
   if cbBasicShowPassword.Checked then
     editBasicPassword.EchoMode := emNormal
@@ -572,23 +572,23 @@ begin
     editBasicPassword.EchoMode := emPassword;
 end;
 
-procedure TForm1.cbUrlChange(Sender: TObject);
+procedure TMainForm.cbUrlChange(Sender: TObject);
 begin
   SyncURLQueryParams;
 end;
 
-procedure TForm1.cbUrlKeyPress(Sender: TObject; var Key: char);
+procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);
 begin
   if key = #13 then btnSubmitClick(Sender);
 end;
 
-procedure TForm1.dlgFindFind(Sender: TObject);
+procedure TMainForm.dlgFindFind(Sender: TObject);
 begin
   dlgFind.CloseDialog;
   FindStart;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TMainForm.FormCreate(Sender: TObject);
 var
   C: string;
 begin
@@ -643,7 +643,7 @@ begin
   StartNewRequest;
 end;
 
-procedure TForm1.FormDestroy(Sender: TObject);
+procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FResponseTabManager);
 
@@ -658,7 +658,7 @@ begin
   inherited;
 end;
 
-procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
 begin
   case OptionsForm.GetShortCutItem(Key, Shift) of
     sciFocusUrl:    cbUrl.SetFocus;
@@ -676,7 +676,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormShow(Sender: TObject);
+procedure TMainForm.FormShow(Sender: TObject);
 var
   I: Byte;
 begin
@@ -691,7 +691,7 @@ begin
     end;
 end;
 
-procedure TForm1.gaClearRowsClick(Sender: TObject);
+procedure TMainForm.gaClearRowsClick(Sender: TObject);
 var
   Grid: TStringGrid;
 begin
@@ -699,7 +699,7 @@ begin
   DoGridOperation(Grid, goClear);
 end;
 
-procedure TForm1.gaEditRowClick(Sender: TObject);
+procedure TMainForm.gaEditRowClick(Sender: TObject);
 var
   Grid: TStringGrid;
 begin
@@ -707,7 +707,7 @@ begin
   DoGridOperation(Grid, goEdit);
 end;
 
-procedure TForm1.gaInsertRowClick(Sender: TObject);
+procedure TMainForm.gaInsertRowClick(Sender: TObject);
 var
   Grid: TStringGrid;
 begin
@@ -715,14 +715,14 @@ begin
   DoGridOperation(Grid, goNew);
 end;
 
-procedure TForm1.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
+procedure TMainForm.gridColRowInserted(Sender: TObject; IsColumn: Boolean; sIndex,
   tIndex: Integer);
 begin
   // New inserted columns with "On" checked by default.
   (Sender as TStringGrid).Cells[0, sIndex] := '1';
 end;
 
-procedure TForm1.gridEditDblClick(Sender: TObject);
+procedure TMainForm.gridEditDblClick(Sender: TObject);
 var
   grid: TStringGrid;
 begin
@@ -738,7 +738,7 @@ begin
   end;
 end;
 
-procedure TForm1.gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
+procedure TMainForm.gridFormSelectEditor(Sender: TObject; aCol, aRow: Integer;
   var Editor: TWinControl);
 begin
   if aCol = 3 then
@@ -749,7 +749,7 @@ begin
       end;
 end;
 
-procedure TForm1.gridParamsCheckboxToggled(sender: TObject; aCol,
+procedure TMainForm.gridParamsCheckboxToggled(sender: TObject; aCol,
   aRow: Integer; aState: TCheckboxState);
 var
   Params: TQueryParams;
@@ -775,17 +775,17 @@ begin
   end;
 end;
 
-procedure TForm1.gridParamsEditingDone(Sender: TObject);
+procedure TMainForm.gridParamsEditingDone(Sender: TObject);
 begin
   SyncGridQueryParams;
 end;
 
-procedure TForm1.gridRespCookieDblClick(Sender: TObject);
+procedure TMainForm.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
 end;
 
-procedure TForm1.miExportClick(Sender: TObject);
+procedure TMainForm.miExportClick(Sender: TObject);
 begin
   if Trim(cbUrl.Text) = '' then begin
     OKMsg('Export', 'Request url is missing.');
@@ -797,7 +797,7 @@ begin
   end;
 end;
 
-procedure TForm1.miFindClick(Sender: TObject);
+procedure TMainForm.miFindClick(Sender: TObject);
 var
   tab: TResponseTab;
   Sel: string;
@@ -830,17 +830,17 @@ begin
   dlgFind.Execute;
 end;
 
-procedure TForm1.miFindNextClick(Sender: TObject);
+procedure TMainForm.miFindNextClick(Sender: TObject);
 begin
   FindText;
 end;
 
-procedure TForm1.miHelpCmdClick(Sender: TObject);
+procedure TMainForm.miHelpCmdClick(Sender: TObject);
 begin
   THelpForm.HelpModal(Self, 'Command line help', Trim(Usage));
 end;
 
-procedure TForm1.miImportClick(Sender: TObject);
+procedure TMainForm.miImportClick(Sender: TObject);
 begin
   with TImportForm.Create(Self) do begin
     if ShowModal = mrOK then begin
@@ -853,7 +853,7 @@ begin
   end;
 end;
 
-procedure TForm1.JsonTreeDblClick(Sender: TObject);
+procedure TMainForm.JsonTreeDblClick(Sender: TObject);
 var
   Node: TTreeNode;
 begin
@@ -874,7 +874,7 @@ end;
 //    child tree.
 // 2. Copy node key.
 // 3. Copy node key + value.
-procedure TForm1.JsonTreePopupMenuClick(Sender: TObject);
+procedure TMainForm.JsonTreePopupMenuClick(Sender: TObject);
 var
   Node, ParentNode: TTreeNode;
   MenuItem: TMenuItem;
@@ -941,7 +941,7 @@ begin
     FResponseJsonTab.Filter(Node);
 end;
 
-procedure TForm1.miManageHeadersClick(Sender: TObject);
+procedure TMainForm.miManageHeadersClick(Sender: TObject);
 var
   i, aRow, p1, p2: integer;
   gridHeaders: TStringGrid;
@@ -978,18 +978,18 @@ begin
   UpdateHeadersPickList;
 end;
 
-procedure TForm1.miNewClick(Sender: TObject);
+procedure TMainForm.miNewClick(Sender: TObject);
 begin
   if PromptNewRequest('Are you sure you want to start a new request ?') then
     StartNewRequest;
 end;
 
-procedure TForm1.miNewWindowClick(Sender: TObject);
+procedure TMainForm.miNewWindowClick(Sender: TObject);
 begin
   AppExec(Application.ExeName, ['--new']);
 end;
 
-procedure TForm1.miOpenRequestClick(Sender: TObject);
+procedure TMainForm.miOpenRequestClick(Sender: TObject);
 var
   jsonStr: string;
 begin
@@ -1007,17 +1007,17 @@ begin
   end;
 end;
 
-procedure TForm1.miOptionsClick(Sender: TObject);
+procedure TMainForm.miOptionsClick(Sender: TObject);
 begin
   if OptionsForm.ShowModal = mrOK then ApplyOptions;
 end;
 
-procedure TForm1.miQuitClick(Sender: TObject);
+procedure TMainForm.miQuitClick(Sender: TObject);
 begin
   Close;
 end;
 
-procedure TForm1.miAboutClick(Sender: TObject);
+procedure TMainForm.miAboutClick(Sender: TObject);
 begin
   with TAboutForm.Create(Self) do
   begin
@@ -1026,7 +1026,7 @@ begin
   end;
 end;
 
-procedure TForm1.gaDeleteRowClick(Sender: TObject);
+procedure TMainForm.gaDeleteRowClick(Sender: TObject);
 var
   Grid: TStringGrid;
 begin
@@ -1034,7 +1034,7 @@ begin
   DoGridOperation(Grid, goDelete);
 end;
 
-procedure TForm1.miSaveRequestClick(Sender: TObject);
+procedure TMainForm.miSaveRequestClick(Sender: TObject);
 var
   obj: TRequestObject;
   streamer: TJSONStreamer;
@@ -1061,7 +1061,7 @@ begin
   end;
 end;
 
-procedure TForm1.miSaveResponseClick(Sender: TObject);
+procedure TMainForm.miSaveResponseClick(Sender: TObject);
 begin
   try
     dlgSave.FileName := GetRequestFilename;
@@ -1077,25 +1077,25 @@ begin
   end;
 end;
 
-procedure TForm1.OnGridClear(Sender: TObject; Grid: TStringGrid);
+procedure TMainForm.OnGridClear(Sender: TObject; Grid: TStringGrid);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
 end;
 
-procedure TForm1.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
 end;
 
-procedure TForm1.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
+procedure TMainForm.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
   const aRow: Integer);
 begin
   EditGridRow(Grid);
 end;
 
-procedure TForm1.OnGridNewRow(Sender: TObject; Grid: TStringGrid;
+procedure TMainForm.OnGridNewRow(Sender: TObject; Grid: TStringGrid;
   const aRow: Integer);
 begin
   // New inserted columns with "On" checked by default.
@@ -1104,7 +1104,7 @@ begin
     Grid.DeleteRow(aRow);
 end;
 
-procedure TForm1.pagesResponseChange(Sender: TObject);
+procedure TMainForm.pagesResponseChange(Sender: TObject);
 begin
   // Switching between tabs resets FindNext search.
   // This behaviour doesn't affect the search from the response_tabs unit
@@ -1112,7 +1112,7 @@ begin
   FFindTextPos := 0;
 end;
 
-procedure TForm1.pmAuthTypeClick(Sender: TObject);
+procedure TMainForm.pmAuthTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
 begin
@@ -1122,7 +1122,7 @@ begin
   else if mi = miAuthBearer then SelectAuthTab(atBearer);
 end;
 
-procedure TForm1.pmBodyTypeClick(Sender: TObject);
+procedure TMainForm.pmBodyTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
 begin
@@ -1135,7 +1135,7 @@ end;
 // Show/hide some items in Grid's popup menu.
 // Depending on grid popup menu can show or hide some menu items for specific
 // grid.
-procedure TForm1.popupGridActionsPopup(Sender: TObject);
+procedure TMainForm.popupGridActionsPopup(Sender: TObject);
 begin
   gaSaveHeader.Visible := False;
   gaManageHeaders.Visible := False;
@@ -1145,14 +1145,14 @@ begin
   end;
 end;
 
-procedure TForm1.PSMAINRestoreProperties(Sender: TObject);
+procedure TMainForm.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
   SetAppCaption(cbUrl.Text);
   SyncURLQueryParams;
 end;
 
-procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
+procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
   procedure SetColumns(grid: TStringGrid);
   var
     Val, col: Integer;
@@ -1181,7 +1181,7 @@ begin
   end;
 end;
 
-procedure TForm1.PSMAINSavingProperties(Sender: TObject);
+procedure TMainForm.PSMAINSavingProperties(Sender: TObject);
   procedure SaveColumns(grid: TStringGrid);
   var
     I: Integer;
@@ -1207,7 +1207,7 @@ begin
   end;
 end;
 
-procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
+procedure TMainForm.requestHeadersBeforeSelection(Sender: TObject; aCol,
   aRow: Integer);
 var
   header: string;
@@ -1217,7 +1217,7 @@ begin
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
 end;
 
-procedure TForm1.tbtnFormUploadClick(Sender: TObject);
+procedure TMainForm.tbtnFormUploadClick(Sender: TObject);
 var
   Row, A: Integer;
 begin
@@ -1237,7 +1237,7 @@ begin
   end;
 end;
 
-procedure TForm1.tbtnJsonLoadClick(Sender: TObject);
+procedure TMainForm.tbtnJsonLoadClick(Sender: TObject);
 var
   fs: TStream;
   parser: TJSONParser;
@@ -1261,12 +1261,12 @@ begin
   end;
 end;
 
-procedure TForm1.tbtnManageHeadersClick(Sender: TObject);
+procedure TMainForm.tbtnManageHeadersClick(Sender: TObject);
 begin
   miManageHeadersClick(requestHeaders);
 end;
 
-procedure TForm1.tbtnBodyFormatClick(Sender: TObject);
+procedure TMainForm.tbtnBodyFormatClick(Sender: TObject);
 var
   ErrMsg: string;
 begin
@@ -1276,7 +1276,7 @@ begin
     ShowMessage(ErrMsg);
 end;
 
-procedure TForm1.tbtnRespFollowClick(Sender: TObject);
+procedure TMainForm.tbtnRespFollowClick(Sender: TObject);
 var
   I: Integer;
 begin
@@ -1288,7 +1288,7 @@ begin
     end;
 end;
 
-procedure TForm1.tbtnRespViewClick(Sender: TObject);
+procedure TMainForm.tbtnRespViewClick(Sender: TObject);
 var
   btn: TToolButton;
 begin
@@ -1303,7 +1303,7 @@ begin
     SelectResponseViewTab(rvTimings);
 end;
 
-procedure TForm1.tbtnSaveHeaderClick(Sender: TObject);
+procedure TMainForm.tbtnSaveHeaderClick(Sender: TObject);
 var
   KV: TKeyValue;
 begin
@@ -1312,7 +1312,7 @@ begin
     HeadersEditorForm.Add(KV.Key, KV.Value);
 end;
 
-procedure TForm1.TimerRequestTimer(Sender: TObject);
+procedure TMainForm.TimerRequestTimer(Sender: TObject);
 var
   Min, Sec: Integer;
 begin
@@ -1322,7 +1322,7 @@ begin
   StatusTextInfo.Caption := Format('%.2d:%.2d', [Min, Sec]);
 end;
 
-procedure TForm1.ViewSwitchTabs(Sender: TObject);
+procedure TMainForm.ViewSwitchTabs(Sender: TObject);
 var
   mi: TMenuItem;
   I: Byte;
@@ -1357,7 +1357,7 @@ begin
   ToggleRequestSide(False);
 end;
 
-procedure TForm1.ViewToggleTabs(Sender: TObject);
+procedure TMainForm.ViewToggleTabs(Sender: TObject);
 var
   Chk: Boolean;
 begin
@@ -1375,7 +1375,7 @@ begin
 end;
 
 // Synchronizes query parameters from the url.
-procedure TForm1.SyncURLQueryParams;
+procedure TMainForm.SyncURLQueryParams;
 var
   Params, Keep: TQueryParams;
   I, Idx: Integer;
@@ -1408,7 +1408,7 @@ begin
 end;
 
 // Synchronizes query parameters from the grid.
-procedure TForm1.SyncGridQueryParams;
+procedure TMainForm.SyncGridQueryParams;
 var
   Params: TQueryParams;
   KV: TKeyValue;
@@ -1428,13 +1428,13 @@ begin
   end;
 end;
 
-function TForm1.IsRowEnabled(const grid: TStringGrid; aRow: Integer): Boolean;
+function TMainForm.IsRowEnabled(const grid: TStringGrid; aRow: Integer): Boolean;
 begin
   if aRow = -1 then aRow := grid.Row;
   Result := grid.Cells[0, aRow] = '1';
 end;
 
-function TForm1.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
+function TMainForm.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
 var
   Offset: ShortInt;
 begin
@@ -1450,12 +1450,12 @@ begin
   Result.Value:=grid.Cells[Offset+1, aRow];
 end;
 
-function TForm1.FormatJson(json: TJSONData): string;
+function TMainForm.FormatJson(json: TJSONData): string;
 begin
   Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
-procedure TForm1.SelectBodyTab(const tab: tbodytab);
+procedure TMainForm.SelectBodyTab(const tab: tbodytab);
 begin
   tbtnFormUpload.Visible  := False;
   tbtnBodyFormat.Visible  := False;
@@ -1500,7 +1500,7 @@ begin
   gnavBody.SetButtonsOrder;
 end;
 
-procedure TForm1.SelectAuthTab(const tab: TAuthTab);
+procedure TMainForm.SelectAuthTab(const tab: TAuthTab);
 begin
   if tab = atNone then
     pagesAuth.Visible := False
@@ -1518,7 +1518,7 @@ begin
   tabAuth.Caption := 'Auth: ' + tbtnAuthType.Caption;
 end;
 
-function TForm1.GetSelectedBodyTab: TBodyTab;
+function TMainForm.GetSelectedBodyTab: TBodyTab;
 begin
   case pagesBody.ActivePageIndex of
     0: Result:=btJson;
@@ -1528,7 +1528,7 @@ begin
   end;
 end;
 
-function TForm1.GetSelectedAuthTab: TAuthTab;
+function TMainForm.GetSelectedAuthTab: TAuthTab;
 begin
   if pagesAuth.Visible then
     case pagesAuth.ActivePageIndex of
@@ -1540,7 +1540,7 @@ begin
     Result := atNone;
 end;
 
-function TForm1.GetSelectedResponseViewTab: TResponseView;
+function TMainForm.GetSelectedResponseViewTab: TResponseView;
 begin
   if pagesRespView.ActivePage = tabRespText then
     Exit(rvText);
@@ -1551,7 +1551,7 @@ begin
   raise Exception.Create('Cannot get value for response view active page.');
 end;
 
-procedure TForm1.DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
+procedure TMainForm.DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
 var
   toolbar: TGridNavigator;
 begin
@@ -1574,7 +1574,7 @@ begin
   end;
 end;
 
-procedure TForm1.OnOpenResponseTab(Tab: TResponseTab;
+procedure TMainForm.OnOpenResponseTab(Tab: TResponseTab;
   ResponseInfo: TResponseInfo);
 var
   ImageTab: TResponseImageTab;
@@ -1605,7 +1605,7 @@ begin
   end;
 end;
 
-procedure TForm1.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
+procedure TMainForm.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
 begin
   if Tab is TResponseJsonTab then begin
     if OptionsForm.JsonSaveFormatted then
@@ -1618,18 +1618,18 @@ begin
     Tab.Save(FileName);
 end;
 
-procedure TForm1.OnJsonTabButtonOptionsClick(Sender: TObject);
+procedure TMainForm.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
   if OptionsForm.ShowModalPage(opJson) = mrOK then
     ApplyOptions;
 end;
 
-procedure TForm1.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
+procedure TMainForm.JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
 begin
   Editor.Text := FormatJson(JsonData);
 end;
 
-procedure TForm1.FindStart(Search: Boolean = True);
+procedure TMainForm.FindStart(Search: Boolean = True);
 var
   tab: TResponseTab;
   IsText: Boolean;
@@ -1645,7 +1645,7 @@ begin
     FindText;
 end;
 
-procedure TForm1.ToggleRequestSide(VisibleSide: Boolean);
+procedure TMainForm.ToggleRequestSide(VisibleSide: Boolean);
 begin
   OptionsForm.LayoutEnable := VisibleSide;
   if not VisibleSide then begin
@@ -1673,7 +1673,7 @@ begin
   end;
 end;
 
-procedure TForm1.ApplyOptions;
+procedure TMainForm.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
   FResponseJsonTab.TreeExpanded := OptionsForm.JsonExpanded;
@@ -1730,7 +1730,7 @@ begin
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 
-function TForm1.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
+function TMainForm.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
   aRow: Integer; isUnique: Boolean): Integer;
 var
   Start: SmallInt;
@@ -1755,7 +1755,7 @@ end;
 
 // Add values to request grid.
 // Adjust header name from the predefined name from the headers editor form.
-procedure TForm1.AddRequestHeader(AHeader, AValue: string);
+procedure TMainForm.AddRequestHeader(AHeader, AValue: string);
 var
   headers: TStringList;
   iter: string;
@@ -1777,7 +1777,7 @@ begin
   end;
 end;
 
-procedure TForm1.AddFormData(AName, AValue: string; isFile: Boolean);
+procedure TMainForm.AddFormData(AName, AValue: string; isFile: Boolean);
 var
   isUnique: Boolean = False;
   KV: TKeyValuePair;
@@ -1792,7 +1792,7 @@ begin
     gridForm.Cells[3, Added] := 'File';
 end;
 
-procedure TForm1.OpenRequestFile(jsonStr: string);
+procedure TMainForm.OpenRequestFile(jsonStr: string);
 var
   streamer: TJSONDeStreamer;
   obj: TRequestObject;
@@ -1812,7 +1812,7 @@ begin
   obj.Free;
 end;
 
-procedure TForm1.OnHttpException(Url, Method: string; E: Exception);
+procedure TMainForm.OnHttpException(Url, Method: string; E: Exception);
 begin
   TimerRequest.Enabled := False;
   UpdateStatusLine;
@@ -1825,7 +1825,7 @@ begin
   btnSubmit.Enabled := True;
 end;
 
-procedure TForm1.ParseContentType(Headers: TStrings);
+procedure TMainForm.ParseContentType(Headers: TStrings);
 var
   i: integer;
   kv: TKeyValuePair;
@@ -1842,7 +1842,7 @@ begin
   end;
 end;
 
-function TForm1.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
+function TMainForm.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
 var
   p: integer;
 begin
@@ -1851,7 +1851,7 @@ begin
   if (not all) and (p <> 0) then Result.Value := Trim(LeftStr(Result.Value, p - 1));
 end;
 
-procedure TForm1.UpdateHeadersPickList;
+procedure TMainForm.UpdateHeadersPickList;
 begin
   with requestHeaders do begin
     HeadersEditorForm.FillHeaders(Columns.Items[1].PickList);
@@ -1860,7 +1860,7 @@ begin
   end;
 end;
 
-function TForm1.EncodeFormData: string;
+function TMainForm.EncodeFormData: string;
 var
   i: integer;
   KV: TKeyValue;
@@ -1876,7 +1876,7 @@ begin
   end;
 end;
 
-procedure TForm1.OnRequestComplete(Info: TResponseInfo);
+procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 var
   i, p: integer;
   h: string;
@@ -1970,7 +1970,7 @@ begin
   Info.Free;
 end;
 
-procedure TForm1.UpdateStatusLine(Main: string);
+procedure TMainForm.UpdateStatusLine(Main: string);
 begin
   StatusTextMain.Caption  := Main;
   StatusTextTime.Caption := '';
@@ -1979,7 +1979,7 @@ begin
   StatusImageSize.Visible := False;
 end;
 
-procedure TForm1.UpdateStatusLine(Info: TResponseInfo);
+procedure TMainForm.UpdateStatusLine(Info: TResponseInfo);
 var
   w: Integer;
   tm: TTimeMSec;
@@ -2010,7 +2010,7 @@ begin
   StatusTextSize.Height := StatusTextMain.Height;
 end;
 
-procedure TForm1.ShowResponseCookie(Headers: TStrings);
+procedure TMainForm.ShowResponseCookie(Headers: TStrings);
 var
   I, J, Row, Size: Integer;
   kv: TKeyValuePair;
@@ -2071,7 +2071,7 @@ end;
 // Creates a filename based on a request.
 // If parameter 'ext' is empty then extension will be detected depending on
 // the document.
-function TForm1.GetRequestFilename(ext: string): string;
+function TMainForm.GetRequestFilename(ext: string): string;
 var
   uri: TURI;
   basename: string;
@@ -2095,7 +2095,7 @@ begin
   Result := Format('%s.%s', [basename, ext]);
 end;
 
-function TForm1.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
+function TMainForm.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
 var
   Need: Boolean = False;
 
@@ -2131,7 +2131,7 @@ begin
   Result := True;
 end;
 
-procedure TForm1.StartNewRequest;
+procedure TMainForm.StartNewRequest;
   procedure ResetGrid(grid: TStringGrid);
   begin
     grid.RowCount := 2;
@@ -2178,7 +2178,7 @@ begin
   SetAppCaption;
 end;
 
-function TForm1.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
+function TMainForm.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
 var
   ss: TStringStream;
   parser: TJSONParser;
@@ -2209,7 +2209,7 @@ end;
 // The sender can be a Popup menu or popup menu item.
 // Returns nil when popup doesn't belongs to grid.
 // Raises an exception when sender isn't popup or menu item.
-function TForm1.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
+function TMainForm.GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
 var
   Component: TComponent;
 begin
@@ -2238,7 +2238,7 @@ begin
     Result := nil;
 end;
 
-function TForm1.EditGridRow(Grid: TStringGrid;
+function TMainForm.EditGridRow(Grid: TStringGrid;
   const ValueFocused: Boolean): TModalResult;
 var
   kv: TKeyValue;
@@ -2260,7 +2260,7 @@ begin
   end;
 end;
 
-procedure TForm1.SetAppCaption(const AValue: String);
+procedure TMainForm.SetAppCaption(const AValue: String);
 begin
   Caption := ApplicationName;
   if AValue <> '' then Caption := Caption + ': ' + AValue;

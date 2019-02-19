@@ -17,8 +17,7 @@ begin
   Application.Title := 'HTTP request inspector';
   RequireDerivedFormResource := True;
   Application.Initialize;
-
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TMainForm, MainForm);
   Application.CreateForm(TOptionsForm, OptionsForm);
 
   try
@@ -31,7 +30,7 @@ begin
     end;
   end;
 
-  Form1.ApplyOptions;
+  MainForm.ApplyOptions;
   Application.Run;
 end.
 
