@@ -245,7 +245,6 @@ type
     procedure SetAppCaption(const AValue: String = '');
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
-    function FormatJson(json: TJSONData): string;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
     function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
@@ -1448,11 +1447,6 @@ begin
   end;
   Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
   Result.Value:=grid.Cells[Offset+1, aRow];
-end;
-
-function TMainForm.FormatJson(json: TJSONData): string;
-begin
-  Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
 procedure TMainForm.SelectBodyTab(const tab: tbodytab);

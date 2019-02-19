@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, Controls, ValEdit, Dialogs, Forms;
+  Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms;
 
 type
 
@@ -48,9 +48,12 @@ procedure OKMsg(Caption, Txt: string);
 procedure ERRMsg(Caption, Txt: string);
 procedure WarnMsg(Caption, Txt: string);
 
+// Format a json data depending on the current json options.
+function FormatJson(json: TJSONData): string;
+
 implementation
 
-uses process, LazUTF8, SynEditTypes, strutils;
+uses process, LazUTF8, SynEditTypes, options, strutils;
 
 function FilePutContents(const filename, contents: string): Boolean;
 var
@@ -299,6 +302,11 @@ end;
 procedure WarnMsg(Caption, Txt: string);
 begin
   MessageDlg(Caption, Txt, mtWarning, [mbOK], 0);
+end;
+
+function FormatJson(json: TJSONData): string;
+begin
+  Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
 end.
