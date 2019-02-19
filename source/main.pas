@@ -46,6 +46,16 @@ type
     gaSeparator: TMenuItem;
     editNotes: TMemo;
     lblDesc: TLabel;
+    miTabSep: TMenuItem;
+    miTabToggle: TMenuItem;
+    miTabNotes: TMenuItem;
+    miTabAuth: TMenuItem;
+    miTabs: TMenuItem;
+    miTabHeaders: TMenuItem;
+    miTabQuery: TMenuItem;
+    miTabBody: TMenuItem;
+    miTabCookie: TMenuItem;
+    miView: TMenuItem;
     tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
@@ -155,6 +165,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
     procedure gaClearRowsClick(Sender: TObject);
     procedure gaEditRowClick(Sender: TObject);
     procedure gaInsertRowClick(Sender: TObject);
@@ -207,6 +218,8 @@ type
     procedure tbtnRespViewClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
+    procedure ViewSwitchTabs(Sender: TObject);
+    procedure ViewToggleTabs(Sender: TObject);
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
@@ -241,6 +254,7 @@ type
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
+    procedure ToggleRequestSide(VisibleSide: Boolean);
   public
     procedure ApplyOptions;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
@@ -660,6 +674,21 @@ begin
         end;
     end;
   end;
+end;
+
+procedure TForm1.FormShow(Sender: TObject);
+var
+  I: Byte;
+begin
+  // Restore tabs visibility.
+  ViewSwitchTabs(nil);
+  ViewToggleTabs(nil);
+  // Select and show active visible tab.
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then begin
+      pagesRequest.ActivePageIndex := I;
+      break;
+    end;
 end;
 
 procedure TForm1.gaClearRowsClick(Sender: TObject);
@@ -1133,6 +1162,7 @@ procedure TForm1.PSMAINRestoringProperties(Sender: TObject);
       if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
     end;
   end;
+
 begin
   SetColumns(requestHeaders);
   SetColumns(responseHeaders);
@@ -1140,6 +1170,15 @@ begin
   SetColumns(gridReqCookie);
   SetColumns(gridRespCookie);
   SetColumns(gridParams);
+  with PSMAIN do begin
+    miTabHeaders.Checked := ReadBoolean('tabHeaders', True);
+    miTabQuery.Checked := ReadBoolean('tabQuery', True);
+    miTabCookie.Checked := ReadBoolean('tabCookie', True);
+    miTabBody.Checked := ReadBoolean('tabBody', True);
+    miTabAuth.Checked := ReadBoolean('tabAuth', True);
+    miTabNotes.Checked := ReadBoolean('tabNotes', True);
+    miTabToggle.Checked := ReadBoolean('tabToggle', True);
+  end;
 end;
 
 procedure TForm1.PSMAINSavingProperties(Sender: TObject);
@@ -1157,6 +1196,15 @@ begin
   SaveColumns(gridReqCookie);
   SaveColumns(gridRespCookie);
   SaveColumns(gridParams);
+  with PSMAIN do begin
+    WriteBoolean('tabHeaders', miTabHeaders.Checked);
+    WriteBoolean('tabQuery', miTabQuery.Checked);
+    WriteBoolean('tabCookie', miTabCookie.Checked);
+    WriteBoolean('tabBody', miTabBody.Checked);
+    WriteBoolean('tabAuth', miTabAuth.Checked);
+    WriteBoolean('tabNotes', miTabNotes.Checked);
+    WriteBoolean('tabToggle', miTabToggle.Checked);
+  end;
 end;
 
 procedure TForm1.requestHeadersBeforeSelection(Sender: TObject; aCol,
@@ -1272,6 +1320,58 @@ begin
   Min := FRequestSeconds div 60;
   Sec := FRequestSeconds mod 60;
   StatusTextInfo.Caption := Format('%.2d:%.2d', [Min, Sec]);
+end;
+
+procedure TForm1.ViewSwitchTabs(Sender: TObject);
+var
+  mi: TMenuItem;
+  I: Byte;
+  Restore: Boolean; // Need to restore Request splitter side ?
+begin
+  if (Sender <> Nil) and (Sender is TMenuItem) then begin
+    mi := TMenuItem(Sender);
+    mi.Checked := not mi.Checked;
+  end;
+  // Should the splitter side restored ?
+  Restore := True;
+  for I := 0 to pagesRequest.PageCount - 1 do
+    // Don't restore if one of tabs is visible.
+    if pagesRequest.Pages[I].TabVisible then begin
+      Restore := False;
+      Break;
+    end;
+  // Switch tabs visibility.
+  tabHeaders.TabVisible := miTabHeaders.Checked;
+  tabQuery.TabVisible := miTabQuery.Checked;
+  tabBody.TabVisible := miTabBody.Checked;
+  tabReqCookie.TabVisible := miTabCookie.Checked;
+  tabAuth.TabVisible := miTabAuth.Checked;
+  tabNotes.TabVisible := miTabNotes.Checked;
+  for I := 0 to pagesRequest.PageCount - 1 do
+    if pagesRequest.Pages[I].TabVisible then begin
+      if Restore then
+        ToggleRequestSide(True);
+      Exit; //=>
+    end;
+  // Hide request splitter side.
+  ToggleRequestSide(False);
+end;
+
+procedure TForm1.ViewToggleTabs(Sender: TObject);
+var
+  Chk: Boolean;
+begin
+  if Sender <> nil then
+    miTabToggle.Checked := not miTabToggle.Checked;
+  Chk := miTabToggle.Checked;
+  pagesRequest.Visible := Chk;
+  miTabHeaders.Enabled := Chk;
+  miTabQuery.Enabled := Chk;
+  miTabBody.Enabled := Chk;
+  miTabCookie.Enabled := Chk;
+  miTabAuth.Enabled := Chk;
+  miTabNotes.Enabled := Chk;
+  ToggleRequestSide(Chk);
 end;
 
 // Synchronizes query parameters from the url.
@@ -1545,6 +1645,34 @@ begin
     FindText;
 end;
 
+procedure TForm1.ToggleRequestSide(VisibleSide: Boolean);
+begin
+  OptionsForm.LayoutEnable := VisibleSide;
+  if not VisibleSide then begin
+    LayoutSplitter.Cursor := crDefault;
+    if LayoutSplitter.SplitterType = pstVertical then begin
+      splitterSideRequest.Height := 0;
+      splitterSideRequest.Constraints.MaxHeight := 1;
+    end
+    else begin
+      splitterSideRequest.Width := 0;
+      splitterSideRequest.Constraints.MaxWidth := 1;
+    end;
+  end
+  else begin
+    if LayoutSplitter.SplitterType = pstVertical then begin
+      splitterSideRequest.Constraints.MaxHeight := 0;
+      splitterSideRequest.Height := LayoutSplitter.Height div 2;
+      LayoutSplitter.Cursor := crVSplit;
+    end
+    else begin
+      splitterSideRequest.Constraints.MaxWidth := 0;
+      splitterSideRequest.Width := LayoutSplitter.Width div 2;
+      LayoutSplitter.Cursor := crHSplit;
+    end;
+  end;
+end;
+
 procedure TForm1.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -1598,6 +1726,7 @@ begin
   miOpenRequest.ShortCut   := OptionsForm.GetShortCutValue(sciOpenRequest);
   miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
+  miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 

@@ -16,7 +16,7 @@ type
   // Keyboard shortcut item.
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
-    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciQuit);
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciToggleTabs, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -96,6 +96,7 @@ type
     procedure SetFontDemo;
     procedure InitFonts;
     procedure InitShortcuts;
+    procedure SetLayoutEnable(AValue: Boolean);
     procedure SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
     function GetKeyNameByCode(AKey: Word): string;
     function GetShortCutName(Item: TShortCutItem): string;
@@ -122,6 +123,7 @@ type
     property Timeout: Integer read GetRequestTimeout;
     property EditRequestMethods: Boolean read GetEditRequestMethods;
     property FitImages: Boolean read GetFitImages;
+    property LayoutEnable: Boolean write SetLayoutEnable;
   end;
 
 var
@@ -464,7 +466,13 @@ begin
   SetShortCut(sciSaveBody,      113, []); // F2
   SetShortCut(sciSwitchView,    115, []); // F4
   SetShortCut(sciSubmit,        120, []); // F9
+  SetShortCut(sciToggleTabs,    84, [ssAlt, ssShift]); // T
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
+end;
+
+procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
+begin
+  gbLayout.Enabled := AValue;
 end;
 
 procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
@@ -551,6 +559,7 @@ begin
     sciSaveBody:      Result := 'Save response body';
     sciSwitchView:    Result := 'Switch views';
     sciSubmit:        Result := 'Submit the request';
+    sciToggleTabs:    Result := 'Toggle request pane';
     sciQuit:          Result := 'Quit';
   end;
 end;

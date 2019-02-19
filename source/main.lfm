@@ -148,6 +148,7 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
+  OnShow = FormShow
   SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;Left;Top;Width;LayoutSplitter.Position'
   LCLVersion = '1.8.4.0'
   object LayoutSplitter: TPairSplitter
@@ -251,7 +252,7 @@ object Form1: TForm1
               ShowNavButtons = True
               object ToolButton1: TToolButton
                 Left = 146
-                Height = 22
+                Height = 5
                 Top = 0
                 Caption = 'ToolButton1'
                 Style = tbsDivider
@@ -1629,6 +1630,50 @@ object Form1: TForm1
         Caption = '&Quit'
         ShortCut = 16465
         OnClick = miQuitClick
+      end
+    end
+    object miView: TMenuItem
+      Caption = '&View'
+      object miTabs: TMenuItem
+        Caption = '&Tabs'
+        object miTabHeaders: TMenuItem
+          Caption = '&Headers'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabQuery: TMenuItem
+          Caption = '&Query'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabBody: TMenuItem
+          Caption = '&Body'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabCookie: TMenuItem
+          Caption = '&Cookie'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabAuth: TMenuItem
+          Caption = '&Auth'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabNotes: TMenuItem
+          Caption = '&Notes'
+          Checked = True
+          OnClick = ViewSwitchTabs
+        end
+        object miTabSep: TMenuItem
+          Caption = '-'
+        end
+        object miTabToggle: TMenuItem
+          Caption = '&Toggle'
+          Checked = True
+          OnClick = ViewToggleTabs
+        end
       end
     end
     object miEdit: TMenuItem
