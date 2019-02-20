@@ -229,7 +229,6 @@ type
     FRequestSeconds: Integer;
     FProfilerGraph: TProfilerGraph;
     procedure OnHttpException(Url, Method: string; E: Exception);
-    procedure ParseContentType(Headers: TStrings);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
     function EncodeFormData: string;
@@ -1819,23 +1818,6 @@ begin
   btnSubmit.Enabled := True;
 end;
 
-procedure TMainForm.ParseContentType(Headers: TStrings);
-var
-  i: integer;
-  kv: TKeyValuePair;
-begin
-  FContentType := '';
-  for i := 0 to headers.count - 1 do
-  begin
-    kv := ParseHeaderLine(Headers.Strings[i]);
-    if LowerCase(kv.Key) = 'content-type' then
-    begin
-      FContentType := LowerCase(kv.Value);
-      Exit; // =>
-    end;
-  end;
-end;
-
 function TMainForm.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
 var
   p: integer;
@@ -1895,7 +1877,7 @@ begin
     responseHeaders.Cells[1, i + 1] := kv.Value;
     textResp.Lines.Add(Format('%s: %s', [kv.Key, kv.Value]));
   end;
-  ParseContentType(Info.ResponseHeaders);
+  FContentType := Info.ContentType;
 
   UpdateStatusLine(Info);
 
