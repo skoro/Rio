@@ -72,7 +72,6 @@ type
   TResponseInfo = class
   private
     FContent: TStringStream;
-    FContentType: string;
     FHttpVersion: string;
     FMethod: string;
     FRequestHeaders: TStrings;
@@ -81,6 +80,7 @@ type
     FStatusText: string;
     FUrl: string;
     FTimeCheckPoints: TTimeCheckPointList;
+    function GetContentType: string;
     function GetLocation: string;
     function GetRequestTime: TTimeMSec;
   public
@@ -94,7 +94,7 @@ type
     property RequestHeaders: TStrings read FRequestHeaders;
     property ResponseHeaders: TStrings read FResponseHeaders;
     property Content: TStringStream read FContent;
-    property ContentType: string read FContentType write FContentType;
+    property ContentType: string read GetContentType;
     property TimeCheckPoints: TTimeCheckPointList read FTimeCheckPoints;
     property RequestTime: TTimeMSec read GetRequestTime;
     property Location: string read GetLocation;
@@ -123,7 +123,6 @@ type
     procedure OnClientException;
   protected
     procedure Execute; override;
-    function ParseContentType: string;
   public
     constructor Create(CreateSuspened: boolean);
     destructor Destroy; override;
@@ -151,10 +150,11 @@ function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
 function SplitMimeType(const ContentType: string): TMimeType;
 // Appends 'http:' proto to the url if it missing.
 function NormalizeUrl(Url: string): string;
+function ParseContentType(Headers: TStrings): string;
 
 implementation
 
-uses dateutils, strutils, RtlConsts, app_helpers;
+uses dateutils, strutils, RtlConsts, ValEdit, app_helpers;
 
 const
   CRLF = #13#10;
@@ -237,6 +237,24 @@ begin
       Result := 'http://' + Result;
 end;
 
+function ParseContentType(Headers: TStrings): string;
+var
+  I, P: integer;
+  KV: TKeyValuePair;
+begin
+  Result := '';
+  for I := 0 to Headers.Count - 1 do
+  begin
+    KV := SplitKV(Headers.Strings[I], ':');
+    if LowerCase(KV.Key) = 'content-type' then begin
+      Result := KV.Value;
+      P := Pos(';', Result);
+      if P <> 0 then // remove charset option.
+        Result := Trim(LeftStr(Result, P - 1));
+    end;
+  end;
+end;
+
 { TTimeProfiler }
 
 function TTimeProfiler.GetCheckPoint(T: string): TTimeCheckPoint;
@@ -316,6 +334,11 @@ begin
   for I := 0 to FResponseHeaders.Count - 1 do
     if LowerCase(FResponseHeaders.Names[I]) = 'location' then
       Exit(FResponseHeaders.ValueFromIndex[I]);
+end;
+
+function TResponseInfo.GetContentType: string;
+begin
+  Result := ParseContentType(FResponseHeaders);
 end;
 
 function TResponseInfo.GetRequestTime: TTimeMSec;
@@ -490,7 +513,6 @@ begin
     info.StatusText := FHttpClient.ResponseStatusText;
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
     info.Content.WriteString(FResponseData.DataString);
-    info.ContentType := ParseContentType;
     info.TimeCheckPoints.Assign(FHttpClient.TimeProfiler.CheckPoints);
     FOnRequestComplete(info);
   end;
@@ -514,30 +536,6 @@ begin
     begin
       FException := E;
       Synchronize(@OnClientException);
-    end;
-  end;
-end;
-
-function TThreadHttpClient.ParseContentType: string;
-var
-  I, P: integer;
-  Line, Header: string;
-begin
-  Result := '';
-  for I := 0 to FHttpClient.ResponseHeaders.Count - 1 do
-  begin
-    Line := FHttpClient.ResponseHeaders.Strings[I];
-    P := Pos(':', Line);
-    if p <> 0 then
-    begin
-      Header := LeftStr(Line, P - 1);
-      if LowerCase(Header) = 'content-type' then
-      begin
-        Result := Trim(RightStr(Line, Length(Line) - P));
-        P := Pos(';', Result);
-        if P <> 0 then
-          Result := Trim(LeftStr(Result, P - 1));
-      end;
     end;
   end;
 end;
