@@ -1858,7 +1858,6 @@ var
   h: string;
   mime: TMimeType;
   kv: TKeyValuePair;
-  t:TTimeMSec;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
