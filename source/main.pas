@@ -1659,6 +1659,8 @@ end;
 procedure TMainForm.ToggleRequestSide(VisibleSide: Boolean);
 begin
   OptionsForm.LayoutEnable := VisibleSide;
+  miLayoutHor.Enabled := VisibleSide;
+  miLayoutVert.Enabled := VisibleSide;
   if not VisibleSide then begin
     LayoutSplitter.Cursor := crDefault;
     if LayoutSplitter.SplitterType = pstVertical then begin
