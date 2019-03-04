@@ -46,6 +46,8 @@ type
     gaSeparator: TMenuItem;
     editNotes: TMemo;
     lblDesc: TLabel;
+    miLayoutVert: TMenuItem;
+    miLayoutHor: TMenuItem;
     miTabSep: TMenuItem;
     miTabToggle: TMenuItem;
     miTabNotes: TMenuItem;

@@ -1675,6 +1675,14 @@ object MainForm: TMainForm
           OnClick = ViewToggleTabs
         end
       end
+      object miLayoutVert: TMenuItem
+        Caption = '&Vertical layout'
+        RadioItem = True
+      end
+      object miLayoutHor: TMenuItem
+        Caption = '&Horizontal layout'
+        RadioItem = True
+      end
     end
     object miEdit: TMenuItem
       Caption = '&Edit'
