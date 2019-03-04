@@ -220,6 +220,7 @@ type
     procedure tbtnRespViewClick(Sender: TObject);
     procedure tbtnSaveHeaderClick(Sender: TObject);
     procedure TimerRequestTimer(Sender: TObject);
+    procedure ViewSwitchLayout(Sender: TObject);
     procedure ViewSwitchTabs(Sender: TObject);
     procedure ViewToggleTabs(Sender: TObject);
   private
@@ -257,6 +258,7 @@ type
     procedure ToggleRequestSide(VisibleSide: Boolean);
   public
     procedure ApplyOptions;
+    procedure SwitchLayout;
     function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
       aRow: Integer = -1; isUnique: Boolean = True): Integer;
     procedure AddRequestHeader(AHeader, AValue: string);
@@ -1322,6 +1324,20 @@ begin
   StatusTextInfo.Caption := Format('%.2d:%.2d', [Min, Sec]);
 end;
 
+procedure TMainForm.ViewSwitchLayout(Sender: TObject);
+var
+  mi: TMenuItem;
+begin
+  if (Sender is TMenuItem) then begin
+    mi := TMenuItem(Sender);
+    if mi = miLayoutVert then
+      OptionsForm.PanelsLayout := pstVertical;
+    if mi = miLayoutHor then
+      OptionsForm.PanelsLayout := pstHorizontal;
+    SwitchLayout;
+  end;
+end;
+
 procedure TMainForm.ViewSwitchTabs(Sender: TObject);
 var
   mi: TMenuItem;
@@ -1674,16 +1690,7 @@ begin
   FResponseJsonTab.TreeExpanded := OptionsForm.JsonExpanded;
   FResponseJsonTab.LineNumbers  := OptionsForm.JsonLines;
 
-  // Adjust window size before change layout.
-  if (LayoutSplitter.SplitterType = pstVertical) and
-       (OptionsForm.PanelsLayout = pstHorizontal) and
-       (Width < 460) then
-    Width := 600;
-  if (LayoutSplitter.SplitterType = pstHorizontal) and
-       (OptionsForm.PanelsLayout = pstVertical) and
-       (Height < 400) then
-    Height := 600;
-  LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
+  SwitchLayout;
 
   if GetSelectedBodyTab = btForm then
     gnavBody.ShowNavButtons := not OptionsForm.GridButtonsHidden;
@@ -1723,6 +1730,25 @@ begin
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
+end;
+
+procedure TMainForm.SwitchLayout;
+begin
+  // Adjust window size before change layout.
+  if (LayoutSplitter.SplitterType = pstVertical) and
+       (OptionsForm.PanelsLayout = pstHorizontal) and
+       (Width < 460) then
+    Width := 600;
+  if (LayoutSplitter.SplitterType = pstHorizontal) and
+       (OptionsForm.PanelsLayout = pstVertical) and
+       (Height < 400) then
+    Height := 600;
+
+  LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
+
+  // View layout menu items.
+  miLayoutHor.Checked := (OptionsForm.PanelsLayout = pstHorizontal);
+  miLayoutVert.Checked := (OptionsForm.PanelsLayout = pstVertical);
 end;
 
 function TMainForm.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;

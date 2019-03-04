@@ -22,10 +22,10 @@ object OptionsForm: TOptionsForm
     Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabShortcuts
+    ActivePage = tabAppearance
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 3
+    TabIndex = 1
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet

@@ -97,6 +97,7 @@ type
     procedure InitFonts;
     procedure InitShortcuts;
     procedure SetLayoutEnable(AValue: Boolean);
+    procedure SetPanelsLayout(AValue: TPairSplitterType);
     procedure SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);
     function GetKeyNameByCode(AKey: Word): string;
     function GetShortCutName(Item: TShortCutItem): string;
@@ -118,7 +119,7 @@ type
     property JsonView: TViewPage read GetJsonView;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
     property JsonLines: Boolean read GetJsonLines;
-    property PanelsLayout: TPairSplitterType read GetPanelsLayout;
+    property PanelsLayout: TPairSplitterType read GetPanelsLayout write SetPanelsLayout;
     property GridButtonsHidden: Boolean read GetGridButtonsHidden;
     property Timeout: Integer read GetRequestTimeout;
     property EditRequestMethods: Boolean read GetEditRequestMethods;
@@ -473,6 +474,16 @@ end;
 procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
 begin
   gbLayout.Enabled := AValue;
+end;
+
+procedure TOptionsForm.SetPanelsLayout(AValue: TPairSplitterType);
+begin
+  if GetPanelsLayout = AValue then
+    Exit; //=>
+  if AValue = pstVertical then
+    rbLayoutVert.Checked := True;
+  if AValue = pstHorizontal then
+    rbLayoutHor.Checked := True;
 end;
 
 procedure TOptionsForm.SetShortCut(Item: TShortCutItem; AKey: Word; AShiftState: TShiftState);

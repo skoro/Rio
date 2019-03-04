@@ -1678,10 +1678,12 @@ object MainForm: TMainForm
       object miLayoutVert: TMenuItem
         Caption = '&Vertical layout'
         RadioItem = True
+        OnClick = ViewSwitchLayout
       end
       object miLayoutHor: TMenuItem
         Caption = '&Horizontal layout'
         RadioItem = True
+        OnClick = ViewSwitchLayout
       end
     end
     object miEdit: TMenuItem
