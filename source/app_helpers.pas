@@ -10,7 +10,8 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms;
+  Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids,
+  key_value;
 
 type
 
@@ -50,6 +51,10 @@ procedure WarnMsg(Caption, Txt: string);
 
 // Format a json data depending on the current json options.
 function FormatJson(json: TJSONData): string;
+
+// Grid helpers
+function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
+function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1; isUnique: Boolean = True): Integer;
 
 implementation
 
@@ -307,6 +312,45 @@ end;
 function FormatJson(json: TJSONData): string;
 begin
   Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
+end;
+
+function GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
+var
+  Offset: ShortInt;
+begin
+  if aRow = -1 then aRow := grid.Row;
+  // Grids with more two columns should have first column with checkboxes.
+  if grid.ColCount = 2 then
+    Offset := 0
+  else begin
+    Offset := 1;
+    Result.Enabled := (grid.Cells[0, aRow] = '1');
+  end;
+  Result.Key := Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
+  Result.Value := grid.Cells[Offset+1, aRow];
+end;
+
+function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer;
+  isUnique: Boolean): Integer;
+var
+  Start: SmallInt;
+begin
+  Start := 0;
+  with AGrid do begin
+    if Columns[0].ButtonStyle <> cbsAuto then
+      Start := 1;
+    if isUnique and (Cols[Start].IndexOf(KV.Key) > 0) then
+      Exit;
+    if aRow = -1 then begin
+      RowCount := RowCount + 1;
+      ARow := RowCount - 1;
+    end;
+    if Columns[0].ButtonStyle = cbsCheckboxColumn then
+      Cells[0, ARow] := '1';
+    Cells[Start, ARow] := KV.Key;
+    Cells[Start + 1, ARow] := KV.Value;
+  end;
+  Result := ARow;
 end;
 
 end.

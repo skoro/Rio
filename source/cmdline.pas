@@ -100,7 +100,7 @@ begin
   if Application.HasOption('C', 'cookie') then begin
     Values := Application.GetOptionValues('C', 'cookie');
     for I := Length(Values) - 1 downto 0 do
-      MainForm.SetRowKV(MainForm.gridReqCookie, SplitKV(Values[I], '='));
+      SetRowKV(MainForm.gridReqCookie, SplitKV(Values[I], '='));
   end;
   // Body data.
   if Application.HasOption('d', 'data') then

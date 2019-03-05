@@ -248,7 +248,6 @@ type
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
     function IsRowEnabled(const grid: TStringGrid; aRow: Integer = -1): Boolean;
-    function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
@@ -259,8 +258,6 @@ type
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
-    function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
-      aRow: Integer = -1; isUnique: Boolean = True): Integer;
     procedure AddRequestHeader(AHeader, AValue: string);
     procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
     procedure OpenRequestFile(jsonStr: string);
@@ -1450,22 +1447,6 @@ begin
   Result := grid.Cells[0, aRow] = '1';
 end;
 
-function TMainForm.GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
-var
-  Offset: ShortInt;
-begin
-  if aRow = -1 then aRow := grid.Row;
-  // Grids with more two columns should have first column with checkboxes.
-  if grid.ColCount = 2 then
-    Offset := 0
-  else begin
-    Offset := 1;
-    Result.Enabled := (grid.Cells[0, aRow] = '1');
-  end;
-  Result.Key:=Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
-  Result.Value:=grid.Cells[Offset+1, aRow];
-end;
-
 procedure TMainForm.SelectBodyTab(const tab: tbodytab);
 begin
   tbtnFormUpload.Visible  := False;
@@ -1751,29 +1732,6 @@ begin
   // View layout menu items.
   miLayoutHor.Checked := (OptionsForm.PanelsLayout = pstHorizontal);
   miLayoutVert.Checked := (OptionsForm.PanelsLayout = pstVertical);
-end;
-
-function TMainForm.SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair;
-  aRow: Integer; isUnique: Boolean): Integer;
-var
-  Start: SmallInt;
-begin
-  Start := 0;
-  with AGrid do begin
-    if Columns[0].ButtonStyle <> cbsAuto then
-      Start := 1;
-    if isUnique and (Cols[Start].IndexOf(KV.Key) > 0) then
-      Exit;
-    if aRow = -1 then begin
-      RowCount := RowCount + 1;
-      ARow := RowCount - 1;
-    end;
-    if Columns[0].ButtonStyle = cbsCheckboxColumn then
-      Cells[0, ARow] := '1';
-    Cells[Start, ARow] := KV.Key;
-    Cells[Start + 1, ARow] := KV.Value;
-  end;
-  Result := ARow;
 end;
 
 // Add values to request grid.
