@@ -72,6 +72,7 @@ type
     procedure cboxFontItemChange(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure gridShortcutsButtonClick(Sender: TObject; aCol, aRow: Integer);
@@ -172,6 +173,14 @@ begin
 
   Props.Active := True;
   pagesOptions.ActivePage := tabGeneral;
+end;
+
+procedure TOptionsForm.FormDestroy(Sender: TObject);
+var
+  I: Integer;
+begin
+  for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do
+    FreeAndNil(FFontItemList[I]);
 end;
 
 procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;

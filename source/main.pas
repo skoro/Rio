@@ -646,6 +646,9 @@ procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FResponseTabManager);
 
+  if Assigned(FProfilerGraph) then
+    FreeAndNil(FProfilerGraph);
+
   // Если не освободить, то когда активна вкладка JSON при выходе
   // из приложения возникают исключения что память не освобождена.
   jsImages.Free;

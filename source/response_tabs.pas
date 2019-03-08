@@ -929,7 +929,11 @@ begin
 end;
 
 destructor TResponseTabManager.Destroy;
+var
+  I: Integer;
 begin
+  for I := 0 to FTabs.Count - 1 do
+    TResponseTab(FTabs.Items[I]).Free;
   FreeAndNil(FTabs);
   FreeAndNil(FOpenedTabs);
   FreeAndNil(FPageControl);
@@ -1109,6 +1113,7 @@ end;
 
 destructor TResponseTab.Destroy;
 begin
+  FreeTab;
   inherited Destroy;
 end;
 
