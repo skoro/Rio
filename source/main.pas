@@ -1719,6 +1719,10 @@ begin
 end;
 
 procedure TMainForm.SwitchLayout;
+{$IfDef WINDOWS}
+var
+  s: string;
+{$EndIf}
 begin
   // Adjust window size before change layout.
   if (LayoutSplitter.SplitterType = pstVertical) and
@@ -1730,7 +1734,15 @@ begin
        (Height < 400) then
     Height := 600;
 
+  // Switching layout on Windows leads to fatal exception.
+  // The reason is TMemo component (filled with the text).
+  // This hack clears text before switching and then fills the text back.
+  {$IfDef WINDOWS}
+  s := responseRaw.Text;
+  responseRaw.Clear;
+  {$EndIf}
   LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
+  {$IfDef WINDOWS}responseRaw.Text := s;{$EndIf}
 
   // View layout menu items.
   miLayoutHor.Checked := (OptionsForm.PanelsLayout = pstHorizontal);
