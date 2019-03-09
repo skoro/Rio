@@ -255,6 +255,7 @@ type
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
+    procedure FinishRequest;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -314,10 +315,11 @@ begin
   except on E: Exception do
     begin
       cbUrl.SetFocus;
-      Exit;
+      Exit; //=>
     end;
   end;
 
+  Screen.Cursor:=crHourGlass;
   FContentType := '';
   formData := '';
   contentType := '';
@@ -366,7 +368,8 @@ begin
           begin
             FreeAndNil(FHttpClient);
             ShowMessage(E.Message);
-            Exit;
+            FinishRequest;
+            Exit; //=>
           end;
         end;
       finally
@@ -1670,6 +1673,11 @@ begin
   end;
 end;
 
+procedure TMainForm.FinishRequest;
+begin
+  Screen.Cursor := crDefault;
+end;
+
 procedure TMainForm.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -1819,6 +1827,7 @@ begin
   else
     ShowMessage(E.Message);
   btnSubmit.Enabled := True;
+  FinishRequest;
 end;
 
 function TMainForm.ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
@@ -1946,6 +1955,7 @@ begin
 
   // Finally, dispose response info data.
   Info.Free;
+  FinishRequest;
 end;
 
 procedure TMainForm.UpdateStatusLine(Main: string);
