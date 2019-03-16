@@ -11,11 +11,11 @@ object HelpForm: THelpForm
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object bpButtons: TButtonPanel
     Left = 6
-    Height = 26
-    Top = 289
+    Height = 25
+    Top = 290
     Width = 606
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -28,11 +28,12 @@ object HelpForm: THelpForm
     ButtonOrder = boCloseCancelOK
     TabOrder = 0
     ShowButtons = [pbClose]
+    ShowGlyphs = [pbOK, pbCancel, pbHelp]
     ShowBevel = False
   end
   object helpText: TMemo
     Left = 6
-    Height = 277
+    Height = 278
     Top = 6
     Width = 606
     Align = alClient
