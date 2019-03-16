@@ -1746,11 +1746,15 @@ begin
   // The reason is TMemo component (filled with the text).
   // This hack clears text before switching and then fills the text back.
   {$IfDef WINDOWS}
-  s := responseRaw.Text;
-  responseRaw.Clear;
+    Screen.Cursor := crHourGlass;
+    s := responseRaw.Text;
+    responseRaw.Clear;
   {$EndIf}
   LayoutSplitter.SplitterType := OptionsForm.PanelsLayout;
-  {$IfDef WINDOWS}responseRaw.Text := s;{$EndIf}
+  {$IfDef WINDOWS}
+    responseRaw.Text := s;
+    Screen.Cursor := crDefault;
+  {$EndIf}
 
   // View layout menu items.
   miLayoutHor.Checked := (OptionsForm.PanelsLayout = pstHorizontal);
