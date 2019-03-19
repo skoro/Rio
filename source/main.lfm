@@ -1240,12 +1240,12 @@ object MainForm: TMainForm
                 Left = 46
                 Top = 0
                 AutoSize = True
-                Caption = 'Text'
+                Caption = 'Log'
                 ImageIndex = 1
                 OnClick = tbtnRespViewClick
               end
               object tbtnRespFollow: TToolButton
-                Left = 165
+                Left = 162
                 Top = 0
                 AutoSize = True
                 Caption = 'Follow'
@@ -1254,7 +1254,7 @@ object MainForm: TMainForm
                 Visible = False
               end
               object tbtnRespTime: TToolButton
-                Left = 95
+                Left = 92
                 Top = 0
                 AutoSize = True
                 Caption = 'Timings'
