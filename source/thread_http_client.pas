@@ -86,6 +86,10 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    // Fill a buffer with request - response exchange with the server.
+    // inStr  - a prefix for request headers.
+    // outStr - a prefix for response headers.
+    procedure ServerLog(Buffer: TStrings; inStr: string = '<'; outStr: string = '>');
     property StatusCode: Integer read FStatusCode write FStatusCode;
     property StatusText: string read FStatusText write FStatusText;
     property HttpVersion: string read FHttpVersion write FHttpVersion;
@@ -363,6 +367,22 @@ begin
   FreeAndNil(FResponseHeaders);
   FreeAndNil(FTimeCheckPoints);
   inherited Destroy;
+end;
+
+procedure TResponseInfo.ServerLog(Buffer: TStrings; inStr: string;
+  outStr: string);
+var
+  I: Integer;
+begin
+  RequestHeaders.NameValueSeparator := ':';
+  with RequestHeaders do
+    for I := 0 to Count - 1 do
+      Buffer.Add('%s %s: %s', [inStr, Names[I], ValueFromIndex[I]]);
+  Buffer.Add(inStr);
+  ResponseHeaders.NameValueSeparator := ':';
+  with ResponseHeaders do
+    for I := 0 to Count - 1 do
+      Buffer.Add('%s %s: %s', [outStr, Names[I], ValueFromIndex[I]]);
 end;
 
 { TCustomHttpClient }

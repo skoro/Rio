@@ -1880,7 +1880,6 @@ begin
   SetAppCaption(cbUrl.Text);
 
   // Response headers.
-  textResp.Clear;
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
   for i := 0 to Info.ResponseHeaders.Count - 1 do
   begin
@@ -1890,10 +1889,11 @@ begin
     kv.Value := Trim(RightStr(h, Length(h) - p));
     responseHeaders.Cells[0, i + 1] := kv.Key;
     responseHeaders.Cells[1, i + 1] := kv.Value;
-    textResp.Lines.Add(Format('%s: %s', [kv.Key, kv.Value]));
   end;
   FContentType := Info.ContentType;
 
+  textResp.Clear;
+  Info.ServerLog(textResp.Lines);
   UpdateStatusLine(Info);
 
   if (Info.StatusCode <> 404) then
