@@ -1871,9 +1871,7 @@ end;
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 var
   i, p: integer;
-  h: string;
   mime: TMimeType;
-  kv: TKeyValuePair;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
@@ -1881,14 +1879,11 @@ begin
 
   // Response headers.
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
+  Info.ResponseHeaders.NameValueSeparator := ':';
   for i := 0 to Info.ResponseHeaders.Count - 1 do
   begin
-    h := Info.ResponseHeaders.Strings[i];
-    p := Pos(':', h);
-    kv.Key := LeftStr(h, p - 1);
-    kv.Value := Trim(RightStr(h, Length(h) - p));
-    responseHeaders.Cells[0, i + 1] := kv.Key;
-    responseHeaders.Cells[1, i + 1] := kv.Value;
+    responseHeaders.Cells[0, i + 1] := Trim(Info.ResponseHeaders.Names[i]);
+    responseHeaders.Cells[1, i + 1] := Trim(Info.ResponseHeaders.ValueFromIndex[i]);
   end;
   FContentType := Info.ContentType;
 
