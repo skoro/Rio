@@ -82,6 +82,7 @@ type
     FUrl: string;
     FTimeCheckPoints: TTimeCheckPointList;
     FRequestLines: TStrings;
+    FServerHttpVersion: string;
     function GetContentType: string;
     function GetLocation: string;
     function GetRequestTime: TTimeMSec;
@@ -110,6 +111,7 @@ type
     // These lines include the requested resource (the first lines) and
     // all the request headers.
     property RequestLines: TStrings read FRequestLines write FRequestLines;
+    property ServerHttpVersion: string read FServerHttpVersion write FServerHttpVersion;
   end;
 
   TOnRequestComplete = procedure(ResponseInfo: TResponseInfo) of object;
@@ -394,6 +396,7 @@ begin
     end;
   end;
   Buffer.Add(inStr);
+  Buffer.Add('%s HTTP/%s %d %s', [outStr, FServerHttpVersion, FStatusCode, FStatusText]);
   ResponseHeaders.NameValueSeparator := ':';
   with ResponseHeaders do
     for I := 0 to Count - 1 do
@@ -604,6 +607,7 @@ begin
     if Assigned(FCookies) then
       FHttpClient.Cookies := FCookies;
     info.RequestLines := FHttpClient.CreateRequestLines(FHttpMethod, FUrl);
+    info.ServerHttpVersion := FHttpClient.ServerHTTPVersion;
     FOnRequestComplete(info);
   end;
 end;
