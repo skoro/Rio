@@ -599,6 +599,10 @@ begin
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
     info.Content.WriteString(FResponseData.DataString);
     info.TimeCheckPoints.Assign(FHttpClient.TimeProfiler.CheckPoints);
+    // HttpClient clears cookies after request.
+    // For the server logs we need to restore them.
+    if Assigned(FCookies) then
+      FHttpClient.Cookies := FCookies;
     info.RequestLines := FHttpClient.CreateRequestLines(FHttpMethod, FUrl);
     FOnRequestComplete(info);
   end;
