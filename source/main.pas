@@ -478,9 +478,11 @@ begin
     if (ActiveTab = tabContent) and tabContent.TabVisible then
       Txt := responseRaw
     else begin // And finally fallback to the "Response" tab.
-      // Don't find if response timings tab is opened.
-      if (ActiveTab = tabResponse) and (pagesRespView.ActivePage = tabRespTime) then
-        Exit;;
+      // Don't find if response timings tab or grid is opened.
+      if (ActiveTab = tabResponse) and
+         ((pagesRespView.ActivePage = tabRespTime) or (pagesRespView.ActivePage = tabRespList))
+      then
+        Exit;
       Txt := textResp;
       ActiveTab := tabResponse;
     end;
@@ -517,23 +519,6 @@ begin
         miFindNext.Enabled := False;
     end;
     else begin
-      // On active header response tab set selection in the grid.
-      if (ActiveTab = tabResponse) then begin
-        // Calculate grid row and col for navigation of the search result.
-        Row := 1;
-        Col := 0;
-        for i := 1 to Length(textResp.Text) do begin
-          chr := textResp.Text[i];
-          if (i = fp.Pos) then break
-          else if (chr = #10) then begin
-            Inc(Row);
-            Col := 0;
-          end
-          else if Chr = ':' then Inc(Col);
-        end;
-        responseHeaders.Row := Row;
-        responseHeaders.Col := Col;
-      end;
     end;
   end;
 end;
