@@ -460,7 +460,8 @@ var
   FindSucc: Integer;
   Ans: Integer;
   ActiveTab: TTabSheet;
-  Txt: TMemo = nil;
+  Txt: string = '';
+  memo: TMemo = nil;
   i, row, col: Integer;
   chr: Char;
 begin
@@ -473,34 +474,48 @@ begin
     pagesResponse.ActivePage := tab.TabSheet;
     FindSucc := tab.FindNext;
   end
+  // Search in focused internal tabs: Response and subtabs, Content...
   else begin
     // Next, "Content" tab priority.
     if (ActiveTab = tabContent) and tabContent.TabVisible then
-      Txt := responseRaw
-    else begin // And finally fallback to the "Response" tab.
-      // Don't find if response timings tab or grid is opened.
-      if (ActiveTab = tabResponse) and
-         ((pagesRespView.ActivePage = tabRespTime) or (pagesRespView.ActivePage = tabRespList))
-      then
-        Exit;
-      Txt := textResp;
-      ActiveTab := tabResponse;
+      Memo := responseRaw
+    else begin
+      // And finally fallback to the "Response" tab.
+      // Search in Response subtabs.
+      if (ActiveTab = tabResponse) then
+      begin
+        //ActiveTab := tabResponse;
+        if pagesRespView.ActivePage = tabRespTime then
+          Exit // =>
+        else if pagesRespView.ActivePage = tabRespList then
+            Txt := GridToString(responseHeaders, #9, 1, 0)
+        else if pagesRespView.ActivePage = tabRespText then
+            memo := textResp;
+      end;
     end;
-    pagesResponse.ActivePage := ActiveTab;
-    fp := FindInText(Txt.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+    if (memo = nil) and (txt = '') then
+      Exit; //=>
+    if Assigned(memo) and (txt = '') then
+      txt := memo.Text;
+    //pagesResponse.ActivePage := ActiveTab;
+    fp := FindInText(Txt, dlgFind.FindText, dlgFind.Options, FFindTextPos);
     if (fp.Pos = -1) and (FFindTextPos = 0) then
       FindSucc := -1 // Not found at all.
     else
       FindSucc := fp.Pos + 1;
-    if fp.Pos > 0 then begin
-      Txt.SelStart  := fp.SelStart;
-      Txt.SelLength := fp.SelLength;
-      if Txt.Parent.Focused then
-        Txt.SetFocus;
+    if fp.Pos > 0 then
+    begin
+      if Assigned(memo) then
+      begin
+        Memo.SelStart  := fp.SelStart;
+        Memo.SelLength := fp.SelLength;
+        if Memo.Parent.Focused then
+          Memo.SetFocus;
+      end;
       if frDown in dlgFind.Options then
-        FFindTextPos := fp.Pos + Txt.SelLength
+        FFindTextPos := fp.Pos + fp.SelLength
       else
-        FFindTextPos := fp.Pos - Txt.SelLength;
+        FFindTextPos := fp.Pos - fp.SelLength;
     end;
   end;
 
@@ -518,8 +533,26 @@ begin
       else
         miFindNext.Enabled := False;
     end;
-    else begin
-    end;
+    // The search string is found.
+    else
+      if (ActiveTab = tabResponse) and (pagesRespView.ActivePage = tabRespList) then begin
+        // Convert the search position to grid row, col.
+        Row := 1;
+        Col := 0;
+        for i := 1 to Length(txt) do begin
+          chr := txt[i];
+          if (i = fp.Pos) then
+            break
+          else if (chr = #10) then begin // Line ending - next row.
+            Inc(Row);
+            Col := 0;
+          end
+          else if (chr = #9) then // Tab - next column.
+            Inc(Col);
+        end;
+        responseHeaders.Row := Row;
+        responseHeaders.Col := Col;
+      end;
   end;
 end;
 
