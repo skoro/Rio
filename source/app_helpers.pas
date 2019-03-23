@@ -56,11 +56,16 @@ function FormatJson(json: TJSONData): string;
 function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
 function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1; isUnique: Boolean = True): Integer;
 
+// Converts a TStringGrid component to the string.
+// delimChar - a delimiter between columns
+// aRow, aCol - row and column offsets
+function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer = 1; aCol: Integer = 0): string;
+
 implementation
 
 uses process, LazUTF8, SynEditTypes, options, strutils;
 
-function FilePutContents(const filename, contents: string): Boolean;
+function FilePutContents(const filename, contents: ansistring): Boolean;
 var
   fs: TFileStream;
 begin
@@ -351,6 +356,32 @@ begin
     Cells[Start + 1, ARow] := KV.Value;
   end;
   Result := ARow;
+end;
+
+function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer;
+  aCol: Integer): string;
+var
+  r,c: Integer;
+  s: string;
+  Buf: TStrings;
+begin
+  Buf := TStringList.Create;
+  try
+    for r := aRow to aGrid.RowCount - 1 do begin
+      s := '';
+      for c := aCol to aGrid.ColCount - 1 do
+        if c = aCol then
+          s := aGrid.Cells[c, r]
+        else
+          s := s + delimChar + aGrid.Cells[c, r];
+      Buf.Add(s);
+    end;
+    Buf.SkipLastLineBreak := True;
+    //Result := StringReplace(Buf.Text, LineEnding, '\n', [rfReplaceAll, rfIgnoreCase]);
+    Result := Buf.Text;
+  finally
+    FreeAndNil(Buf);
+  end;
 end;
 
 end.
