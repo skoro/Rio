@@ -256,6 +256,7 @@ type
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
     procedure FinishRequest;
+    procedure ResetFindTextPos;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -564,6 +565,7 @@ begin
       tbtnRespText.Down := False;
       tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespList;
+      ResetFindTextPos;
       if Showing then // Don't focus the component when form is creating.
         responseHeaders.SetFocus;
     end;
@@ -572,6 +574,7 @@ begin
       tbtnRespText.Down := True;
       tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespText;
+      ResetFindTextPos;
       if Showing then
         textResp.SetFocus;
     end;
@@ -1132,7 +1135,7 @@ begin
   // Switching between tabs resets FindNext search.
   // This behaviour doesn't affect the search from the response_tabs unit
   // in case when a response tab implements find methods with the internal next position.
-  FFindTextPos := 0;
+  ResetFindTextPos;
 end;
 
 procedure TMainForm.pmAuthTypeClick(Sender: TObject);
@@ -1694,6 +1697,11 @@ end;
 procedure TMainForm.FinishRequest;
 begin
   Screen.Cursor := crDefault;
+end;
+
+procedure TMainForm.ResetFindTextPos;
+begin
+  FFindTextPos := 0;
 end;
 
 procedure TMainForm.ApplyOptions;
