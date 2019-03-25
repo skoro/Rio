@@ -5,8 +5,8 @@ unit bookmark_form;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, ButtonPanel,
-  ExtCtrls, Buttons, StdCtrls, ComCtrls;
+  Forms, ButtonPanel,
+  ExtCtrls, StdCtrls, ComCtrls;
 
 type
 
