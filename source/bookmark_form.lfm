@@ -1,0 +1,146 @@
+object BookmarkForm: TBookmarkForm
+  Left = 454
+  Height = 300
+  Top = 231
+  Width = 260
+  Caption = 'Bookmark'
+  ClientHeight = 300
+  ClientWidth = 260
+  Constraints.MinHeight = 300
+  Constraints.MinWidth = 260
+  LCLVersion = '1.8.4.0'
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 27
+    Top = 267
+    Width = 248
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.Caption = '&Delete'
+    CloseButton.DefaultCaption = False
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 0
+    ShowButtons = [pbOK, pbCancel, pbClose]
+    ShowGlyphs = []
+    ShowBevel = False
+  end
+  object pName: TPanel
+    Left = 6
+    Height = 48
+    Top = 6
+    Width = 248
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Around = 6
+    BevelOuter = bvNone
+    ClientHeight = 48
+    ClientWidth = 248
+    TabOrder = 1
+    object lName: TLabel
+      Left = 0
+      Height = 17
+      Top = 2
+      Width = 248
+      Align = alTop
+      BorderSpacing.Top = 2
+      BorderSpacing.Bottom = 2
+      Caption = 'Name:'
+      ParentColor = False
+    end
+    object edName: TEdit
+      Left = 0
+      Height = 27
+      Top = 21
+      Width = 248
+      Align = alTop
+      TabOrder = 0
+    end
+  end
+  object pFolders: TPanel
+    Left = 6
+    Height = 153
+    Top = 60
+    Width = 248
+    Align = alClient
+    BorderSpacing.Around = 6
+    BevelOuter = bvNone
+    Caption = 'pFolders'
+    ClientHeight = 153
+    ClientWidth = 248
+    TabOrder = 2
+    object lFolder: TLabel
+      Left = 0
+      Height = 17
+      Top = 0
+      Width = 248
+      Align = alTop
+      Caption = 'Folder:'
+      ParentColor = False
+    end
+    object pFolderBtn: TPanel
+      Left = 0
+      Height = 27
+      Top = 126
+      Width = 248
+      Align = alBottom
+      AutoSize = True
+      BevelOuter = bvNone
+      ClientHeight = 27
+      ClientWidth = 248
+      TabOrder = 0
+      object btnNewFolder: TButton
+        Left = 0
+        Height = 27
+        Top = 0
+        Width = 73
+        Align = alLeft
+        AutoSize = True
+        Caption = 'New Folder'
+        TabOrder = 0
+      end
+    end
+    object tvFolders: TTreeView
+      Left = 0
+      Height = 109
+      Top = 17
+      Width = 248
+      Align = alClient
+      TabOrder = 1
+    end
+  end
+  object pOptions: TPanel
+    Left = 6
+    Height = 42
+    Top = 219
+    Width = 248
+    Align = alBottom
+    AutoSize = True
+    BorderSpacing.Around = 6
+    BevelOuter = bvNone
+    ClientHeight = 42
+    ClientWidth = 248
+    TabOrder = 3
+    object chkSaveResponse: TCheckBox
+      Left = 0
+      Height = 21
+      Top = 0
+      Width = 248
+      Align = alTop
+      Caption = 'Save response'
+      TabOrder = 0
+    end
+    object chkSyncResp: TCheckBox
+      Left = 0
+      Height = 21
+      Top = 21
+      Width = 248
+      Align = alTop
+      Caption = 'Synchronize response content'
+      TabOrder = 1
+    end
+  end
+end
