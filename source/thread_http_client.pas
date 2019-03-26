@@ -50,6 +50,7 @@ type
   TCustomHttpClient = class(TFPHTTPClient)
   private
     FTimeProfiler: TTimeProfiler;
+    FSentCookies: TStrings; // Preserve sent cookies to use them in server log.
   protected
     procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
     procedure SendRequest(const AMethod: String; URI: TURI); override;
@@ -425,6 +426,8 @@ end;
 procedure TCustomHttpClient.SendRequest(const AMethod: String; URI: TURI);
 begin
   FTimeProfiler.Start('Send request');
+  FreeAndNil(FSentCookies);
+  FSentCookies := Cookies;
   inherited SendRequest(AMethod, URI);
   FTimeProfiler.Stop('Send request');
 end;
@@ -479,14 +482,14 @@ begin
     If AllowHeader(L) then
       Buf.Add(l);
   end;
-  if Assigned(Cookies) then
+  if Assigned(FSentCookies) then
   begin
     L := 'Cookie:';
-    for I := 0 to Cookies.Count-1 do
+    for I := 0 to FSentCookies.Count-1 do
     begin
       if ( I > 0 ) then
         L := L + '; ';
-      L := L + Cookies[i];
+      L := L + FSentCookies[i];
     end;
     if AllowHeader(L) then
       Buf.Add(L);
