@@ -6,8 +6,8 @@ interface
 
 uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
-  SynHighlighterJScript, thread_http_client, response_tabs, key_value,
+  fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
+  SynEdit, SynHighlighterJScript, thread_http_client, response_tabs, key_value,
   profiler_graph, GridNavigator, SysUtils, jsonparser;
 
 type
@@ -58,6 +58,7 @@ type
     miTabBody: TMenuItem;
     miTabCookie: TMenuItem;
     miView: TMenuItem;
+    btnBookmark: TSpeedButton;
     tabRespTime: TTabSheet;
     toolbarIcons: TImageList;
     textResp: TMemo;
@@ -159,6 +160,7 @@ type
     tbtnRespText: TToolButton;
     tbtnRespFollow: TToolButton;
     tbtnRespTime: TToolButton;
+    procedure BookmarkEditorShow(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -281,7 +283,7 @@ implementation
 
 uses about, headers_editor, cookie_form, uriparser, request_object,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
-  import_form, export_form, Clipbrd;
+  import_form, export_form, bookmark_form, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -300,6 +302,15 @@ begin
   FRequestSeconds := 0;
   if SubmitRequest then
     TimerRequest.Enabled := True;
+end;
+
+procedure TMainForm.BookmarkEditorShow(Sender: TObject);
+begin
+  with TBookmarkForm.Create(Self) do
+  begin
+    ShowModal;
+    Close;
+  end;
 end;
 
 function TMainForm.SubmitRequest: Boolean;

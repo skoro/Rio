@@ -8,6 +8,7 @@ object BookmarkForm: TBookmarkForm
   ClientWidth = 260
   Constraints.MinHeight = 300
   Constraints.MinWidth = 260
+  Position = poOwnerFormCenter
   LCLVersion = '1.8.4.0'
   object ButtonPanel: TButtonPanel
     Left = 6

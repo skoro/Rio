@@ -254,6 +254,7 @@
         <Filename Value="bookmark_form.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BookmarkForm"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit20>
     </Units>
