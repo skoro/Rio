@@ -261,6 +261,7 @@ type
     procedure ToggleRequestSide(VisibleSide: Boolean);
     procedure FinishRequest;
     procedure ResetFindTextPos;
+    procedure EnableSubmitButton;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -286,7 +287,7 @@ var
 
 implementation
 
-uses about, headers_editor, cookie_form, uriparser,
+uses about, headers_editor, cookie_form,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
   import_form, export_form, bookmark_form, Clipbrd;
 
@@ -678,15 +679,9 @@ begin
 end;
 
 procedure TMainForm.cbUrlChange(Sender: TObject);
-var
-  isEmpty: Boolean;
 begin
   SyncURLQueryParams;
-  isEmpty := False;
-  if Length(Trim(cbUrl.Text)) = 0 then
-    isEmpty := True;
-  btnSubmit.Enabled := not isEmpty;
-  btnBookmark.Enabled := not isEmpty;
+  EnableSubmitButton;
 end;
 
 procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -1268,6 +1263,7 @@ begin
   // Update Query tab and app title.
   SetAppCaption(cbUrl.Text);
   SyncURLQueryParams;
+  EnableSubmitButton;
 end;
 
 procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
@@ -1566,7 +1562,7 @@ begin
   Result := grid.Cells[0, aRow] = '1';
 end;
 
-procedure TMainForm.SelectBodyTab(const tab: tbodytab);
+procedure TMainForm.SelectBodyTab(const tab: TBodyTab);
 begin
   tbtnFormUpload.Visible  := False;
   tbtnBodyFormat.Visible  := False;
@@ -1794,6 +1790,17 @@ end;
 procedure TMainForm.ResetFindTextPos;
 begin
   FFindTextPos := 0;
+end;
+
+procedure TMainForm.EnableSubmitButton;
+var
+  isEmpty: Boolean;
+begin
+  isEmpty := False;
+  if Length(Trim(cbUrl.Text)) = 0 then
+    isEmpty := True;
+  btnSubmit.Enabled := not isEmpty;
+  btnBookmark.Enabled := not isEmpty;
 end;
 
 procedure TMainForm.ApplyOptions;
