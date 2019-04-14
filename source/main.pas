@@ -678,8 +678,15 @@ begin
 end;
 
 procedure TMainForm.cbUrlChange(Sender: TObject);
+var
+  isEmpty: Boolean;
 begin
   SyncURLQueryParams;
+  isEmpty := False;
+  if Length(Trim(cbUrl.Text)) = 0 then
+    isEmpty := True;
+  btnSubmit.Enabled := not isEmpty;
+  btnBookmark.Enabled := not isEmpty;
 end;
 
 procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -2247,6 +2254,9 @@ begin
 
   FResponseTabManager.CloseTabs;
   SetAppCaption;
+
+  btnSubmit.Enabled := False;
+  btnBookmark.Enabled := False;
 end;
 
 function TMainForm.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
