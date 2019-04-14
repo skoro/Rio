@@ -172,7 +172,7 @@ function ParseContentType(Headers: TStrings): string;
 // Generate filename from the url and content type.
 // If parameter 'DefExt' is empty then extension will be detected depending on
 // the document.
-function GetRequestFilename(Url, ContentType: string; DefExt: string = ''): string;
+function GetRequestFilename(Url: string; ContentType: string = ''; DefExt: string = ''): string;
 
 implementation
 
@@ -283,7 +283,7 @@ var
   basename: string;
 begin
   uri := ParseURI(NormalizeUrl(Url));
-  if DefExt = '' then begin
+  if (ContentType <> '') and (DefExt = '') then begin
     DefExt := RightStr(ContentType, Length(ContentType) - Pos('/', ContentType));
     // Get extension name from strings like 'rss+xml', etc.
     DefExt := RightStr(DefExt, Length(DefExt) - Pos('+', DefExt));
@@ -298,7 +298,7 @@ begin
   // already contains the extension.
   if (ContentType = 'image/jpeg') and (RightStr(basename, 4) = '.jpg') then
     Exit(basename);
-  Result := Format('%s.%s', [basename, DefExt]);
+  Result := IfThen(DefExt <> '', Format('%s.%s', [basename, DefExt]), basename);
 end;
 
 { TTimeProfiler }
