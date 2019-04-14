@@ -41,7 +41,7 @@ var
 
 implementation
 
-uses Controls, sysutils;
+uses Controls, thread_http_client, sysutils;
 
 {$R *.lfm}
 
@@ -60,6 +60,7 @@ end;
 function TBookmarkForm.CreateBookmark(RO: TRequestObject): TBookmark;
 begin
   ButtonPanel.CloseButton.Visible := False;
+  edName.Text := GetRequestFilename(RO.Url);
   if ShowModal <> mrOK then
     Exit(NIL); //=>
   Result := TBookmark.Create(edName.Text);
