@@ -8,12 +8,11 @@ uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, thread_http_client, response_tabs, key_value,
-  profiler_graph, bookmarks, GridNavigator, SysUtils, jsonparser;
+  profiler_graph, bookmarks, request_object, GridNavigator, SysUtils,
+  jsonparser;
 
 type
 
-  TBodyTab = (btForm, btJson, btOther);
-  TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
   TResponseView = (rvList, rvText, rvTimings);
 
@@ -268,7 +267,7 @@ type
     procedure AddRequestHeader(AHeader, AValue: string);
     procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
     procedure OpenRequestFile(jsonStr: string);
-    procedure SelectBodyTab(const tab: tbodytab);
+    procedure SelectBodyTab(const tab: TBodyTab);
     procedure SelectAuthTab(const tab: TAuthTab);
     procedure SelectResponseViewTab(rView: TResponseView);
     function GetSelectedBodyTab: TBodyTab;
@@ -278,6 +277,8 @@ type
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
     function SubmitRequest: Boolean;
     procedure FindText;
+    function CreateRequestObject: TRequestObject;
+    procedure SetRequestObject(RO: TRequestObject);
   end;
 
 var
@@ -285,7 +286,7 @@ var
 
 implementation
 
-uses about, headers_editor, cookie_form, uriparser, request_object,
+uses about, headers_editor, cookie_form, uriparser,
   app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
   import_form, export_form, bookmark_form, Clipbrd;
 
@@ -550,6 +551,66 @@ begin
         responseHeaders.Col := Col;
       end;
     end;
+  end;
+end;
+
+function TMainForm.CreateRequestObject: TRequestObject;
+begin
+  Result := TRequestObject.Create;
+  with Result do begin
+    Method := cbMethod.Text;
+    Url    := cbUrl.Text;
+    Body   := editOther.Text;
+    Json   := editJson.Text;
+    SetCollectionFromGrid(requestHeaders, Headers);
+    SetCollectionFromGrid(gridReqCookie, Cookies);
+    SetCollectionFromGrid(gridParams, Params);
+    GetFormFromGrid(gridForm);
+    AuthType := GetSelectedAuthTab;
+    AuthBasic.Login    := editBasicLogin.Text;
+    AuthBasic.Password := editBasicPassword.Text;
+    AuthBearer.Prefix  := editBearerPrefix.Text;
+    AuthBearer.Token   := editBearerToken.Text;
+    DataType := GetSelectedBodyTab;
+    Notes := editNotes.Text;
+  end;
+end;
+
+procedure TMainForm.SetRequestObject(RO: TRequestObject);
+var
+  bt: TBodyTab;
+begin
+  with RO do begin
+    cbUrl.Text     := Url;
+    cbMethod.Text  := Method;
+    editOther.Text := Body;
+    editJson.Text  := Json;
+    editNotes.Text := Notes;
+
+    SetCollectionToGrid(Headers, requestHeaders);
+    SetCollectionToGrid(Cookies, gridReqCookie);
+    SetCollectionToGrid(Params, gridParams);
+    SetFormToGrid(gridForm);
+
+    SelectAuthTab(AuthType);
+    editBasicLogin.Text    := AuthBasic.Login;
+    editBasicPassword.Text := AuthBasic.Password;
+    editBearerPrefix.Text  := AuthBearer.Prefix;
+    editBearerToken.Text   := AuthBearer.Token;
+
+    // Set body tab depending on data.
+    if IsJson then
+       bt := btJson
+    else
+      if not Body.Trim.IsEmpty then
+        bt := btOther
+    else
+      bt := btForm;
+    SelectBodyTab(bt);
+
+    // Set response content.
+    if Assigned(ResponseInfo) then
+      OnRequestComplete(ResponseInfo);
   end;
 end;
 
@@ -870,7 +931,7 @@ begin
       if RequestObjects.Count = 0 then
         ERRMsg('Error', 'Data not imported.')
       else
-        RequestObjects.Items[0].RequestObject.LoadToForm(Self);
+        Self.SetRequestObject(RequestObjects.Items[0].RequestObject);
     end;
     Free;
   end;
@@ -1066,7 +1127,7 @@ begin
   streamer := TJSONStreamer.Create(nil);
 
   try
-    obj := TRequestObject.Create(Self);
+    obj := CreateRequestObject;
     json := streamer.ObjectToJSONString(obj);
 
     try
@@ -1829,7 +1890,7 @@ begin
   try
     streamer.JSONToObject(jsonStr, obj);
     StartNewRequest;
-    obj.LoadToForm(Self);
+    SetRequestObject(obj);
   except on E: Exception do
       ShowMessage(E.Message);
   end;

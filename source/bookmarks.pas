@@ -5,7 +5,7 @@ unit bookmarks;
 interface
 
 uses
-  Classes, SysUtils, ComCtrls, ExtCtrls, Controls{, request_object};
+  Classes, SysUtils, ComCtrls, ExtCtrls, Controls, request_object;
 
 type
 
@@ -14,15 +14,15 @@ type
   TBookmark = class
   private
     FName: string;
-    //FRequest: TRequestObject;
+    FRequest: TRequestObject;
     FTreeNode: TTreeNode;
     procedure SetName(AValue: string);
     procedure SetTreeNode(AValue: TTreeNode);
   public
-//    constructor Create(aName: string; aRequest: TRequestObject);
+    constructor Create(aName: string; aRequest: TRequestObject);
     destructor Destroy; override;
     property Name: string read FName write SetName;
-    //property Request: TRequestObject read FRequest;
+    property Request: TRequestObject read FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
   end;
 
@@ -65,11 +65,11 @@ begin
   FTreeNode := AValue;
 end;
 
-{constructor TBookmark.Create(aName: string; aRequest: TRequestObject);
+constructor TBookmark.Create(aName: string; aRequest: TRequestObject);
 begin
   FName := aName;
   FRequest := aRequest;
-end;}
+end;
 
 destructor TBookmark.Destroy;
 begin

@@ -5,9 +5,12 @@ unit request_object;
 interface
 
 uses
-  Classes, SysUtils, Grids, main;
+  Classes, SysUtils, Grids, thread_http_client;
 
 type
+
+  TBodyTab = (btForm, btJson, btOther);
+  TAuthTab = (atNone = -1, atBasic, atBearer);
 
   { TRequestParamItem }
 
@@ -120,12 +123,12 @@ type
     FAuthType: TAuthTab; // TODO: should be TAuthType
     FDataType: TBodyTab;
     FNotes: string;
+    FResponseInfo: TResponseInfo;
     function GetFilename: string;
     procedure SetMethod(AValue: string);
   protected
   public
     constructor Create;
-    constructor Create(form: TMainForm); overload;
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
@@ -135,8 +138,8 @@ type
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
-    procedure LoadToForm(form: TMainForm);
     function IsJson: Boolean;
+    property ResponseInfo: TResponseInfo read FResponseInfo write FResponseInfo;
   published
     property Method: string read FMethod write SetMethod;
     property Url: string read FUrl write FUrl;
@@ -147,9 +150,9 @@ type
     property Cookies: TRequestParamList read FCookies;
     property Params: TRequestParamList read FParams;
     property AuthType: TAuthTab read FAuthType write FAuthType;
-    property AuthBasic: TAuthBasic read FAuthBasic;
-    property AuthBearer: TAuthBearer read FAuthBearer;
-    property DataType: TBodyTab read FDataType;
+    property AuthBasic: TAuthBasic read FAuthBasic write FAuthBasic;
+    property AuthBearer: TAuthBearer read FAuthBearer write FAuthBearer;
+    property DataType: TBodyTab read FDataType write FDataType;
     property Filename: string read GetFilename;
     property Notes: string read FNotes write FNotes;
   end;
@@ -283,28 +286,7 @@ begin
   FAuthBearer := TAuthBearer.Create;
   FMethod     := 'GET';
   FNotes      := '';
-end;
-
-constructor TRequestObject.Create(form: TMainForm);
-begin
-  Create;
-  with form do begin
-    Method := cbMethod.Text;
-    Url    := cbUrl.Text;
-    Body   := editOther.Text;
-    Json   := editJson.Text;
-    SetCollectionFromGrid(requestHeaders, FHeaders);
-    SetCollectionFromGrid(gridReqCookie, FCookies);
-    SetCollectionFromGrid(gridParams, FParams);
-    GetFormFromGrid(gridForm);
-    FAuthType := GetSelectedAuthTab;
-    FAuthBasic.Login    := editBasicLogin.Text;
-    FAuthBasic.Password := editBasicPassword.Text;
-    FAuthBearer.Prefix  := editBearerPrefix.Text;
-    FAuthBearer.Token   := editBearerToken.Text;
-    FDataType := GetSelectedBodyTab;
-    FNotes := editNotes.Text;
-  end;
+  FResponseInfo := nil;
 end;
 
 destructor TRequestObject.Destroy;
@@ -315,6 +297,8 @@ begin
   FParams.Free;
   FAuthBasic.Free;
   FAuthBearer.Free;
+  // Please notice, there is no free for ResponseInfo. It should be
+  // freed manual.
   inherited Destroy;
 end;
 
@@ -413,40 +397,6 @@ begin
     Name := AName;
     Value := AValue;
     ElemType := AElemType;
-  end;
-end;
-
-procedure TRequestObject.LoadToForm(form: TMainForm);
-var
-  bt: TBodyTab;
-begin
-  with form do begin
-    cbUrl.Text     := Url;
-    cbMethod.Text  := Method;
-    editOther.Text := Body;
-    editJson.Text  := Json;
-    editNotes.Text := Notes;
-
-    SetCollectionToGrid(Headers, requestHeaders);
-    SetCollectionToGrid(Cookies, gridReqCookie);
-    SetCollectionToGrid(Params, gridParams);
-    SetFormToGrid(gridForm);
-
-    SelectAuthTab(AuthType);
-    editBasicLogin.Text    := AuthBasic.Login;
-    editBasicPassword.Text := AuthBasic.Password;
-    editBearerPrefix.Text  := AuthBearer.Prefix;
-    editBearerToken.Text   := AuthBearer.Token;
-
-    // Set body tab depending on data.
-    if IsJson then
-       bt := btJson
-    else
-      if not Body.Trim.IsEmpty then
-        bt := btOther
-    else
-      bt := btForm;
-    SelectBodyTab(bt);
   end;
 end;
 
