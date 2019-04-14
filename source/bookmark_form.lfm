@@ -8,6 +8,7 @@ object BookmarkForm: TBookmarkForm
   ClientWidth = 260
   Constraints.MinHeight = 300
   Constraints.MinWidth = 260
+  OnCreate = FormCreate
   Position = poOwnerFormCenter
   LCLVersion = '1.8.4.0'
   object ButtonPanel: TButtonPanel
@@ -102,6 +103,7 @@ object BookmarkForm: TBookmarkForm
         Align = alLeft
         AutoSize = True
         Caption = 'New Folder'
+        OnClick = btnNewFolderClick
         TabOrder = 0
       end
     end
@@ -111,6 +113,7 @@ object BookmarkForm: TBookmarkForm
       Top = 17
       Width = 248
       Align = alClient
+      ScrollBars = ssAutoBoth
       TabOrder = 1
     end
   end

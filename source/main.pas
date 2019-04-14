@@ -244,7 +244,6 @@ type
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
     procedure ShowResponseCookie(Headers: TStrings);
-    function GetRequestFilename(ext: string = ''): string;
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     function EditGridRow(Grid: TStringGrid;
@@ -311,11 +310,18 @@ begin
 end;
 
 procedure TMainForm.BookmarkEditorShow(Sender: TObject);
+var
+  bm: TBookmark;
+  RO: TRequestObject;
 begin
   with TBookmarkForm.Create(Self) do
   begin
-    ShowModal;
-    Close;
+    RO := CreateRequestObject;
+    bm := CreateBookmark(RO);
+    if bm = Nil then begin
+      FreeAndNil(RO);
+    end;
+    Free;
   end;
 end;
 
@@ -1152,7 +1158,7 @@ begin
     json := streamer.ObjectToJSONString(obj);
 
     try
-      dlgSave.FileName := GetRequestFilename('request.json');
+      dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType, 'request.json');
       dlgSave.Title := 'Save the request to a file';
       if dlgSave.Execute then
         if not FilePutContents(dlgSave.Filename, json) then
@@ -1169,7 +1175,7 @@ end;
 procedure TMainForm.miSaveResponseClick(Sender: TObject);
 begin
   try
-    dlgSave.FileName := GetRequestFilename;
+    dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType);
     dlgSave.Title := 'Save the response to a file';
     if dlgSave.Execute then begin
       if (FResponseTabManager.OpenedTabs.Count = 0) and (tabContent.TabVisible) then
@@ -2158,33 +2164,6 @@ begin
 
   if Row > 1 then tabRespCookie.TabVisible := True
     else tabRespCookie.TabVisible := False;
-end;
-
-// Creates a filename based on a request.
-// If parameter 'ext' is empty then extension will be detected depending on
-// the document.
-function TMainForm.GetRequestFilename(ext: string): string;
-var
-  uri: TURI;
-  basename: string;
-begin
-  uri := ParseURI(NormalizeUrl(cbUrl.Text));
-  if ext = '' then begin
-    ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
-    // Get extension name from strings like 'rss+xml', etc.
-    ext := RightStr(ext, Length(ext) - Pos('+', ext));
-  end;
-  basename := TrimSet(uri.Document, ['/']);
-  if basename = '' then
-    basename := uri.Host;
-  // Strip extension from a document name (mainly for images).
-  if RightStr(basename, Length(ext) + 1) = '.' + ext then
-    basename := LeftStr(basename, Length(basename) - Length(ext) - 1);
-  // Don't append a content type extension to a jpeg image if the image
-  // already contains the extension.
-  if (FContentType = 'image/jpeg') and (RightStr(basename, 4) = '.jpg') then
-    Exit(basename);
-  Result := Format('%s.%s', [basename, ext]);
 end;
 
 function TMainForm.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;

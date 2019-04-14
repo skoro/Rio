@@ -19,10 +19,10 @@ type
     procedure SetName(AValue: string);
     procedure SetTreeNode(AValue: TTreeNode);
   public
-    constructor Create(aName: string; aRequest: TRequestObject);
+    constructor Create(aName: string);
     destructor Destroy; override;
     property Name: string read FName write SetName;
-    property Request: TRequestObject read FRequest;
+    property Request: TRequestObject read FRequest write FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
   end;
 
@@ -65,14 +65,16 @@ begin
   FTreeNode := AValue;
 end;
 
-constructor TBookmark.Create(aName: string; aRequest: TRequestObject);
+constructor TBookmark.Create(aName: string);
 begin
   FName := aName;
-  FRequest := aRequest;
+  FRequest := nil;
 end;
 
 destructor TBookmark.Destroy;
 begin
+  if FRequest <> Nil then
+    FreeAndNil(FRequest);
   inherited Destroy;
 end;
 

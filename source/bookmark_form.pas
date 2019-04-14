@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, Classes;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Classes;
 
 type
 
@@ -25,11 +25,15 @@ type
     pFolderBtn: TPanel;
     pName: TPanel;
     tvFolders: TTreeView;
+    procedure btnNewFolderClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
   private
 
   public
-
+    property TreeView: TTreeView read tvFolders;
+    function CreateBookmark(RO: TRequestObject): TBookmark;
+    function EditBookmark(Bookmark: TBookmark): TModalResult;
   end;
 
 var
@@ -51,6 +55,30 @@ begin
     Exit; //=>
   end;
   ModalResult := mrOK;
+end;
+
+function TBookmarkForm.CreateBookmark(RO: TRequestObject): TBookmark;
+begin
+  ButtonPanel.CloseButton.Visible := False;
+  if ShowModal <> mrOK then
+    Exit(NIL); //=>
+  Result := TBookmark.Create(edName.Text);
+  Result.Request := RO;
+end;
+
+function TBookmarkForm.EditBookmark(Bookmark: TBookmark): TModalResult;
+begin
+
+end;
+
+procedure TBookmarkForm.FormCreate(Sender: TObject);
+begin
+  ButtonPanel.OKButton.ModalResult := mrNone;
+end;
+
+procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
+begin
+
 end;
 
 end.
