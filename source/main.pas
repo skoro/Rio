@@ -261,6 +261,7 @@ type
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
     procedure FinishRequest;
+    procedure ResetFindTextPos;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -476,7 +477,8 @@ var
   FindSucc: Integer;
   Ans: Integer;
   ActiveTab: TTabSheet;
-  Txt: TMemo = nil;
+  Txt: string = '';
+  memo: TMemo = nil;
   i, row, col: Integer;
   chr: Char;
 begin
@@ -489,32 +491,48 @@ begin
     pagesResponse.ActivePage := tab.TabSheet;
     FindSucc := tab.FindNext;
   end
+  // Search in focused internal tabs: Response and subtabs, Content...
   else begin
     // Next, "Content" tab priority.
     if (ActiveTab = tabContent) and tabContent.TabVisible then
-      Txt := responseRaw
-    else begin // And finally fallback to the "Response" tab.
-      // Don't find if response timings tab is opened.
-      if (ActiveTab = tabResponse) and (pagesRespView.ActivePage = tabRespTime) then
-        Exit;;
-      Txt := textResp;
-      ActiveTab := tabResponse;
+      Memo := responseRaw
+    else begin
+      // And finally fallback to the "Response" tab.
+      // Search in Response subtabs.
+      if (ActiveTab = tabResponse) then
+      begin
+        //ActiveTab := tabResponse;
+        if pagesRespView.ActivePage = tabRespTime then
+          Exit // =>
+        else if pagesRespView.ActivePage = tabRespList then
+            Txt := GridToString(responseHeaders, #9, 1, 0)
+        else if pagesRespView.ActivePage = tabRespText then
+            memo := textResp;
+      end;
     end;
-    pagesResponse.ActivePage := ActiveTab;
-    fp := FindInText(Txt.Text, dlgFind.FindText, dlgFind.Options, FFindTextPos);
+    if (memo = nil) and (txt = '') then
+      Exit; //=>
+    if Assigned(memo) and (txt = '') then
+      txt := memo.Text;
+    //pagesResponse.ActivePage := ActiveTab;
+    fp := FindInText(Txt, dlgFind.FindText, dlgFind.Options, FFindTextPos);
     if (fp.Pos = -1) and (FFindTextPos = 0) then
       FindSucc := -1 // Not found at all.
     else
       FindSucc := fp.Pos + 1;
-    if fp.Pos > 0 then begin
-      Txt.SelStart  := fp.SelStart;
-      Txt.SelLength := fp.SelLength;
-      if Txt.Parent.Focused then
-        Txt.SetFocus;
+    if fp.Pos > 0 then
+    begin
+      if Assigned(memo) then
+      begin
+        Memo.SelStart  := fp.SelStart;
+        Memo.SelLength := fp.SelLength;
+        if Memo.Parent.Focused then
+          Memo.SetFocus;
+      end;
       if frDown in dlgFind.Options then
-        FFindTextPos := fp.Pos + Txt.SelLength
+        FFindTextPos := fp.Pos + fp.SelLength
       else
-        FFindTextPos := fp.Pos - Txt.SelLength;
+        FFindTextPos := fp.Pos - fp.SelLength;
     end;
   end;
 
@@ -532,25 +550,26 @@ begin
       else
         miFindNext.Enabled := False;
     end;
-    else begin
-      // On active header response tab set selection in the grid.
-      if (ActiveTab = tabResponse) then begin
-        // Calculate grid row and col for navigation of the search result.
+    // The search string is found.
+    else
+      if (ActiveTab = tabResponse) and (pagesRespView.ActivePage = tabRespList) then begin
+        // Convert the search position to grid row, col.
         Row := 1;
         Col := 0;
-        for i := 1 to Length(textResp.Text) do begin
-          chr := textResp.Text[i];
-          if (i = fp.Pos) then break
-          else if (chr = #10) then begin
+        for i := 1 to Length(txt) do begin
+          chr := txt[i];
+          if (i = fp.Pos) then
+            break
+          else if (chr = #10) then begin // Line ending - next row.
             Inc(Row);
             Col := 0;
           end
-          else if Chr = ':' then Inc(Col);
+          else if (chr = #9) then // Tab - next column.
+            Inc(Col);
         end;
         responseHeaders.Row := Row;
         responseHeaders.Col := Col;
       end;
-    end;
   end;
 end;
 
@@ -622,6 +641,7 @@ begin
       tbtnRespText.Down := False;
       tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespList;
+      ResetFindTextPos;
       if Showing then // Don't focus the component when form is creating.
         responseHeaders.SetFocus;
     end;
@@ -630,6 +650,7 @@ begin
       tbtnRespText.Down := True;
       tbtnRespTime.Down := False;
       pagesRespView.ActivePage := tabRespText;
+      ResetFindTextPos;
       if Showing then
         textResp.SetFocus;
     end;
@@ -1193,7 +1214,7 @@ begin
   // Switching between tabs resets FindNext search.
   // This behaviour doesn't affect the search from the response_tabs unit
   // in case when a response tab implements find methods with the internal next position.
-  FFindTextPos := 0;
+  ResetFindTextPos;
 end;
 
 procedure TMainForm.pmAuthTypeClick(Sender: TObject);
@@ -1757,6 +1778,11 @@ begin
   Screen.Cursor := crDefault;
 end;
 
+procedure TMainForm.ResetFindTextPos;
+begin
+  FFindTextPos := 0;
+end;
+
 procedure TMainForm.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -1950,29 +1976,24 @@ end;
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 var
   i, p: integer;
-  h: string;
   mime: TMimeType;
-  kv: TKeyValuePair;
 begin
   btnSubmit.Enabled := True;
   TimerRequest.Enabled := False;
   SetAppCaption(cbUrl.Text);
 
   // Response headers.
-  textResp.Clear;
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
+  Info.ResponseHeaders.NameValueSeparator := ':';
   for i := 0 to Info.ResponseHeaders.Count - 1 do
   begin
-    h := Info.ResponseHeaders.Strings[i];
-    p := Pos(':', h);
-    kv.Key := LeftStr(h, p - 1);
-    kv.Value := Trim(RightStr(h, Length(h) - p));
-    responseHeaders.Cells[0, i + 1] := kv.Key;
-    responseHeaders.Cells[1, i + 1] := kv.Value;
-    textResp.Lines.Add(Format('%s: %s', [kv.Key, kv.Value]));
+    responseHeaders.Cells[0, i + 1] := Trim(Info.ResponseHeaders.Names[i]);
+    responseHeaders.Cells[1, i + 1] := Trim(Info.ResponseHeaders.ValueFromIndex[i]);
   end;
   FContentType := Info.ContentType;
 
+  textResp.Clear;
+  Info.ServerLog(textResp.Lines);
   UpdateStatusLine(Info);
 
   if (Info.StatusCode <> 404) then

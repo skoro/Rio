@@ -50,6 +50,7 @@ type
   TCustomHttpClient = class(TFPHTTPClient)
   private
     FTimeProfiler: TTimeProfiler;
+    FSentCookies: TStrings; // Preserve sent cookies to use them in server log.
   protected
     procedure ConnectToServer(const AHost: String; APort: Integer; UseSSL : Boolean=False); override;
     procedure SendRequest(const AMethod: String; URI: TURI); override;
@@ -58,6 +59,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    function CreateRequestLines(AMethod, AUrl: string): TStrings; virtual;
     procedure HTTPMethod(Const AMethod,AURL : String; Stream : TStream; Const AllowedResponseCodes : Array of Integer); override;
     procedure MultiFileStreamFormPost(FormData, FileNames: TStrings);
     property TimeProfiler: TTimeProfiler read FTimeProfiler;
@@ -80,17 +82,25 @@ type
     FStatusText: string;
     FUrl: string;
     FTimeCheckPoints: TTimeCheckPointList;
+    FRequestLines: TStrings;
+    FServerHttpVersion: string;
     function GetContentType: string;
     function GetLocation: string;
     function GetRequestTime: TTimeMSec;
   public
     constructor Create;
     destructor Destroy; override;
+    // Fill a buffer with request - response exchange with the server.
+    // inStr  - a prefix for request headers.
+    // outStr - a prefix for response headers.
+    procedure ServerLog(Buffer: TStrings; inStr: string = '<'; outStr: string = '>');
     property StatusCode: Integer read FStatusCode write FStatusCode;
     property StatusText: string read FStatusText write FStatusText;
     property HttpVersion: string read FHttpVersion write FHttpVersion;
     property Url: string read FUrl write FUrl;
     property Method: string read FMethod write FMethod;
+    // Original request headers. For additional headers that can be added
+    // by the http client see RequestLines property.
     property RequestHeaders: TStrings read FRequestHeaders;
     property ResponseHeaders: TStrings read FResponseHeaders;
     property Content: TStringStream read FContent;
@@ -98,6 +108,11 @@ type
     property TimeCheckPoints: TTimeCheckPointList read FTimeCheckPoints;
     property RequestTime: TTimeMSec read GetRequestTime;
     property Location: string read GetLocation;
+    // Request Lines are the lines that actually transmitted to the server.
+    // These lines include the requested resource (the first lines) and
+    // all the request headers.
+    property RequestLines: TStrings read FRequestLines write FRequestLines;
+    property ServerHttpVersion: string read FServerHttpVersion write FServerHttpVersion;
   end;
 
   TOnRequestComplete = procedure(ResponseInfo: TResponseInfo) of object;
@@ -154,7 +169,7 @@ function ParseContentType(Headers: TStrings): string;
 
 implementation
 
-uses dateutils, strutils, RtlConsts, ValEdit, app_helpers;
+uses dateutils, strutils, RtlConsts, base64, ValEdit, app_helpers;
 
 const
   CRLF = #13#10;
@@ -354,6 +369,7 @@ begin
   FResponseHeaders := TStringList.Create;
   FResponseHeaders.NameValueSeparator := ':';
   FTimeCheckPoints := TTimeCheckPointList.Create;
+  FRequestLines := nil;
 end;
 
 destructor TResponseInfo.Destroy;
@@ -362,7 +378,30 @@ begin
   FreeAndNil(FRequestHeaders);
   FreeAndNil(FResponseHeaders);
   FreeAndNil(FTimeCheckPoints);
+  if Assigned(FRequestLines) then
+    FreeAndNil(FRequestLines);
   inherited Destroy;
+end;
+
+procedure TResponseInfo.ServerLog(Buffer: TStrings; inStr: string;
+  outStr: string);
+var
+  I: Integer;
+begin
+  if Assigned(FRequestLines) then begin
+    with FRequestLines do begin
+      Buffer.Add('%s %s', [inStr, Strings[0]]);
+      NameValueSeparator := ':';
+      for I := 1 to Count - 1 do
+        Buffer.Add('%s %s: %s', [inStr, Names[I], ValueFromIndex[I]]);
+    end;
+  end;
+  Buffer.Add(inStr);
+  Buffer.Add('%s HTTP/%s %d %s', [outStr, FServerHttpVersion, FStatusCode, FStatusText]);
+  ResponseHeaders.NameValueSeparator := ':';
+  with ResponseHeaders do
+    for I := 0 to Count - 1 do
+      Buffer.Add('%s %s: %s', [outStr, Names[I], ValueFromIndex[I]]);
 end;
 
 { TCustomHttpClient }
@@ -387,6 +426,8 @@ end;
 procedure TCustomHttpClient.SendRequest(const AMethod: String; URI: TURI);
 begin
   FTimeProfiler.Start('Send request');
+  FreeAndNil(FSentCookies);
+  FSentCookies := Cookies;
   inherited SendRequest(AMethod, URI);
   FTimeProfiler.Stop('Send request');
 end;
@@ -404,6 +445,56 @@ begin
   FTimeProfiler.Start('Read response');
   Result := inherited ReadResponse(Stream, AllowedResponseCodes, HeadersOnly);
   FTimeProfiler.Stop('Read response');
+end;
+
+function TCustomHttpClient.CreateRequestLines(AMethod, AUrl: string): TStrings;
+var
+  UN,PW,S,L : String;
+  I : Integer;
+  Buf: TStrings;
+  URI: TURI;
+begin
+  Buf := TStringList.Create;
+  URI := ParseURI(AURL, False);
+  S := Uppercase(AMethod)+' '+GetServerURL(URI)+' '+'HTTP/'+HTTPVersion;
+  Buf.Add(S);
+  UN := URI.Username;
+  PW := URI.Password;
+  if (UserName<>'') then
+  begin
+    UN := UserName;
+    PW := Password;
+  end;
+  if (UN <> '') then
+  begin
+    S := 'Authorization: Basic ' + EncodeStringBase64(UN + ':' + PW);
+    Buf.Add(S);
+  end;
+  S := 'Host: ' + URI.Host;
+  If (URI.Port <> 0) then
+    S:=S+':'+IntToStr(URI.Port);
+  Buf.Add(S);
+  If Assigned(RequestBody) and (IndexOfHeader('Content-Length')=-1) then
+    Buf.Add('Content-Length: %d', [RequestBody.Size]);
+  For I:=0 to RequestHeaders.Count-1 do
+  begin
+    l := RequestHeaders[i];
+    If AllowHeader(L) then
+      Buf.Add(l);
+  end;
+  if Assigned(FSentCookies) then
+  begin
+    L := 'Cookie:';
+    for I := 0 to FSentCookies.Count-1 do
+    begin
+      if ( I > 0 ) then
+        L := L + '; ';
+      L := L + FSentCookies[i];
+    end;
+    if AllowHeader(L) then
+      Buf.Add(L);
+  end;
+  Result := Buf;
 end;
 
 constructor TCustomHttpClient.Create(AOwner: TComponent);
@@ -514,6 +605,12 @@ begin
     info.HttpVersion := FHttpClient.ServerHTTPVersion;
     info.Content.WriteString(FResponseData.DataString);
     info.TimeCheckPoints.Assign(FHttpClient.TimeProfiler.CheckPoints);
+    // HttpClient clears cookies after request.
+    // For the server logs we need to restore them.
+    if Assigned(FCookies) then
+      FHttpClient.Cookies := FCookies;
+    info.RequestLines := FHttpClient.CreateRequestLines(FHttpMethod, FUrl);
+    info.ServerHttpVersion := FHttpClient.ServerHTTPVersion;
     FOnRequestComplete(info);
   end;
 end;
