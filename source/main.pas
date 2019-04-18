@@ -293,6 +293,8 @@ uses about, headers_editor, cookie_form,
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
+  BOOKMARK_IMG_UNSET = 4;
+  BOOKMARK_IMG_SET = 5;
 
 {$R *.lfm}
 
@@ -321,6 +323,9 @@ begin
     bm := CreateBookmark(RO);
     if bm = Nil then begin
       FreeAndNil(RO);
+    end
+    else begin
+      toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph);
     end;
     Free;
   end;
@@ -2263,6 +2268,7 @@ begin
   SetAppCaption;
 
   btnSubmit.Enabled := False;
+  toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
   btnBookmark.Enabled := False;
 end;
 
