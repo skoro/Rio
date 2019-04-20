@@ -40,7 +40,7 @@ type
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
-    function NewFolder(FolderName: string): TTreeNode;
+    function NewFolder(FolderName: string; Edit: Boolean = True): TTreeNode;
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
   end;
@@ -131,10 +131,18 @@ begin
   inherited Destroy;
 end;
 
-function TBookmarkManager.NewFolder(FolderName: string): TTreeNode;
+function TBookmarkManager.NewFolder(FolderName: string; Edit: Boolean): TTreeNode;
+var
+  root: TTreeNode;
 begin
-  // STUB
-  Result := NIL;
+  root := FTreeView.Selected;
+  if root = NIL then
+    root := FTreeView.Items.GetFirstNode;
+  Result := FTreeView.Items.AddChild(root, FolderName);
+  Result.MakeVisible;
+  if Edit then
+    Result.EditText;
+  Result.Data := NIL;
 end;
 
 end.
