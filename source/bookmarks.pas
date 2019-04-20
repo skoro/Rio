@@ -31,13 +31,18 @@ type
   TBookmarkManager = class(TPanel)
   private
     FTreeView: TTreeView;
+    FRootNode: TTreeNode;
+    function GetRootName: string;
+    procedure SetRootName(AValue: string);
   protected
     function CreateTree: TTreeView; virtual;
+    procedure CreateRootNode;
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
     function NewFolder(FolderName: string): TTreeNode;
     property TreeView: TTreeView read FTreeView;
+    property RootName: string read GetRootName write SetRootName;
   end;
 
 implementation
@@ -80,12 +85,34 @@ end;
 
 { TBookmarkManager }
 
+function TBookmarkManager.GetRootName: string;
+begin
+  Result := FRootNode.Text;
+end;
+
+procedure TBookmarkManager.SetRootName(AValue: string);
+begin
+  if RootName = AValue then
+    Exit; // =>
+  FRootNode.Text := AValue;
+end;
+
 function TBookmarkManager.CreateTree: TTreeView;
 begin
   Result := TTreeView.Create(Self);
   Result.Parent := Self;
   Result.Align := alClient;
   Result.ScrollBars := ssAutoBoth;
+end;
+
+procedure TBookmarkManager.CreateRootNode;
+begin
+  with FTreeView.Items do begin
+    Clear;
+    FRootNode := AddChild(NIL, 'My bookmarks');
+    FRootNode.Data := NIL;
+    FRootNode.MakeVisible;
+  end;
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);
@@ -95,6 +122,7 @@ begin
   Caption := '';
   BevelOuter := bvNone;
   FTreeView := CreateTree;
+  CreateRootNode;
 end;
 
 destructor TBookmarkManager.Destory;
