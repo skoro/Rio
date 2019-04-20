@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Classes;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
 
 type
 
@@ -28,12 +28,15 @@ type
     procedure btnNewFolderClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
+    procedure tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
+      Cancel: Boolean);
   private
-
+    FNewNode: TTreeNode;
+    function GetFolderNode: TTreeNode;
   public
     property TreeView: TTreeView read tvFolders;
+    property FolderNode: TTreeNode read GetFolderNode;
     function CreateBookmark(RO: TRequestObject): TBookmark;
-    function EditBookmark(Bookmark: TBookmark): TModalResult;
   end;
 
 var
@@ -41,7 +44,7 @@ var
 
 implementation
 
-uses Controls, thread_http_client, sysutils;
+uses thread_http_client, sysutils;
 
 {$R *.lfm}
 
@@ -57,6 +60,24 @@ begin
   ModalResult := mrOK;
 end;
 
+procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
+  Cancel: Boolean);
+begin
+  // Delete currently inserted node on canceling edit.
+  if Cancel and Assigned(FNewNode) and (FNewNode = Node) then
+    FNewNode.Delete;
+  if not Cancel then
+    Node.Selected := True;
+  FNewNode := Nil;
+end;
+
+function TBookmarkForm.GetFolderNode: TTreeNode;
+begin
+  Result := tvFolders.Selected;
+  if Result = NIL then
+    Result := tvFolders.Items.GetFirstNode;
+end;
+
 function TBookmarkForm.CreateBookmark(RO: TRequestObject): TBookmark;
 begin
   ButtonPanel.CloseButton.Visible := False;
@@ -67,19 +88,22 @@ begin
   Result.Request := RO;
 end;
 
-function TBookmarkForm.EditBookmark(Bookmark: TBookmark): TModalResult;
-begin
-
-end;
-
 procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
+  FNewNode := NIL;
 end;
 
 procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
+var
+  root: TTreeNode;
 begin
-
+  root := tvFolders.Selected;
+  if root = NIL then
+    root := tvFolders.Items.GetFirstNode;
+  FNewNode := tvFolders.Items.AddChild(root, '');
+  FNewNode.MakeVisible;
+  FNewNode.EditText;
 end;
 
 end.

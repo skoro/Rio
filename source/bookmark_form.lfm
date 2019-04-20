@@ -65,14 +65,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 153
+    Height = 151
     Top = 60
     Width = 248
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 153
+    ClientHeight = 151
     ClientWidth = 248
     TabOrder = 2
     object lFolder: TLabel
@@ -87,7 +87,7 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 126
+      Top = 124
       Width = 248
       Align = alBottom
       AutoSize = True
@@ -102,36 +102,37 @@ object BookmarkForm: TBookmarkForm
         Width = 73
         Align = alLeft
         AutoSize = True
-        Caption = 'New Folder'
+        Caption = '&New Folder'
         OnClick = btnNewFolderClick
         TabOrder = 0
       end
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 109
+      Height = 107
       Top = 17
       Width = 248
       Align = alClient
       ScrollBars = ssAutoBoth
       TabOrder = 1
+      OnEditingEnd = tvFoldersEditingEnd
     end
   end
   object pOptions: TPanel
     Left = 6
-    Height = 42
-    Top = 219
+    Height = 44
+    Top = 217
     Width = 248
     Align = alBottom
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 42
+    ClientHeight = 44
     ClientWidth = 248
     TabOrder = 3
     object chkSaveResponse: TCheckBox
       Left = 0
-      Height = 21
+      Height = 22
       Top = 0
       Width = 248
       Align = alTop
@@ -140,8 +141,8 @@ object BookmarkForm: TBookmarkForm
     end
     object chkSyncResp: TCheckBox
       Left = 0
-      Height = 21
-      Top = 21
+      Height = 22
+      Top = 22
       Width = 248
       Align = alTop
       Caption = 'Synchronize response content'

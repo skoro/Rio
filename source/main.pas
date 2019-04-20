@@ -319,6 +319,7 @@ var
 begin
   with TBookmarkForm.Create(Self) do
   begin
+    TreeView.Items := FBookManager.TreeView.Items;
     RO := CreateRequestObject;
     bm := CreateBookmark(RO);
     if bm = Nil then begin
@@ -326,6 +327,8 @@ begin
     end
     else begin
       toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph);
+      FBookManager.TreeView.Items := TreeView.Items;
+      FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
     end;
     Free;
   end;

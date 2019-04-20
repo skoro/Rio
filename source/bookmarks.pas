@@ -41,6 +41,7 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
     function NewFolder(FolderName: string; Edit: Boolean = True): TTreeNode;
+    function AddBookmark(BM: TBookmark; FolderPath: string): TTreeNode;
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
   end;
@@ -143,6 +144,21 @@ begin
   if Edit then
     Result.EditText;
   Result.Data := NIL;
+end;
+
+function TBookmarkManager.AddBookmark(BM: TBookmark; FolderPath: string
+  ): TTreeNode;
+var
+  FolderNode: TTreeNode;
+begin
+  FolderNode := FTreeView.Items.FindNodeWithTextPath(FolderPath);
+  if FolderNode = nil then
+    raise Exception.Create(Format('Folder %s not found.', [FolderPath]));
+  if FolderNode.Data <> NIL then
+    raise Exception.Create('Bookmark can be attached only to a folder.');
+  Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
+  Result.MakeVisible;
+  Result.Data := BM;
 end;
 
 end.
