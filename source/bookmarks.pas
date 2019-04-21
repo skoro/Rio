@@ -110,7 +110,7 @@ procedure TBookmarkManager.CreateRootNode;
 begin
   with FTreeView.Items do begin
     Clear;
-    FRootNode := AddChild(NIL, 'My bookmarks');
+    FRootNode := Add(NIL, 'My bookmarks');
     FRootNode.Data := NIL;
     FRootNode.MakeVisible;
   end;
