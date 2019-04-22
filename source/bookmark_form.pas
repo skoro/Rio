@@ -32,11 +32,13 @@ type
       Cancel: Boolean);
   private
     FNewNode: TTreeNode;
+    FOnNewFolder: TBookmarkNewFolder;
     function GetFolderNode: TTreeNode;
   public
     property TreeView: TTreeView read tvFolders;
     property FolderNode: TTreeNode read GetFolderNode;
     function CreateBookmark(RO: TRequestObject): TBookmark;
+    property OnNewFolder: TBookmarkNewFolder read FOnNewFolder write FOnNewFolder;
   end;
 
 var
@@ -66,8 +68,11 @@ begin
   // Delete currently inserted node on canceling edit.
   if Cancel and Assigned(FNewNode) and (FNewNode = Node) then
     FNewNode.Delete;
-  if not Cancel then
+  if not Cancel then begin
     Node.Selected := True;
+    if Assigned(FOnNewFolder) then
+      FOnNewFolder(Self, Node.GetTextPath);
+  end;
   FNewNode := Nil;
 end;
 

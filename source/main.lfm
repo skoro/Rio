@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 325
+  Left = 327
   Height = 614
-  Top = 111
+  Top = 109
   Width = 579
   Caption = 'HTTP request inspector'
   ClientHeight = 591

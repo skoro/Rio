@@ -9,6 +9,9 @@ uses
 
 type
 
+  // Callback when a new folder is created.
+  TBookmarkNewFolder = procedure (Sender: TObject; FolderPath: string) of object;
+
   { TBookmark }
 
   TBookmark = class
@@ -41,14 +44,27 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
     function NewFolder(FolderName: string; Edit: Boolean = True): TTreeNode;
+    // Add a bookmark to the tree.
+    // BM - the bookmark instance.
+    // FolderPath - the bookmark folder path separated by /
     function AddBookmark(BM: TBookmark; FolderPath: string): TTreeNode;
+    // Creates the folder tree items and attaches these items to a custom tree.
+    procedure AttachFolderNodes(CustomTree: TCustomTreeView);
+    procedure AddFolder(Sender: TObject; FolderPath: string);
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
   end;
 
+  function IsFolderNode(Node: TTreeNode): Boolean;
+
 implementation
 
-uses StdCtrls;
+uses StdCtrls, strutils;
+
+function IsFolderNode(Node: TTreeNode): Boolean;
+begin
+  Result := Node.Data = NIL;
+end;
 
 
 { TBookmark }
@@ -159,6 +175,42 @@ begin
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.MakeVisible;
   Result.Data := BM;
+end;
+
+procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
+  procedure WalkNodes(CurrentNode: TTreeNode; NewParent: TTreeNode = NIL);
+  var
+    Child: TTreeNode;
+  begin
+    Child := CurrentNode.GetFirstChild;
+    while Child <> NIL do begin
+      if IsFolderNode(Child) then
+        WalkNodes(Child, CustomTree.Items.AddChild(NewParent, Child.Text));
+      Child := Child.GetNextSibling;
+    end;
+  end;
+var
+  FirstNode, NewParent: TTreeNode;
+begin
+  FirstNode := FTreeView.Items.GetFirstNode;
+  CustomTree.Items.Clear;
+  NewParent := CustomTree.Items.AddChild(FirstNode.Parent, FirstNode.Text);
+  WalkNodes(FirstNode, NewParent);
+end;
+
+procedure TBookmarkManager.AddFolder(Sender: TObject; FolderPath: string);
+var
+  p: SizeInt;
+  FolderName, CurFolder: string;
+  ParentNode: TTreeNode;
+begin
+  p := RPos('/', FolderPath);
+  FolderName := RightStr(FolderPath, Length(FolderPath) - p);
+  CurFolder := LeftStr(FolderPath, p - 1);
+  ParentNode := FTreeView.Items.FindNodeWithTextPath(CurFolder);
+  if ParentNode = NIL then
+    raise Exception.Create(Format('Folder %s not found.', [CurFolder]));
+  FTreeView.Items.AddChild(ParentNode, FolderName);
 end;
 
 end.

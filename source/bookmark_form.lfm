@@ -1,7 +1,7 @@
 object BookmarkForm: TBookmarkForm
-  Left = 454
+  Left = 456
   Height = 300
-  Top = 231
+  Top = 281
   Width = 260
   Caption = 'Bookmark'
   ClientHeight = 300
