@@ -322,7 +322,7 @@ begin
     OnNewFolder := @FBookManager.AddFolder;
     FBookManager.AttachFolderNodes(TreeView);
     RO := CreateRequestObject;
-    bm := CreateBookmark(RO);
+    bm := CreateBookmarkModal(RO);
     if bm = Nil then begin
       FreeAndNil(RO);
     end

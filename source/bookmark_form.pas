@@ -37,7 +37,7 @@ type
   public
     property TreeView: TTreeView read tvFolders;
     property FolderNode: TTreeNode read GetFolderNode;
-    function CreateBookmark(RO: TRequestObject): TBookmark;
+    function CreateBookmarkModal(RO: TRequestObject): TBookmark;
     property OnNewFolder: TBookmarkNewFolder read FOnNewFolder write FOnNewFolder;
   end;
 
@@ -83,7 +83,7 @@ begin
     Result := tvFolders.Items.GetFirstNode;
 end;
 
-function TBookmarkForm.CreateBookmark(RO: TRequestObject): TBookmark;
+function TBookmarkForm.CreateBookmarkModal(RO: TRequestObject): TBookmark;
 begin
   ButtonPanel.CloseButton.Visible := False;
   edName.Text := GetRequestFilename(RO.Url);
