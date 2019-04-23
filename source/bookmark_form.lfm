@@ -113,9 +113,11 @@ object BookmarkForm: TBookmarkForm
       Top = 17
       Width = 248
       Align = alClient
+      AutoExpand = True
       ScrollBars = ssAutoBoth
       TabOrder = 1
       OnEditingEnd = tvFoldersEditingEnd
+      Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
     end
   end
   object pOptions: TPanel
