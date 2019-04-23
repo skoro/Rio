@@ -35,6 +35,7 @@ type
   private
     FTreeView: TTreeView;
     FRootNode: TTreeNode;
+    FCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetRootName(AValue: string);
   protected
@@ -51,8 +52,11 @@ type
     // Creates the folder tree items and attaches these items to a custom tree.
     procedure AttachFolderNodes(CustomTree: TCustomTreeView);
     procedure AddFolder(Sender: TObject; FolderPath: string);
+    procedure ResetCurrent;
+
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
+    property CurrentBookmark: TBookmark read FCurrentBookmark;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
@@ -139,6 +143,7 @@ begin
   Caption := '';
   BevelOuter := bvNone;
   FTreeView := CreateTree;
+  FCurrentBookmark := NIL;
   CreateRootNode;
 end;
 
@@ -175,6 +180,7 @@ begin
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.MakeVisible;
   Result.Data := BM;
+  FCurrentBookmark := BM;
 end;
 
 procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
@@ -210,7 +216,15 @@ begin
   ParentNode := FTreeView.Items.FindNodeWithTextPath(CurFolder);
   if ParentNode = NIL then
     raise Exception.Create(Format('Folder %s not found.', [CurFolder]));
-  FTreeView.Items.AddChild(ParentNode, FolderName);
+  with FTreeView.Items.AddChild(ParentNode, FolderName) do begin
+    Data := NIL;
+    MakeVisible;
+  end;
+end;
+
+procedure TBookmarkManager.ResetCurrent;
+begin
+  FCurrentBookmark := NIL;
 end;
 
 end.

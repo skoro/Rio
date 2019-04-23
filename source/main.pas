@@ -262,6 +262,7 @@ type
     procedure FinishRequest;
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
+    procedure BookmarkButtonIcon(Added: Boolean);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -327,7 +328,7 @@ begin
       FreeAndNil(RO);
     end
     else begin
-      toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph);
+      BookmarkButtonIcon(True);
       FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
     end;
     Free;
@@ -690,6 +691,7 @@ procedure TMainForm.cbUrlChange(Sender: TObject);
 begin
   SyncURLQueryParams;
   EnableSubmitButton;
+  // TODO: reset current bookmark on changing url.
 end;
 
 procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -1811,6 +1813,14 @@ begin
   btnBookmark.Enabled := not isEmpty;
 end;
 
+procedure TMainForm.BookmarkButtonIcon(Added: Boolean);
+begin
+  if Added then
+    toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph)
+  else
+    toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
+end;
+
 procedure TMainForm.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -2270,9 +2280,11 @@ begin
   FResponseTabManager.CloseTabs;
   SetAppCaption;
 
+  // Submit and Bookmark buttons state.
   btnSubmit.Enabled := False;
-  toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
   btnBookmark.Enabled := False;
+  BookmarkButtonIcon(False);
+  FBookManager.ResetCurrent;
 end;
 
 function TMainForm.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
