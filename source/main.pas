@@ -302,11 +302,25 @@ const
 { TMainForm }
 
 procedure TMainForm.btnSubmitClick(Sender: TObject);
+var
+  RO: TRequestObject;
 begin
   // Don't submit a request when the current request is in progress by pressing
   // shortcut key.
   if not btnSubmit.Enabled then
     Exit; // =>
+
+  // A different url unbookmark the current bookmark.
+  try
+    RO := CreateRequestObject;
+    if not FBookManager.IsCurrentRequest(RO) then begin
+      BookmarkButtonIcon(False);
+      FBookManager.ResetCurrent;
+    end;
+  finally
+    FreeAndNil(RO);
+  end;
+
   TimerRequest.Enabled := False;
   FRequestSeconds := 0;
   if SubmitRequest then
@@ -691,7 +705,6 @@ procedure TMainForm.cbUrlChange(Sender: TObject);
 begin
   SyncURLQueryParams;
   EnableSubmitButton;
-  // TODO: reset current bookmark on changing url.
 end;
 
 procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);

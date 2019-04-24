@@ -53,6 +53,8 @@ type
     procedure AttachFolderNodes(CustomTree: TCustomTreeView);
     procedure AddFolder(Sender: TObject; FolderPath: string);
     procedure ResetCurrent;
+    // Check that the request object is matched with the current bookmark.
+    function IsCurrentRequest(RO: TRequestObject): Boolean;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -180,6 +182,7 @@ begin
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.MakeVisible;
   Result.Data := BM;
+  Result.Selected := True;
   FCurrentBookmark := BM;
 end;
 
@@ -225,6 +228,11 @@ end;
 procedure TBookmarkManager.ResetCurrent;
 begin
   FCurrentBookmark := NIL;
+end;
+
+function TBookmarkManager.IsCurrentRequest(RO: TRequestObject): Boolean;
+begin
+  Result := Assigned(FCurrentBookmark) and (FCurrentBookmark.Request.Url = RO.Url);
 end;
 
 end.
