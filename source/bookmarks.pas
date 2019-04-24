@@ -35,7 +35,8 @@ type
   private
     FTreeView: TTreeView;
     FRootNode: TTreeNode;
-    FCurrentBookmark: TBookmark;
+    FCurrentNode: TTreeNode;
+    function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetRootName(AValue: string);
   protected
@@ -58,7 +59,8 @@ type
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
-    property CurrentBookmark: TBookmark read FCurrentBookmark;
+    property CurrentNode: TTreeNode read FCurrentNode;
+    property CurrentBookmark: TBookmark read GetCurrentBookmark;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
@@ -113,6 +115,16 @@ begin
   Result := FRootNode.Text;
 end;
 
+function TBookmarkManager.GetCurrentBookmark: TBookmark;
+begin
+  Result := NIL;
+  if Assigned(FCurrentNode) then begin
+    if FCurrentNode.Data = NIL then
+      raise Exception.Create('Runtime error: node data is not bookmark.');
+    Result := TBookmark(FCurrentNode.Data);
+  end;
+end;
+
 procedure TBookmarkManager.SetRootName(AValue: string);
 begin
   if RootName = AValue then
@@ -145,7 +157,7 @@ begin
   Caption := '';
   BevelOuter := bvNone;
   FTreeView := CreateTree;
-  FCurrentBookmark := NIL;
+  FCurrentNode := NIL;
   CreateRootNode;
 end;
 
@@ -183,7 +195,7 @@ begin
   Result.MakeVisible;
   Result.Data := BM;
   Result.Selected := True;
-  FCurrentBookmark := BM;
+  FCurrentNode := Result;
 end;
 
 procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
@@ -227,14 +239,19 @@ end;
 
 procedure TBookmarkManager.ResetCurrent;
 begin
-  if FTreeView.Selected <> NIL then
-    FTreeView.Selected.Selected := False;
-  FCurrentBookmark := NIL;
+  if Assigned(FCurrentNode) then
+    FCurrentNode.Selected := False;
+  FCurrentNode := NIL;
 end;
 
 function TBookmarkManager.IsCurrentRequest(RO: TRequestObject): Boolean;
+var
+  BM: TBookmark;
 begin
-  Result := Assigned(FCurrentBookmark) and (FCurrentBookmark.Request.Url = RO.Url);
+  BM := GetCurrentBookmark;
+  if not Assigned(BM) then
+    Exit(False);
+  Result := BM.Request.Url = RO.Url;
 end;
 
 end.
