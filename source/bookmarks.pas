@@ -227,6 +227,8 @@ end;
 
 procedure TBookmarkManager.ResetCurrent;
 begin
+  if FTreeView.Selected <> NIL then
+    FTreeView.Selected.Selected := False;
   FCurrentBookmark := NIL;
 end;
 
