@@ -1298,13 +1298,11 @@ class function TFPCustomHTTPClient.IndexOfHeader(HTTPHeaders: TStrings;
   const AHeader: String): Integer;
 
 Var
-  L : Integer;
   H : String;
 begin
   H:=LowerCase(Aheader);
-  l:=Length(AHeader);
   Result:=HTTPHeaders.Count-1;
-  While (Result>=0) and ((LowerCase(Copy(HTTPHeaders[Result],1,l)))<>h) do
+  While (Result>=0) and ((LowerCase(HTTPHeaders[Result]))<>h) do
     Dec(Result);
 end;
 
