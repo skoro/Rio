@@ -336,14 +336,19 @@ begin
   begin
     OnNewFolder := @FBookManager.AddFolder;
     FBookManager.AttachFolderNodes(TreeView);
-    RO := CreateRequestObject;
-    bm := CreateBookmarkModal(RO);
-    if bm = Nil then begin
-      FreeAndNil(RO);
+    if Assigned(FBookManager.CurrentBookmark) then begin
+      EditBookmarkModal(FBookManager.CurrentBookmark);
     end
     else begin
-      BookmarkButtonIcon(True);
-      FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
+      RO := CreateRequestObject;
+      bm := CreateBookmarkModal(RO);
+      if bm = Nil then begin
+        FreeAndNil(RO);
+      end
+      else begin
+        BookmarkButtonIcon(True);
+        FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
+      end;
     end;
     Free;
   end;

@@ -38,6 +38,7 @@ type
     property TreeView: TTreeView read tvFolders;
     property FolderNode: TTreeNode read GetFolderNode;
     function CreateBookmarkModal(RO: TRequestObject): TBookmark;
+    function EditBookmarkModal(BM: TBookmark): TModalResult;
     property OnNewFolder: TBookmarkNewFolder read FOnNewFolder write FOnNewFolder;
   end;
 
@@ -93,9 +94,16 @@ begin
   Result.Request := RO;
 end;
 
+function TBookmarkForm.EditBookmarkModal(BM: TBookmark): TModalResult;
+begin
+  edName.Text := BM.Name;
+  Result := ShowModal;
+end;
+
 procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
+  ButtonPanel.CloseButton.ModalResult := mrNone;
   FNewNode := NIL;
 end;
 
