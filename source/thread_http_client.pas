@@ -5,7 +5,7 @@ unit thread_http_client;
 interface
 
 uses
-  Classes, SysUtils, fphttpclient, fgl, URIParser;
+  Classes, SysUtils, httpclient, fgl, URIParser;
 
 type
 
