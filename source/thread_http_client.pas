@@ -491,7 +491,7 @@ begin
         L := L + '; ';
       L := L + FSentCookies[i];
     end;
-    if AllowHeader(L) then
+    if AllowHeader(L) and (L <> 'Cookie:') then
       Buf.Add(L);
   end;
   Result := Buf;
