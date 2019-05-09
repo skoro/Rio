@@ -138,6 +138,8 @@ begin
   Result.Parent := Self;
   Result.Align := alClient;
   Result.ScrollBars := ssAutoBoth;
+  Result.Options := [tvoReadOnly, tvoShowRoot, tvoShowLines, tvoShowButtons,
+                 tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
 end;
 
 procedure TBookmarkManager.CreateRootNode;
