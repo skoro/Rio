@@ -17,6 +17,13 @@ type
   // When bookmark selected in the tree.
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
 
+  { EFolderNode }
+
+  EFolderNode = class(Exception)
+  public
+    constructor CreateDef;
+  end;
+
   { TBookmark }
 
   TBookmark = class
@@ -86,6 +93,13 @@ begin
   Result := Node.Data = NIL;
 end;
 
+{ EFolderNode }
+
+constructor EFolderNode.CreateDef;
+begin
+  inherited Create('Node is a folder.');
+end;
+
 
 { TBookmark }
 
@@ -104,6 +118,8 @@ begin
     Exit; // =>
   if not Assigned(avalue) then
     raise Exception.Create('Bookmark must be assigned to tree node.');
+  if IsFolderNode(AValue) then
+    raise EFolderNode.CreateDef;
   FTreeNode := AValue;
 end;
 
@@ -221,9 +237,9 @@ var
 begin
   FolderNode := FTreeView.Items.FindNodeWithTextPath(FolderPath);
   if FolderNode = nil then
-    raise Exception.Create(Format('Folder %s not found.', [FolderPath]));
-  if FolderNode.Data <> NIL then
-    raise Exception.Create('Bookmark can be attached only to a folder.');
+    raise Exception.CreateFmt('Folder %s not found.', [FolderPath]);
+  if not IsFolderNode(FolderNode) then
+    raise EFolderNode.Create('Node must be a folder.');
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.MakeVisible;
   Result.Data := BM;
@@ -263,7 +279,7 @@ begin
   CurFolder := LeftStr(FolderPath, p - 1);
   ParentNode := FTreeView.Items.FindNodeWithTextPath(CurFolder);
   if ParentNode = NIL then
-    raise Exception.Create(Format('Folder %s not found.', [CurFolder]));
+    raise Exception.CreateFmt('Folder %s not found.', [CurFolder]);
   with FTreeView.Items.AddChild(ParentNode, FolderName) do begin
     Data := NIL;
     MakeVisible;
