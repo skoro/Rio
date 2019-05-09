@@ -58,7 +58,7 @@ type
     function CreateTree: TTreeView; virtual;
     procedure CreateRootNode; virtual;
     // TreeView double click event handler.
-    procedure InternalTreeOnDblClick(Sender: TObject);
+    procedure InternalTreeOnDblClick(Sender: TObject); virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -195,8 +195,11 @@ begin
     Exit; // =>
   Prev := GetCurrentBookmark;
   FCurrentNode := Selected;
-  if Assigned(FOnChangeBookmark) then
+  if Assigned(FOnChangeBookmark) then begin
     FOnChangeBookmark(Prev, GetCurrentBookmark);
+    FCurrentNode := Selected; // Preserve selected node after user callback.
+  end;
+  FTreeView.Selected := Selected;
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);

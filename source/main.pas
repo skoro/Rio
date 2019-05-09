@@ -1844,7 +1844,11 @@ end;
 
 procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
 begin
+  StartNewRequest;
+  BookmarkButtonIcon(True);
   SetRequestObject(Selected.Request);
+  btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
 end;
 
 procedure TMainForm.ApplyOptions;
