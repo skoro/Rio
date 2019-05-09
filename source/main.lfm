@@ -377,10 +377,10 @@ object MainForm: TMainForm
               Height = 212
               Top = 0
               Width = 521
-              ActivePage = tabNotes
+              ActivePage = tabAuth
               Align = alClient
               Anchors = [akLeft, akRight, akBottom]
-              TabIndex = 5
+              TabIndex = 4
               TabOrder = 0
               object tabHeaders: TTabSheet
                 Caption = 'Headers'
@@ -388,9 +388,9 @@ object MainForm: TMainForm
                 ClientWidth = 517
                 object requestHeaders: TStringGrid
                   Left = 0
-                  Height = 151
+                  Height = 155
                   Top = 26
-                  Width = 551
+                  Width = 517
                   Align = alClient
                   BorderStyle = bsNone
                   ColCount = 3
@@ -432,7 +432,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 551
+                  Width = 517
                   Caption = 'gnavHeaders'
                   EdgeBorders = []
                   ShowCaptions = True
@@ -445,7 +445,7 @@ object MainForm: TMainForm
                   ShowNavButtons = True
                   object ToolButton1: TToolButton
                     Left = 146
-                    Height = 5
+                    Height = 22
                     Top = 0
                     Caption = 'ToolButton1'
                     Style = tbsDivider
@@ -1206,7 +1206,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 551
+                  Width = 517
                   EdgeBorders = []
                   ShowCaptions = True
                   TabOrder = 0
@@ -1220,9 +1220,9 @@ object MainForm: TMainForm
                 end
                 object pagesAuth: TPageControl
                   Left = 0
-                  Height = 152
+                  Height = 155
                   Top = 26
-                  Width = 551
+                  Width = 517
                   ActivePage = tabAuthBearer
                   Align = alClient
                   ShowTabs = False
@@ -1230,25 +1230,25 @@ object MainForm: TMainForm
                   TabOrder = 1
                   object tabAuthBasic: TTabSheet
                     Caption = 'Basic'
-                    ClientHeight = 148
-                    ClientWidth = 547
+                    ClientHeight = 151
+                    ClientWidth = 513
                     object ScrollBox1: TScrollBox
                       Left = 0
-                      Height = 149
+                      Height = 151
                       Top = 0
-                      Width = 549
+                      Width = 513
                       HorzScrollBar.Page = 232
-                      VertScrollBar.Page = 133
+                      VertScrollBar.Page = 134
                       Align = alClient
                       BorderStyle = bsNone
-                      ClientHeight = 149
-                      ClientWidth = 549
+                      ClientHeight = 151
+                      ClientWidth = 513
                       Color = clNone
                       ParentColor = False
                       TabOrder = 0
                       object editBasicLogin: TLabeledEdit
                         Left = 8
-                        Height = 29
+                        Height = 25
                         Top = 24
                         Width = 224
                         EditLabel.AnchorSideLeft.Control = editBasicLogin
@@ -1256,8 +1256,8 @@ object MainForm: TMainForm
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBasicLogin
                         EditLabel.Left = 8
-                        EditLabel.Height = 19
-                        EditLabel.Top = 2
+                        EditLabel.Height = 17
+                        EditLabel.Top = 4
                         EditLabel.Width = 224
                         EditLabel.Caption = 'Login:'
                         EditLabel.ParentColor = False
@@ -1265,7 +1265,7 @@ object MainForm: TMainForm
                       end
                       object editBasicPassword: TLabeledEdit
                         Left = 8
-                        Height = 29
+                        Height = 25
                         Top = 80
                         Width = 224
                         EchoMode = emPassword
@@ -1274,8 +1274,8 @@ object MainForm: TMainForm
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBasicPassword
                         EditLabel.Left = 8
-                        EditLabel.Height = 19
-                        EditLabel.Top = 58
+                        EditLabel.Height = 17
+                        EditLabel.Top = 60
                         EditLabel.Width = 224
                         EditLabel.Caption = 'Password:'
                         EditLabel.ParentColor = False
@@ -1286,7 +1286,7 @@ object MainForm: TMainForm
                         Left = 8
                         Height = 22
                         Top = 112
-                        Width = 119
+                        Width = 111
                         Caption = 'Show password'
                         OnClick = cbBasicShowPasswordClick
                         TabOrder = 2
@@ -1295,43 +1295,43 @@ object MainForm: TMainForm
                   end
                   object tabAuthBearer: TTabSheet
                     Caption = 'tabAuthBearer'
-                    ClientHeight = 148
-                    ClientWidth = 547
+                    ClientHeight = 151
+                    ClientWidth = 513
                     object ScrollBox2: TScrollBox
                       Left = 0
-                      Height = 146
+                      Height = 151
                       Top = 0
-                      Width = 545
+                      Width = 513
                       HorzScrollBar.Page = 208
                       VertScrollBar.Page = 105
                       Align = alClient
                       BorderStyle = bsNone
-                      ClientHeight = 146
-                      ClientWidth = 545
+                      ClientHeight = 151
+                      ClientWidth = 513
                       Color = clNone
                       ParentColor = False
                       TabOrder = 0
                       object editBearerToken: TLabeledEdit
                         Left = 8
-                        Height = 26
+                        Height = 25
                         Top = 80
-                        Width = 532
+                        Width = 500
                         Anchors = [akTop, akLeft, akRight]
                         EditLabel.AnchorSideLeft.Control = editBearerToken
                         EditLabel.AnchorSideRight.Control = editBearerToken
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBearerToken
                         EditLabel.Left = 8
-                        EditLabel.Height = 16
-                        EditLabel.Top = 61
-                        EditLabel.Width = 532
+                        EditLabel.Height = 17
+                        EditLabel.Top = 60
+                        EditLabel.Width = 500
                         EditLabel.Caption = 'Token:'
                         EditLabel.ParentColor = False
                         TabOrder = 0
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
-                        Height = 26
+                        Height = 25
                         Top = 24
                         Width = 200
                         EditLabel.AnchorSideLeft.Control = editBearerPrefix
@@ -1339,8 +1339,8 @@ object MainForm: TMainForm
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBearerPrefix
                         EditLabel.Left = 8
-                        EditLabel.Height = 16
-                        EditLabel.Top = 5
+                        EditLabel.Height = 17
+                        EditLabel.Top = 4
                         EditLabel.Width = 200
                         EditLabel.Caption = 'Prefix:'
                         EditLabel.ParentColor = False

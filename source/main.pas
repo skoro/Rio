@@ -263,6 +263,7 @@ type
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
     procedure BookmarkButtonIcon(Added: Boolean);
+    procedure OnChangeBookmark(Prev, Selected: TBookmark);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -350,7 +351,7 @@ begin
         FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
       end;
     end;
-    Free;
+    Free; // free bookmark form.
   end;
 end;
 
@@ -771,8 +772,10 @@ begin
 
   KeyValueForm := TKeyValueForm.Create(Application);
 
+  // Bookmark manager initialization.
   FBookManager := TBookmarkManager.Create(Self);
   FBookManager.Parent := BookmarkSide;
+  FBookManager.OnChangeBookmark := @OnChangeBookmark;
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
@@ -1837,6 +1840,11 @@ begin
     toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph)
   else
     toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
+end;
+
+procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
+begin
+  SetRequestObject(Selected.Request);
 end;
 
 procedure TMainForm.ApplyOptions;

@@ -8,9 +8,14 @@ uses
   Classes, SysUtils, ComCtrls, ExtCtrls, Controls, request_object;
 
 type
+  // Forward declaration.
+  TBookmark = class;
 
   // Callback when a new folder is created.
   TBookmarkNewFolder = procedure (Sender: TObject; FolderPath: string) of object;
+
+  // When bookmark selected in the tree.
+  TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
 
   { TBookmark }
 
@@ -36,12 +41,18 @@ type
     FTreeView: TTreeView;
     FRootNode: TTreeNode;
     FCurrentNode: TTreeNode;
+    FOnChangeBookmark: TOnChangeBookmark;
+
     function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetRootName(AValue: string);
+
   protected
     function CreateTree: TTreeView; virtual;
-    procedure CreateRootNode;
+    procedure CreateRootNode; virtual;
+    // TreeView double click event handler.
+    procedure InternalTreeOnDblClick(Sender: TObject);
+
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
@@ -61,6 +72,7 @@ type
     property RootName: string read GetRootName write SetRootName;
     property CurrentNode: TTreeNode read FCurrentNode;
     property CurrentBookmark: TBookmark read GetCurrentBookmark;
+    property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
@@ -140,6 +152,8 @@ begin
   Result.ScrollBars := ssAutoBoth;
   Result.Options := [tvoReadOnly, tvoShowRoot, tvoShowLines, tvoShowButtons,
                  tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
+  // Event handlers.
+  Result.OnDblClick := @InternalTreeOnDblClick;
 end;
 
 procedure TBookmarkManager.CreateRootNode;
@@ -150,6 +164,23 @@ begin
     FRootNode.Data := NIL;
     FRootNode.MakeVisible;
   end;
+end;
+
+procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
+var
+  Selected: TTreeNode;
+  Prev: TBookmark;
+begin
+  Selected := FTreeView.Selected;
+  // The node must be selected and is not be a folder node.
+  if not (Assigned(Selected) and (not IsFolderNode(Selected))) then
+    Exit; // =>
+  if Selected = FCurrentNode then
+    Exit; // =>
+  Prev := GetCurrentBookmark;
+  FCurrentNode := Selected;
+  if Assigned(FOnChangeBookmark) then
+    FOnChangeBookmark(Prev, GetCurrentBookmark);
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);
