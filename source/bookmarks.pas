@@ -63,7 +63,6 @@ type
   public
     constructor Create(TheOwner: TComponent); override;
     destructor Destory;
-    function NewFolder(FolderName: string; Edit: Boolean = True): TTreeNode;
     // Add a bookmark to the tree.
     // BM - the bookmark instance.
     // FolderPath - the bookmark folder path separated by /
@@ -217,20 +216,6 @@ destructor TBookmarkManager.Destory;
 begin
   FreeAndNil(FTreeView);
   inherited Destroy;
-end;
-
-function TBookmarkManager.NewFolder(FolderName: string; Edit: Boolean): TTreeNode;
-var
-  root: TTreeNode;
-begin
-  root := FTreeView.Selected;
-  if root = NIL then
-    root := FTreeView.Items.GetFirstNode;
-  Result := FTreeView.Items.AddChild(root, FolderName);
-  Result.MakeVisible;
-  if Edit then
-    Result.EditText;
-  Result.Data := NIL;
 end;
 
 function TBookmarkManager.AddBookmark(BM: TBookmark; FolderPath: string
