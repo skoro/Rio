@@ -3,13 +3,15 @@ object BookmarkForm: TBookmarkForm
   Height = 300
   Top = 281
   Width = 260
+  BorderIcons = [biSystemMenu]
   Caption = 'Bookmark'
   ClientHeight = 300
   ClientWidth = 260
   Constraints.MinHeight = 300
   Constraints.MinWidth = 260
   OnCreate = FormCreate
-  Position = poOwnerFormCenter
+  Position = poMainFormCenter
+  ShowInTaskBar = stNever
   LCLVersion = '1.8.4.0'
   object ButtonPanel: TButtonPanel
     Left = 6
