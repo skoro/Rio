@@ -72,6 +72,11 @@ end;
 procedure TBookmarkForm.tvFoldersEditing(Sender: TObject; Node: TTreeNode;
   var AllowEdit: Boolean);
 begin
+  // Don't allow to edit the root node.
+  if Node.Parent = NIL then begin
+    AllowEdit := False;
+    Exit; // =>
+  end;
   // Start editing the existing node.
   FPrevName := Node.Text;
   FPrevPath := Node.GetTextPath;
