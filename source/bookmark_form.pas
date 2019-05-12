@@ -36,7 +36,8 @@ type
     FIsNewNode: Boolean;
     FOnNewFolder: TOnNewFolderNode;
     FOnRenameFolder: TOnRenameFolderNode;
-    FPrevPath: string; // Keep a folder path before editing the node.
+    FPrevPath: string; // Keep an original node path before editing node.
+    FPrevName: string; // Keep an source node name before editing node.
     function GetFolderNode: TTreeNode;
   public
     property TreeView: TTreeView read tvFolders;
@@ -72,6 +73,7 @@ procedure TBookmarkForm.tvFoldersEditing(Sender: TObject; Node: TTreeNode;
   var AllowEdit: Boolean);
 begin
   // Start editing the existing node.
+  FPrevName := Node.Text;
   FPrevPath := Node.GetTextPath;
   FIsNewNode := False;
 end;
@@ -81,7 +83,8 @@ procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
 begin
   // A new node is edited.
   if FIsNewNode then begin
-    if Cancel then
+    // Don't add a cancelled node or node without name.
+    if Cancel or (Trim(Node.Text) = '') then
       Node.Delete
     else begin
       Node.Selected := True;
@@ -91,13 +94,17 @@ begin
     end;
   end
   // An existing node is edited.
-  else begin
-    if FPrevPath <> '' then begin;
-      if Assigned(FOnRenameFolder) then
-        FOnRenameFolder(Self, FPrevPath, Node.Text);
+  else
+    if FPrevPath <> '' then begin
+      if Cancel or (Trim(Node.Text) = '') then
+        Node.Text := FPrevName
+      else begin
+        if Assigned(FOnRenameFolder) then
+          FOnRenameFolder(Self, FPrevPath, Node.Text);
+      end;
+      FPrevName := '';
       FPrevPath := '';
     end;
-  end;
 end;
 
 function TBookmarkForm.GetFolderNode: TTreeNode;
