@@ -336,6 +336,7 @@ begin
   with TBookmarkForm.Create(Self) do
   begin
     OnNewFolder := @FBookManager.AddFolder;
+    OnRenameFolder := @FBookManager.RenameFolder;
     FBookManager.AttachFolderNodes(TreeView);
     if Assigned(FBookManager.CurrentBookmark) then begin
       EditBookmarkModal(FBookManager.CurrentBookmark);

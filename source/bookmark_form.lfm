@@ -118,6 +118,7 @@ object BookmarkForm: TBookmarkForm
       AutoExpand = True
       ScrollBars = ssAutoBoth
       TabOrder = 1
+      OnEditing = tvFoldersEditing
       OnEditingEnd = tvFoldersEditingEnd
       Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
     end

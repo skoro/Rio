@@ -12,16 +12,30 @@ type
   TBookmark = class;
 
   // Callback when a new folder is created.
-  TBookmarkNewFolder = procedure (Sender: TObject; FolderPath: string) of object;
-
+  TOnNewFolderNode = function (Sender: TObject; FolderPath: string): TTreeNode of object;
+  // Callback when a folder was renamed.
+  TOnRenameFolderNode = procedure (Sender: TObject; FolderPath, NewName: string) of object;
   // When bookmark selected in the tree.
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
 
-  { EFolderNode }
+  { ENodeException }
 
-  EFolderNode = class(Exception)
+  ENodeException = class(Exception)
+  private
+    FNode: TTreeNode;
   public
-    constructor CreateDef;
+    constructor CreateNode(ANode: TTreeNode; const msg: string);
+    property Node: TTreeNode read FNode write FNode;
+  end;
+
+  { ENodePathNotFound }
+
+  ENodePathNotFound = class(Exception)
+  private
+    FPath: string;
+  public
+    constructor CreatePath(APath: string);
+    property Path: string read FPath write FPath;
   end;
 
   { TBookmark }
@@ -69,10 +83,15 @@ type
     function AddBookmark(BM: TBookmark; FolderPath: string): TTreeNode;
     // Creates the folder tree items and attaches these items to a custom tree.
     procedure AttachFolderNodes(CustomTree: TCustomTreeView);
-    procedure AddFolder(Sender: TObject; FolderPath: string);
+    // Adds a new folder by its path to the tree.
+    function AddFolder(Sender: TObject; FolderPath: string): TTreeNode;
+    // Renames a folder.
+    procedure RenameFolder(Sender: TObject; FolderPath, NewName: string);
+    // Reset current bookmark and node.
     procedure ResetCurrent;
     // Check that the request object is matched with the current bookmark.
     function IsCurrentRequest(RO: TRequestObject): Boolean;
+    function FindFolder(TextPath: string): TTreeNode;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -92,13 +111,21 @@ begin
   Result := Node.Data = NIL;
 end;
 
-{ EFolderNode }
+{ ENodePathNotFound }
 
-constructor EFolderNode.CreateDef;
+constructor ENodePathNotFound.CreatePath(APath: string);
 begin
-  inherited Create('Node is a folder.');
+  inherited CreateFmt('Folder path %s not found.', [APath]);
+  FPath := APath;
 end;
 
+{ ENodeException }
+
+constructor ENodeException.CreateNode(ANode: TTreeNode; const msg: string);
+begin
+  inherited Create(msg);
+  FNode := ANode;
+end;
 
 { TBookmark }
 
@@ -118,7 +145,7 @@ begin
   if not Assigned(avalue) then
     raise Exception.Create('Bookmark must be assigned to tree node.');
   if IsFolderNode(AValue) then
-    raise EFolderNode.CreateDef;
+    raise ENodeException.CreateNode(AValue, 'The node is a folder node.');
   FTreeNode := AValue;
 end;
 
@@ -223,11 +250,7 @@ function TBookmarkManager.AddBookmark(BM: TBookmark; FolderPath: string
 var
   FolderNode: TTreeNode;
 begin
-  FolderNode := FTreeView.Items.FindNodeWithTextPath(FolderPath);
-  if FolderNode = nil then
-    raise Exception.CreateFmt('Folder %s not found.', [FolderPath]);
-  if not IsFolderNode(FolderNode) then
-    raise EFolderNode.Create('Node must be a folder.');
+  FolderNode := FindFolder(FolderPath);
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.MakeVisible;
   Result.Data := BM;
@@ -256,7 +279,7 @@ begin
   WalkNodes(FirstNode, NewParent);
 end;
 
-procedure TBookmarkManager.AddFolder(Sender: TObject; FolderPath: string);
+function TBookmarkManager.AddFolder(Sender: TObject; FolderPath: string): TTreeNode;
 var
   p: SizeInt;
   FolderName, CurFolder: string;
@@ -265,13 +288,19 @@ begin
   p := RPos('/', FolderPath);
   FolderName := RightStr(FolderPath, Length(FolderPath) - p);
   CurFolder := LeftStr(FolderPath, p - 1);
-  ParentNode := FTreeView.Items.FindNodeWithTextPath(CurFolder);
-  if ParentNode = NIL then
-    raise Exception.CreateFmt('Folder %s not found.', [CurFolder]);
-  with FTreeView.Items.AddChild(ParentNode, FolderName) do begin
-    Data := NIL;
-    MakeVisible;
-  end;
+  ParentNode := FindFolder(CurFolder);
+  Result := FTreeView.Items.AddChild(ParentNode, FolderName);
+  Result.Data := NIL;
+  Result.MakeVisible;
+end;
+
+procedure TBookmarkManager.RenameFolder(Sender: TObject; FolderPath,
+  NewName: string);
+var
+  Folder: TTreeNode;
+begin
+  Folder := FindFolder(FolderPath);
+  Folder.Text := NewName;
 end;
 
 procedure TBookmarkManager.ResetCurrent;
@@ -289,6 +318,15 @@ begin
   if not Assigned(BM) then
     Exit(False);
   Result := BM.Request.Url = RO.Url;
+end;
+
+function TBookmarkManager.FindFolder(TextPath: string): TTreeNode;
+begin
+  Result := FTreeView.Items.FindNodeWithTextPath(TextPath);
+  if Result = NIL then
+    raise ENodePathNotFound.CreatePath(TextPath);
+  if not IsFolderNode(Result) then
+    raise ENodeException.CreateNode(Result, 'The node must be a folder.');
 end;
 
 end.

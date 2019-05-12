@@ -28,18 +28,23 @@ type
     procedure btnNewFolderClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
+    procedure tvFoldersEditing(Sender: TObject; Node: TTreeNode;
+      var AllowEdit: Boolean);
     procedure tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
       Cancel: Boolean);
   private
-    FNewNode: TTreeNode;
-    FOnNewFolder: TBookmarkNewFolder;
+    FIsNewNode: Boolean;
+    FOnNewFolder: TOnNewFolderNode;
+    FOnRenameFolder: TOnRenameFolderNode;
+    FPrevPath: string; // Keep a folder path before editing the node.
     function GetFolderNode: TTreeNode;
   public
     property TreeView: TTreeView read tvFolders;
     property FolderNode: TTreeNode read GetFolderNode;
     function CreateBookmarkModal(RO: TRequestObject): TBookmark;
     function EditBookmarkModal(BM: TBookmark): TModalResult;
-    property OnNewFolder: TBookmarkNewFolder read FOnNewFolder write FOnNewFolder;
+    property OnNewFolder: TOnNewFolderNode read FOnNewFolder write FOnNewFolder;
+    property OnRenameFolder: TOnRenameFolderNode read FOnRenameFolder write FOnRenameFolder;
   end;
 
 var
@@ -63,18 +68,36 @@ begin
   ModalResult := mrOK;
 end;
 
+procedure TBookmarkForm.tvFoldersEditing(Sender: TObject; Node: TTreeNode;
+  var AllowEdit: Boolean);
+begin
+  // Start editing the existing node.
+  FPrevPath := Node.GetTextPath;
+  FIsNewNode := False;
+end;
+
 procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
 begin
-  // Delete currently inserted node on canceling edit.
-  if Cancel and Assigned(FNewNode) and (FNewNode = Node) then
-    FNewNode.Delete;
-  if not Cancel then begin
-    Node.Selected := True;
-    if Assigned(FOnNewFolder) then
-      FOnNewFolder(Self, Node.GetTextPath);
+  // A new node is edited.
+  if FIsNewNode then begin
+    if Cancel then
+      Node.Delete
+    else begin
+      Node.Selected := True;
+      if Assigned(FOnNewFolder) then
+        FOnNewFolder(Self, Node.GetTextPath);
+      FIsNewNode := False;
+    end;
+  end
+  // An existing node is edited.
+  else begin
+    if FPrevPath <> '' then begin;
+      if Assigned(FOnRenameFolder) then
+        FOnRenameFolder(Self, FPrevPath, Node.Text);
+      FPrevPath := '';
+    end;
   end;
-  FNewNode := Nil;
 end;
 
 function TBookmarkForm.GetFolderNode: TTreeNode;
@@ -104,7 +127,7 @@ procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   ButtonPanel.CloseButton.ModalResult := mrNone;
-  FNewNode := NIL;
+  FIsNewNode := False;
 end;
 
 procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
@@ -114,9 +137,11 @@ begin
   root := tvFolders.Selected;
   if root = NIL then
     root := tvFolders.Items.GetFirstNode;
-  FNewNode := tvFolders.Items.AddChild(root, '');
-  FNewNode.MakeVisible;
-  FNewNode.EditText;
+  with tvFolders.Items.AddChild(root, '') do begin
+    MakeVisible;
+    EditText;
+  end;
+  FIsNewNode := True;
 end;
 
 end.

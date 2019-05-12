@@ -445,7 +445,7 @@ object MainForm: TMainForm
                   ShowNavButtons = True
                   object ToolButton1: TToolButton
                     Left = 146
-                    Height = 22
+                    Height = 5
                     Top = 0
                     Caption = 'ToolButton1'
                     Style = tbsDivider
@@ -1238,7 +1238,7 @@ object MainForm: TMainForm
                       Top = 0
                       Width = 513
                       HorzScrollBar.Page = 232
-                      VertScrollBar.Page = 134
+                      VertScrollBar.Page = 133
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 151
