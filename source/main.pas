@@ -451,6 +451,7 @@ begin
     FHttpClient.RequestBody := TStringStream.Create(formData);
 
   btnSubmit.Enabled := False;
+  btnBookmark.Enabled := False;
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -2008,6 +2009,7 @@ begin
   else
     ShowMessage(E.Message);
   btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
   FinishRequest;
 end;
 
@@ -2051,6 +2053,7 @@ var
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
   TimerRequest.Enabled := False;
   SetAppCaption(cbUrl.Text);
 
