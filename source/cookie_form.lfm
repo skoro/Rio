@@ -14,7 +14,7 @@ object CookieForm: TCookieForm
   OnKeyDown = FormKeyDown
   Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object Panel1: TPanel
     Left = 0
     Height = 335
@@ -36,7 +36,7 @@ object CookieForm: TCookieForm
     end
     object editName: TLabeledEdit
       Left = 8
-      Height = 29
+      Height = 27
       Top = 32
       Width = 265
       Anchors = [akTop, akLeft, akRight]
@@ -45,8 +45,8 @@ object CookieForm: TCookieForm
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = editName
       EditLabel.Left = 8
-      EditLabel.Height = 19
-      EditLabel.Top = 10
+      EditLabel.Height = 17
+      EditLabel.Top = 12
       EditLabel.Width = 265
       EditLabel.Caption = 'Name'
       EditLabel.ParentColor = False
@@ -54,7 +54,7 @@ object CookieForm: TCookieForm
     end
     object editDomain: TLabeledEdit
       Left = 8
-      Height = 29
+      Height = 27
       Top = 88
       Width = 265
       Anchors = [akTop, akLeft, akRight]
@@ -63,8 +63,8 @@ object CookieForm: TCookieForm
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = editDomain
       EditLabel.Left = 8
-      EditLabel.Height = 19
-      EditLabel.Top = 66
+      EditLabel.Height = 17
+      EditLabel.Top = 68
       EditLabel.Width = 265
       EditLabel.Caption = 'Domain'
       EditLabel.ParentColor = False
@@ -72,7 +72,7 @@ object CookieForm: TCookieForm
     end
     object editPath: TLabeledEdit
       Left = 8
-      Height = 29
+      Height = 27
       Top = 144
       Width = 265
       Anchors = [akTop, akLeft, akRight]
@@ -81,8 +81,8 @@ object CookieForm: TCookieForm
       EditLabel.AnchorSideRight.Side = asrBottom
       EditLabel.AnchorSideBottom.Control = editPath
       EditLabel.Left = 8
-      EditLabel.Height = 19
-      EditLabel.Top = 122
+      EditLabel.Height = 17
+      EditLabel.Top = 124
       EditLabel.Width = 265
       EditLabel.Caption = 'Path'
       EditLabel.ParentColor = False
@@ -92,7 +92,7 @@ object CookieForm: TCookieForm
       Left = 96
       Height = 22
       Top = 176
-      Width = 67
+      Width = 63
       Caption = 'Secure'
       TabOrder = 4
     end
@@ -100,29 +100,29 @@ object CookieForm: TCookieForm
       Left = 8
       Height = 22
       Top = 176
-      Width = 52
+      Width = 48
       Caption = 'Http'
       TabOrder = 5
     end
     object labelExpires: TLabel
       Left = 8
-      Height = 19
+      Height = 17
       Top = 205
-      Width = 49
+      Width = 44
       Caption = 'Expires:'
       ParentColor = False
     end
     object Label1: TLabel
       Left = 8
-      Height = 19
+      Height = 17
       Top = 232
-      Width = 34
+      Width = 31
       Caption = 'Value'
       ParentColor = False
     end
     object expiresValue: TEdit
       Left = 64
-      Height = 29
+      Height = 27
       Top = 200
       Width = 209
       Anchors = [akTop, akLeft, akRight]

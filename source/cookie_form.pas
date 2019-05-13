@@ -172,7 +172,7 @@ end;
 procedure TCookieForm.View;
 begin
   InitValuesFromGrid;
-  Show;
+  ShowModal;
 end;
 
 end.
