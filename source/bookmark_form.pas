@@ -38,6 +38,8 @@ type
     FOnRenameFolder: TOnRenameFolderNode;
     FPrevPath: string; // Keep an original node path before editing node.
     FPrevName: string; // Keep an source node name before editing node.
+    function GetBookmarkFolder: string;
+    function GetBookmarkName: string;
     function GetFolderNode: TTreeNode;
   public
     property TreeView: TTreeView read tvFolders;
@@ -46,6 +48,8 @@ type
     function EditBookmarkModal(BM: TBookmark): TModalResult;
     property OnNewFolder: TOnNewFolderNode read FOnNewFolder write FOnNewFolder;
     property OnRenameFolder: TOnRenameFolderNode read FOnRenameFolder write FOnRenameFolder;
+    property BookmarkName: string read GetBookmarkName;
+    property BookmarkFolder: string read GetBookmarkFolder;
   end;
 
 var
@@ -117,6 +121,23 @@ begin
   Result := tvFolders.Selected;
   if Result = NIL then
     Result := tvFolders.Items.GetFirstNode;
+end;
+
+function TBookmarkForm.GetBookmarkFolder: string;
+var
+  fNode: TTreeNode;
+begin
+  fNode := tvFolders.Selected;
+  if not Assigned(fNode) then
+    fNode := tvFolders.Items.GetFirstNode;
+  if not Assigned(fNode) then
+    raise Exception.Create('Cannot get a folder node.');
+  Result := fNode.GetTextPath;
+end;
+
+function TBookmarkForm.GetBookmarkName: string;
+begin
+  Result := edName.Text;
 end;
 
 function TBookmarkForm.CreateBookmarkModal(RO: TRequestObject): TBookmark;
