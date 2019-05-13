@@ -44,9 +44,6 @@ type
     procedure View;
   end;
 
-var
-  CookieForm: TCookieForm;
-
 implementation
 
 uses SysUtils, strutils, app_helpers;

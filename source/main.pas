@@ -652,11 +652,6 @@ begin
   gridReqCookie.Cells[0, 1] := '1';
   gridParams.Cells[0, 1] := '1';
 
-  // Init cookie form.
-  CookieForm := TCookieForm.Create(Application);
-  CookieForm.ResponseGrid := gridRespCookie;
-  CookieForm.RequestGrid := gridReqCookie;
-
   KeyValueForm := TKeyValueForm.Create(Application);
 
   SelectBodyTab(btForm);
@@ -808,7 +803,12 @@ end;
 
 procedure TMainForm.gridRespCookieDblClick(Sender: TObject);
 begin
-  CookieForm.View;
+  with TCookieForm.Create(Self) do begin
+    ResponseGrid := gridRespCookie;
+    RequestGrid := gridReqCookie;
+    View;
+    Free;
+  end;
 end;
 
 procedure TMainForm.miExportClick(Sender: TObject);
