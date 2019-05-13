@@ -338,13 +338,16 @@ begin
     OnNewFolder := @FBookManager.AddFolder;
     OnRenameFolder := @FBookManager.RenameFolder;
     FBookManager.AttachFolderNodes(TreeView);
+    // Edit current bookmark.
     if Assigned(FBookManager.CurrentBookmark) then begin
-      EditBookmarkModal(FBookManager.CurrentBookmark);
+      if EditBookmarkModal(FBookManager.CurrentBookmark) = mrOK then
+        FBookManager.UpdateCurrent(BookmarkName, BookmarkFolder);
     end
+    // Add a new bookmark.
     else begin
       RO := CreateRequestObject;
       bm := CreateBookmarkModal(RO);
-      if bm = Nil then begin
+      if bm = Nil then begin // modal cancelled.
         FreeAndNil(RO);
       end
       else begin

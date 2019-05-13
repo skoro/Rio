@@ -89,6 +89,10 @@ type
     procedure RenameFolder(Sender: TObject; FolderPath, NewName: string);
     // Reset current bookmark and node.
     procedure ResetCurrent;
+    // Update current bookmark: set a new name or/and move to another folder.
+    // ANewName - a bookmark new name
+    // TextPath - move the bookmark to another folder (optional).
+    procedure UpdateCurrent(ANewName, TextPath: string);
     // Check that the request object is matched with the current bookmark.
     function IsCurrentRequest(RO: TRequestObject): Boolean;
     function FindFolder(TextPath: string): TTreeNode;
@@ -308,6 +312,25 @@ begin
   if Assigned(FCurrentNode) then
     FCurrentNode.Selected := False;
   FCurrentNode := NIL;
+end;
+
+procedure TBookmarkManager.UpdateCurrent(ANewName, TextPath: string);
+var
+  BM: TBookmark;
+begin
+  BM := CurrentBookmark;
+  if not Assigned(BM) then
+    Exit; // =>
+  // Rename.
+  if (ANewName <> '') and (BM.Name <> ANewName) then begin
+    BM.Name := ANewName;
+    FCurrentNode.Text := ANewName;
+  end;
+  // Move to another folder.
+  if (TextPath <> '') and (FCurrentNode.GetTextPath <> TextPath) then begin
+    FCurrentNode.Delete;
+    AddBookmark(BM, TextPath); // current node will be updated here.
+  end;
 end;
 
 function TBookmarkManager.IsCurrentRequest(RO: TRequestObject): Boolean;
