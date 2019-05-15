@@ -26,6 +26,7 @@ object BookmarkForm: TBookmarkForm
     CloseButton.Name = 'CloseButton'
     CloseButton.Caption = '&Delete'
     CloseButton.DefaultCaption = False
+    CloseButton.OnClick = CloseButtonClick
     CancelButton.Name = 'CancelButton'
     CancelButton.DefaultCaption = True
     TabOrder = 0

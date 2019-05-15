@@ -13,9 +13,11 @@ type
 
   // Callback when a new folder is created.
   TOnNewFolderNode = function (Sender: TObject; FolderPath: string): TTreeNode of object;
-  // Callback when a folder was renamed.
+  // Callback when the folder was renamed.
   TOnRenameFolderNode = procedure (Sender: TObject; FolderPath, NewName: string) of object;
-  // When bookmark selected in the tree.
+  // Callback when the bookmark is ready to delete.
+  TOnDeleteBookmark = procedure (BM: TBookmark) of object;
+  // When bookmark is changed (opened).
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
 
   { ENodeException }
@@ -97,6 +99,10 @@ type
     function IsCurrentRequest(RO: TRequestObject): Boolean;
     // Finds the folder node by path.
     function FindFolder(FolderPath: string): TTreeNode;
+    // Deletes the bookmark from the tree.
+    procedure DeleteBookmark(BM: TBookmark);
+    // Finds a tree node by bookmark instance.
+    function FindNode(BM: TBookmark): TTreeNode;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -351,6 +357,44 @@ begin
     raise ENodePathNotFound.CreatePath(FolderPath);
   if not IsFolderNode(Result) then
     raise ENodeException.CreateNode(Result, 'The node must be a folder.');
+end;
+
+procedure TBookmarkManager.DeleteBookmark(BM: TBookmark);
+var
+  bNode: TTreeNode;
+begin
+  bNode := FindNode(BM);
+  if not Assigned(bNode) then
+    Exit; // =>
+  if bNode = FCurrentNode then begin
+    FCurrentNode := NIL;
+  end;
+  FreeAndNil(BM);
+  bNode.Delete;
+end;
+
+function TBookmarkManager.FindNode(BM: TBookmark): TTreeNode;
+  function InternalFind(aNode: TTreeNode): TTreeNode;
+  var
+    Child: TTreeNode;
+  begin
+    Result := NIL;
+    if not Assigned(aNode) then
+      Exit; // =>
+    Child := aNode.GetFirstChild;
+    while Child <> NIL do begin
+      if IsFolderNode(Child) then begin
+        Result := InternalFind(Child);
+        if Result <> NIL then
+          Exit; // =>
+      end;
+      if Child.Data = Pointer(BM) then
+        Exit(Child);
+      Child := Child.GetNextSibling;
+    end;
+  end;
+begin
+  Result := InternalFind(FTreeView.Items.GetFirstNode);
 end;
 
 end.

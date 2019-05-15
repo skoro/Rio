@@ -6,7 +6,10 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
+
+const
+  mrDelete = mrLast + 1; // Modal result for delete operation.
 
 type
 
@@ -26,6 +29,7 @@ type
     pName: TPanel;
     tvFolders: TTreeView;
     procedure btnNewFolderClick(Sender: TObject);
+    procedure CloseButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure tvFoldersEditing(Sender: TObject; Node: TTreeNode;
@@ -36,8 +40,10 @@ type
     FIsNewNode: Boolean;
     FOnNewFolder: TOnNewFolderNode;
     FOnRenameFolder: TOnRenameFolderNode;
+    FOnDeleteBookmark: TOnDeleteBookmark;
     FPrevPath: string; // Keep an original node path before editing node.
     FPrevName: string; // Keep an source node name before editing node.
+    FBookmark: TBookmark; // The edited bookmark.
     function GetBookmarkFolder: string;
     function GetBookmarkName: string;
     function GetFolderNode: TTreeNode;
@@ -48,6 +54,7 @@ type
     function EditBookmarkModal(BM: TBookmark): TModalResult;
     property OnNewFolder: TOnNewFolderNode read FOnNewFolder write FOnNewFolder;
     property OnRenameFolder: TOnRenameFolderNode read FOnRenameFolder write FOnRenameFolder;
+    property OnDeleteBookmark: TOnDeleteBookmark read FOnDeleteBookmark write FOnDeleteBookmark;
     property BookmarkName: string read GetBookmarkName;
     property BookmarkFolder: string read GetBookmarkFolder;
   end;
@@ -57,7 +64,7 @@ var
 
 implementation
 
-uses thread_http_client, sysutils;
+uses thread_http_client, app_helpers, sysutils;
 
 {$R *.lfm}
 
@@ -65,6 +72,7 @@ uses thread_http_client, sysutils;
 
 procedure TBookmarkForm.OKButtonClick(Sender: TObject);
 begin
+  // Don't allow to close form without a bookmark name.
   if Trim(edName.Text) = '' then
   begin
     edName.SetFocus;
@@ -90,7 +98,7 @@ end;
 procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
 begin
-  // A new node is edited.
+  // A new node has been added.
   if FIsNewNode then begin
     // Don't add a cancelled node or node without name.
     if Cancel or (Trim(Node.Text) = '') then
@@ -102,9 +110,10 @@ begin
       FIsNewNode := False;
     end;
   end
-  // An existing node is edited.
+  // An existing node has been edited.
   else
     if FPrevPath <> '' then begin
+      // Revert the previous name on cancel or empty name.
       if Cancel or (Trim(Node.Text) = '') then
         Node.Text := FPrevName
       else begin
@@ -152,6 +161,7 @@ end;
 
 function TBookmarkForm.EditBookmarkModal(BM: TBookmark): TModalResult;
 begin
+  FBookmark := BM;
   edName.Text := BM.Name;
   Result := ShowModal;
 end;
@@ -159,7 +169,6 @@ end;
 procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
-  ButtonPanel.CloseButton.ModalResult := mrNone;
   FIsNewNode := False;
 end;
 
@@ -175,6 +184,19 @@ begin
     EditText;
   end;
   FIsNewNode := True;
+end;
+
+procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
+var
+  mr: TModalResult;
+begin
+  ModalResult := mrNone;
+  mr := ConfirmDlg('Delete bookmark', 'Are you sure you want to delete this bookmark ?');
+  if mr <> mrOK then
+    Exit; // =>
+  if Assigned(FOnDeleteBookmark) and Assigned(FBookmark) then
+    FOnDeleteBookmark(FBookmark);
+  ModalResult := mrDelete;
 end;
 
 end.
