@@ -91,11 +91,12 @@ type
     procedure ResetCurrent;
     // Update current bookmark: set a new name or/and move to another folder.
     // ANewName - a bookmark new name
-    // TextPath - move the bookmark to another folder (optional).
-    procedure UpdateCurrent(ANewName, TextPath: string);
+    // FolderPath - move the bookmark to another folder (optional).
+    procedure UpdateCurrent(ANewName, FolderPath: string);
     // Check that the request object is matched with the current bookmark.
     function IsCurrentRequest(RO: TRequestObject): Boolean;
-    function FindFolder(TextPath: string): TTreeNode;
+    // Finds the folder node by path.
+    function FindFolder(FolderPath: string): TTreeNode;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -314,7 +315,7 @@ begin
   FCurrentNode := NIL;
 end;
 
-procedure TBookmarkManager.UpdateCurrent(ANewName, TextPath: string);
+procedure TBookmarkManager.UpdateCurrent(ANewName, FolderPath: string);
 var
   BM: TBookmark;
 begin
@@ -327,9 +328,9 @@ begin
     FCurrentNode.Text := ANewName;
   end;
   // Move to another folder.
-  if (TextPath <> '') and (FCurrentNode.GetTextPath <> TextPath) then begin
+  if (FolderPath <> '') and (FCurrentNode.GetTextPath <> FolderPath) then begin
     FCurrentNode.Delete;
-    AddBookmark(BM, TextPath); // current node will be updated here.
+    AddBookmark(BM, FolderPath); // current node will be updated here.
   end;
 end;
 
@@ -343,11 +344,11 @@ begin
   Result := BM.Request.Url = RO.Url;
 end;
 
-function TBookmarkManager.FindFolder(TextPath: string): TTreeNode;
+function TBookmarkManager.FindFolder(FolderPath: string): TTreeNode;
 begin
-  Result := FTreeView.Items.FindNodeWithTextPath(TextPath);
+  Result := FTreeView.Items.FindNodeWithTextPath(FolderPath);
   if Result = NIL then
-    raise ENodePathNotFound.CreatePath(TextPath);
+    raise ENodePathNotFound.CreatePath(FolderPath);
   if not IsFolderNode(Result) then
     raise ENodeException.CreateNode(Result, 'The node must be a folder.');
 end;
