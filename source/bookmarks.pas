@@ -100,6 +100,8 @@ type
     procedure DeleteBookmark(BM: TBookmark);
     // Finds a tree node by bookmark instance.
     function FindNode(BM: TBookmark): TTreeNode;
+    // Select bookmark.
+    procedure OpenBookmark;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -115,25 +117,30 @@ type
   private
     FBookmarkManager: TBookmarkManager;
     function GetBookmarkManager: TBookmarkManager;
+    function GetSelectedNode: TTreeNode;
   protected
     function CreateItem(const caption: string): TMenuItem; virtual;
     procedure CreateDefaultItems; virtual;
     procedure InternalOnClickOpen(Sender: TObject); virtual;
     procedure InternalOnClickEdit(Sender: TObject); virtual;
     procedure InternalOnClickDelete(Sender: TObject); virtual;
+    procedure RenameFolder(FolderNode: TTreeNode); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
+    property SelectedNode: TTreeNode read GetSelectedNode;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
 
 implementation
 
-uses StdCtrls, strutils;
+uses StdCtrls, Dialogs, strutils;
 
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
+  if not Assigned(Node) then
+    raise Exception.Create('A node instance is required.');
   Result := Node.Data = NIL;
 end;
 
@@ -144,6 +151,11 @@ begin
   if not Assigned(FBookmarkManager) then
     raise Exception.Create('Bookmark manager is required for popup menu.');
   Result := FBookmarkManager;
+end;
+
+function TBookmarkPopup.GetSelectedNode: TTreeNode;
+begin
+  Result := FBookmarkManager.TreeView.Selected;
 end;
 
 function TBookmarkPopup.CreateItem(const caption: string): TMenuItem;
@@ -164,18 +176,45 @@ begin
 end;
 
 procedure TBookmarkPopup.InternalOnClickOpen(Sender: TObject);
+var
+  sNode: TTreeNode;
 begin
-
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    if sNode.Expanded then sNode.Collapse(True) else sNode.Expand(True);
+    Exit; // =>
+  end;
+  FBookmarkManager.OpenBookmark;
 end;
 
 procedure TBookmarkPopup.InternalOnClickEdit(Sender: TObject);
+var
+  sNode: TTreeNode;
 begin
-
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    RenameFolder(sNode);
+    Exit; // =>
+  end;
 end;
 
 procedure TBookmarkPopup.InternalOnClickDelete(Sender: TObject);
 begin
 
+end;
+
+procedure TBookmarkPopup.RenameFolder(FolderNode: TTreeNode);
+var
+  NewName: string;
+begin
+  NewName := InputBox('Edit folder', 'A new folder name:', FolderNode.Text);
+  if (NewName = FolderNode.Text) or (Trim(NewName) = '') then
+    Exit; // =>
+  FolderNode.Text := NewName;
 end;
 
 constructor TBookmarkPopup.Create(AOwner: TComponent);
@@ -296,23 +335,8 @@ begin
 end;
 
 procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
-var
-  Selected: TTreeNode;
-  Prev: TBookmark;
 begin
-  Selected := FTreeView.Selected;
-  // The node must be selected and is not be a folder node.
-  if not (Assigned(Selected) and (not IsFolderNode(Selected))) then
-    Exit; // =>
-  if Selected = FCurrentNode then
-    Exit; // =>
-  Prev := GetCurrentBookmark;
-  FCurrentNode := Selected;
-  if Assigned(FOnChangeBookmark) then begin
-    FOnChangeBookmark(Prev, GetCurrentBookmark);
-    FCurrentNode := Selected; // Preserve selected node after user callback.
-  end;
-  FTreeView.Selected := Selected;
+  OpenBookmark;
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);
@@ -471,6 +495,26 @@ function TBookmarkManager.FindNode(BM: TBookmark): TTreeNode;
   end;
 begin
   Result := InternalFind(FTreeView.Items.GetFirstNode);
+end;
+
+procedure TBookmarkManager.OpenBookmark;
+var
+  Selected: TTreeNode;
+  Prev: TBookmark;
+begin
+  Selected := FTreeView.Selected;
+  // The node must be selected and is not be a folder node.
+  if not (Assigned(Selected) and (not IsFolderNode(Selected))) then
+    Exit; // =>
+  if Selected = FCurrentNode then
+    Exit; // =>
+  Prev := GetCurrentBookmark;
+  FCurrentNode := Selected;
+  if Assigned(FOnChangeBookmark) then begin
+    FOnChangeBookmark(Prev, GetCurrentBookmark);
+    FCurrentNode := Selected; // Preserve selected node after user callback.
+  end;
+  FTreeView.Selected := Selected;
 end;
 
 end.
