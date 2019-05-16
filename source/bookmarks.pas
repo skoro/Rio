@@ -8,8 +8,9 @@ uses
   Classes, SysUtils, ComCtrls, ExtCtrls, Controls, Menus, request_object;
 
 type
-  // Forward declaration.
+  // Forward declarations.
   TBookmark = class;
+  TBookmarkPopup = class;
 
   // When bookmark is changed (opened).
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
@@ -60,8 +61,10 @@ type
     FCurrentNode: TTreeNode;
     FOnChangeBookmark: TOnChangeBookmark;
 
+    function GetBookmarkPopup: TBookmarkPopup;
     function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
+    procedure SetBookmarkPopup(AValue: TBookmarkPopup);
     procedure SetRootName(AValue: string);
 
   protected
@@ -103,6 +106,7 @@ type
     property CurrentNode: TTreeNode read FCurrentNode;
     property CurrentBookmark: TBookmark read GetCurrentBookmark;
     property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
+    property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
   end;
 
   { TBookmarkPopup }
@@ -240,6 +244,13 @@ begin
   Result := FRootNode.Text;
 end;
 
+procedure TBookmarkManager.SetBookmarkPopup(AValue: TBookmarkPopup);
+begin
+  if FTreeView.PopupMenu = AValue then
+    Exit; // =>
+  FTreeView.PopupMenu := TPopupMenu(AValue);
+end;
+
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
 begin
   Result := NIL;
@@ -248,6 +259,11 @@ begin
       raise Exception.Create('Runtime error: node data is not bookmark.');
     Result := TBookmark(FCurrentNode.Data);
   end;
+end;
+
+function TBookmarkManager.GetBookmarkPopup: TBookmarkPopup;
+begin
+  Result := TBookmarkPopup(FTreeView.PopupMenu);
 end;
 
 procedure TBookmarkManager.SetRootName(AValue: string);
@@ -267,8 +283,6 @@ begin
                  tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
   // Event handlers.
   Result.OnDblClick := @InternalTreeOnDblClick;
-  // Popup menu
-  Result.PopupMenu := TBookmarkPopup.Create(Self);
 end;
 
 procedure TBookmarkManager.CreateRootNode;
@@ -308,6 +322,7 @@ begin
   Caption := '';
   BevelOuter := bvNone;
   FTreeView := CreateTree;
+  Popup := TBookmarkPopup.Create(Self);
   FCurrentNode := NIL;
   CreateRootNode;
 end;
