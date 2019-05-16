@@ -11,12 +11,6 @@ type
   // Forward declaration.
   TBookmark = class;
 
-  // Callback when a new folder is created.
-  TOnNewFolderNode = function (Sender: TObject; FolderPath: string): TTreeNode of object;
-  // Callback when the folder was renamed.
-  TOnRenameFolderNode = procedure (Sender: TObject; FolderPath, NewName: string) of object;
-  // Callback when the bookmark is ready to delete.
-  TOnDeleteBookmark = procedure (BM: TBookmark) of object;
   // When bookmark is changed (opened).
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
 
