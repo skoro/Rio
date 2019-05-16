@@ -57,6 +57,8 @@ type
     procedure UpdateBookmark; virtual;
     procedure DeleteBookmark; virtual;
 
+    class function DeleteDlg(BM: TBookmark): Boolean;
+
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
     property RequestObject: TRequestObject read GetRequestObject write FRequestObject;
     property DeleteEnabled: Boolean read GetDeleteEnabled write SetDeleteEnabled;
@@ -223,6 +225,13 @@ begin
     DeleteBookmark(CurrentBookmark);
 end;
 
+class function TBookmarkForm.DeleteDlg(BM: TBookmark): Boolean;
+begin
+  Result := ConfirmDlg('Delete bookmark',
+    Format('Are you sure you want to delete "%s" bookmark ?', [BM.Name])
+  ) = mrOK;
+end;
+
 procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
@@ -244,16 +253,9 @@ begin
 end;
 
 procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
-var
-  mr: TModalResult;
 begin
   ModalResult := mrNone;
-  mr := ConfirmDlg('Delete bookmark',
-    Format('Are you sure you want to delete "%s" bookmark ?', [
-      BookmarkManager.CurrentBookmark.Name
-    ])
-  );
-  if mr <> mrOK then
+  if not DeleteDlg(BookmarkManager.CurrentBookmark) then
     Exit; // =>
   DeleteBookmark;
   ModalResult := mrDeleted;
