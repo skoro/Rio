@@ -330,37 +330,28 @@ end;
 
 procedure TMainForm.BookmarkEditorShow(Sender: TObject);
 var
-  bm: TBookmark;
   RO: TRequestObject;
 begin
   with TBookmarkForm.Create(Self) do
   begin
-    OnNewFolder := @FBookManager.AddFolder;
-    OnRenameFolder := @FBookManager.RenameFolder;
-    OnDeleteBookmark := @FBookManager.DeleteBookmark;
-    FBookManager.AttachFolderNodes(TreeView);
-    // Edit current bookmark.
-    if Assigned(FBookManager.CurrentBookmark) then begin
-      case EditBookmarkModal(FBookManager.CurrentBookmark) of
-        mrOK: FBookManager.UpdateCurrent(BookmarkName, BookmarkFolder);
-        mrDelete:
-          if FBookManager.CurrentBookmark = NIL then
-            BookmarkButtonIcon(False);
-      end;
-    end
-    // Add a new bookmark.
-    else begin
-      RO := CreateRequestObject;
-      bm := CreateBookmarkModal(RO);
-      if bm = Nil then begin // modal cancelled.
-        FreeAndNil(RO);
-      end
-      else begin
+    RO := CreateRequestObject;
+    RequestObject := RO;
+    BookmarkManager := FBookManager;
+    case ShowModal of
+      mrAdded: begin
         BookmarkButtonIcon(True);
-        FBookManager.AddBookmark(bm, FolderNode.GetTextPath);
+      end;
+      mrDeleted: begin
+        BookmarkButtonIcon(False);
+      end;
+      mrOk: begin
+        // stub.
+      end;
+      else begin
+        FreeAndNil(RO);
       end;
     end;
-    Free; // free bookmark form.
+    Free;
   end;
 end;
 

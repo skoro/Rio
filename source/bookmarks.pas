@@ -5,7 +5,7 @@ unit bookmarks;
 interface
 
 uses
-  Classes, SysUtils, ComCtrls, ExtCtrls, Controls, request_object;
+  Classes, SysUtils, ComCtrls, ExtCtrls, Controls, Menus, request_object;
 
 type
   // Forward declaration.
@@ -86,9 +86,9 @@ type
     // Creates the folder tree items and attaches these items to a custom tree.
     procedure AttachFolderNodes(CustomTree: TCustomTreeView);
     // Adds a new folder by its path to the tree.
-    function AddFolder(Sender: TObject; FolderPath: string): TTreeNode;
+    function AddFolder(FolderPath: string): TTreeNode;
     // Renames a folder.
-    procedure RenameFolder(Sender: TObject; FolderPath, NewName: string);
+    procedure RenameFolder(FolderPath, NewName: string);
     // Reset current bookmark and node.
     procedure ResetCurrent;
     // Update current bookmark: set a new name or/and move to another folder.
@@ -111,6 +111,23 @@ type
     property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
   end;
 
+  { TBookmarkPopup }
+
+  TBookmarkPopup = class(TPopupMenu)
+  private
+    FBookmarkManager: TBookmarkManager;
+    function GetBookmarkManager: TBookmarkManager;
+  protected
+    function CreateItem(const caption: string): TMenuItem; virtual;
+    procedure CreateDefaultItems; virtual;
+    procedure InternalOnClickOpen(Sender: TObject); virtual;
+    procedure InternalOnClickEdit(Sender: TObject); virtual;
+    procedure InternalOnClickDelete(Sender: TObject); virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+    property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
+  end;
+
   function IsFolderNode(Node: TTreeNode): Boolean;
 
 implementation
@@ -120,6 +137,55 @@ uses StdCtrls, strutils;
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
   Result := Node.Data = NIL;
+end;
+
+{ TBookmarkPopup }
+
+function TBookmarkPopup.GetBookmarkManager: TBookmarkManager;
+begin
+  if not Assigned(FBookmarkManager) then
+    raise Exception.Create('Bookmark manager is required for popup menu.');
+  Result := FBookmarkManager;
+end;
+
+function TBookmarkPopup.CreateItem(const caption: string): TMenuItem;
+begin
+  Result := TMenuItem.Create(Self);
+  Result.Caption := caption;
+  Items.Add(Result);
+end;
+
+procedure TBookmarkPopup.CreateDefaultItems;
+begin
+  with CreateItem('Open') do
+    OnClick := @InternalOnClickOpen;
+  with CreateItem('Edit') do
+    OnClick := @InternalOnClickEdit;
+  with CreateItem('Delete') do
+    OnClick := @InternalOnClickDelete;
+end;
+
+procedure TBookmarkPopup.InternalOnClickOpen(Sender: TObject);
+begin
+
+end;
+
+procedure TBookmarkPopup.InternalOnClickEdit(Sender: TObject);
+begin
+
+end;
+
+procedure TBookmarkPopup.InternalOnClickDelete(Sender: TObject);
+begin
+
+end;
+
+constructor TBookmarkPopup.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CreateDefaultItems;
+  if AOwner is TBookmarkManager then
+    FBookmarkManager := TBookmarkManager(AOwner);
 end;
 
 { ENodePathNotFound }
@@ -207,6 +273,8 @@ begin
                  tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
   // Event handlers.
   Result.OnDblClick := @InternalTreeOnDblClick;
+  // Popup menu
+  Result.PopupMenu := TBookmarkPopup.Create(Self);
 end;
 
 procedure TBookmarkManager.CreateRootNode;
@@ -290,7 +358,7 @@ begin
   WalkNodes(FirstNode, NewParent);
 end;
 
-function TBookmarkManager.AddFolder(Sender: TObject; FolderPath: string): TTreeNode;
+function TBookmarkManager.AddFolder(FolderPath: string): TTreeNode;
 var
   p: SizeInt;
   FolderName, CurFolder: string;
@@ -305,8 +373,7 @@ begin
   Result.MakeVisible;
 end;
 
-procedure TBookmarkManager.RenameFolder(Sender: TObject; FolderPath,
-  NewName: string);
+procedure TBookmarkManager.RenameFolder(FolderPath, NewName: string);
 var
   Folder: TTreeNode;
 begin

@@ -6,10 +6,11 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
 
 const
-  mrDelete = mrLast + 1; // Modal result for delete operation.
+  mrAdded = mrLast + 1; // A new bookmark was added.
+  mrDeleted = mrLast + 2; // Modal result for delete operation.
 
 type
 
@@ -37,26 +38,30 @@ type
     procedure tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
       Cancel: Boolean);
   private
-    FIsNewNode: Boolean;
-    FOnNewFolder: TOnNewFolderNode;
-    FOnRenameFolder: TOnRenameFolderNode;
-    FOnDeleteBookmark: TOnDeleteBookmark;
+    FIsNewNode: Boolean; // A new folder was added.
+    FBookmarkManager: TBookmarkManager;
     FPrevPath: string; // Keep an original node path before editing node.
     FPrevName: string; // Keep an source node name before editing node.
-    FBookmark: TBookmark; // The edited bookmark.
-    function GetBookmarkFolder: string;
+    FRequestObject: TRequestObject;
+    function GetBookmarkManager: TBookmarkManager;
     function GetBookmarkName: string;
-    function GetFolderNode: TTreeNode;
+    function GetDeleteEnabled: Boolean;
+    function GetFolderPath: string;
+    function GetRequestObject: TRequestObject;
+    procedure SetDeleteEnabled(AValue: Boolean);
   public
-    property TreeView: TTreeView read tvFolders;
-    property FolderNode: TTreeNode read GetFolderNode;
-    function CreateBookmarkModal(RO: TRequestObject): TBookmark;
-    function EditBookmarkModal(BM: TBookmark): TModalResult;
-    property OnNewFolder: TOnNewFolderNode read FOnNewFolder write FOnNewFolder;
-    property OnRenameFolder: TOnRenameFolderNode read FOnRenameFolder write FOnRenameFolder;
-    property OnDeleteBookmark: TOnDeleteBookmark read FOnDeleteBookmark write FOnDeleteBookmark;
+    function ShowModal: TModalResult; override;
+    procedure PrepareEditForm; virtual;
+    procedure PrepareAddForm; virtual;
+    procedure AddBookmark; virtual;
+    procedure UpdateBookmark; virtual;
+    procedure DeleteBookmark; virtual;
+
+    property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
+    property RequestObject: TRequestObject read GetRequestObject write FRequestObject;
+    property DeleteEnabled: Boolean read GetDeleteEnabled write SetDeleteEnabled;
+    property FolderPath: string read GetFolderPath;
     property BookmarkName: string read GetBookmarkName;
-    property BookmarkFolder: string read GetBookmarkFolder;
   end;
 
 var
@@ -105,8 +110,7 @@ begin
       Node.Delete
     else begin
       Node.Selected := True;
-      if Assigned(FOnNewFolder) then
-        FOnNewFolder(Self, Node.GetTextPath);
+      BookmarkManager.AddFolder(Node.GetTextPath);
       FIsNewNode := False;
     end;
   end
@@ -116,23 +120,14 @@ begin
       // Revert the previous name on cancel or empty name.
       if Cancel or (Trim(Node.Text) = '') then
         Node.Text := FPrevName
-      else begin
-        if Assigned(FOnRenameFolder) then
-          FOnRenameFolder(Self, FPrevPath, Node.Text);
-      end;
+      else
+        BookmarkManager.RenameFolder(FPrevPath, Node.Text);
       FPrevName := '';
       FPrevPath := '';
     end;
 end;
 
-function TBookmarkForm.GetFolderNode: TTreeNode;
-begin
-  Result := tvFolders.Selected;
-  if Result = NIL then
-    Result := tvFolders.Items.GetFirstNode;
-end;
-
-function TBookmarkForm.GetBookmarkFolder: string;
+function TBookmarkForm.GetFolderPath: string;
 var
   fNode: TTreeNode;
 begin
@@ -144,26 +139,88 @@ begin
   Result := fNode.GetTextPath;
 end;
 
+function TBookmarkForm.GetRequestObject: TRequestObject;
+begin
+  if not Assigned(FRequestObject) then
+    raise Exception.Create('Request object is required.');
+  Result := FRequestObject;
+end;
+
+procedure TBookmarkForm.SetDeleteEnabled(AValue: Boolean);
+begin
+  ButtonPanel.CloseButton.Visible := AValue;
+end;
+
+function TBookmarkForm.GetBookmarkManager: TBookmarkManager;
+begin
+  if not Assigned(FBookmarkManager) then
+    raise Exception.Create('Bookmark manager is required.');
+  Result := FBookmarkManager;
+end;
+
 function TBookmarkForm.GetBookmarkName: string;
 begin
   Result := edName.Text;
 end;
 
-function TBookmarkForm.CreateBookmarkModal(RO: TRequestObject): TBookmark;
+function TBookmarkForm.GetDeleteEnabled: Boolean;
 begin
-  ButtonPanel.CloseButton.Visible := False;
-  edName.Text := GetRequestFilename(RO.Url);
-  if ShowModal <> mrOK then
-    Exit(NIL); //=>
-  Result := TBookmark.Create(edName.Text);
-  Result.Request := RO;
+  Result := ButtonPanel.CloseButton.Visible;
 end;
 
-function TBookmarkForm.EditBookmarkModal(BM: TBookmark): TModalResult;
+function TBookmarkForm.ShowModal: TModalResult;
+var
+  IsNew: Boolean;
 begin
-  FBookmark := BM;
-  edName.Text := BM.Name;
-  Result := ShowModal;
+  IsNew := not Assigned(BookmarkManager.CurrentBookmark);
+
+  if IsNew then
+    PrepareAddForm
+  else
+    PrepareEditForm;
+
+  BookmarkManager.AttachFolderNodes(tvFolders);
+
+  Result := inherited ShowModal;
+  if IsNew and (Result = mrOK) then begin
+    AddBookmark;
+    Result := mrAdded;
+  end;
+  if not IsNew and (Result = mrOK) then begin
+    UpdateBookmark;
+  end;
+end;
+
+procedure TBookmarkForm.PrepareEditForm;
+begin
+  DeleteEnabled := True;
+  edName.Text := BookmarkManager.CurrentBookmark.Name;
+end;
+
+procedure TBookmarkForm.PrepareAddForm;
+begin
+  DeleteEnabled := False;
+  edName.Text := GetRequestFilename(RequestObject.Url);
+end;
+
+procedure TBookmarkForm.AddBookmark;
+var
+  BM: TBookmark;
+begin
+  BM := TBookmark.Create(edName.Text);
+  BM.Request := RequestObject;
+  BookmarkManager.AddBookmark(BM, FolderPath);
+end;
+
+procedure TBookmarkForm.UpdateBookmark;
+begin
+  BookmarkManager.UpdateCurrent(BookmarkName, FolderPath);
+end;
+
+procedure TBookmarkForm.DeleteBookmark;
+begin
+  with BookmarkManager do
+    DeleteBookmark(CurrentBookmark);
 end;
 
 procedure TBookmarkForm.FormCreate(Sender: TObject);
@@ -191,12 +248,15 @@ var
   mr: TModalResult;
 begin
   ModalResult := mrNone;
-  mr := ConfirmDlg('Delete bookmark', 'Are you sure you want to delete this bookmark ?');
+  mr := ConfirmDlg('Delete bookmark',
+    Format('Are you sure you want to delete "%s" bookmark ?', [
+      BookmarkManager.CurrentBookmark.Name
+    ])
+  );
   if mr <> mrOK then
     Exit; // =>
-  if Assigned(FOnDeleteBookmark) and Assigned(FBookmark) then
-    FOnDeleteBookmark(FBookmark);
-  ModalResult := mrDelete;
+  DeleteBookmark;
+  ModalResult := mrDeleted;
 end;
 
 end.
