@@ -162,7 +162,7 @@ type
     TimerRequest: TTimer;
     toolbarResponse: TToolBar;
     ToolButton1: TToolButton;
-    procedure BookmarkEditorShow(Sender: TObject);
+    procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -263,6 +263,7 @@ type
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
     procedure BookmarkButtonIcon(Added: Boolean);
+    procedure BookmarkEditorShow(Sender: TObject; BM: TBookmark);
     procedure OnChangeBookmark(Prev, Selected: TBookmark);
   public
     procedure ApplyOptions;
@@ -328,30 +329,9 @@ begin
     TimerRequest.Enabled := True;
 end;
 
-procedure TMainForm.BookmarkEditorShow(Sender: TObject);
-var
-  RO: TRequestObject;
+procedure TMainForm.btnBookmarkClick(Sender: TObject);
 begin
-  with TBookmarkForm.Create(Self) do
-  begin
-    RO := CreateRequestObject;
-    BookmarkManager := FBookManager;
-    case ShowModal(FBookManager.CurrentBookmark, RO) of
-      mrAdded: begin
-        BookmarkButtonIcon(True);
-      end;
-      mrDeleted: begin
-        BookmarkButtonIcon(False);
-      end;
-      mrOk: begin
-        // stub.
-      end;
-      else begin
-        FreeAndNil(RO);
-      end;
-    end;
-    Free;
-  end;
+  BookmarkEditorShow(Sender, FBookManager.CurrentBookmark);
 end;
 
 function TMainForm.SubmitRequest: Boolean;
@@ -776,6 +756,7 @@ begin
   FBookManager := TBookmarkManager.Create(Self);
   FBookManager.Parent := BookmarkSide;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
+  FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
@@ -1840,6 +1821,33 @@ begin
     toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph)
   else
     toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
+end;
+
+procedure TMainForm.BookmarkEditorShow(Sender: TObject; BM: TBookmark);
+var
+  RO: TRequestObject;
+begin
+  with TBookmarkForm.Create(Self) do
+  begin
+    RO := CreateRequestObject;
+    BookmarkManager := FBookManager;
+    case ShowModal(BM, RO) of
+      mrAdded: begin
+        BookmarkButtonIcon(True);
+      end;
+      mrDeleted: begin
+        if FBookManager.CurrentBookmark = NIL then
+          BookmarkButtonIcon(False);
+      end;
+      mrOk: begin
+        // stub.
+      end;
+      else begin
+        FreeAndNil(RO);
+      end;
+    end;
+    Free;
+  end;
 end;
 
 procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);

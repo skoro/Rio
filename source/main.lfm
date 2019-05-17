@@ -217,7 +217,7 @@ object MainForm: TMainForm
       Top = 0
       Width = 32
       Align = alRight
-      OnClick = BookmarkEditorShow
+      OnClick = btnBookmarkClick
     end
   end
   object StatusPanel: TPanel
