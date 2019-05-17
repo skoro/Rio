@@ -14,6 +14,8 @@ type
 
   // When bookmark is changed (opened).
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
+  // When 'Edit' item was selected in the popup menu.
+  TOnEditBookmarkClick = procedure (Sender: TObject; BM: TBookmark) of object;
 
   { ENodeException }
 
@@ -98,6 +100,9 @@ type
     function FindFolder(FolderPath: string): TTreeNode;
     // Deletes the bookmark from the tree.
     function DeleteBookmark(BM: TBookmark): Boolean;
+    // Deletes the folder and all its children (folders, bookmarks).
+    function DeleteFolder(FolderPath: string): Boolean;
+    function DeleteFolderNode(FolderNode: TTreeNode): Boolean;
     // Finds a tree node by bookmark instance.
     function FindNode(BM: TBookmark): TTreeNode;
     // Select bookmark.
@@ -116,6 +121,7 @@ type
   TBookmarkPopup = class(TPopupMenu)
   private
     FBookmarkManager: TBookmarkManager;
+    FOnEditClick: TOnEditBookmarkClick;
     function GetBookmarkManager: TBookmarkManager;
     function GetSelectedNode: TTreeNode;
   protected
@@ -127,8 +133,12 @@ type
     procedure RenameFolder(FolderNode: TTreeNode); virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    function ConfirmDeleteFolder(FolderName: string): Boolean;
+    function ConfirmDeleteBookmark(BM: TBookmark): Boolean;
+
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
     property SelectedNode: TTreeNode read GetSelectedNode;
+    property OnEditClick: TOnEditBookmarkClick read FOnEditClick write FOnEditClick;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
@@ -136,7 +146,7 @@ type
 
 implementation
 
-uses StdCtrls, Dialogs, strutils;
+uses StdCtrls, Dialogs, app_helpers, strutils;
 
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
@@ -192,9 +202,9 @@ begin
     Exit; // =>
   if IsFolderNode(sNode) then begin
     if sNode.Expanded then sNode.Collapse(True) else sNode.Expand(True);
-    Exit; // =>
-  end;
-  FBookmarkManager.OpenBookmark;
+  end
+  else
+    FBookmarkManager.OpenBookmark;
 end;
 
 procedure TBookmarkPopup.InternalOnClickEdit(Sender: TObject);
@@ -206,13 +216,32 @@ begin
     Exit; // =>
   if IsFolderNode(sNode) then begin
     RenameFolder(sNode);
-    Exit; // =>
+  end
+  else begin
+    if Assigned(FOnEditClick) then
+      FOnEditClick(Sender, NodeToBookmark(sNode));
   end;
 end;
 
 procedure TBookmarkPopup.InternalOnClickDelete(Sender: TObject);
+var
+  sNode: TTreeNode;
+  BM: TBookmark;
 begin
-
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    // Don't allow to delete root node.
+    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(sNode.Text) then
+      BookmarkManager.DeleteFolderNode(sNode);
+  end
+  else begin
+    BM := NodeToBookmark(sNode);
+    if ConfirmDeleteBookmark(BM) then begin
+      BookmarkManager.DeleteBookmark(BM);
+    end;
+  end;
 end;
 
 procedure TBookmarkPopup.RenameFolder(FolderNode: TTreeNode);
@@ -223,6 +252,16 @@ begin
   if (NewName = FolderNode.Text) or (Trim(NewName) = '') then
     Exit; // =>
   FolderNode.Text := NewName;
+end;
+
+function TBookmarkPopup.ConfirmDeleteFolder(FolderName: string): Boolean;
+begin
+  Result := ConfirmDlg('Delete folder ?', Format('Are you sure you want to delete folder "%s" and ALL its children ?', [FolderName])) = mrOK;
+end;
+
+function TBookmarkPopup.ConfirmDeleteBookmark(BM: TBookmark): Boolean;
+begin
+  Result := ConfirmDlg('Delete bookmark ?', Format('Are you sure you want to delete "%s" ?', [BM.Name])) = mrOK;
 end;
 
 constructor TBookmarkPopup.Create(AOwner: TComponent);
@@ -479,6 +518,38 @@ begin
   end;
   FreeAndNil(BM);
   bNode.Delete;
+  Result := True;
+end;
+
+function TBookmarkManager.DeleteFolder(FolderPath: string): Boolean;
+var
+  fNode: TTreeNode;
+begin
+  try
+    fNode := FindFolder(FolderPath);
+    Result := DeleteFolderNode(fNode);
+  except on E: ENodePathNotFound do
+    Exit(False); // =>
+  end;
+end;
+
+function TBookmarkManager.DeleteFolderNode(FolderNode: TTreeNode): Boolean;
+  // Recursive node delete.
+  procedure DeleteNode(aNode: TTreeNode);
+  begin
+    if aNode = FCurrentNode then
+      FCurrentNode := NIL;
+    while aNode.HasChildren do
+      DeleteNode(aNode.GetLastChild);
+    if Assigned(aNode.Data) then
+      TBookmark(aNode.Data).Free;
+    aNode.Delete;
+  end;
+
+begin
+  if not IsFolderNode(FolderNode) then
+    Exit(False);
+  DeleteNode(FolderNode);
   Result := True;
 end;
 

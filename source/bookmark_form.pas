@@ -60,8 +60,6 @@ type
     procedure UpdateBookmark; virtual;
     procedure DeleteBookmark; virtual;
 
-    class function DeleteDlg(BM: TBookmark): Boolean;
-
     property Bookmark: TBookmark read FBookmark write FBookmark;
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
     property RequestObject: TRequestObject read GetRequestObject write FRequestObject;
@@ -159,7 +157,8 @@ end;
 
 function TBookmarkForm.ShowModal: TModalResult;
 begin
-  { TODO : Strict properties checking before using modal. }
+  if (not Assigned(FBookmark)) or (not Assigned(FRequestObject)) then
+    raise Exception.Create('Bookmark or request object is required.');
   Result := inherited ShowModal;
 end;
 
@@ -238,13 +237,6 @@ begin
   BookmarkManager.DeleteBookmark(FBookmark);
 end;
 
-class function TBookmarkForm.DeleteDlg(BM: TBookmark): Boolean;
-begin
-  Result := ConfirmDlg('Delete bookmark',
-    Format('Are you sure you want to delete "%s" bookmark ?', [BM.Name])
-  ) = mrOK;
-end;
-
 procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
@@ -273,7 +265,7 @@ end;
 procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
 begin
   ModalResult := mrNone;
-  if not DeleteDlg(BookmarkManager.CurrentBookmark) then
+  if not BookmarkManager.Popup.ConfirmDeleteBookmark(FBookmark) then
     Exit; // =>
   DeleteBookmark;
   ModalResult := mrDeleted;
