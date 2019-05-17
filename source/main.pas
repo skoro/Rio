@@ -265,6 +265,7 @@ type
     procedure BookmarkButtonIcon(Added: Boolean);
     procedure BookmarkEditorShow(Sender: TObject; BM: TBookmark);
     procedure OnChangeBookmark(Prev, Selected: TBookmark);
+    procedure OnDeleteBookmark(Sender: TObject; BM: TBookmark);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -757,6 +758,7 @@ begin
   FBookManager.Parent := BookmarkSide;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
+  FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
@@ -1857,6 +1859,15 @@ begin
   SetRequestObject(Selected.Request);
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
+end;
+
+procedure TMainForm.OnDeleteBookmark(Sender: TObject; BM: TBookmark);
+var
+  Curr: TBookmark;
+begin
+  Curr := FBookManager.CurrentBookmark;
+  if (Curr = BM) or (Curr = NIL) then
+    BookmarkButtonIcon(False);
 end;
 
 procedure TMainForm.ApplyOptions;

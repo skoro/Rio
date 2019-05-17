@@ -14,8 +14,8 @@ type
 
   // When bookmark is changed (opened).
   TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
-  // When 'Edit' item was selected in the popup menu.
-  TOnEditBookmarkClick = procedure (Sender: TObject; BM: TBookmark) of object;
+  // When the bookmark menu item was selected in the popup menu.
+  TOnBookmarkClick = procedure (Sender: TObject; BM: TBookmark) of object;
 
   { ENodeException }
 
@@ -123,7 +123,8 @@ type
   TBookmarkPopup = class(TPopupMenu)
   private
     FBookmarkManager: TBookmarkManager;
-    FOnEditClick: TOnEditBookmarkClick;
+    FOnEditClick: TOnBookmarkClick;
+    FOnDeleteClick: TOnBookmarkClick;
     function GetBookmarkManager: TBookmarkManager;
     function GetSelectedNode: TTreeNode;
   protected
@@ -140,7 +141,8 @@ type
 
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
     property SelectedNode: TTreeNode read GetSelectedNode;
-    property OnEditClick: TOnEditBookmarkClick read FOnEditClick write FOnEditClick;
+    property OnEditClick: TOnBookmarkClick read FOnEditClick write FOnEditClick;
+    property OnDeleteClick: TOnBookmarkClick read FOnDeleteClick write FOnDeleteClick;
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
@@ -235,12 +237,17 @@ begin
     Exit; // =>
   if IsFolderNode(sNode) then begin
     // Don't allow to delete root node.
-    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(sNode.Text) then
+    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(sNode.Text) then begin
       BookmarkManager.DeleteFolderNode(sNode);
+      if Assigned(FOnDeleteClick) then
+        FOnDeleteClick(Self, NIL);
+    end;
   end
   else begin
     BM := NodeToBookmark(sNode);
     if ConfirmDeleteBookmark(BM) then begin
+      if Assigned(FOnDeleteClick) then
+        FOnDeleteClick(Self, BM);
       BookmarkManager.DeleteBookmark(BM);
     end;
   end;
