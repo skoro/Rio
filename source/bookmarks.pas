@@ -67,6 +67,7 @@ type
     function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetBookmarkPopup(AValue: TBookmarkPopup);
+    procedure SetCurrentNode(AValue: TTreeNode);
     procedure SetRootName(AValue: string);
 
   protected
@@ -74,6 +75,7 @@ type
     procedure CreateRootNode; virtual;
     // TreeView double click event handler.
     procedure InternalTreeOnDblClick(Sender: TObject); virtual;
+    function GetNodeFolderPath(aNode: TTreeNode): string;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -106,11 +108,11 @@ type
     // Finds a tree node by bookmark instance.
     function FindNode(BM: TBookmark): TTreeNode;
     // Select bookmark.
-    procedure OpenBookmark;
+    procedure OpenBookmark(BM: TBookmark = NIL);
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
-    property CurrentNode: TTreeNode read FCurrentNode;
+    property CurrentNode: TTreeNode read FCurrentNode write SetCurrentNode;
     property CurrentBookmark: TBookmark read GetCurrentBookmark;
     property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
@@ -337,12 +339,27 @@ begin
   FTreeView.PopupMenu := TPopupMenu(AValue);
 end;
 
+procedure TBookmarkManager.SetCurrentNode(AValue: TTreeNode);
+begin
+  if FCurrentNode = AValue then
+    Exit; // =>
+  if AValue = NIL then
+    ResetCurrent
+  else begin
+    if IsFolderNode(AValue) then
+      raise ENodeException.CreateNode(AValue, 'Current node cannot be a folder node.');
+    FCurrentNode := AValue;
+    FCurrentNode.Selected := True;
+    FCurrentNode.MakeVisible;
+  end;
+end;
+
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
 begin
   Result := NIL;
   if Assigned(FCurrentNode) then begin
     if FCurrentNode.Data = NIL then
-      raise Exception.Create('Runtime error: node data is not bookmark.');
+      raise ENodeException.CreateNode(FCurrentNode, 'Runtime error: node data is not bookmark.');
     Result := TBookmark(FCurrentNode.Data);
   end;
 end;
@@ -386,6 +403,18 @@ begin
   OpenBookmark;
 end;
 
+function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
+var
+  path: string;
+  p: SizeInt;
+begin
+  path := aNode.GetTextPath;
+  if IsFolderNode(aNode) then
+    Exit(path);
+  p := RPos('/', path);
+  Result := LeftStr(path, p - 1);
+end;
+
 constructor TBookmarkManager.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
@@ -411,10 +440,7 @@ var
 begin
   FolderNode := FindFolder(FolderPath);
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
-  Result.MakeVisible;
   Result.Data := BM;
-  Result.Selected := True;
-  FCurrentNode := Result;
 end;
 
 procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
@@ -471,6 +497,7 @@ end;
 function TBookmarkManager.UpdateBookmark(BM: TBookmark; ANewName, FolderPath: string): Boolean;
 var
   bNode: TTreeNode;
+  isCurrent: Boolean;
 begin
   bNode := FindNode(BM);
   if not Assigned(bNode) then
@@ -481,9 +508,12 @@ begin
     bNode.Text := ANewName;
   end;
   // Move to another folder.
-  if (FolderPath <> '') and (bNode.GetTextPath <> FolderPath) then begin
+  if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
+    isCurrent := (bNode = FCurrentNode);
     bNode.Delete;
-    AddBookmark(BM, FolderPath);
+    bNode := AddBookmark(BM, FolderPath);
+    if isCurrent then
+      CurrentNode := bNode;
   end;
 end;
 
@@ -514,7 +544,7 @@ begin
   if not Assigned(bNode) then
     Exit(False); // =>
   if bNode = FCurrentNode then begin
-    FCurrentNode := NIL;
+    ResetCurrent;
   end;
   FreeAndNil(BM);
   bNode.Delete;
@@ -538,7 +568,7 @@ function TBookmarkManager.DeleteFolderNode(FolderNode: TTreeNode): Boolean;
   procedure DeleteNode(aNode: TTreeNode);
   begin
     if aNode = FCurrentNode then
-      FCurrentNode := NIL;
+      ResetCurrent;
     while aNode.HasChildren do
       DeleteNode(aNode.GetLastChild);
     if Assigned(aNode.Data) then
@@ -577,12 +607,15 @@ begin
   Result := InternalFind(FTreeView.Items.GetFirstNode);
 end;
 
-procedure TBookmarkManager.OpenBookmark;
+procedure TBookmarkManager.OpenBookmark(BM: TBookmark = NIL);
 var
   Selected: TTreeNode;
   Prev: TBookmark;
 begin
-  Selected := FTreeView.Selected;
+  if BM = NIL then
+    Selected := FTreeView.Selected
+  else
+    Selected := FindNode(BM);
   // The node must be selected and is not be a folder node.
   if not (Assigned(Selected) and (not IsFolderNode(Selected))) then
     Exit; // =>

@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
 
 const
   mrAdded = mrLast + 1; // A new bookmark was added.
@@ -73,7 +73,7 @@ var
 
 implementation
 
-uses thread_http_client, app_helpers, sysutils;
+uses thread_http_client, sysutils;
 
 {$R *.lfm}
 
@@ -221,10 +221,12 @@ end;
 procedure TBookmarkForm.AddBookmark;
 var
   BM: TBookmark;
+  NewNode: TTreeNode;
 begin
   BM := TBookmark.Create(BookmarkName);
   BM.Request := RequestObject;
-  BookmarkManager.AddBookmark(BM, FolderPath);
+  NewNode := BookmarkManager.AddBookmark(BM, FolderPath);
+  BookmarkManager.CurrentNode := NewNode;
 end;
 
 procedure TBookmarkForm.UpdateBookmark;
