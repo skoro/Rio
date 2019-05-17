@@ -335,9 +335,8 @@ begin
   with TBookmarkForm.Create(Self) do
   begin
     RO := CreateRequestObject;
-    RequestObject := RO;
     BookmarkManager := FBookManager;
-    case ShowModal of
+    case ShowModal(FBookManager.CurrentBookmark, RO) of
       mrAdded: begin
         BookmarkButtonIcon(True);
       end;

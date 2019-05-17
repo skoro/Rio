@@ -10,6 +10,7 @@ object BookmarkForm: TBookmarkForm
   Constraints.MinHeight = 300
   Constraints.MinWidth = 260
   OnCreate = FormCreate
+  OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
   LCLVersion = '1.8.4.0'

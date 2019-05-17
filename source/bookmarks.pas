@@ -91,13 +91,13 @@ type
     // Update current bookmark: set a new name or/and move to another folder.
     // ANewName - a bookmark new name
     // FolderPath - move the bookmark to another folder (optional).
-    procedure UpdateCurrent(ANewName, FolderPath: string);
+    function UpdateBookmark(BM: TBookmark; ANewName, FolderPath: string): Boolean;
     // Check that the request object is matched with the current bookmark.
     function IsCurrentRequest(RO: TRequestObject): Boolean;
     // Finds the folder node by path.
     function FindFolder(FolderPath: string): TTreeNode;
     // Deletes the bookmark from the tree.
-    procedure DeleteBookmark(BM: TBookmark);
+    function DeleteBookmark(BM: TBookmark): Boolean;
     // Finds a tree node by bookmark instance.
     function FindNode(BM: TBookmark): TTreeNode;
     // Select bookmark.
@@ -132,6 +132,7 @@ type
   end;
 
   function IsFolderNode(Node: TTreeNode): Boolean;
+  function NodeToBookmark(Node: TTreeNode): TBookmark;
 
 implementation
 
@@ -142,6 +143,13 @@ begin
   if not Assigned(Node) then
     raise Exception.Create('A node instance is required.');
   Result := Node.Data = NIL;
+end;
+
+function NodeToBookmark(Node: TTreeNode): TBookmark;
+begin
+  if IsFolderNode(Node) then
+    raise ENodeException.CreateNode(Node, 'The node is a folder node but expected bookmark node.');
+  Result := TBookmark(Node.Data);
 end;
 
 { TBookmarkPopup }
@@ -421,22 +429,22 @@ begin
   FCurrentNode := NIL;
 end;
 
-procedure TBookmarkManager.UpdateCurrent(ANewName, FolderPath: string);
+function TBookmarkManager.UpdateBookmark(BM: TBookmark; ANewName, FolderPath: string): Boolean;
 var
-  BM: TBookmark;
+  bNode: TTreeNode;
 begin
-  BM := CurrentBookmark;
-  if not Assigned(BM) then
-    Exit; // =>
+  bNode := FindNode(BM);
+  if not Assigned(bNode) then
+    Exit(False); // =>
   // Rename.
   if (ANewName <> '') and (BM.Name <> ANewName) then begin
     BM.Name := ANewName;
-    FCurrentNode.Text := ANewName;
+    bNode.Text := ANewName;
   end;
   // Move to another folder.
-  if (FolderPath <> '') and (FCurrentNode.GetTextPath <> FolderPath) then begin
-    FCurrentNode.Delete;
-    AddBookmark(BM, FolderPath); // current node will be updated here.
+  if (FolderPath <> '') and (bNode.GetTextPath <> FolderPath) then begin
+    bNode.Delete;
+    AddBookmark(BM, FolderPath);
   end;
 end;
 
@@ -459,18 +467,19 @@ begin
     raise ENodeException.CreateNode(Result, 'The node must be a folder.');
 end;
 
-procedure TBookmarkManager.DeleteBookmark(BM: TBookmark);
+function TBookmarkManager.DeleteBookmark(BM: TBookmark): Boolean;
 var
   bNode: TTreeNode;
 begin
   bNode := FindNode(BM);
   if not Assigned(bNode) then
-    Exit; // =>
+    Exit(False); // =>
   if bNode = FCurrentNode then begin
     FCurrentNode := NIL;
   end;
   FreeAndNil(BM);
   bNode.Delete;
+  Result := True;
 end;
 
 function TBookmarkManager.FindNode(BM: TBookmark): TTreeNode;

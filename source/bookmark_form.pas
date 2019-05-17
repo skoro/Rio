@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
 
 const
   mrAdded = mrLast + 1; // A new bookmark was added.
@@ -32,6 +32,7 @@ type
     procedure btnNewFolderClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
     procedure tvFoldersEditing(Sender: TObject; Node: TTreeNode;
       var AllowEdit: Boolean);
@@ -43,6 +44,7 @@ type
     FPrevPath: string; // Keep an original node path before editing node.
     FPrevName: string; // Keep an source node name before editing node.
     FRequestObject: TRequestObject;
+    FBookmark: TBookmark; // Edited bookmark.
     function GetBookmarkManager: TBookmarkManager;
     function GetBookmarkName: string;
     function GetDeleteEnabled: Boolean;
@@ -51,6 +53,7 @@ type
     procedure SetDeleteEnabled(AValue: Boolean);
   public
     function ShowModal: TModalResult; override;
+    function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
     procedure PrepareEditForm; virtual;
     procedure PrepareAddForm; virtual;
     procedure AddBookmark; virtual;
@@ -59,6 +62,7 @@ type
 
     class function DeleteDlg(BM: TBookmark): Boolean;
 
+    property Bookmark: TBookmark read FBookmark write FBookmark;
     property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
     property RequestObject: TRequestObject read GetRequestObject write FRequestObject;
     property DeleteEnabled: Boolean read GetDeleteEnabled write SetDeleteEnabled;
@@ -153,6 +157,12 @@ begin
   ButtonPanel.CloseButton.Visible := AValue;
 end;
 
+function TBookmarkForm.ShowModal: TModalResult;
+begin
+  { TODO : Strict properties checking before using modal. }
+  Result := inherited ShowModal;
+end;
+
 function TBookmarkForm.GetBookmarkManager: TBookmarkManager;
 begin
   if not Assigned(FBookmarkManager) then
@@ -170,11 +180,15 @@ begin
   Result := ButtonPanel.CloseButton.Visible;
 end;
 
-function TBookmarkForm.ShowModal: TModalResult;
+function TBookmarkForm.ShowModal(BM: TBookmark; RO: TRequestObject
+  ): TModalResult;
 var
   IsNew: Boolean;
 begin
-  IsNew := not Assigned(BookmarkManager.CurrentBookmark);
+  FBookmark := BM;
+  FRequestObject := RO;
+
+  IsNew := (not Assigned(BM)) and Assigned(RO);
 
   if IsNew then
     PrepareAddForm
@@ -196,7 +210,7 @@ end;
 procedure TBookmarkForm.PrepareEditForm;
 begin
   DeleteEnabled := True;
-  edName.Text := BookmarkManager.CurrentBookmark.Name;
+  edName.Text := FBookmark.Name;
 end;
 
 procedure TBookmarkForm.PrepareAddForm;
@@ -209,20 +223,19 @@ procedure TBookmarkForm.AddBookmark;
 var
   BM: TBookmark;
 begin
-  BM := TBookmark.Create(edName.Text);
+  BM := TBookmark.Create(BookmarkName);
   BM.Request := RequestObject;
   BookmarkManager.AddBookmark(BM, FolderPath);
 end;
 
 procedure TBookmarkForm.UpdateBookmark;
 begin
-  BookmarkManager.UpdateCurrent(BookmarkName, FolderPath);
+  BookmarkManager.UpdateBookmark(FBookmark, BookmarkName, FolderPath);
 end;
 
 procedure TBookmarkForm.DeleteBookmark;
 begin
-  with BookmarkManager do
-    DeleteBookmark(CurrentBookmark);
+  BookmarkManager.DeleteBookmark(FBookmark);
 end;
 
 class function TBookmarkForm.DeleteDlg(BM: TBookmark): Boolean;
@@ -236,6 +249,11 @@ procedure TBookmarkForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   FIsNewNode := False;
+end;
+
+procedure TBookmarkForm.FormShow(Sender: TObject);
+begin
+  edName.SetFocus;
 end;
 
 procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
