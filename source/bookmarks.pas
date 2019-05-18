@@ -133,6 +133,7 @@ type
     procedure InternalOnClickOpen(Sender: TObject); virtual;
     procedure InternalOnClickEdit(Sender: TObject); virtual;
     procedure InternalOnClickDelete(Sender: TObject); virtual;
+    procedure InternalOnClickNewFolder(Sender: TObject); virtual;
     procedure RenameFolder(FolderNode: TTreeNode); virtual;
   public
     constructor Create(AOwner: TComponent); override;
@@ -191,6 +192,8 @@ procedure TBookmarkPopup.CreateDefaultItems;
 begin
   with CreateItem('Open') do
     OnClick := @InternalOnClickOpen;
+  with CreateItem('New folder') do
+    OnClick := @InternalOnClickNewFolder;
   with CreateItem('Edit') do
     OnClick := @InternalOnClickEdit;
   with CreateItem('Delete') do
@@ -251,6 +254,24 @@ begin
       BookmarkManager.DeleteBookmark(BM);
     end;
   end;
+end;
+
+procedure TBookmarkPopup.InternalOnClickNewFolder(Sender: TObject);
+var
+  fName: string;
+  sNode: TTreeNode;
+begin
+  fName := InputBox('New folder', 'Folder name:', '');
+  if Trim(fName) = '' then
+    Exit; // =>
+  sNode := SelectedNode;
+  if not Assigned(sNode) then // No selected - attach to the root node.
+    sNode := FBookmarkManager.TreeView.Items.GetFirstNode;
+  if not IsFolderNode(sNode) then
+    sNode := sNode.Parent;
+  if (not Assigned(sNode)) or (not IsFolderNode(sNode)) then
+    Exit; // =>
+  FBookmarkManager.AddFolder(sNode.GetTextPath + '/' + fName);
 end;
 
 procedure TBookmarkPopup.RenameFolder(FolderNode: TTreeNode);
