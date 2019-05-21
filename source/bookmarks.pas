@@ -75,7 +75,6 @@ type
     procedure CreateRootNode; virtual;
     // TreeView double click event handler.
     procedure InternalTreeOnDblClick(Sender: TObject); virtual;
-    function GetNodeFolderPath(aNode: TTreeNode): string;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -109,6 +108,8 @@ type
     function FindNode(BM: TBookmark): TTreeNode;
     // Select bookmark.
     procedure OpenBookmark(BM: TBookmark = NIL);
+    // Get the node folder path (this is like dirname for files).
+    function GetNodeFolderPath(aNode: TTreeNode): string;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
