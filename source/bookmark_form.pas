@@ -189,12 +189,12 @@ begin
 
   IsNew := (not Assigned(BM)) and Assigned(RO);
 
+  BookmarkManager.AttachFolderNodes(tvFolders);
+
   if IsNew then
     PrepareAddForm
   else
     PrepareEditForm;
-
-  BookmarkManager.AttachFolderNodes(tvFolders);
 
   Result := inherited ShowModal;
   if IsNew and (Result = mrOK) then begin
@@ -207,9 +207,25 @@ begin
 end;
 
 procedure TBookmarkForm.PrepareEditForm;
+var
+  srcNode, dstNode: TTreeNode;
+  path: string;
 begin
   DeleteEnabled := True;
   edName.Text := FBookmark.Name;
+  // Select the bookmark node by default.
+  srcNode := FBookmarkManager.FindNode(FBookmark);
+  if not Assigned(srcNode) then
+    { TODO : should be logged ? }
+    Exit; // =>
+  path := FBookmarkManager.GetNodeFolderPath(srcNode);
+  dstNode := tvFolders.Items.FindNodeWithTextPath(path);
+  if Assigned(dstNode) then
+    with dstNode do begin
+      Selected := True;
+      MakeVisible;
+    end;
+  { TODO : path not found. Should be logged ? }
 end;
 
 procedure TBookmarkForm.PrepareAddForm;
