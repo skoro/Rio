@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
 
 const
   mrAdded = mrLast + 1; // A new bookmark was added.
@@ -19,12 +19,9 @@ type
   TBookmarkForm = class(TForm)
     btnNewFolder: TButton;
     ButtonPanel: TButtonPanel;
-    chkSaveResponse: TCheckBox;
-    chkSyncResp: TCheckBox;
     edName: TEdit;
     lFolder: TLabel;
     lName: TLabel;
-    pOptions: TPanel;
     pFolders: TPanel;
     pFolderBtn: TPanel;
     pName: TPanel;

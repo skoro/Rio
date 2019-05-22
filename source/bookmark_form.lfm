@@ -69,14 +69,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 151
+    Height = 201
     Top = 60
     Width = 248
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 151
+    ClientHeight = 201
     ClientWidth = 248
     TabOrder = 2
     object lFolder: TLabel
@@ -91,10 +91,11 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 124
+      Top = 174
       Width = 248
       Align = alBottom
       AutoSize = True
+      BorderSpacing.Top = 4
       BevelOuter = bvNone
       ClientHeight = 27
       ClientWidth = 248
@@ -113,7 +114,7 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 107
+      Height = 153
       Top = 17
       Width = 248
       Align = alClient
@@ -123,37 +124,6 @@ object BookmarkForm: TBookmarkForm
       OnEditing = tvFoldersEditing
       OnEditingEnd = tvFoldersEditingEnd
       Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
-    end
-  end
-  object pOptions: TPanel
-    Left = 6
-    Height = 44
-    Top = 217
-    Width = 248
-    Align = alBottom
-    AutoSize = True
-    BorderSpacing.Around = 6
-    BevelOuter = bvNone
-    ClientHeight = 44
-    ClientWidth = 248
-    TabOrder = 3
-    object chkSaveResponse: TCheckBox
-      Left = 0
-      Height = 22
-      Top = 0
-      Width = 248
-      Align = alTop
-      Caption = 'Save response'
-      TabOrder = 0
-    end
-    object chkSyncResp: TCheckBox
-      Left = 0
-      Height = 22
-      Top = 22
-      Width = 248
-      Align = alTop
-      Caption = 'Synchronize response content'
-      TabOrder = 1
     end
   end
 end
