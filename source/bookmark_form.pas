@@ -70,7 +70,7 @@ var
 
 implementation
 
-uses thread_http_client, sysutils;
+uses thread_http_client, app_helpers, sysutils;
 
 {$R *.lfm}
 
@@ -111,7 +111,10 @@ begin
       Node.Delete
     else begin
       Node.Selected := True;
-      BookmarkManager.AddFolder(Node.GetTextPath);
+      if BookmarkManager.AddFolder(Node.GetTextPath) = NIL then begin
+        ERRMsg('Error', 'Cannot add folder: ' + Node.Text);
+        Node.Delete;
+      end;
       FIsNewNode := False;
     end;
   end
@@ -122,7 +125,10 @@ begin
       if Cancel or (Trim(Node.Text) = '') then
         Node.Text := FPrevName
       else
-        BookmarkManager.RenameFolder(FPrevPath, Node.Text);
+        if not BookmarkManager.RenameFolder(FPrevPath, Node.Text) then begin
+          ERRMsg('Error', 'Cannot rename folder to: ' + Node.Text);
+          Node.Text := FPrevName;
+        end;
       FPrevName := '';
       FPrevPath := '';
     end;

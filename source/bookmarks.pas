@@ -88,7 +88,7 @@ type
     // Adds a new folder by its path to the tree.
     function AddFolder(FolderPath: string): TTreeNode;
     // Renames a folder.
-    procedure RenameFolder(FolderPath, NewName: string);
+    function RenameFolder(FolderPath, NewName: string): Boolean;
     // Reset current bookmark and node.
     procedure ResetCurrent;
     // Update current bookmark: set a new name or/and move to another folder.
@@ -282,7 +282,8 @@ begin
   NewName := InputBox('Edit folder', 'A new folder name:', FolderNode.Text);
   if (NewName = FolderNode.Text) or (Trim(NewName) = '') then
     Exit; // =>
-  FolderNode.Text := NewName;
+  if not FBookmarkManager.RenameFolder(FolderNode.GetTextPath, NewName) then
+    ERRMsg('Error', 'Cannot rename folder. Folder is already exist ?');
 end;
 
 function TBookmarkPopup.ConfirmDeleteFolder(FolderName: string): Boolean;
@@ -468,6 +469,8 @@ var
   FolderNode: TTreeNode;
 begin
   FolderNode := FindFolder(FolderPath);
+  if FolderNode = NIL then
+    raise ENodePathNotFound.CreatePath(FolderPath);
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.Data := BM;
 end;
@@ -499,21 +502,34 @@ var
   FolderName, CurFolder: string;
   ParentNode: TTreeNode;
 begin
+  if FTreeView.Items.FindNodeWithTextPath(FolderPath) <> NIL then
+    Exit(NIL); // =>
   p := RPos('/', FolderPath);
   FolderName := RightStr(FolderPath, Length(FolderPath) - p);
   CurFolder := LeftStr(FolderPath, p - 1);
   ParentNode := FindFolder(CurFolder);
+  if ParentNode = NIL then
+    raise ENodePathNotFound.CreatePath(CurFolder);
   Result := FTreeView.Items.AddChild(ParentNode, FolderName);
   Result.Data := NIL;
   Result.MakeVisible;
 end;
 
-procedure TBookmarkManager.RenameFolder(FolderPath, NewName: string);
+function TBookmarkManager.RenameFolder(FolderPath, NewName: string): Boolean;
 var
   Folder: TTreeNode;
+  p: SizeInt;
+  newPath: string;
 begin
+  p := RPos('/', FolderPath);
+  newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
+  if FTreeView.Items.FindNodeWithTextPath(newPath) <> NIL then
+    Exit(False);
   Folder := FindFolder(FolderPath);
+  if Folder = NIL then
+    Exit(False); // =>
   Folder.Text := NewName;
+  Result := True;
 end;
 
 procedure TBookmarkManager.ResetCurrent;
@@ -559,10 +575,9 @@ end;
 function TBookmarkManager.FindFolder(FolderPath: string): TTreeNode;
 begin
   Result := FTreeView.Items.FindNodeWithTextPath(FolderPath);
-  if Result = NIL then
-    raise ENodePathNotFound.CreatePath(FolderPath);
-  if not IsFolderNode(Result) then
-    raise ENodeException.CreateNode(Result, 'The node must be a folder.');
+  if (Result <> NIL) and IsFolderNode(Result) then
+    Exit;
+  Result := NIL;
 end;
 
 function TBookmarkManager.DeleteBookmark(BM: TBookmark): Boolean;
@@ -584,12 +599,10 @@ function TBookmarkManager.DeleteFolder(FolderPath: string): Boolean;
 var
   fNode: TTreeNode;
 begin
-  try
-    fNode := FindFolder(FolderPath);
-    Result := DeleteFolderNode(fNode);
-  except on E: ENodePathNotFound do
-    Exit(False); // =>
-  end;
+  fNode := FindFolder(FolderPath);
+  if fNode = NIL then
+    Exit(False);
+  Result := DeleteFolderNode(fNode);
 end;
 
 function TBookmarkManager.DeleteFolderNode(FolderNode: TTreeNode): Boolean;
