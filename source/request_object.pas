@@ -125,6 +125,7 @@ type
     FNotes: string;
     FResponseInfo: TResponseInfo;
     function GetFilename: string;
+    function GetUrlPath: string;
     procedure SetMethod(AValue: string);
   protected
   public
@@ -143,6 +144,7 @@ type
   published
     property Method: string read FMethod write SetMethod;
     property Url: string read FUrl write FUrl;
+    property UrlPath: string read GetUrlPath;
     property Body: string read FBody write FBody;
     property Json: string read FJson write FJson;
     property Headers: TRequestParamList read FHeaders;
@@ -272,6 +274,20 @@ begin
   Result := TrimSet(U.Document, ['/']);
   if Result = '' then
     Result := U.Host;
+end;
+
+function TRequestObject.GetUrlPath: string;
+var
+  uri: TURI;
+begin
+  uri := ParseURI(FUrl);
+  Result := Format('%s://%s%s%s%s', [
+    uri.Protocol,
+    uri.Host,
+    IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
+    uri.Path,
+    uri.Document
+  ]);
 end;
 
 constructor TRequestObject.Create;
