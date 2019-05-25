@@ -569,7 +569,7 @@ begin
   BM := GetCurrentBookmark;
   if not Assigned(BM) then
     Exit(False);
-  Result := BM.Request.Url = RO.Url;
+  Result := BM.Request.UrlPath = RO.UrlPath;
 end;
 
 function TBookmarkManager.FindFolder(FolderPath: string): TTreeNode;
