@@ -22,11 +22,12 @@ type
     FTimeCheckPoints: TTimeCheckPointList;
     procedure SetTimeCheckPoints(AValue: TTimeCheckPointList);
   protected
-    procedure CreateChart(AParent: TWinControl);
-    procedure SetProfilerData;
+    procedure CreateChart(AParent: TWinControl); virtual;
+    procedure SetProfilerData; virtual;
   public
     constructor Create(AParent: TWinControl);
     destructor Destroy; override;
+    procedure Clear; virtual;
     property TimeCheckPoints: TTimeCheckPointList
       read FTimeCheckPoints write SetTimeCheckPoints;
     property Chart: TChart read FChart;
@@ -84,9 +85,7 @@ var
   end;
 
 begin
-  FListChartSource.Clear;
-  FListChartSourceLABELS.Clear;
-  FListChartSourceVALUES.Clear;
+  Clear;
   if FTimeCheckPoints.Count = 0 then
     Exit;
 
@@ -118,6 +117,13 @@ begin
     (cp.Duration - hdr.Duration), total.Duration]);
   FListChartSourceLABELS.Add(0, 3, 'Response');
   FListChartSourceVALUES.Add(0, 3, Format('%d ms', [cp.Duration - hdr.Duration]));
+end;
+
+procedure TProfilerGraph.Clear;
+begin
+  FListChartSource.Clear;
+  FListChartSourceLABELS.Clear;
+  FListChartSourceVALUES.Clear;
 end;
 
 constructor TProfilerGraph.Create(AParent: TWinControl);
