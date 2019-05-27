@@ -2175,7 +2175,7 @@ begin
   tabRespCookie.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
   if Assigned(FProfilerGraph) then
-    FProfilerGraph.Clear;
+    FreeAndNil(FProfilerGraph);
 
   // Menu items.
   miSaveResponse.Enabled := False;
