@@ -2169,10 +2169,13 @@ begin
   // Response fields.
   responseHeaders.RowCount := 1;
   responseRaw.Text := '';
+  textResp.Text := '';
   FContentType := '';
   tabContent.TabVisible := False;
   tabRespCookie.TabVisible := False;
   pagesResponse.ActivePage := tabResponse;
+  if Assigned(FProfilerGraph) then
+    FProfilerGraph.Clear;
 
   // Menu items.
   miSaveResponse.Enabled := False;

@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 41
   Width = 565
   Caption = 'HTTP request inspector'
-  ClientHeight = 593
+  ClientHeight = 591
   ClientWidth = 565
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
@@ -154,7 +154,7 @@ object MainForm: TMainForm
   object LayoutSplitter: TPairSplitter
     Cursor = crVSplit
     Left = 0
-    Height = 526
+    Height = 524
     Top = 37
     Width = 565
     Align = alClient
@@ -191,8 +191,8 @@ object MainForm: TMainForm
           TabOrder = 0
           object tabHeaders: TTabSheet
             Caption = 'Headers'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object requestHeaders: TStringGrid
               Left = 0
               Height = 151
@@ -273,8 +273,8 @@ object MainForm: TMainForm
           end
           object tabQuery: TTabSheet
             Caption = 'Query'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object gridParams: TStringGrid
               Left = 0
               Height = 152
@@ -330,8 +330,8 @@ object MainForm: TMainForm
           end
           object tabBody: TTabSheet
             Caption = 'Body'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object pagesBody: TPageControl
               Left = 0
               Height = 152
@@ -948,8 +948,8 @@ object MainForm: TMainForm
           end
           object tabReqCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object gridReqCookie: TStringGrid
               Left = 0
               Height = 152
@@ -1007,8 +1007,8 @@ object MainForm: TMainForm
           end
           object tabAuth: TTabSheet
             Caption = 'Auth'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object toolbarAuth: TToolBar
               Left = 0
               Height = 26
@@ -1160,13 +1160,13 @@ object MainForm: TMainForm
           end
           object tabNotes: TTabSheet
             Caption = 'Notes'
-            ClientHeight = 177
-            ClientWidth = 551
+            ClientHeight = 181
+            ClientWidth = 553
             object editNotes: TMemo
               Left = 0
-              Height = 160
+              Height = 164
               Top = 17
-              Width = 551
+              Width = 553
               Align = alClient
               ScrollBars = ssAutoBoth
               TabOrder = 0
@@ -1175,7 +1175,7 @@ object MainForm: TMainForm
               Left = 0
               Height = 17
               Top = 0
-              Width = 551
+              Width = 553
               Align = alTop
               Caption = 'Description:'
               ParentColor = False
@@ -1187,25 +1187,25 @@ object MainForm: TMainForm
     object splitterSideResponse: TPairSplitterSide
       Cursor = crArrow
       Left = 0
-      Height = 301
+      Height = 299
       Top = 225
       Width = 565
       ClientWidth = 565
-      ClientHeight = 301
+      ClientHeight = 299
       object panelResponse: TPanel
         Left = 4
-        Height = 293
+        Height = 291
         Top = 4
         Width = 557
         Align = alClient
         BorderSpacing.Around = 4
         BevelOuter = bvNone
-        ClientHeight = 293
+        ClientHeight = 291
         ClientWidth = 557
         TabOrder = 0
         object pagesResponse: TPageControl
           Left = 0
-          Height = 293
+          Height = 291
           Top = 0
           Width = 557
           ActivePage = tabResponse
@@ -1215,13 +1215,13 @@ object MainForm: TMainForm
           OnChange = pagesResponseChange
           object tabResponse: TTabSheet
             Caption = 'Response'
-            ClientHeight = 258
-            ClientWidth = 551
+            ClientHeight = 260
+            ClientWidth = 553
             object toolbarResponse: TToolBar
               Left = 0
               Height = 22
               Top = 0
-              Width = 551
+              Width = 553
               AutoSize = True
               EdgeBorders = []
               Images = toolbarIcons
@@ -1264,23 +1264,23 @@ object MainForm: TMainForm
             end
             object pagesRespView: TPageControl
               Left = 0
-              Height = 236
+              Height = 238
               Top = 22
-              Width = 551
-              ActivePage = tabRespList
+              Width = 553
+              ActivePage = tabRespText
               Align = alClient
               ShowTabs = False
-              TabIndex = 0
+              TabIndex = 1
               TabOrder = 1
               object tabRespList: TTabSheet
                 Caption = 'tabRespList'
-                ClientHeight = 230
-                ClientWidth = 545
+                ClientHeight = 234
+                ClientWidth = 549
                 object responseHeaders: TStringGrid
                   Left = 0
-                  Height = 230
+                  Height = 234
                   Top = 0
-                  Width = 545
+                  Width = 549
                   Align = alClient
                   AutoEdit = False
                   BorderStyle = bsNone
@@ -1313,13 +1313,13 @@ object MainForm: TMainForm
               end
               object tabRespText: TTabSheet
                 Caption = 'tabRespText'
-                ClientHeight = 230
-                ClientWidth = 545
+                ClientHeight = 234
+                ClientWidth = 549
                 object textResp: TMemo
                   Left = 0
-                  Height = 236
+                  Height = 234
                   Top = 0
-                  Width = 545
+                  Width = 549
                   Align = alClient
                   BorderStyle = bsNone
                   ReadOnly = True
@@ -1334,8 +1334,8 @@ object MainForm: TMainForm
           end
           object tabRespCookie: TTabSheet
             Caption = 'Cookie'
-            ClientHeight = 258
-            ClientWidth = 551
+            ClientHeight = 260
+            ClientWidth = 553
             TabVisible = False
             object gridRespCookie: TStringGrid
               Left = 0
@@ -1406,11 +1406,11 @@ object MainForm: TMainForm
           end
           object tabContent: TTabSheet
             Caption = 'Content'
-            ClientHeight = 258
-            ClientWidth = 551
+            ClientHeight = 260
+            ClientWidth = 553
             object responseRaw: TMemo
               Left = 0
-              Height = 214
+              Height = 260
               Top = 0
               Width = 553
               Align = alClient
@@ -1486,7 +1486,7 @@ object MainForm: TMainForm
   object StatusPanel: TPanel
     Left = 4
     Height = 30
-    Top = 563
+    Top = 561
     Width = 557
     Align = alBottom
     BorderSpacing.Left = 4
