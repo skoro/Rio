@@ -106,6 +106,7 @@ end;
 procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
 begin
+  btnNewFolder.Enabled := True;
   // A new node has been added.
   if FIsNewNode then begin
     // Don't add a cancelled node or node without name.
@@ -275,6 +276,7 @@ procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
 var
   root: TTreeNode;
 begin
+  btnNewFolder.Enabled := False;
   root := tvFolders.Selected;
   if root = NIL then
     root := tvFolders.Items.GetFirstNode;
