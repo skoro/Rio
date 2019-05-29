@@ -19,9 +19,11 @@ type
   TBookmarkForm = class(TForm)
     btnNewFolder: TButton;
     ButtonPanel: TButtonPanel;
+    cbLock: TCheckBox;
     edName: TEdit;
     lFolder: TLabel;
     lName: TLabel;
+    pOptions: TPanel;
     pFolders: TPanel;
     pFolderBtn: TPanel;
     pName: TPanel;

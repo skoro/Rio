@@ -69,14 +69,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 201
+    Height = 173
     Top = 60
     Width = 248
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 201
+    ClientHeight = 173
     ClientWidth = 248
     TabOrder = 2
     object lFolder: TLabel
@@ -91,7 +91,7 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 174
+      Top = 146
       Width = 248
       Align = alBottom
       AutoSize = True
@@ -114,7 +114,7 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 153
+      Height = 125
       Top = 17
       Width = 248
       Align = alClient
@@ -124,6 +124,28 @@ object BookmarkForm: TBookmarkForm
       OnEditing = tvFoldersEditing
       OnEditingEnd = tvFoldersEditingEnd
       Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+    end
+  end
+  object pOptions: TPanel
+    Left = 6
+    Height = 22
+    Top = 239
+    Width = 248
+    Align = alBottom
+    AutoSize = True
+    BorderSpacing.Around = 6
+    BevelOuter = bvNone
+    ClientHeight = 22
+    ClientWidth = 248
+    TabOrder = 3
+    object cbLock: TCheckBox
+      Left = 0
+      Height = 22
+      Top = 0
+      Width = 248
+      Align = alTop
+      Caption = '&Lock request data'
+      TabOrder = 0
     end
   end
 end
