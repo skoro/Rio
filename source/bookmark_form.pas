@@ -122,7 +122,7 @@ begin
   else
     if FPrevPath <> '' then begin
       // Revert the previous name on cancel or empty name.
-      if Cancel or (Trim(Node.Text) = '') then
+      if Cancel or (Trim(Node.Text) = '') or (FPrevName = Node.Text) then
         Node.Text := FPrevName
       else
         if not BookmarkManager.RenameFolder(FPrevPath, Node.Text) then begin
