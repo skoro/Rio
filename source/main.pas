@@ -1854,6 +1854,10 @@ end;
 
 procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
 begin
+  if not Prev.Locked then begin
+    Prev.Request.Free;
+    Prev.Request := CreateRequestObject;
+  end;
   StartNewRequest;
   BookmarkButtonIcon(True);
   SetRequestObject(Selected.Request);
