@@ -219,6 +219,7 @@ var
 begin
   DeleteEnabled := True;
   edName.Text := FBookmark.Name;
+  cbLock.Checked := FBookmark.Locked;
   // Select the bookmark node by default.
   srcNode := FBookmarkManager.FindNode(FBookmark);
   if not Assigned(srcNode) then
@@ -247,12 +248,14 @@ var
 begin
   BM := TBookmark.Create(BookmarkName);
   BM.Request := RequestObject;
+  BM.Locked := cbLock.Checked;
   NewNode := BookmarkManager.AddBookmark(BM, FolderPath);
   BookmarkManager.CurrentNode := NewNode;
 end;
 
 procedure TBookmarkForm.UpdateBookmark;
 begin
+  FBookmark.Locked := cbLock.Checked;
   BookmarkManager.UpdateBookmark(FBookmark, BookmarkName, FolderPath);
 end;
 
