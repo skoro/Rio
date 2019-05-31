@@ -44,14 +44,16 @@ type
     FName: string;
     FRequest: TRequestObject;
     FTreeNode: TTreeNode;
-    procedure SetName(AValue: string);
-    procedure SetTreeNode(AValue: TTreeNode);
+    FLocked: Boolean;
+    procedure SetName(AValue: string); virtual;
+    procedure SetTreeNode(AValue: TTreeNode); virtual;
   public
-    constructor Create(aName: string);
+    constructor Create(aName: string); virtual;
     destructor Destroy; override;
     property Name: string read FName write SetName;
     property Request: TRequestObject read FRequest write FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
+    property Locked: Boolean read FLocked write FLocked;
   end;
 
   { TBookmarkManager }
@@ -346,6 +348,7 @@ constructor TBookmark.Create(aName: string);
 begin
   FName := aName;
   FRequest := nil;
+  FLocked := False;
 end;
 
 destructor TBookmark.Destroy;
