@@ -13,14 +13,14 @@ type
 ```
 
 Далее необходимо установить какие коды клавиш будут обрабатываться.
-Для вконце процедуры `procedure TOptionsForm.InitShortcuts` нужно добавить
+Для этого в конце процедуры `procedure TOptionsForm.InitShortcuts` нужно добавить
 вызов `SetShortCut`:
 
 ```
 SetShortCut(sciQuit, 81, [ssCtrl]); // Q
 ```
 
-Число - это код клавиши, его можно взять из файла key_codes.txt,
+Число 81 - это код клавиши, его можно взять из файла `key_codes.txt`,
 `ssCtrl` - модификатор, т.е. ожидаем нажатия Control-q. Другие модификаторы:
 `ssAlt`, `ssShift`.
 
