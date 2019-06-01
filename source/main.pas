@@ -791,6 +791,7 @@ begin
     sciFocusUrl:    cbUrl.SetFocus;
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
+    sciBookmark:    btnBookmarkClick(Sender);
     sciSwitchView: begin
       // Switch views in the response tab (list or text view).
       if pagesResponse.ActivePage = tabResponse then

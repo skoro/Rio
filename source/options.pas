@@ -16,7 +16,8 @@ type
   // Keyboard shortcut item.
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
-    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciToggleTabs, sciQuit);
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciBookmark,
+    sciToggleTabs, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -478,6 +479,7 @@ begin
   SetShortCut(sciSubmit,        120, []); // F9
   SetShortCut(sciToggleTabs,    84, [ssAlt, ssShift]); // T
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
+  SetShortCut(sciBookmark,      68, [ssCtrl]); // T
 end;
 
 procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
@@ -581,6 +583,7 @@ begin
     sciSubmit:        Result := 'Submit the request';
     sciToggleTabs:    Result := 'Toggle request pane';
     sciQuit:          Result := 'Quit';
+    sciBookmark:      Result := 'Add/edit bookmark';
   end;
 end;
 
