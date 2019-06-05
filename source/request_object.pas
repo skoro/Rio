@@ -140,6 +140,7 @@ type
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
     function IsJson: Boolean;
+    function ToJson: string;
     property ResponseInfo: TResponseInfo read FResponseInfo write FResponseInfo;
   published
     property Method: string read FMethod write SetMethod;
@@ -161,7 +162,7 @@ type
 
 implementation
 
-uses strutils, URIParser;
+uses strutils, URIParser, fpjsonrtti;
 
 { TFormParamsEnumerator }
 
@@ -425,6 +426,19 @@ begin
     if (LowerCase(FHeaders[i].Name) = 'content-type')
        and (AnsiStartsText('application/json', FHeaders[i].Value)) then
       Exit(True);
+end;
+
+function TRequestObject.ToJson: string;
+var
+  streamer: TJSONStreamer;
+begin
+  Result := '';
+  streamer := TJSONStreamer.Create(Nil);
+  try
+    Result := streamer.ObjectToJSONString(Self);
+  finally
+    streamer.Free;
+  end;
 end;
 
 end.

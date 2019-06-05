@@ -1165,27 +1165,24 @@ end;
 procedure TMainForm.miSaveRequestClick(Sender: TObject);
 var
   obj: TRequestObject;
-  streamer: TJSONStreamer;
   json: string;
 begin
-  streamer := TJSONStreamer.Create(nil);
-
   try
     obj := CreateRequestObject;
-    json := streamer.ObjectToJSONString(obj);
-
     try
       dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType, 'request.json');
       dlgSave.Title := 'Save the request to a file';
+      json := obj.ToJson;
+      if json = '' then
+        raise Exception.Create('Cannot convert the request to a string.');
       if dlgSave.Execute then
-        if not FilePutContents(dlgSave.Filename, json) then
+        if not FilePutContents(dlgSave.Filename, obj.ToJson) then
           ShowMessage('Cannot create file ' + dlgSave.FileName);
     except on E: Exception do
       ShowMessage(E.Message);
     end;
   finally
     obj.Free;
-    streamer.Free;
   end;
 end;
 
