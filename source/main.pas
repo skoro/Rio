@@ -1996,21 +1996,15 @@ end;
 
 procedure TMainForm.OpenRequestFile(jsonStr: string);
 var
-  streamer: TJSONDeStreamer;
   obj: TRequestObject;
 begin
-  streamer := TJSONDeStreamer.Create(nil);
-  obj := TRequestObject.Create;
-
   try
-    streamer.JSONToObject(jsonStr, obj);
+    obj := TRequestObject.CreateFromJson(jsonStr);
     StartNewRequest;
     SetRequestObject(obj);
   except on E: Exception do
       ShowMessage(E.Message);
   end;
-
-  streamer.Free;
   obj.Free;
 end;
 

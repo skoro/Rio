@@ -140,7 +140,10 @@ type
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
     function IsJson: Boolean;
+    // Serialize to a json string.
     function ToJson: string;
+    // Unserialize from a json string.
+    class function CreateFromJson(json: string): TRequestObject;
     property ResponseInfo: TResponseInfo read FResponseInfo write FResponseInfo;
   published
     property Method: string read FMethod write SetMethod;
@@ -436,6 +439,19 @@ begin
   streamer := TJSONStreamer.Create(Nil);
   try
     Result := streamer.ObjectToJSONString(Self);
+  finally
+    streamer.Free;
+  end;
+end;
+
+class function TRequestObject.CreateFromJson(json: string): TRequestObject;
+var
+  streamer: TJSONDeStreamer;
+begin
+  streamer := TJSONDeStreamer.Create(nil);
+  try
+    Result := TRequestObject.Create;
+    streamer.JSONToObject(json, Result);
   finally
     streamer.Free;
   end;
