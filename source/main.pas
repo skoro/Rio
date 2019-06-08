@@ -1977,6 +1977,7 @@ begin
   FProfilerGraph.TimeCheckPoints := info.TimeCheckPoints;
 
   tbtnRespFollow.Visible := (Info.Location <> '');
+  textResp.CaretPos := Point(0, 0);
 
   // Finally, dispose response info data.
   Info.Free;
