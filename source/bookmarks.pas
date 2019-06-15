@@ -161,16 +161,19 @@ type
 
   // Globals section.
   // ===================================
+const
+  // Application bookmarks filename.
+  BOOKMARK_FILENAME = 'Bookmarks.xml';
 
   function IsFolderNode(Node: TTreeNode): Boolean;
   function NodeToBookmark(Node: TTreeNode): TBookmark;
 
   // Save the application bookmarks.
-  procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = 'Bookmarks.xml');
+  procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = BOOKMARK_FILENAME);
   // Load the application bookmarks.
-  function LoadAppBookmarks(BM: TBookmarkManager; Filename: string = 'Bookmarks.xml'): Boolean;
+  function LoadAppBookmarks(BM: TBookmarkManager; Filename: string = BOOKMARK_FILENAME): Boolean;
   // Get the full path name of the application bookmarks.
-  function GetAppBookmarksFilename(Basename: string = 'Bookmarks.xml'): string;
+  function GetAppBookmarksFilename(Basename: string = BOOKMARK_FILENAME): string;
 
 implementation
 
