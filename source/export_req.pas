@@ -95,7 +95,7 @@ type
 
 implementation
 
-uses main, strutils, fphttpclient;
+uses strutils, fphttpclient;
 
 { TTextExport }
 
