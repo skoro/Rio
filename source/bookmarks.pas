@@ -119,10 +119,7 @@ type
     // Get the node folder path (this is like dirname for files).
     function GetNodeFolderPath(aNode: TTreeNode): string;
     // Save the bookmarks content to a string buffer.
-    procedure SaveToXmlStream(S: TStream); virtual;
-    // Save the bookmarks content to a file.
-    procedure SaveToXmlFile(FileName: string); virtual;
-    { TODO : Refactor to SaveBookmarksToStream and so on. }
+    procedure SaveXmlToStream(S: TStream); virtual;
     // Load bookmarks from the stream.
     procedure LoadXmlFromStream(S: TStream); virtual;
 
@@ -194,9 +191,15 @@ begin
 end;
 
 procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string);
+var
+  FS: TFileStream;
 begin
-  { TODO : Refactor to stream like LoadAppBookmarks. }
-  BM.SaveToXmlFile(GetAppBookmarksFilename(Filename));
+  try
+    FS := TFileStream.Create(GetAppBookmarksFilename(Filename), fmCreate);
+    BM.SaveXmlToStream(FS);
+  finally
+    FS.Free;
+  end;
 end;
 
 function LoadAppBookmarks(BM: TBookmarkManager; Filename: string): Boolean;
@@ -567,7 +570,7 @@ begin
   Result := LeftStr(path, p - 1);
 end;
 
-procedure TBookmarkManager.SaveToXmlStream(S: TStream);
+procedure TBookmarkManager.SaveXmlToStream(S: TStream);
 var
   Doc: TXMLDocument;
   XmlRoot: TDOMNode;
@@ -581,18 +584,6 @@ begin
     WriteXML(Doc, S);
   finally
     Doc.Free;
-  end;
-end;
-
-procedure TBookmarkManager.SaveToXmlFile(FileName: string);
-var
-  FS: TFileStream;
-begin
-  try
-    FS := TFileStream.Create(FileName, fmCreate);
-    SaveToXmlStream(FS);
-  finally
-    FS.Free;
   end;
 end;
 
