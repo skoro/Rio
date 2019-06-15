@@ -5,7 +5,7 @@ unit bookmarks;
 interface
 
 uses
-  Classes, SysUtils, ComCtrls, ExtCtrls, Controls, Menus, request_object;
+  Classes, SysUtils, DOM, ComCtrls, ExtCtrls, Controls, Menus, request_object;
 
 type
   // Forward declarations.
@@ -50,9 +50,9 @@ type
   public
     constructor Create(aName: string); virtual;
     destructor Destroy; override;
-    property Name: string read FName write SetName;
     property Request: TRequestObject read FRequest write FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
+    property Name: string read FName write SetName;
     property Locked: Boolean read FLocked write FLocked;
   end;
 
@@ -77,6 +77,8 @@ type
     procedure CreateRootNode; virtual;
     // TreeView double click event handler.
     procedure InternalTreeOnDblClick(Sender: TObject); virtual;
+    // Walk around the TreeView and save its content to the xml document.
+    procedure InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode); virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -112,6 +114,8 @@ type
     procedure OpenBookmark(BM: TBookmark = NIL);
     // Get the node folder path (this is like dirname for files).
     function GetNodeFolderPath(aNode: TTreeNode): string;
+    // Save the bookmarks content to a string buffer.
+    function SaveToXmlString: string;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -154,7 +158,7 @@ type
 
 implementation
 
-uses StdCtrls, Dialogs, app_helpers, strutils;
+uses StdCtrls, Dialogs, app_helpers, strutils, XMLWrite;
 
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
@@ -436,6 +440,36 @@ begin
   OpenBookmark;
 end;
 
+procedure TBookmarkManager.InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode);
+var
+  Child: TTreeNode;
+  BM: TBookmark;
+  XmlNode: TDOMNode;
+begin
+  if not Assigned(aNode) then
+    Exit; // =>
+  Child := aNode.GetFirstChild;
+  while Child <> NIL do begin
+    if IsFolderNode(Child) then begin // Folder node.
+      XmlNode := Doc.CreateElement('Folder');
+      TDOMElement(XmlNode).SetAttribute('name', Child.Text);
+      XmlRoot.AppendChild(XmlNode);
+      InternalSaveToXml(Doc, XmlNode, Child);
+    end
+    else begin // Bookmark node.
+      XmlNode := Doc.CreateElement('Bookmark');
+      BM := TBookmark(Child.Data);
+      with TDOMElement(XmlNode) do begin
+        SetAttribute('name', BM.Name);
+        SetAttribute('locked', IfThen(BM.Locked, '1', '0'));
+      end;
+      XmlNode.AppendChild(Doc.CreateCDATASection(BM.Request.ToJson));
+      XmlRoot.AppendChild(XmlNode);
+    end;
+    Child := Child.GetNextSibling;
+  end; // while
+end;
+
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
 var
   path: string;
@@ -446,6 +480,27 @@ begin
     Exit(path);
   p := RPos('/', path);
   Result := LeftStr(path, p - 1);
+end;
+
+function TBookmarkManager.SaveToXmlString: string;
+var
+  Doc: TXMLDocument;
+  XmlRoot: TDOMNode;
+  SS: TStringStream;
+begin
+  try
+    Doc := TXMLDocument.Create;
+    SS := TStringStream.Create('');
+    XmlRoot := Doc.CreateElement('Bookmarks');
+    TDOMElement(XmlRoot).SetAttribute('name', RootName);
+    Doc.AppendChild(XmlRoot);
+    InternalSaveToXml(Doc, XmlRoot, FRootNode);
+    WriteXML(Doc, SS);
+    Result := SS.DataString;
+  finally
+    Doc.Free;
+    SS.Free;
+  end;
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);
