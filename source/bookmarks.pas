@@ -5,7 +5,7 @@ unit bookmarks;
 interface
 
 uses
-  Classes, SysUtils, DOM, XMLRead, ComCtrls, ExtCtrls, Controls, Menus,
+  Classes, SysUtils, DOM, ComCtrls, ExtCtrls, Controls, Menus,
   request_object;
 
 type
@@ -177,7 +177,7 @@ const
 
 implementation
 
-uses StdCtrls, Dialogs, app_helpers, strutils, XMLWrite;
+uses StdCtrls, Dialogs, app_helpers, strutils, XMLWrite, XMLRead;
 
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
