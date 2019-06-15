@@ -115,7 +115,9 @@ type
     // Get the node folder path (this is like dirname for files).
     function GetNodeFolderPath(aNode: TTreeNode): string;
     // Save the bookmarks content to a string buffer.
-    function SaveToXmlString: string;
+    procedure SaveToXmlStream(S: TStream); virtual;
+    // Save the bookmarks content to a file.
+    procedure SaveToXmlFile(FileName: string); virtual;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -153,8 +155,16 @@ type
     property OnDeleteClick: TOnBookmarkClick read FOnDeleteClick write FOnDeleteClick;
   end;
 
+  // Globals section.
+  // ===================================
+
   function IsFolderNode(Node: TTreeNode): Boolean;
   function NodeToBookmark(Node: TTreeNode): TBookmark;
+
+  // Save the application bookmarks.
+  procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = 'Bookmarks.xml');
+  // Get the full path name of the application bookmarks.
+  function GetAppBookmarksFilename(Basename: string = 'Bookmarks.xml'): string;
 
 implementation
 
@@ -172,6 +182,16 @@ begin
   if IsFolderNode(Node) then
     raise ENodeException.CreateNode(Node, 'The node is a folder node but expected bookmark node.');
   Result := TBookmark(Node.Data);
+end;
+
+procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string);
+begin
+  BM.SaveToXmlFile(GetAppBookmarksFilename());
+end;
+
+function GetAppBookmarksFilename(Basename: string): string;
+begin
+  Result := GetAppConfigDir(False) + DirectorySeparator + Basename;
 end;
 
 { TBookmarkPopup }
@@ -482,24 +502,32 @@ begin
   Result := LeftStr(path, p - 1);
 end;
 
-function TBookmarkManager.SaveToXmlString: string;
+procedure TBookmarkManager.SaveToXmlStream(S: TStream);
 var
   Doc: TXMLDocument;
   XmlRoot: TDOMNode;
-  SS: TStringStream;
 begin
   try
     Doc := TXMLDocument.Create;
-    SS := TStringStream.Create('');
     XmlRoot := Doc.CreateElement('Bookmarks');
     TDOMElement(XmlRoot).SetAttribute('name', RootName);
     Doc.AppendChild(XmlRoot);
     InternalSaveToXml(Doc, XmlRoot, FRootNode);
-    WriteXML(Doc, SS);
-    Result := SS.DataString;
+    WriteXML(Doc, S);
   finally
     Doc.Free;
-    SS.Free;
+  end;
+end;
+
+procedure TBookmarkManager.SaveToXmlFile(FileName: string);
+var
+  FS: TFileStream;
+begin
+  try
+    FS := TFileStream.Create(FileName, fmCreate);
+    SaveToXmlStream(FS);
+  finally
+    FS.Free;
   end;
 end;
 

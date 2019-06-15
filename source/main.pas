@@ -769,6 +769,8 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  SaveAppBookmarks(FBookManager);
+
   FreeAndNil(FResponseTabManager);
 
   if Assigned(FProfilerGraph) then
