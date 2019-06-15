@@ -292,7 +292,7 @@ var
 implementation
 
 uses about, headers_editor, cookie_form,
-  app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
+  app_helpers, strutils, help_form, cmdline, options,
   import_form, export_form, bookmark_form, Clipbrd;
 
 const
