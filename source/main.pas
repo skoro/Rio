@@ -759,6 +759,7 @@ begin
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
   FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
+  LoadAppBookmarks(FBookManager);
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);

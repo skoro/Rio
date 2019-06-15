@@ -5,7 +5,8 @@ unit bookmarks;
 interface
 
 uses
-  Classes, SysUtils, DOM, ComCtrls, ExtCtrls, Controls, Menus, request_object;
+  Classes, SysUtils, DOM, XMLRead, ComCtrls, ExtCtrls, Controls, Menus,
+  request_object;
 
 type
   // Forward declarations.
@@ -75,10 +76,13 @@ type
   protected
     function CreateTree: TTreeView; virtual;
     procedure CreateRootNode; virtual;
+    function InternalAddFolder(ParentNode: TTreeNode; FolderName: string): TTreeNode; virtual;
     // TreeView double click event handler.
     procedure InternalTreeOnDblClick(Sender: TObject); virtual;
     // Walk around the TreeView and save its content to the xml document.
     procedure InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode); virtual;
+    // Populate the tree view from the XML.
+    procedure InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode); virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -118,6 +122,9 @@ type
     procedure SaveToXmlStream(S: TStream); virtual;
     // Save the bookmarks content to a file.
     procedure SaveToXmlFile(FileName: string); virtual;
+    { TODO : Refactor to SaveBookmarksToStream and so on. }
+    // Load bookmarks from the stream.
+    procedure LoadXmlFromStream(S: TStream); virtual;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -163,6 +170,8 @@ type
 
   // Save the application bookmarks.
   procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = 'Bookmarks.xml');
+  // Load the application bookmarks.
+  function LoadAppBookmarks(BM: TBookmarkManager; Filename: string = 'Bookmarks.xml'): Boolean;
   // Get the full path name of the application bookmarks.
   function GetAppBookmarksFilename(Basename: string = 'Bookmarks.xml'): string;
 
@@ -186,12 +195,31 @@ end;
 
 procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string);
 begin
-  BM.SaveToXmlFile(GetAppBookmarksFilename());
+  { TODO : Refactor to stream like LoadAppBookmarks. }
+  BM.SaveToXmlFile(GetAppBookmarksFilename(Filename));
+end;
+
+function LoadAppBookmarks(BM: TBookmarkManager; Filename: string): Boolean;
+var
+  FS: TFileStream;
+  Path: string;
+begin
+  Result := False;
+  try
+    Path := GetAppBookmarksFilename(Filename);
+    if not FileExists(Path) then
+      Exit; // =>
+    FS := TFileStream.Create(Path, fmOpenRead);
+    BM.LoadXmlFromStream(FS);
+    Result := True;
+  finally
+    FS.Free;
+  end;
 end;
 
 function GetAppBookmarksFilename(Basename: string): string;
 begin
-  Result := GetAppConfigDir(False) + DirectorySeparator + Basename;
+  Result := GetAppConfigDir(False) + Basename;
 end;
 
 { TBookmarkPopup }
@@ -370,6 +398,7 @@ end;
 
 constructor TBookmark.Create(aName: string);
 begin
+  { TODO : Check that name is not empty. }
   FName := aName;
   FRequest := nil;
   FLocked := False;
@@ -455,6 +484,14 @@ begin
   end;
 end;
 
+function TBookmarkManager.InternalAddFolder(ParentNode: TTreeNode;
+  FolderName: string): TTreeNode;
+begin
+  Result := FTreeView.Items.AddChild(ParentNode, FolderName);
+  Result.Data := NIL;
+  Result.MakeVisible;
+end;
+
 procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
 begin
   OpenBookmark;
@@ -488,6 +525,34 @@ begin
     end;
     Child := Child.GetNextSibling;
   end; // while
+end;
+
+procedure TBookmarkManager.InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode);
+var
+  Elem: TDOMElement;
+  Child: TDOMNode;
+  BM: TBookmark;
+  fNode: TTreeNode;
+begin
+  if XmlNode = NIL then // Stops if reached a leaf.
+    Exit; // =>
+  Child := XmlNode.FirstChild;
+  while Child <> NIL do begin
+    Elem := TDOMElement(Child);
+    case LowerCase(Child.NodeName) of
+      'folder': begin
+        fNode := InternalAddFolder(aNode, Elem.GetAttribute('name'));
+        InternalLoadFromXml(Child, fNode);
+      end;
+      'bookmark': begin
+        BM := TBookmark.Create(Elem.GetAttribute('name'));
+        BM.Locked := Elem.GetAttribute('locked') = '1';
+        BM.Request := TRequestObject.CreateFromJson(Child.TextContent);
+        AddBookmark(BM, aNode.GetTextPath);
+      end;
+    end;
+    Child := Child.NextSibling;
+  end;
 end;
 
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
@@ -528,6 +593,27 @@ begin
     SaveToXmlStream(FS);
   finally
     FS.Free;
+  end;
+end;
+
+procedure TBookmarkManager.LoadXmlFromStream(S: TStream);
+var
+  Doc: TXMLDocument;
+  XmlRoot: TDOMNode;
+begin
+  try
+    ReadXMLFile(Doc, S);
+    XmlRoot := Doc.FindNode('Bookmarks');
+    if not Assigned(XmlRoot) then
+      raise Exception.Create('Malformed xml input.');
+    CreateRootNode;
+    FRootNode.Text := TDOMElement(XmlRoot).GetAttribute('name');
+    while XmlRoot <> NIL do begin
+      InternalLoadFromXml(XmlRoot, FRootNode);
+      XmlRoot := XmlRoot.NextSibling;
+    end;
+  finally
+    Doc.Free;
   end;
 end;
 
@@ -596,9 +682,7 @@ begin
   ParentNode := FindFolder(CurFolder);
   if ParentNode = NIL then
     raise ENodePathNotFound.CreatePath(CurFolder);
-  Result := FTreeView.Items.AddChild(ParentNode, FolderName);
-  Result.Data := NIL;
-  Result.MakeVisible;
+  Result := InternalAddFolder(ParentNode, FolderName);
 end;
 
 function TBookmarkManager.RenameFolder(FolderPath, NewName: string): Boolean;
