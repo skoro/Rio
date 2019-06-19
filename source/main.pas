@@ -46,6 +46,7 @@ type
     gridRespCookie: TStringGrid;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
+    miBookmarks: TMenuItem;
     miLayoutVert: TMenuItem;
     miLayoutHor: TMenuItem;
     miTabSep: TMenuItem;
@@ -184,6 +185,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miBookmarksClick(Sender: TObject);
     procedure miExportClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
@@ -208,6 +210,7 @@ type
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure pagesResponseChange(Sender: TObject);
+    procedure PairSplitterResize(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
     procedure pmBodyTypeClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
@@ -259,6 +262,7 @@ type
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
+    procedure ToggleBookmarksSide(VisibleSide: Boolean);
     procedure FinishRequest;
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
@@ -814,6 +818,7 @@ begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
+  ToggleBookmarksSide(miBookmarks.Checked);
   // Select and show active visible tab.
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
@@ -914,6 +919,12 @@ end;
 procedure TMainForm.gridRespCookieDblClick(Sender: TObject);
 begin
   CookieForm.View;
+end;
+
+procedure TMainForm.miBookmarksClick(Sender: TObject);
+begin
+  miBookmarks.Checked := not miBookmarks.Checked;
+  ToggleBookmarksSide(miBookmarks.Checked);
 end;
 
 procedure TMainForm.miExportClick(Sender: TObject);
@@ -1240,6 +1251,18 @@ begin
   ResetFindTextPos;
 end;
 
+procedure TMainForm.PairSplitterResize(Sender: TObject);
+var
+  pss: TPairSplitterSide;
+begin
+  if not (Sender is TPairSplitterSide) then
+    Exit; // =>
+  pss := TPairSplitterSide(Sender);
+  if (pss = BookmarkSide) then begin
+    miBookmarks.Checked := pss.Width > 1;
+  end;
+end;
+
 procedure TMainForm.pmAuthTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
@@ -1307,6 +1330,7 @@ begin
     miTabAuth.Checked := ReadBoolean('tabAuth', True);
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
+    miBookmarks.Checked := ReadBoolean('bookmarks', True);
   end;
 end;
 
@@ -1333,6 +1357,7 @@ begin
     WriteBoolean('tabAuth', miTabAuth.Checked);
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
+    WriteBoolean('bookmarks', miBookmarks.Checked);
   end;
 end;
 
@@ -1794,6 +1819,16 @@ begin
       splitterSideRequest.Width := LayoutSplitter.Width div 2;
       LayoutSplitter.Cursor := crHSplit;
     end;
+  end;
+end;
+
+procedure TMainForm.ToggleBookmarksSide(VisibleSide: Boolean);
+begin
+  if VisibleSide then begin
+    BookmarkSide.Width := 145;
+  end
+  else begin
+    BookmarkSide.Width := 1;
   end;
 end;
 
