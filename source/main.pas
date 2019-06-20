@@ -1955,6 +1955,7 @@ begin
   miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
+  miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 
