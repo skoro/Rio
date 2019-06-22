@@ -142,7 +142,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="21">
+    <Units Count="22">
       <Unit0>
         <Filename Value="http_inspector.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -251,9 +251,16 @@
         <IsPartOfProject Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="httpclient.pas"/>
+        <Filename Value="bookmark_form.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="BookmarkForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit20>
+      <Unit21>
+        <Filename Value="bookmarks.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit21>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

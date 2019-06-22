@@ -1,0 +1,840 @@
+unit bookmarks;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, DOM, ComCtrls, ExtCtrls, Controls, Menus,
+  request_object;
+
+type
+  // Forward declarations.
+  TBookmark = class;
+  TBookmarkPopup = class;
+
+  // When bookmark is changed (opened).
+  TOnChangeBookmark = procedure (Previous, Selected: TBookmark) of object;
+  // When the bookmark menu item was selected in the popup menu.
+  TOnBookmarkClick = procedure (Sender: TObject; BM: TBookmark) of object;
+
+  { ENodeException }
+
+  ENodeException = class(Exception)
+  private
+    FNode: TTreeNode;
+  public
+    constructor CreateNode(ANode: TTreeNode; const msg: string);
+    property Node: TTreeNode read FNode write FNode;
+  end;
+
+  { ENodePathNotFound }
+
+  ENodePathNotFound = class(Exception)
+  private
+    FPath: string;
+  public
+    constructor CreatePath(APath: string);
+    property Path: string read FPath write FPath;
+  end;
+
+  { TBookmark }
+
+  TBookmark = class
+  private
+    FName: string;
+    FRequest: TRequestObject;
+    FTreeNode: TTreeNode;
+    FLocked: Boolean;
+    procedure SetName(AValue: string); virtual;
+    procedure SetTreeNode(AValue: TTreeNode); virtual;
+  public
+    constructor Create(aName: string); virtual;
+    destructor Destroy; override;
+    property Request: TRequestObject read FRequest write FRequest;
+    property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
+    property Name: string read FName write SetName;
+    property Locked: Boolean read FLocked write FLocked;
+  end;
+
+  { TBookmarkManager }
+
+  TBookmarkManager = class(TPanel)
+  private
+    FTreeView: TTreeView;
+    FRootNode: TTreeNode;
+    FCurrentNode: TTreeNode;
+    FOnChangeBookmark: TOnChangeBookmark;
+
+    function GetBookmarkPopup: TBookmarkPopup;
+    function GetCurrentBookmark: TBookmark;
+    function GetRootName: string;
+    procedure SetBookmarkPopup(AValue: TBookmarkPopup);
+    procedure SetCurrentNode(AValue: TTreeNode);
+    procedure SetRootName(AValue: string);
+
+  protected
+    function CreateTree: TTreeView; virtual;
+    procedure CreateRootNode; virtual;
+    function InternalAddFolder(ParentNode: TTreeNode; FolderName: string): TTreeNode; virtual;
+    // TreeView double click event handler.
+    procedure InternalTreeOnDblClick(Sender: TObject); virtual;
+    // Walk around the TreeView and save its content to the xml document.
+    procedure InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode); virtual;
+    // Populate the tree view from the XML.
+    procedure InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode); virtual;
+
+  public
+    constructor Create(TheOwner: TComponent); override;
+    destructor Destory;
+    // Add a bookmark to the tree.
+    // BM - the bookmark instance.
+    // FolderPath - the bookmark folder path separated by /
+    function AddBookmark(BM: TBookmark; FolderPath: string): TTreeNode;
+    // Creates the folder tree items and attaches these items to a custom tree.
+    procedure AttachFolderNodes(CustomTree: TCustomTreeView);
+    // Adds a new folder by its path to the tree.
+    function AddFolder(FolderPath: string): TTreeNode;
+    // Renames a folder.
+    function RenameFolder(FolderPath, NewName: string): Boolean;
+    // Reset current bookmark and node.
+    procedure ResetCurrent;
+    // Update current bookmark: set a new name or/and move to another folder.
+    // ANewName - a bookmark new name
+    // FolderPath - move the bookmark to another folder (optional).
+    function UpdateBookmark(BM: TBookmark; ANewName, FolderPath: string): Boolean;
+    // Check that the request object is matched with the current bookmark.
+    function IsCurrentRequest(RO: TRequestObject): Boolean;
+    // Finds the folder node by path.
+    function FindFolder(FolderPath: string): TTreeNode;
+    // Deletes the bookmark from the tree.
+    function DeleteBookmark(BM: TBookmark): Boolean;
+    // Deletes the folder and all its children (folders, bookmarks).
+    function DeleteFolder(FolderPath: string): Boolean;
+    function DeleteFolderNode(FolderNode: TTreeNode): Boolean;
+    // Finds a tree node by bookmark instance.
+    function FindNode(BM: TBookmark): TTreeNode;
+    // Select bookmark.
+    procedure OpenBookmark(BM: TBookmark = NIL);
+    // Get the node folder path (this is like dirname for files).
+    function GetNodeFolderPath(aNode: TTreeNode): string;
+    // Save the bookmarks content to a string buffer.
+    procedure SaveXmlToStream(S: TStream); virtual;
+    // Load bookmarks from the stream.
+    procedure LoadXmlFromStream(S: TStream); virtual;
+
+    property TreeView: TTreeView read FTreeView;
+    property RootName: string read GetRootName write SetRootName;
+    property CurrentNode: TTreeNode read FCurrentNode write SetCurrentNode;
+    property CurrentBookmark: TBookmark read GetCurrentBookmark;
+    property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
+    property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
+  end;
+
+  { TBookmarkPopup }
+
+  TBookmarkPopup = class(TPopupMenu)
+  private
+    FBookmarkManager: TBookmarkManager;
+    FOnEditClick: TOnBookmarkClick;
+    FOnDeleteClick: TOnBookmarkClick;
+    function GetBookmarkManager: TBookmarkManager;
+    function GetSelectedNode: TTreeNode;
+  protected
+    function CreateItem(const caption: string): TMenuItem; virtual;
+    procedure CreateDefaultItems; virtual;
+    procedure InternalOnClickOpen(Sender: TObject); virtual;
+    procedure InternalOnClickEdit(Sender: TObject); virtual;
+    procedure InternalOnClickDelete(Sender: TObject); virtual;
+    procedure InternalOnClickNewFolder(Sender: TObject); virtual;
+    procedure RenameFolder(FolderNode: TTreeNode); virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+    function ConfirmDeleteFolder(FolderName: string): Boolean;
+    function ConfirmDeleteBookmark(BM: TBookmark): Boolean;
+
+    property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
+    property SelectedNode: TTreeNode read GetSelectedNode;
+    property OnEditClick: TOnBookmarkClick read FOnEditClick write FOnEditClick;
+    property OnDeleteClick: TOnBookmarkClick read FOnDeleteClick write FOnDeleteClick;
+  end;
+
+  // Globals section.
+  // ===================================
+const
+  // Application bookmarks filename.
+  BOOKMARK_FILENAME = 'Bookmarks.xml';
+
+  function IsFolderNode(Node: TTreeNode): Boolean;
+  function NodeToBookmark(Node: TTreeNode): TBookmark;
+
+  // Save the application bookmarks.
+  procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = BOOKMARK_FILENAME);
+  // Load the application bookmarks.
+  function LoadAppBookmarks(BM: TBookmarkManager; Filename: string = BOOKMARK_FILENAME): Boolean;
+  // Get the full path name of the application bookmarks.
+  function GetAppBookmarksFilename(Basename: string = BOOKMARK_FILENAME): string;
+
+implementation
+
+uses StdCtrls, Dialogs, app_helpers, strutils, XMLWrite, XMLRead;
+
+function IsFolderNode(Node: TTreeNode): Boolean;
+begin
+  if not Assigned(Node) then
+    raise Exception.Create('A node instance is required.');
+  Result := Node.Data = NIL;
+end;
+
+function NodeToBookmark(Node: TTreeNode): TBookmark;
+begin
+  if IsFolderNode(Node) then
+    raise ENodeException.CreateNode(Node, 'The node is a folder node but expected bookmark node.');
+  Result := TBookmark(Node.Data);
+end;
+
+procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string);
+var
+  FS: TFileStream;
+begin
+  try
+    FS := TFileStream.Create(GetAppBookmarksFilename(Filename), fmCreate);
+    BM.SaveXmlToStream(FS);
+  finally
+    FS.Free;
+  end;
+end;
+
+function LoadAppBookmarks(BM: TBookmarkManager; Filename: string): Boolean;
+var
+  FS: TFileStream;
+  Path: string;
+begin
+  Result := False;
+  try
+    Path := GetAppBookmarksFilename(Filename);
+    if not FileExists(Path) then
+      Exit; // =>
+    FS := TFileStream.Create(Path, fmOpenRead);
+    BM.LoadXmlFromStream(FS);
+    Result := True;
+  finally
+    FS.Free;
+  end;
+end;
+
+function GetAppBookmarksFilename(Basename: string): string;
+begin
+  Result := GetAppConfigDir(False) + Basename;
+end;
+
+{ TBookmarkPopup }
+
+function TBookmarkPopup.GetBookmarkManager: TBookmarkManager;
+begin
+  if not Assigned(FBookmarkManager) then
+    raise Exception.Create('Bookmark manager is required for popup menu.');
+  Result := FBookmarkManager;
+end;
+
+function TBookmarkPopup.GetSelectedNode: TTreeNode;
+begin
+  Result := FBookmarkManager.TreeView.Selected;
+end;
+
+function TBookmarkPopup.CreateItem(const caption: string): TMenuItem;
+begin
+  Result := TMenuItem.Create(Self);
+  Result.Caption := caption;
+  Items.Add(Result);
+end;
+
+procedure TBookmarkPopup.CreateDefaultItems;
+begin
+  with CreateItem('Open') do
+    OnClick := @InternalOnClickOpen;
+  with CreateItem('New folder') do
+    OnClick := @InternalOnClickNewFolder;
+  with CreateItem('Edit') do
+    OnClick := @InternalOnClickEdit;
+  with CreateItem('Delete') do
+    OnClick := @InternalOnClickDelete;
+end;
+
+procedure TBookmarkPopup.InternalOnClickOpen(Sender: TObject);
+var
+  sNode: TTreeNode;
+begin
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    if sNode.Expanded then sNode.Collapse(True) else sNode.Expand(True);
+  end
+  else
+    FBookmarkManager.OpenBookmark;
+end;
+
+procedure TBookmarkPopup.InternalOnClickEdit(Sender: TObject);
+var
+  sNode: TTreeNode;
+begin
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    RenameFolder(sNode);
+  end
+  else begin
+    if Assigned(FOnEditClick) then
+      FOnEditClick(Sender, NodeToBookmark(sNode));
+  end;
+end;
+
+procedure TBookmarkPopup.InternalOnClickDelete(Sender: TObject);
+var
+  sNode: TTreeNode;
+  BM: TBookmark;
+begin
+  sNode := SelectedNode;
+  if not Assigned(sNode) then
+    Exit; // =>
+  if IsFolderNode(sNode) then begin
+    // Don't allow to delete root node.
+    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(sNode.Text) then begin
+      BookmarkManager.DeleteFolderNode(sNode);
+      if Assigned(FOnDeleteClick) then
+        FOnDeleteClick(Self, NIL);
+    end;
+  end
+  else begin
+    BM := NodeToBookmark(sNode);
+    if ConfirmDeleteBookmark(BM) then begin
+      if Assigned(FOnDeleteClick) then
+        FOnDeleteClick(Self, BM);
+      BookmarkManager.DeleteBookmark(BM);
+    end;
+  end;
+end;
+
+procedure TBookmarkPopup.InternalOnClickNewFolder(Sender: TObject);
+var
+  fName: string;
+  sNode: TTreeNode;
+begin
+  fName := InputBox('New folder', 'Folder name:', '');
+  if Trim(fName) = '' then
+    Exit; // =>
+  sNode := SelectedNode;
+  if not Assigned(sNode) then // No selected - attach to the root node.
+    sNode := FBookmarkManager.TreeView.Items.GetFirstNode;
+  if not IsFolderNode(sNode) then
+    sNode := sNode.Parent;
+  if (not Assigned(sNode)) or (not IsFolderNode(sNode)) then
+    Exit; // =>
+  FBookmarkManager.AddFolder(sNode.GetTextPath + '/' + fName);
+end;
+
+procedure TBookmarkPopup.RenameFolder(FolderNode: TTreeNode);
+var
+  NewName: string;
+begin
+  NewName := InputBox('Edit folder', 'A new folder name:', FolderNode.Text);
+  if (NewName = FolderNode.Text) or (Trim(NewName) = '') then
+    Exit; // =>
+  if not FBookmarkManager.RenameFolder(FolderNode.GetTextPath, NewName) then
+    ERRMsg('Error', 'Cannot rename folder. Folder is already exist ?');
+end;
+
+function TBookmarkPopup.ConfirmDeleteFolder(FolderName: string): Boolean;
+begin
+  Result := ConfirmDlg('Delete folder ?', Format('Are you sure you want to delete folder "%s" and ALL its children ?', [FolderName])) = mrOK;
+end;
+
+function TBookmarkPopup.ConfirmDeleteBookmark(BM: TBookmark): Boolean;
+begin
+  Result := ConfirmDlg('Delete bookmark ?', Format('Are you sure you want to delete "%s" ?', [BM.Name])) = mrOK;
+end;
+
+constructor TBookmarkPopup.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  CreateDefaultItems;
+  if AOwner is TBookmarkManager then
+    FBookmarkManager := TBookmarkManager(AOwner);
+end;
+
+{ ENodePathNotFound }
+
+constructor ENodePathNotFound.CreatePath(APath: string);
+begin
+  inherited CreateFmt('Folder path %s not found.', [APath]);
+  FPath := APath;
+end;
+
+{ ENodeException }
+
+constructor ENodeException.CreateNode(ANode: TTreeNode; const msg: string);
+begin
+  inherited Create(msg);
+  FNode := ANode;
+end;
+
+{ TBookmark }
+
+procedure TBookmark.SetName(AValue: string);
+begin
+  if FName = AValue then
+    Exit; // =>
+  if Trim(FName) = '' then
+    raise Exception.Create('Bookmark Name is required.');
+  FName := AValue;
+end;
+
+procedure TBookmark.SetTreeNode(AValue: TTreeNode);
+begin
+  if FTreeNode = AValue then
+    Exit; // =>
+  if not Assigned(avalue) then
+    raise Exception.Create('Bookmark must be assigned to tree node.');
+  if IsFolderNode(AValue) then
+    raise ENodeException.CreateNode(AValue, 'The node is a folder node.');
+  FTreeNode := AValue;
+end;
+
+constructor TBookmark.Create(aName: string);
+begin
+  { TODO : Check that name is not empty. }
+  FName := aName;
+  FRequest := nil;
+  FLocked := False;
+end;
+
+destructor TBookmark.Destroy;
+begin
+  if FRequest <> Nil then
+    FreeAndNil(FRequest);
+  inherited Destroy;
+end;
+
+{ TBookmarkManager }
+
+function TBookmarkManager.GetRootName: string;
+begin
+  Result := FRootNode.Text;
+end;
+
+procedure TBookmarkManager.SetBookmarkPopup(AValue: TBookmarkPopup);
+begin
+  if FTreeView.PopupMenu = AValue then
+    Exit; // =>
+  FTreeView.PopupMenu := TPopupMenu(AValue);
+end;
+
+procedure TBookmarkManager.SetCurrentNode(AValue: TTreeNode);
+begin
+  if FCurrentNode = AValue then
+    Exit; // =>
+  if AValue = NIL then
+    ResetCurrent
+  else begin
+    if IsFolderNode(AValue) then
+      raise ENodeException.CreateNode(AValue, 'Current node cannot be a folder node.');
+    FCurrentNode := AValue;
+    FCurrentNode.Selected := True;
+    FCurrentNode.MakeVisible;
+  end;
+end;
+
+function TBookmarkManager.GetCurrentBookmark: TBookmark;
+begin
+  Result := NIL;
+  if Assigned(FCurrentNode) then begin
+    if FCurrentNode.Data = NIL then
+      raise ENodeException.CreateNode(FCurrentNode, 'Runtime error: node data is not bookmark.');
+    Result := TBookmark(FCurrentNode.Data);
+  end;
+end;
+
+function TBookmarkManager.GetBookmarkPopup: TBookmarkPopup;
+begin
+  Result := TBookmarkPopup(FTreeView.PopupMenu);
+end;
+
+procedure TBookmarkManager.SetRootName(AValue: string);
+begin
+  if RootName = AValue then
+    Exit; // =>
+  FRootNode.Text := AValue;
+end;
+
+function TBookmarkManager.CreateTree: TTreeView;
+begin
+  Result := TTreeView.Create(Self);
+  Result.Parent := Self;
+  Result.Align := alClient;
+  Result.ScrollBars := ssAutoBoth;
+  Result.Options := [tvoReadOnly, tvoShowRoot, tvoShowLines, tvoShowButtons,
+                 tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
+  // Event handlers.
+  Result.OnDblClick := @InternalTreeOnDblClick;
+end;
+
+procedure TBookmarkManager.CreateRootNode;
+begin
+  with FTreeView.Items do begin
+    Clear;
+    FRootNode := Add(NIL, 'My bookmarks');
+    FRootNode.Data := NIL;
+    FRootNode.MakeVisible;
+  end;
+end;
+
+function TBookmarkManager.InternalAddFolder(ParentNode: TTreeNode;
+  FolderName: string): TTreeNode;
+begin
+  Result := FTreeView.Items.AddChild(ParentNode, FolderName);
+  Result.Data := NIL;
+  Result.MakeVisible;
+end;
+
+procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
+begin
+  OpenBookmark;
+end;
+
+procedure TBookmarkManager.InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode);
+var
+  Child: TTreeNode;
+  BM: TBookmark;
+  XmlNode: TDOMNode;
+begin
+  if not Assigned(aNode) then
+    Exit; // =>
+  Child := aNode.GetFirstChild;
+  while Child <> NIL do begin
+    if IsFolderNode(Child) then begin // Folder node.
+      XmlNode := Doc.CreateElement('Folder');
+      TDOMElement(XmlNode).SetAttribute('name', Child.Text);
+      XmlRoot.AppendChild(XmlNode);
+      InternalSaveToXml(Doc, XmlNode, Child);
+    end
+    else begin // Bookmark node.
+      XmlNode := Doc.CreateElement('Bookmark');
+      BM := TBookmark(Child.Data);
+      with TDOMElement(XmlNode) do begin
+        SetAttribute('name', BM.Name);
+        SetAttribute('locked', IfThen(BM.Locked, '1', '0'));
+      end;
+      XmlNode.AppendChild(Doc.CreateCDATASection(BM.Request.ToJson));
+      XmlRoot.AppendChild(XmlNode);
+    end;
+    Child := Child.GetNextSibling;
+  end; // while
+end;
+
+procedure TBookmarkManager.InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode);
+var
+  Elem: TDOMElement;
+  Child: TDOMNode;
+  BM: TBookmark;
+  fNode: TTreeNode;
+begin
+  if XmlNode = NIL then // Stops if reached a leaf.
+    Exit; // =>
+  Child := XmlNode.FirstChild;
+  while Child <> NIL do begin
+    Elem := TDOMElement(Child);
+    case LowerCase(Child.NodeName) of
+      'folder': begin
+        fNode := InternalAddFolder(aNode, Elem.GetAttribute('name'));
+        InternalLoadFromXml(Child, fNode);
+      end;
+      'bookmark': begin
+        BM := TBookmark.Create(Elem.GetAttribute('name'));
+        BM.Locked := Elem.GetAttribute('locked') = '1';
+        BM.Request := TRequestObject.CreateFromJson(Child.TextContent);
+        AddBookmark(BM, aNode.GetTextPath);
+      end;
+    end;
+    Child := Child.NextSibling;
+  end;
+end;
+
+function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
+var
+  path: string;
+  p: SizeInt;
+begin
+  path := aNode.GetTextPath;
+  if IsFolderNode(aNode) then
+    Exit(path);
+  p := RPos('/', path);
+  Result := LeftStr(path, p - 1);
+end;
+
+procedure TBookmarkManager.SaveXmlToStream(S: TStream);
+var
+  Doc: TXMLDocument;
+  XmlRoot: TDOMNode;
+begin
+  try
+    Doc := TXMLDocument.Create;
+    XmlRoot := Doc.CreateElement('Bookmarks');
+    TDOMElement(XmlRoot).SetAttribute('name', RootName);
+    Doc.AppendChild(XmlRoot);
+    InternalSaveToXml(Doc, XmlRoot, FRootNode);
+    WriteXML(Doc, S);
+  finally
+    Doc.Free;
+  end;
+end;
+
+procedure TBookmarkManager.LoadXmlFromStream(S: TStream);
+var
+  Doc: TXMLDocument;
+  XmlRoot: TDOMNode;
+begin
+  try
+    ReadXMLFile(Doc, S);
+    XmlRoot := Doc.FindNode('Bookmarks');
+    if not Assigned(XmlRoot) then
+      raise Exception.Create('Malformed xml input.');
+    CreateRootNode;
+    FRootNode.Text := TDOMElement(XmlRoot).GetAttribute('name');
+    while XmlRoot <> NIL do begin
+      InternalLoadFromXml(XmlRoot, FRootNode);
+      XmlRoot := XmlRoot.NextSibling;
+    end;
+  finally
+    Doc.Free;
+  end;
+end;
+
+constructor TBookmarkManager.Create(TheOwner: TComponent);
+begin
+  inherited Create(TheOwner);
+  Align := alClient;
+  Caption := '';
+  BevelOuter := bvNone;
+  FTreeView := CreateTree;
+  Popup := TBookmarkPopup.Create(Self);
+  BorderSpacing.Left := 4;
+  FCurrentNode := NIL;
+  CreateRootNode;
+end;
+
+destructor TBookmarkManager.Destory;
+begin
+  FreeAndNil(FTreeView);
+  inherited Destroy;
+end;
+
+function TBookmarkManager.AddBookmark(BM: TBookmark; FolderPath: string
+  ): TTreeNode;
+var
+  FolderNode: TTreeNode;
+begin
+  FolderNode := FindFolder(FolderPath);
+  if FolderNode = NIL then
+    raise ENodePathNotFound.CreatePath(FolderPath);
+  Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
+  Result.Data := BM;
+end;
+
+procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
+  procedure WalkNodes(CurrentNode: TTreeNode; NewParent: TTreeNode = NIL);
+  var
+    Child: TTreeNode;
+  begin
+    Child := CurrentNode.GetFirstChild;
+    while Child <> NIL do begin
+      if IsFolderNode(Child) then
+        WalkNodes(Child, CustomTree.Items.AddChild(NewParent, Child.Text));
+      Child := Child.GetNextSibling;
+    end;
+  end;
+var
+  FirstNode, NewParent: TTreeNode;
+begin
+  FirstNode := FTreeView.Items.GetFirstNode;
+  CustomTree.Items.Clear;
+  NewParent := CustomTree.Items.AddChild(FirstNode.Parent, FirstNode.Text);
+  WalkNodes(FirstNode, NewParent);
+end;
+
+function TBookmarkManager.AddFolder(FolderPath: string): TTreeNode;
+var
+  p: SizeInt;
+  FolderName, CurFolder: string;
+  ParentNode: TTreeNode;
+begin
+  if FTreeView.Items.FindNodeWithTextPath(FolderPath) <> NIL then
+    Exit(NIL); // =>
+  p := RPos('/', FolderPath);
+  FolderName := RightStr(FolderPath, Length(FolderPath) - p);
+  CurFolder := LeftStr(FolderPath, p - 1);
+  ParentNode := FindFolder(CurFolder);
+  if ParentNode = NIL then
+    raise ENodePathNotFound.CreatePath(CurFolder);
+  Result := InternalAddFolder(ParentNode, FolderName);
+end;
+
+function TBookmarkManager.RenameFolder(FolderPath, NewName: string): Boolean;
+var
+  Folder: TTreeNode;
+  p: SizeInt;
+  newPath: string;
+begin
+  p := RPos('/', FolderPath);
+  newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
+  if FTreeView.Items.FindNodeWithTextPath(newPath) <> NIL then
+    Exit(False);
+  Folder := FindFolder(FolderPath);
+  if Folder = NIL then
+    Exit(False); // =>
+  Folder.Text := NewName;
+  Result := True;
+end;
+
+procedure TBookmarkManager.ResetCurrent;
+begin
+  if Assigned(FCurrentNode) then
+    FCurrentNode.Selected := False;
+  FCurrentNode := NIL;
+end;
+
+function TBookmarkManager.UpdateBookmark(BM: TBookmark; ANewName, FolderPath: string): Boolean;
+var
+  bNode: TTreeNode;
+  isCurrent: Boolean;
+begin
+  bNode := FindNode(BM);
+  if not Assigned(bNode) then
+    Exit(False); // =>
+  // Rename.
+  if (ANewName <> '') and (BM.Name <> ANewName) then begin
+    BM.Name := ANewName;
+    bNode.Text := ANewName;
+  end;
+  // Move to another folder.
+  if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
+    isCurrent := (bNode = FCurrentNode);
+    bNode.Delete;
+    bNode := AddBookmark(BM, FolderPath);
+    if isCurrent then
+      CurrentNode := bNode;
+  end;
+end;
+
+function TBookmarkManager.IsCurrentRequest(RO: TRequestObject): Boolean;
+var
+  BM: TBookmark;
+begin
+  BM := GetCurrentBookmark;
+  if not Assigned(BM) then
+    Exit(False);
+  Result := BM.Request.UrlPath = RO.UrlPath;
+end;
+
+function TBookmarkManager.FindFolder(FolderPath: string): TTreeNode;
+begin
+  Result := FTreeView.Items.FindNodeWithTextPath(FolderPath);
+  if (Result <> NIL) and IsFolderNode(Result) then
+    Exit;
+  Result := NIL;
+end;
+
+function TBookmarkManager.DeleteBookmark(BM: TBookmark): Boolean;
+var
+  bNode: TTreeNode;
+begin
+  bNode := FindNode(BM);
+  if not Assigned(bNode) then
+    Exit(False); // =>
+  if bNode = FCurrentNode then begin
+    ResetCurrent;
+  end;
+  FreeAndNil(BM);
+  bNode.Delete;
+  Result := True;
+end;
+
+function TBookmarkManager.DeleteFolder(FolderPath: string): Boolean;
+var
+  fNode: TTreeNode;
+begin
+  fNode := FindFolder(FolderPath);
+  if fNode = NIL then
+    Exit(False);
+  Result := DeleteFolderNode(fNode);
+end;
+
+function TBookmarkManager.DeleteFolderNode(FolderNode: TTreeNode): Boolean;
+  // Recursive node delete.
+  procedure DeleteNode(aNode: TTreeNode);
+  begin
+    if aNode = FCurrentNode then
+      ResetCurrent;
+    while aNode.HasChildren do
+      DeleteNode(aNode.GetLastChild);
+    if Assigned(aNode.Data) then
+      TBookmark(aNode.Data).Free;
+    aNode.Delete;
+  end;
+
+begin
+  if not IsFolderNode(FolderNode) then
+    Exit(False);
+  DeleteNode(FolderNode);
+  Result := True;
+end;
+
+function TBookmarkManager.FindNode(BM: TBookmark): TTreeNode;
+  function InternalFind(aNode: TTreeNode): TTreeNode;
+  var
+    Child: TTreeNode;
+  begin
+    Result := NIL;
+    if not Assigned(aNode) then
+      Exit; // =>
+    Child := aNode.GetFirstChild;
+    while Child <> NIL do begin
+      if IsFolderNode(Child) then begin
+        Result := InternalFind(Child);
+        if Result <> NIL then
+          Exit; // =>
+      end;
+      if Child.Data = Pointer(BM) then
+        Exit(Child);
+      Child := Child.GetNextSibling;
+    end;
+  end;
+begin
+  Result := InternalFind(FTreeView.Items.GetFirstNode);
+end;
+
+procedure TBookmarkManager.OpenBookmark(BM: TBookmark = NIL);
+var
+  Selected: TTreeNode;
+  Prev: TBookmark;
+begin
+  if BM = NIL then
+    Selected := FTreeView.Selected
+  else
+    Selected := FindNode(BM);
+  // The node must be selected and is not be a folder node.
+  if not (Assigned(Selected) and (not IsFolderNode(Selected))) then
+    Exit; // =>
+  if Selected = FCurrentNode then
+    Exit; // =>
+  Prev := GetCurrentBookmark;
+  FCurrentNode := Selected;
+  if Assigned(FOnChangeBookmark) then begin
+    FOnChangeBookmark(Prev, GetCurrentBookmark);
+    FCurrentNode := Selected; // Preserve selected node after user callback.
+  end;
+  FTreeView.Selected := Selected;
+end;
+
+end.

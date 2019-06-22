@@ -5,9 +5,12 @@ unit request_object;
 interface
 
 uses
-  Classes, SysUtils, Grids, main;
+  Classes, SysUtils, Grids, thread_http_client;
 
 type
+
+  TBodyTab = (btForm, btJson, btOther);
+  TAuthTab = (atNone = -1, atBasic, atBearer);
 
   { TRequestParamItem }
 
@@ -120,12 +123,13 @@ type
     FAuthType: TAuthTab; // TODO: should be TAuthType
     FDataType: TBodyTab;
     FNotes: string;
+    FResponseInfo: TResponseInfo;
     function GetFilename: string;
+    function GetUrlPath: string;
     procedure SetMethod(AValue: string);
   protected
   public
     constructor Create;
-    constructor Create(form: TMainForm); overload;
     destructor Destroy; override;
     procedure SetCollectionFromGrid(Grid: TStringGrid; coll: TCollection);
     procedure SetCollectionToGrid(coll: TCollection; Grid: TStringGrid);
@@ -135,11 +139,16 @@ type
     procedure AddCookie(AName, AValue: string; IsEnabled: Boolean = True);
     procedure AddForm(AName, AValue: string; IsEnabled: Boolean = True;
       AElemType: TFormTypeItem = ftiText);
-    procedure LoadToForm(form: TMainForm);
     function IsJson: Boolean;
+    // Serialize to a json string.
+    function ToJson: string;
+    // Unserialize from a json string.
+    class function CreateFromJson(json: string): TRequestObject;
+    property ResponseInfo: TResponseInfo read FResponseInfo write FResponseInfo;
   published
     property Method: string read FMethod write SetMethod;
     property Url: string read FUrl write FUrl;
+    property UrlPath: string read GetUrlPath;
     property Body: string read FBody write FBody;
     property Json: string read FJson write FJson;
     property Headers: TRequestParamList read FHeaders;
@@ -147,16 +156,16 @@ type
     property Cookies: TRequestParamList read FCookies;
     property Params: TRequestParamList read FParams;
     property AuthType: TAuthTab read FAuthType write FAuthType;
-    property AuthBasic: TAuthBasic read FAuthBasic;
-    property AuthBearer: TAuthBearer read FAuthBearer;
-    property DataType: TBodyTab read FDataType;
+    property AuthBasic: TAuthBasic read FAuthBasic write FAuthBasic;
+    property AuthBearer: TAuthBearer read FAuthBearer write FAuthBearer;
+    property DataType: TBodyTab read FDataType write FDataType;
     property Filename: string read GetFilename;
     property Notes: string read FNotes write FNotes;
   end;
 
 implementation
 
-uses strutils, URIParser;
+uses strutils, URIParser, fpjsonrtti;
 
 { TFormParamsEnumerator }
 
@@ -271,6 +280,20 @@ begin
     Result := U.Host;
 end;
 
+function TRequestObject.GetUrlPath: string;
+var
+  uri: TURI;
+begin
+  uri := ParseURI(FUrl);
+  Result := Format('%s://%s%s%s%s', [
+    uri.Protocol,
+    uri.Host,
+    IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
+    uri.Path,
+    uri.Document
+  ]);
+end;
+
 constructor TRequestObject.Create;
 begin
   inherited Create;
@@ -283,28 +306,7 @@ begin
   FAuthBearer := TAuthBearer.Create;
   FMethod     := 'GET';
   FNotes      := '';
-end;
-
-constructor TRequestObject.Create(form: TMainForm);
-begin
-  Create;
-  with form do begin
-    Method := cbMethod.Text;
-    Url    := cbUrl.Text;
-    Body   := editOther.Text;
-    Json   := editJson.Text;
-    SetCollectionFromGrid(requestHeaders, FHeaders);
-    SetCollectionFromGrid(gridReqCookie, FCookies);
-    SetCollectionFromGrid(gridParams, FParams);
-    GetFormFromGrid(gridForm);
-    FAuthType := GetSelectedAuthTab;
-    FAuthBasic.Login    := editBasicLogin.Text;
-    FAuthBasic.Password := editBasicPassword.Text;
-    FAuthBearer.Prefix  := editBearerPrefix.Text;
-    FAuthBearer.Token   := editBearerToken.Text;
-    FDataType := GetSelectedBodyTab;
-    FNotes := editNotes.Text;
-  end;
+  FResponseInfo := nil;
 end;
 
 destructor TRequestObject.Destroy;
@@ -315,6 +317,8 @@ begin
   FParams.Free;
   FAuthBasic.Free;
   FAuthBearer.Free;
+  // Please notice, there is no free for ResponseInfo. It should be
+  // freed manual.
   inherited Destroy;
 end;
 
@@ -416,40 +420,6 @@ begin
   end;
 end;
 
-procedure TRequestObject.LoadToForm(form: TMainForm);
-var
-  bt: TBodyTab;
-begin
-  with form do begin
-    cbUrl.Text     := Url;
-    cbMethod.Text  := Method;
-    editOther.Text := Body;
-    editJson.Text  := Json;
-    editNotes.Text := Notes;
-
-    SetCollectionToGrid(Headers, requestHeaders);
-    SetCollectionToGrid(Cookies, gridReqCookie);
-    SetCollectionToGrid(Params, gridParams);
-    SetFormToGrid(gridForm);
-
-    SelectAuthTab(AuthType);
-    editBasicLogin.Text    := AuthBasic.Login;
-    editBasicPassword.Text := AuthBasic.Password;
-    editBearerPrefix.Text  := AuthBearer.Prefix;
-    editBearerToken.Text   := AuthBearer.Token;
-
-    // Set body tab depending on data.
-    if IsJson then
-       bt := btJson
-    else
-      if not Body.Trim.IsEmpty then
-        bt := btOther
-    else
-      bt := btForm;
-    SelectBodyTab(bt);
-  end;
-end;
-
 function TRequestObject.IsJson: Boolean;
 var
   i: integer;
@@ -459,6 +429,32 @@ begin
     if (LowerCase(FHeaders[i].Name) = 'content-type')
        and (AnsiStartsText('application/json', FHeaders[i].Value)) then
       Exit(True);
+end;
+
+function TRequestObject.ToJson: string;
+var
+  streamer: TJSONStreamer;
+begin
+  Result := '';
+  streamer := TJSONStreamer.Create(Nil);
+  try
+    Result := streamer.ObjectToJSONString(Self);
+  finally
+    streamer.Free;
+  end;
+end;
+
+class function TRequestObject.CreateFromJson(json: string): TRequestObject;
+var
+  streamer: TJSONDeStreamer;
+begin
+  streamer := TJSONDeStreamer.Create(nil);
+  try
+    Result := TRequestObject.Create;
+    streamer.JSONToObject(json, Result);
+  finally
+    streamer.Free;
+  end;
 end;
 
 end.

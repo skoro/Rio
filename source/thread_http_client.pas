@@ -163,9 +163,16 @@ function DecodeUrl(const url: string): string;
 function GetURLQueryParams(const url: string): TQueryParams;
 function ReplaceURLQueryParams(const url: string; Params: TQueryParams): string;
 function SplitMimeType(const ContentType: string): TMimeType;
+
 // Appends 'http:' proto to the url if it missing.
 function NormalizeUrl(Url: string): string;
+
 function ParseContentType(Headers: TStrings): string;
+
+// Generate filename from the url and content type.
+// If parameter 'DefExt' is empty then extension will be detected depending on
+// the document.
+function GetRequestFilename(Url: string; ContentType: string = ''; DefExt: string = ''): string;
 
 implementation
 
@@ -268,6 +275,30 @@ begin
         Result := Trim(LeftStr(Result, P - 1));
     end;
   end;
+end;
+
+function GetRequestFilename(Url, ContentType: string; DefExt: string): string;
+var
+  uri: TURI;
+  basename: string;
+begin
+  uri := ParseURI(NormalizeUrl(Url));
+  if (ContentType <> '') and (DefExt = '') then begin
+    DefExt := RightStr(ContentType, Length(ContentType) - Pos('/', ContentType));
+    // Get extension name from strings like 'rss+xml', etc.
+    DefExt := RightStr(DefExt, Length(DefExt) - Pos('+', DefExt));
+  end;
+  basename := TrimSet(uri.Document, ['/']);
+  if basename = '' then
+    basename := uri.Host;
+  // Strip extension from a document name (mainly for images).
+  if RightStr(basename, Length(DefExt) + 1) = '.' + DefExt then
+    basename := LeftStr(basename, Length(basename) - Length(DefExt) - 1);
+  // Don't append a content type extension to a jpeg image if the image
+  // already contains the extension.
+  if (ContentType = 'image/jpeg') and (RightStr(basename, 4) = '.jpg') then
+    Exit(basename);
+  Result := IfThen(DefExt <> '', Format('%s.%s', [basename, DefExt]), basename);
 end;
 
 { TTimeProfiler }

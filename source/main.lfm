@@ -1,11 +1,11 @@
 object MainForm: TMainForm
-  Left = 326
+  Left = 327
   Height = 614
-  Top = 41
-  Width = 565
+  Top = 109
+  Width = 579
   Caption = 'HTTP request inspector'
   ClientHeight = 591
-  ClientWidth = 565
+  ClientWidth = 579
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
     0000400000000100200000000000001000006400000064000000000000000000
@@ -151,1284 +151,11 @@ object MainForm: TMainForm
   OnShow = FormShow
   SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;Left;Top;Width;LayoutSplitter.Position'
   LCLVersion = '1.8.4.0'
-  object LayoutSplitter: TPairSplitter
-    Cursor = crVSplit
-    Left = 0
-    Height = 524
-    Top = 37
-    Width = 565
-    Align = alClient
-    Position = 220
-    SplitterType = pstVertical
-    object splitterSideRequest: TPairSplitterSide
-      Cursor = crArrow
-      Left = 0
-      Height = 220
-      Top = 0
-      Width = 565
-      ClientWidth = 565
-      ClientHeight = 220
-      object panelRequest: TPanel
-        Left = 4
-        Height = 212
-        Top = 4
-        Width = 557
-        Align = alClient
-        BorderSpacing.Around = 4
-        BevelOuter = bvNone
-        ClientHeight = 212
-        ClientWidth = 557
-        TabOrder = 0
-        object pagesRequest: TPageControl
-          Left = 0
-          Height = 212
-          Top = 0
-          Width = 557
-          ActivePage = tabNotes
-          Align = alClient
-          Anchors = [akLeft, akRight, akBottom]
-          TabIndex = 5
-          TabOrder = 0
-          object tabHeaders: TTabSheet
-            Caption = 'Headers'
-            ClientHeight = 181
-            ClientWidth = 553
-            object requestHeaders: TStringGrid
-              Left = 0
-              Height = 151
-              Top = 26
-              Width = 551
-              Align = alClient
-              BorderStyle = bsNone
-              ColCount = 3
-              ColumnClickSorts = True
-              Columns = <              
-                item
-                  ButtonStyle = cbsCheckboxColumn
-                  MaxSize = 32
-                  Title.Caption = ''
-                  Width = 32
-                end              
-                item
-                  ButtonStyle = cbsPickList
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Header'
-                  Width = 267
-                end              
-                item
-                  ButtonStyle = cbsPickList
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Value'
-                  Width = 268
-                end>
-              FixedCols = 0
-              Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
-              PopupMenu = popupGridActions
-              RowCount = 2
-              TabOrder = 0
-              TitleStyle = tsNative
-              OnBeforeSelection = requestHeadersBeforeSelection
-              OnColRowInserted = gridColRowInserted
-              ColWidths = (
-                32
-                267
-                268
-              )
-            end
-            object gnavHeaders: TGridNavigator
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 551
-              Caption = 'gnavHeaders'
-              EdgeBorders = []
-              ShowCaptions = True
-              TabOrder = 1
-              Grid = requestHeaders
-              OnNewRow = OnGridNewRow
-              OnEditRow = OnGridEditRow
-              OnDeleteRow = OnGridDeleteRow
-              OnGridClear = OnGridClear
-              ShowNavButtons = True
-              object ToolButton1: TToolButton
-                Left = 146
-                Height = 5
-                Top = 0
-                Caption = 'ToolButton1'
-                Style = tbsDivider
-              end
-              object tbtnManageHeaders: TToolButton
-                Left = 151
-                Top = 0
-                Caption = 'Manage'
-                OnClick = tbtnManageHeadersClick
-              end
-              object tbtnSaveHeader: TToolButton
-                Left = 205
-                Top = 0
-                Caption = 'Save header'
-                OnClick = tbtnSaveHeaderClick
-              end
-            end
-          end
-          object tabQuery: TTabSheet
-            Caption = 'Query'
-            ClientHeight = 181
-            ClientWidth = 553
-            object gridParams: TStringGrid
-              Left = 0
-              Height = 152
-              Top = 26
-              Width = 551
-              Align = alClient
-              BorderStyle = bsNone
-              ColCount = 3
-              ColumnClickSorts = True
-              Columns = <              
-                item
-                  ButtonStyle = cbsCheckboxColumn
-                  MaxSize = 32
-                  Title.Caption = ''
-                  Width = 32
-                end              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Name'
-                  Width = 128
-                end              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Value'
-                  Width = 256
-                end>
-              FixedCols = 0
-              Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
-              PopupMenu = popupGridActions
-              RowCount = 2
-              TabOrder = 0
-              TitleStyle = tsNative
-              OnCheckboxToggled = gridParamsCheckboxToggled
-              OnColRowInserted = gridColRowInserted
-              OnEditingDone = gridParamsEditingDone
-            end
-            object gnavParams: TGridNavigator
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 551
-              Caption = 'gnavParams'
-              EdgeBorders = []
-              ShowCaptions = True
-              TabOrder = 1
-              Grid = gridParams
-              OnNewRow = OnGridNewRow
-              OnEditRow = OnGridEditRow
-              OnDeleteRow = OnGridDeleteRow
-              OnGridClear = OnGridClear
-              ShowNavButtons = True
-            end
-          end
-          object tabBody: TTabSheet
-            Caption = 'Body'
-            ClientHeight = 181
-            ClientWidth = 553
-            object pagesBody: TPageControl
-              Left = 0
-              Height = 152
-              Top = 26
-              Width = 551
-              ActivePage = tabBodyJson
-              Align = alClient
-              ShowTabs = False
-              TabIndex = 0
-              TabOrder = 0
-              object tabBodyJson: TTabSheet
-                Caption = 'tabBodyJson'
-                ClientHeight = 148
-                ClientWidth = 547
-                inline editJson: TSynEdit
-                  Left = 0
-                  Height = 146
-                  Top = 0
-                  Width = 545
-                  Align = alClient
-                  Font.Height = 13
-                  Font.Name = 'DejaVu Sans Mono'
-                  Font.Pitch = fpFixed
-                  Font.Quality = fqNonAntialiased
-                  ParentColor = False
-                  ParentFont = False
-                  TabOrder = 0
-                  BorderStyle = bsNone
-                  Gutter.Width = 10
-                  Gutter.MouseActions = <>
-                  RightGutter.Width = 0
-                  RightGutter.MouseActions = <>
-                  Highlighter = synJS
-                  Keystrokes = <                  
-                    item
-                      Command = ecUp
-                      ShortCut = 38
-                    end                  
-                    item
-                      Command = ecSelUp
-                      ShortCut = 8230
-                    end                  
-                    item
-                      Command = ecScrollUp
-                      ShortCut = 16422
-                    end                  
-                    item
-                      Command = ecDown
-                      ShortCut = 40
-                    end                  
-                    item
-                      Command = ecSelDown
-                      ShortCut = 8232
-                    end                  
-                    item
-                      Command = ecScrollDown
-                      ShortCut = 16424
-                    end                  
-                    item
-                      Command = ecLeft
-                      ShortCut = 37
-                    end                  
-                    item
-                      Command = ecSelLeft
-                      ShortCut = 8229
-                    end                  
-                    item
-                      Command = ecWordLeft
-                      ShortCut = 16421
-                    end                  
-                    item
-                      Command = ecSelWordLeft
-                      ShortCut = 24613
-                    end                  
-                    item
-                      Command = ecRight
-                      ShortCut = 39
-                    end                  
-                    item
-                      Command = ecSelRight
-                      ShortCut = 8231
-                    end                  
-                    item
-                      Command = ecWordRight
-                      ShortCut = 16423
-                    end                  
-                    item
-                      Command = ecSelWordRight
-                      ShortCut = 24615
-                    end                  
-                    item
-                      Command = ecPageDown
-                      ShortCut = 34
-                    end                  
-                    item
-                      Command = ecSelPageDown
-                      ShortCut = 8226
-                    end                  
-                    item
-                      Command = ecPageBottom
-                      ShortCut = 16418
-                    end                  
-                    item
-                      Command = ecSelPageBottom
-                      ShortCut = 24610
-                    end                  
-                    item
-                      Command = ecPageUp
-                      ShortCut = 33
-                    end                  
-                    item
-                      Command = ecSelPageUp
-                      ShortCut = 8225
-                    end                  
-                    item
-                      Command = ecPageTop
-                      ShortCut = 16417
-                    end                  
-                    item
-                      Command = ecSelPageTop
-                      ShortCut = 24609
-                    end                  
-                    item
-                      Command = ecLineStart
-                      ShortCut = 36
-                    end                  
-                    item
-                      Command = ecSelLineStart
-                      ShortCut = 8228
-                    end                  
-                    item
-                      Command = ecEditorTop
-                      ShortCut = 16420
-                    end                  
-                    item
-                      Command = ecSelEditorTop
-                      ShortCut = 24612
-                    end                  
-                    item
-                      Command = ecLineEnd
-                      ShortCut = 35
-                    end                  
-                    item
-                      Command = ecSelLineEnd
-                      ShortCut = 8227
-                    end                  
-                    item
-                      Command = ecEditorBottom
-                      ShortCut = 16419
-                    end                  
-                    item
-                      Command = ecSelEditorBottom
-                      ShortCut = 24611
-                    end                  
-                    item
-                      Command = ecToggleMode
-                      ShortCut = 45
-                    end                  
-                    item
-                      Command = ecCopy
-                      ShortCut = 16429
-                    end                  
-                    item
-                      Command = ecPaste
-                      ShortCut = 8237
-                    end                  
-                    item
-                      Command = ecDeleteChar
-                      ShortCut = 46
-                    end                  
-                    item
-                      Command = ecCut
-                      ShortCut = 8238
-                    end                  
-                    item
-                      Command = ecDeleteLastChar
-                      ShortCut = 8
-                    end                  
-                    item
-                      Command = ecDeleteLastChar
-                      ShortCut = 8200
-                    end                  
-                    item
-                      Command = ecDeleteLastWord
-                      ShortCut = 16392
-                    end                  
-                    item
-                      Command = ecUndo
-                      ShortCut = 32776
-                    end                  
-                    item
-                      Command = ecRedo
-                      ShortCut = 40968
-                    end                  
-                    item
-                      Command = ecLineBreak
-                      ShortCut = 13
-                    end                  
-                    item
-                      Command = ecSelectAll
-                      ShortCut = 16449
-                    end                  
-                    item
-                      Command = ecCopy
-                      ShortCut = 16451
-                    end                  
-                    item
-                      Command = ecBlockIndent
-                      ShortCut = 24649
-                    end                  
-                    item
-                      Command = ecLineBreak
-                      ShortCut = 16461
-                    end                  
-                    item
-                      Command = ecInsertLine
-                      ShortCut = 16462
-                    end                  
-                    item
-                      Command = ecDeleteWord
-                      ShortCut = 16468
-                    end                  
-                    item
-                      Command = ecBlockUnindent
-                      ShortCut = 24661
-                    end                  
-                    item
-                      Command = ecPaste
-                      ShortCut = 16470
-                    end                  
-                    item
-                      Command = ecCut
-                      ShortCut = 16472
-                    end                  
-                    item
-                      Command = ecDeleteLine
-                      ShortCut = 16473
-                    end                  
-                    item
-                      Command = ecDeleteEOL
-                      ShortCut = 24665
-                    end                  
-                    item
-                      Command = ecUndo
-                      ShortCut = 16474
-                    end                  
-                    item
-                      Command = ecRedo
-                      ShortCut = 24666
-                    end                  
-                    item
-                      Command = ecGotoMarker0
-                      ShortCut = 16432
-                    end                  
-                    item
-                      Command = ecGotoMarker1
-                      ShortCut = 16433
-                    end                  
-                    item
-                      Command = ecGotoMarker2
-                      ShortCut = 16434
-                    end                  
-                    item
-                      Command = ecGotoMarker3
-                      ShortCut = 16435
-                    end                  
-                    item
-                      Command = ecGotoMarker4
-                      ShortCut = 16436
-                    end                  
-                    item
-                      Command = ecGotoMarker5
-                      ShortCut = 16437
-                    end                  
-                    item
-                      Command = ecGotoMarker6
-                      ShortCut = 16438
-                    end                  
-                    item
-                      Command = ecGotoMarker7
-                      ShortCut = 16439
-                    end                  
-                    item
-                      Command = ecGotoMarker8
-                      ShortCut = 16440
-                    end                  
-                    item
-                      Command = ecGotoMarker9
-                      ShortCut = 16441
-                    end                  
-                    item
-                      Command = ecSetMarker0
-                      ShortCut = 24624
-                    end                  
-                    item
-                      Command = ecSetMarker1
-                      ShortCut = 24625
-                    end                  
-                    item
-                      Command = ecSetMarker2
-                      ShortCut = 24626
-                    end                  
-                    item
-                      Command = ecSetMarker3
-                      ShortCut = 24627
-                    end                  
-                    item
-                      Command = ecSetMarker4
-                      ShortCut = 24628
-                    end                  
-                    item
-                      Command = ecSetMarker5
-                      ShortCut = 24629
-                    end                  
-                    item
-                      Command = ecSetMarker6
-                      ShortCut = 24630
-                    end                  
-                    item
-                      Command = ecSetMarker7
-                      ShortCut = 24631
-                    end                  
-                    item
-                      Command = ecSetMarker8
-                      ShortCut = 24632
-                    end                  
-                    item
-                      Command = ecSetMarker9
-                      ShortCut = 24633
-                    end                  
-                    item
-                      Command = EcFoldLevel1
-                      ShortCut = 41009
-                    end                  
-                    item
-                      Command = EcFoldLevel2
-                      ShortCut = 41010
-                    end                  
-                    item
-                      Command = EcFoldLevel3
-                      ShortCut = 41011
-                    end                  
-                    item
-                      Command = EcFoldLevel4
-                      ShortCut = 41012
-                    end                  
-                    item
-                      Command = EcFoldLevel5
-                      ShortCut = 41013
-                    end                  
-                    item
-                      Command = EcFoldLevel6
-                      ShortCut = 41014
-                    end                  
-                    item
-                      Command = EcFoldLevel7
-                      ShortCut = 41015
-                    end                  
-                    item
-                      Command = EcFoldLevel8
-                      ShortCut = 41016
-                    end                  
-                    item
-                      Command = EcFoldLevel9
-                      ShortCut = 41017
-                    end                  
-                    item
-                      Command = EcFoldLevel0
-                      ShortCut = 41008
-                    end                  
-                    item
-                      Command = EcFoldCurrent
-                      ShortCut = 41005
-                    end                  
-                    item
-                      Command = EcUnFoldCurrent
-                      ShortCut = 41003
-                    end                  
-                    item
-                      Command = EcToggleMarkupWord
-                      ShortCut = 32845
-                    end                  
-                    item
-                      Command = ecNormalSelect
-                      ShortCut = 24654
-                    end                  
-                    item
-                      Command = ecColumnSelect
-                      ShortCut = 24643
-                    end                  
-                    item
-                      Command = ecLineSelect
-                      ShortCut = 24652
-                    end                  
-                    item
-                      Command = ecTab
-                      ShortCut = 9
-                    end                  
-                    item
-                      Command = ecShiftTab
-                      ShortCut = 8201
-                    end                  
-                    item
-                      Command = ecMatchBracket
-                      ShortCut = 24642
-                    end                  
-                    item
-                      Command = ecColSelUp
-                      ShortCut = 40998
-                    end                  
-                    item
-                      Command = ecColSelDown
-                      ShortCut = 41000
-                    end                  
-                    item
-                      Command = ecColSelLeft
-                      ShortCut = 40997
-                    end                  
-                    item
-                      Command = ecColSelRight
-                      ShortCut = 40999
-                    end                  
-                    item
-                      Command = ecColSelPageDown
-                      ShortCut = 40994
-                    end                  
-                    item
-                      Command = ecColSelPageBottom
-                      ShortCut = 57378
-                    end                  
-                    item
-                      Command = ecColSelPageUp
-                      ShortCut = 40993
-                    end                  
-                    item
-                      Command = ecColSelPageTop
-                      ShortCut = 57377
-                    end                  
-                    item
-                      Command = ecColSelLineStart
-                      ShortCut = 40996
-                    end                  
-                    item
-                      Command = ecColSelLineEnd
-                      ShortCut = 40995
-                    end                  
-                    item
-                      Command = ecColSelEditorTop
-                      ShortCut = 57380
-                    end                  
-                    item
-                      Command = ecColSelEditorBottom
-                      ShortCut = 57379
-                    end>
-                  MouseActions = <>
-                  MouseTextActions = <>
-                  MouseSelActions = <>
-                  Options = [eoAutoIndent, eoBracketHighlight, eoGroupUndo, eoScrollPastEol, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
-                  VisibleSpecialChars = [vscSpace, vscTabAtLast]
-                  SelectedColor.BackPriority = 50
-                  SelectedColor.ForePriority = 50
-                  SelectedColor.FramePriority = 50
-                  SelectedColor.BoldPriority = 50
-                  SelectedColor.ItalicPriority = 50
-                  SelectedColor.UnderlinePriority = 50
-                  SelectedColor.StrikeOutPriority = 50
-                  BracketHighlightStyle = sbhsBoth
-                  BracketMatchColor.Background = clNone
-                  BracketMatchColor.Foreground = clNone
-                  BracketMatchColor.Style = [fsBold]
-                  FoldedCodeColor.Background = clNone
-                  FoldedCodeColor.Foreground = clGray
-                  FoldedCodeColor.FrameColor = clGray
-                  MouseLinkColor.Background = clNone
-                  MouseLinkColor.Foreground = clBlue
-                  LineHighlightColor.Background = clNone
-                  LineHighlightColor.Foreground = clNone
-                  inline SynLeftGutterPartList1: TSynGutterPartList
-                    object SynGutterCodeFolding1: TSynGutterCodeFolding
-                      AutoSize = False
-                      MouseActions = <>
-                      MarkupInfo.Background = clNone
-                      MarkupInfo.Foreground = clGray
-                      MouseActionsExpanded = <>
-                      MouseActionsCollapsed = <>
-                    end
-                    object SynGutterLineNumber1: TSynGutterLineNumber
-                      Width = 17
-                      Visible = False
-                      MouseActions = <>
-                      MarkupInfo.Background = clBtnFace
-                      MarkupInfo.Foreground = clNone
-                      DigitCount = 2
-                      ShowOnlyLineNumbersMultiplesOf = 1
-                      ZeroStart = False
-                      LeadingZeros = False
-                    end
-                  end
-                end
-              end
-              object tabBodyForm: TTabSheet
-                Caption = 'tabBodyForm'
-                ClientHeight = 148
-                ClientWidth = 547
-                object gridForm: TStringGrid
-                  Left = 0
-                  Height = 149
-                  Top = 0
-                  Width = 549
-                  Align = alClient
-                  BorderStyle = bsNone
-                  ColCount = 4
-                  ColumnClickSorts = True
-                  Columns = <                  
-                    item
-                      ButtonStyle = cbsCheckboxColumn
-                      MaxSize = 32
-                      Title.Caption = ''
-                      Width = 32
-                    end                  
-                    item
-                      Title.Font.Style = [fsBold]
-                      Title.Caption = 'Name'
-                      Width = 259
-                    end                  
-                    item
-                      Title.Font.Style = [fsBold]
-                      Title.Caption = 'Value'
-                      Width = 259
-                    end                  
-                    item
-                      ButtonStyle = cbsPickList
-                      PickList.Strings = (
-                        'Text'
-                        'File'
-                      )
-                      Title.Font.Style = [fsBold]
-                      Title.Caption = 'Type'
-                      Width = 64
-                    end>
-                  FixedCols = 0
-                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
-                  PopupMenu = popupGridActions
-                  RowCount = 2
-                  TabOrder = 0
-                  TitleStyle = tsNative
-                  OnColRowInserted = gridColRowInserted
-                  OnSelectEditor = gridFormSelectEditor
-                  ColWidths = (
-                    32
-                    259
-                    259
-                    64
-                  )
-                end
-              end
-              object tabBodyOther: TTabSheet
-                Caption = 'tabBodyOther'
-                ClientHeight = 148
-                ClientWidth = 547
-                object editOther: TMemo
-                  Left = 0
-                  Height = 152
-                  Top = 0
-                  Width = 549
-                  Align = alClient
-                  BorderStyle = bsNone
-                  ScrollBars = ssAutoBoth
-                  TabOrder = 0
-                end
-              end
-            end
-            object gnavBody: TGridNavigator
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 551
-              Caption = 'gnavBody'
-              EdgeBorders = []
-              ShowCaptions = True
-              TabOrder = 1
-              Grid = gridForm
-              OnNewRow = OnGridNewRow
-              OnEditRow = OnGridEditRow
-              OnDeleteRow = OnGridDeleteRow
-              OnGridClear = OnGridClear
-              ShowNavButtons = True
-              object tbtnBodyType: TToolButton
-                Left = 150
-                Top = 0
-                Caption = 'tbtnBodyType'
-                DropdownMenu = pmBodyType
-                Style = tbsButtonDrop
-              end
-              object tbtnBodyFormat: TToolButton
-                Left = 254
-                Top = 0
-                Caption = 'Format'
-                OnClick = tbtnBodyFormatClick
-              end
-              object tbtnFormUpload: TToolButton
-                Left = 305
-                Top = 0
-                Caption = 'Upload'
-                OnClick = tbtnFormUploadClick
-              end
-              object tbtnJsonLoad: TToolButton
-                Left = 356
-                Top = 0
-                Caption = 'Load'
-                OnClick = tbtnJsonLoadClick
-              end
-            end
-          end
-          object tabReqCookie: TTabSheet
-            Caption = 'Cookie'
-            ClientHeight = 181
-            ClientWidth = 553
-            object gridReqCookie: TStringGrid
-              Left = 0
-              Height = 152
-              Top = 26
-              Width = 551
-              Align = alClient
-              BorderStyle = bsNone
-              ColCount = 3
-              ColumnClickSorts = True
-              Columns = <              
-                item
-                  ButtonStyle = cbsCheckboxColumn
-                  MaxSize = 32
-                  Title.Caption = ''
-                  Width = 32
-                end              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Name'
-                  Width = 179
-                end              
-                item
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Value'
-                  Width = 181
-                end>
-              FixedCols = 0
-              Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
-              PopupMenu = popupGridActions
-              RowCount = 2
-              TabOrder = 0
-              TitleStyle = tsNative
-              ColWidths = (
-                32
-                179
-                181
-              )
-            end
-            object gnavCookie: TGridNavigator
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 551
-              Caption = 'gnavCookie'
-              EdgeBorders = []
-              ShowCaptions = True
-              TabOrder = 1
-              Grid = gridReqCookie
-              OnNewRow = OnGridNewRow
-              OnEditRow = OnGridEditRow
-              OnDeleteRow = OnGridDeleteRow
-              OnGridClear = OnGridClear
-              ShowNavButtons = True
-            end
-          end
-          object tabAuth: TTabSheet
-            Caption = 'Auth'
-            ClientHeight = 181
-            ClientWidth = 553
-            object toolbarAuth: TToolBar
-              Left = 0
-              Height = 26
-              Top = 0
-              Width = 551
-              EdgeBorders = []
-              ShowCaptions = True
-              TabOrder = 0
-              object tbtnAuthType: TToolButton
-                Left = 1
-                Top = 0
-                Caption = 'tbtnAuthType'
-                DropdownMenu = pmAuthType
-                Style = tbsButtonDrop
-              end
-            end
-            object pagesAuth: TPageControl
-              Left = 0
-              Height = 152
-              Top = 26
-              Width = 551
-              ActivePage = tabAuthBearer
-              Align = alClient
-              ShowTabs = False
-              TabIndex = 1
-              TabOrder = 1
-              object tabAuthBasic: TTabSheet
-                Caption = 'Basic'
-                ClientHeight = 148
-                ClientWidth = 547
-                object ScrollBox1: TScrollBox
-                  Left = 0
-                  Height = 149
-                  Top = 0
-                  Width = 549
-                  HorzScrollBar.Page = 232
-                  VertScrollBar.Page = 133
-                  Align = alClient
-                  BorderStyle = bsNone
-                  ClientHeight = 149
-                  ClientWidth = 549
-                  Color = clNone
-                  ParentColor = False
-                  TabOrder = 0
-                  object editBasicLogin: TLabeledEdit
-                    Left = 8
-                    Height = 29
-                    Top = 24
-                    Width = 224
-                    EditLabel.AnchorSideLeft.Control = editBasicLogin
-                    EditLabel.AnchorSideRight.Control = editBasicLogin
-                    EditLabel.AnchorSideRight.Side = asrBottom
-                    EditLabel.AnchorSideBottom.Control = editBasicLogin
-                    EditLabel.Left = 8
-                    EditLabel.Height = 19
-                    EditLabel.Top = 2
-                    EditLabel.Width = 224
-                    EditLabel.Caption = 'Login:'
-                    EditLabel.ParentColor = False
-                    TabOrder = 0
-                  end
-                  object editBasicPassword: TLabeledEdit
-                    Left = 8
-                    Height = 29
-                    Top = 80
-                    Width = 224
-                    EchoMode = emPassword
-                    EditLabel.AnchorSideLeft.Control = editBasicPassword
-                    EditLabel.AnchorSideRight.Control = editBasicPassword
-                    EditLabel.AnchorSideRight.Side = asrBottom
-                    EditLabel.AnchorSideBottom.Control = editBasicPassword
-                    EditLabel.Left = 8
-                    EditLabel.Height = 19
-                    EditLabel.Top = 58
-                    EditLabel.Width = 224
-                    EditLabel.Caption = 'Password:'
-                    EditLabel.ParentColor = False
-                    PasswordChar = '*'
-                    TabOrder = 1
-                  end
-                  object cbBasicShowPassword: TCheckBox
-                    Left = 8
-                    Height = 22
-                    Top = 112
-                    Width = 119
-                    Caption = 'Show password'
-                    OnClick = cbBasicShowPasswordClick
-                    TabOrder = 2
-                  end
-                end
-              end
-              object tabAuthBearer: TTabSheet
-                Caption = 'tabAuthBearer'
-                ClientHeight = 148
-                ClientWidth = 547
-                object ScrollBox2: TScrollBox
-                  Left = 0
-                  Height = 146
-                  Top = 0
-                  Width = 545
-                  HorzScrollBar.Page = 208
-                  VertScrollBar.Page = 105
-                  Align = alClient
-                  BorderStyle = bsNone
-                  ClientHeight = 146
-                  ClientWidth = 545
-                  Color = clNone
-                  ParentColor = False
-                  TabOrder = 0
-                  object editBearerToken: TLabeledEdit
-                    Left = 8
-                    Height = 26
-                    Top = 80
-                    Width = 532
-                    Anchors = [akTop, akLeft, akRight]
-                    EditLabel.AnchorSideLeft.Control = editBearerToken
-                    EditLabel.AnchorSideRight.Control = editBearerToken
-                    EditLabel.AnchorSideRight.Side = asrBottom
-                    EditLabel.AnchorSideBottom.Control = editBearerToken
-                    EditLabel.Left = 8
-                    EditLabel.Height = 16
-                    EditLabel.Top = 61
-                    EditLabel.Width = 532
-                    EditLabel.Caption = 'Token:'
-                    EditLabel.ParentColor = False
-                    TabOrder = 0
-                  end
-                  object editBearerPrefix: TLabeledEdit
-                    Left = 8
-                    Height = 26
-                    Top = 24
-                    Width = 200
-                    EditLabel.AnchorSideLeft.Control = editBearerPrefix
-                    EditLabel.AnchorSideRight.Control = editBearerPrefix
-                    EditLabel.AnchorSideRight.Side = asrBottom
-                    EditLabel.AnchorSideBottom.Control = editBearerPrefix
-                    EditLabel.Left = 8
-                    EditLabel.Height = 16
-                    EditLabel.Top = 5
-                    EditLabel.Width = 200
-                    EditLabel.Caption = 'Prefix:'
-                    EditLabel.ParentColor = False
-                    TabOrder = 1
-                    Text = 'Bearer'
-                  end
-                end
-              end
-            end
-          end
-          object tabNotes: TTabSheet
-            Caption = 'Notes'
-            ClientHeight = 181
-            ClientWidth = 553
-            object editNotes: TMemo
-              Left = 0
-              Height = 164
-              Top = 17
-              Width = 553
-              Align = alClient
-              ScrollBars = ssAutoBoth
-              TabOrder = 0
-            end
-            object lblDesc: TLabel
-              Left = 0
-              Height = 17
-              Top = 0
-              Width = 553
-              Align = alTop
-              Caption = 'Description:'
-              ParentColor = False
-            end
-          end
-        end
-      end
-    end
-    object splitterSideResponse: TPairSplitterSide
-      Cursor = crArrow
-      Left = 0
-      Height = 299
-      Top = 225
-      Width = 565
-      ClientWidth = 565
-      ClientHeight = 299
-      object panelResponse: TPanel
-        Left = 4
-        Height = 291
-        Top = 4
-        Width = 557
-        Align = alClient
-        BorderSpacing.Around = 4
-        BevelOuter = bvNone
-        ClientHeight = 291
-        ClientWidth = 557
-        TabOrder = 0
-        object pagesResponse: TPageControl
-          Left = 0
-          Height = 291
-          Top = 0
-          Width = 557
-          ActivePage = tabResponse
-          Align = alClient
-          TabIndex = 0
-          TabOrder = 0
-          OnChange = pagesResponseChange
-          object tabResponse: TTabSheet
-            Caption = 'Response'
-            ClientHeight = 260
-            ClientWidth = 553
-            object toolbarResponse: TToolBar
-              Left = 0
-              Height = 22
-              Top = 0
-              Width = 553
-              AutoSize = True
-              EdgeBorders = []
-              Images = toolbarIcons
-              List = True
-              ShowCaptions = True
-              TabOrder = 0
-              object tbtnRespList: TToolButton
-                Left = 1
-                Top = 0
-                AutoSize = True
-                Caption = 'List'
-                ImageIndex = 0
-                OnClick = tbtnRespViewClick
-              end
-              object tbtnRespText: TToolButton
-                Left = 46
-                Top = 0
-                AutoSize = True
-                Caption = 'Log'
-                ImageIndex = 1
-                OnClick = tbtnRespViewClick
-              end
-              object tbtnRespFollow: TToolButton
-                Left = 162
-                Top = 0
-                AutoSize = True
-                Caption = 'Follow'
-                ImageIndex = 2
-                OnClick = tbtnRespFollowClick
-                Visible = False
-              end
-              object tbtnRespTime: TToolButton
-                Left = 92
-                Top = 0
-                AutoSize = True
-                Caption = 'Timings'
-                ImageIndex = 3
-                OnClick = tbtnRespViewClick
-              end
-            end
-            object pagesRespView: TPageControl
-              Left = 0
-              Height = 238
-              Top = 22
-              Width = 553
-              ActivePage = tabRespText
-              Align = alClient
-              ShowTabs = False
-              TabIndex = 1
-              TabOrder = 1
-              object tabRespList: TTabSheet
-                Caption = 'tabRespList'
-                ClientHeight = 234
-                ClientWidth = 549
-                object responseHeaders: TStringGrid
-                  Left = 0
-                  Height = 234
-                  Top = 0
-                  Width = 549
-                  Align = alClient
-                  AutoEdit = False
-                  BorderStyle = bsNone
-                  ColCount = 2
-                  Columns = <                  
-                    item
-                      Title.Font.Style = [fsBold]
-                      Title.Caption = 'Header'
-                      Width = 273
-                    end                  
-                    item
-                      Title.Font.Style = [fsBold]
-                      Title.Caption = 'Value'
-                      Width = 274
-                    end>
-                  FixedCols = 0
-                  MouseWheelOption = mwGrid
-                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goTabs, goSmoothScroll, goRowHighlight]
-                  RowCount = 1
-                  TabOrder = 0
-                  TitleFont.Height = -13
-                  TitleFont.Name = 'Sans'
-                  TitleStyle = tsNative
-                  OnDblClick = gridEditDblClick
-                  ColWidths = (
-                    273
-                    274
-                  )
-                end
-              end
-              object tabRespText: TTabSheet
-                Caption = 'tabRespText'
-                ClientHeight = 234
-                ClientWidth = 549
-                object textResp: TMemo
-                  Left = 0
-                  Height = 234
-                  Top = 0
-                  Width = 549
-                  Align = alClient
-                  BorderStyle = bsNone
-                  ReadOnly = True
-                  ScrollBars = ssAutoBoth
-                  TabOrder = 0
-                end
-              end
-              object tabRespTime: TTabSheet
-                Caption = 'tabRespTime'
-              end
-            end
-          end
-          object tabRespCookie: TTabSheet
-            Caption = 'Cookie'
-            ClientHeight = 260
-            ClientWidth = 553
-            TabVisible = False
-            object gridRespCookie: TStringGrid
-              Left = 0
-              Height = 214
-              Top = 0
-              Width = 553
-              Align = alClient
-              BorderStyle = bsNone
-              ColCount = 9
-              ColumnClickSorts = True
-              Columns = <              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Name'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Value'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Domain'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Path'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Expires'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Size'
-                end              
-                item
-                  ButtonStyle = cbsCheckboxColumn
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Http'
-                end              
-                item
-                  ButtonStyle = cbsCheckboxColumn
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'Secure'
-                end              
-                item
-                  ReadOnly = True
-                  Title.Font.Style = [fsBold]
-                  Title.Caption = 'SameSite'
-                end>
-              ExtendedSelect = False
-              FixedCols = 0
-              MouseWheelOption = mwGrid
-              Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goSmoothScroll, goRowHighlight]
-              RowCount = 2
-              TabOrder = 0
-              TitleStyle = tsNative
-              OnDblClick = gridRespCookieDblClick
-            end
-          end
-          object tabContent: TTabSheet
-            Caption = 'Content'
-            ClientHeight = 260
-            ClientWidth = 553
-            object responseRaw: TMemo
-              Left = 0
-              Height = 260
-              Top = 0
-              Width = 553
-              Align = alClient
-              BorderStyle = bsNone
-              ReadOnly = True
-              ScrollBars = ssAutoBoth
-              TabOrder = 0
-            end
-          end
-        end
-      end
-    end
-  end
   object panelUrl: TPanel
     Left = 4
-    Height = 29
+    Height = 27
     Top = 4
-    Width = 557
+    Width = 571
     Align = alTop
     AutoSize = True
     BorderSpacing.Left = 4
@@ -1436,14 +163,15 @@ object MainForm: TMainForm
     BorderSpacing.Right = 4
     BorderSpacing.Bottom = 4
     BevelOuter = bvNone
-    ClientHeight = 29
-    ClientWidth = 557
-    TabOrder = 1
+    ClientHeight = 27
+    ClientWidth = 571
+    TabOrder = 0
     object cbMethod: TComboBox
       Left = 0
       Height = 27
       Top = 0
       Width = 100
+      Align = alLeft
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       ItemHeight = 0
@@ -1460,11 +188,11 @@ object MainForm: TMainForm
       Text = 'GET'
     end
     object cbUrl: TComboBox
-      Left = 104
+      Left = 100
       Height = 27
       Top = 0
-      Width = 373
-      Anchors = [akTop, akLeft, akRight]
+      Width = 390
+      Align = alClient
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       ItemHeight = 0
@@ -1473,30 +201,39 @@ object MainForm: TMainForm
       TabOrder = 1
     end
     object btnSubmit: TButton
-      Left = 480
-      Height = 29
+      Left = 490
+      Height = 27
       Top = 0
-      Width = 75
-      Anchors = [akTop, akRight]
+      Width = 49
+      Align = alRight
+      AutoSize = True
       Caption = 'Submit'
       OnClick = btnSubmitClick
       TabOrder = 2
+    end
+    object btnBookmark: TSpeedButton
+      Left = 539
+      Height = 27
+      Top = 0
+      Width = 32
+      Align = alRight
+      OnClick = btnBookmarkClick
     end
   end
   object StatusPanel: TPanel
     Left = 4
     Height = 30
     Top = 561
-    Width = 557
+    Width = 571
     Align = alBottom
     BorderSpacing.Left = 4
     BorderSpacing.Right = 4
     BevelColor = clNone
     BevelOuter = bvNone
     ClientHeight = 30
-    ClientWidth = 557
+    ClientWidth = 571
     ParentColor = False
-    TabOrder = 2
+    TabOrder = 1
     object StatusTextMain: TLabel
       Left = 0
       Height = 30
@@ -1575,7 +312,7 @@ object MainForm: TMainForm
       ShowHint = True
     end
     object StatusTextInfo: TLabel
-      Left = 477
+      Left = 491
       Height = 30
       Top = 0
       Width = 80
@@ -1583,6 +320,1303 @@ object MainForm: TMainForm
       Caption = 'StatusTextInfo'
       Layout = tlCenter
       ParentColor = False
+    end
+  end
+  object AppSplitter: TPairSplitter
+    Left = 0
+    Height = 526
+    Top = 35
+    Width = 579
+    Align = alClient
+    Position = 145
+    object BookmarkSide: TPairSplitterSide
+      Cursor = crArrow
+      Left = 0
+      Height = 526
+      Top = 0
+      Width = 145
+    end
+    object WorkSide: TPairSplitterSide
+      Cursor = crArrow
+      Left = 150
+      Height = 526
+      Top = 0
+      Width = 429
+      ClientWidth = 429
+      ClientHeight = 526
+      object LayoutSplitter: TPairSplitter
+        Cursor = crVSplit
+        Left = 0
+        Height = 526
+        Top = 0
+        Width = 429
+        Align = alClient
+        Position = 220
+        SplitterType = pstVertical
+        object splitterSideRequest: TPairSplitterSide
+          Cursor = crArrow
+          Left = 0
+          Height = 220
+          Top = 0
+          Width = 429
+          ClientWidth = 429
+          ClientHeight = 220
+          object panelRequest: TPanel
+            Left = 4
+            Height = 212
+            Top = 4
+            Width = 421
+            Align = alClient
+            BorderSpacing.Around = 4
+            BevelOuter = bvNone
+            ClientHeight = 212
+            ClientWidth = 421
+            TabOrder = 0
+            object pagesRequest: TPageControl
+              Left = 0
+              Height = 212
+              Top = 0
+              Width = 421
+              ActivePage = tabAuth
+              Align = alClient
+              Anchors = [akLeft, akRight, akBottom]
+              TabIndex = 4
+              TabOrder = 0
+              object tabHeaders: TTabSheet
+                Caption = 'Headers'
+                ClientHeight = 181
+                ClientWidth = 417
+                object requestHeaders: TStringGrid
+                  Left = 0
+                  Height = 155
+                  Top = 26
+                  Width = 517
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ColCount = 3
+                  ColumnClickSorts = True
+                  Columns = <                  
+                    item
+                      ButtonStyle = cbsCheckboxColumn
+                      MaxSize = 32
+                      Title.Caption = ''
+                      Width = 32
+                    end                  
+                    item
+                      ButtonStyle = cbsPickList
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Header'
+                      Width = 267
+                    end                  
+                    item
+                      ButtonStyle = cbsPickList
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Value'
+                      Width = 268
+                    end>
+                  FixedCols = 0
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+                  PopupMenu = popupGridActions
+                  RowCount = 2
+                  TabOrder = 0
+                  TitleStyle = tsNative
+                  OnBeforeSelection = requestHeadersBeforeSelection
+                  OnColRowInserted = gridColRowInserted
+                  ColWidths = (
+                    32
+                    267
+                    268
+                  )
+                end
+                object gnavHeaders: TGridNavigator
+                  Left = 0
+                  Height = 26
+                  Top = 0
+                  Width = 517
+                  Caption = 'gnavHeaders'
+                  EdgeBorders = []
+                  ShowCaptions = True
+                  TabOrder = 1
+                  Grid = requestHeaders
+                  OnNewRow = OnGridNewRow
+                  OnEditRow = OnGridEditRow
+                  OnDeleteRow = OnGridDeleteRow
+                  OnGridClear = OnGridClear
+                  ShowNavButtons = True
+                  object ToolButton1: TToolButton
+                    Left = 146
+                    Height = 5
+                    Top = 0
+                    Caption = 'ToolButton1'
+                    Style = tbsDivider
+                  end
+                  object tbtnManageHeaders: TToolButton
+                    Left = 151
+                    Top = 0
+                    Caption = 'Manage'
+                    OnClick = tbtnManageHeadersClick
+                  end
+                  object tbtnSaveHeader: TToolButton
+                    Left = 205
+                    Top = 0
+                    Caption = 'Save header'
+                    OnClick = tbtnSaveHeaderClick
+                  end
+                end
+              end
+              object tabQuery: TTabSheet
+                Caption = 'Query'
+                ClientHeight = 181
+                ClientWidth = 417
+                object gridParams: TStringGrid
+                  Left = 0
+                  Height = 152
+                  Top = 26
+                  Width = 551
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ColCount = 3
+                  ColumnClickSorts = True
+                  Columns = <                  
+                    item
+                      ButtonStyle = cbsCheckboxColumn
+                      MaxSize = 32
+                      Title.Caption = ''
+                      Width = 32
+                    end                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Name'
+                      Width = 128
+                    end                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Value'
+                      Width = 256
+                    end>
+                  FixedCols = 0
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+                  PopupMenu = popupGridActions
+                  RowCount = 2
+                  TabOrder = 0
+                  TitleStyle = tsNative
+                  OnCheckboxToggled = gridParamsCheckboxToggled
+                  OnColRowInserted = gridColRowInserted
+                  OnEditingDone = gridParamsEditingDone
+                end
+                object gnavParams: TGridNavigator
+                  Left = 0
+                  Height = 26
+                  Top = 0
+                  Width = 551
+                  Caption = 'gnavParams'
+                  EdgeBorders = []
+                  ShowCaptions = True
+                  TabOrder = 1
+                  Grid = gridParams
+                  OnNewRow = OnGridNewRow
+                  OnEditRow = OnGridEditRow
+                  OnDeleteRow = OnGridDeleteRow
+                  OnGridClear = OnGridClear
+                  ShowNavButtons = True
+                end
+              end
+              object tabBody: TTabSheet
+                Caption = 'Body'
+                ClientHeight = 181
+                ClientWidth = 417
+                object pagesBody: TPageControl
+                  Left = 0
+                  Height = 152
+                  Top = 26
+                  Width = 551
+                  ActivePage = tabBodyJson
+                  Align = alClient
+                  ShowTabs = False
+                  TabIndex = 0
+                  TabOrder = 0
+                  object tabBodyJson: TTabSheet
+                    Caption = 'tabBodyJson'
+                    ClientHeight = 148
+                    ClientWidth = 547
+                    inline editJson: TSynEdit
+                      Left = 0
+                      Height = 146
+                      Top = 0
+                      Width = 545
+                      Align = alClient
+                      Font.Height = 13
+                      Font.Name = 'DejaVu Sans Mono'
+                      Font.Pitch = fpFixed
+                      Font.Quality = fqNonAntialiased
+                      ParentColor = False
+                      ParentFont = False
+                      TabOrder = 0
+                      BorderStyle = bsNone
+                      Gutter.Width = 10
+                      Gutter.MouseActions = <>
+                      RightGutter.Width = 0
+                      RightGutter.MouseActions = <>
+                      Highlighter = synJS
+                      Keystrokes = <                      
+                        item
+                          Command = ecUp
+                          ShortCut = 38
+                        end                      
+                        item
+                          Command = ecSelUp
+                          ShortCut = 8230
+                        end                      
+                        item
+                          Command = ecScrollUp
+                          ShortCut = 16422
+                        end                      
+                        item
+                          Command = ecDown
+                          ShortCut = 40
+                        end                      
+                        item
+                          Command = ecSelDown
+                          ShortCut = 8232
+                        end                      
+                        item
+                          Command = ecScrollDown
+                          ShortCut = 16424
+                        end                      
+                        item
+                          Command = ecLeft
+                          ShortCut = 37
+                        end                      
+                        item
+                          Command = ecSelLeft
+                          ShortCut = 8229
+                        end                      
+                        item
+                          Command = ecWordLeft
+                          ShortCut = 16421
+                        end                      
+                        item
+                          Command = ecSelWordLeft
+                          ShortCut = 24613
+                        end                      
+                        item
+                          Command = ecRight
+                          ShortCut = 39
+                        end                      
+                        item
+                          Command = ecSelRight
+                          ShortCut = 8231
+                        end                      
+                        item
+                          Command = ecWordRight
+                          ShortCut = 16423
+                        end                      
+                        item
+                          Command = ecSelWordRight
+                          ShortCut = 24615
+                        end                      
+                        item
+                          Command = ecPageDown
+                          ShortCut = 34
+                        end                      
+                        item
+                          Command = ecSelPageDown
+                          ShortCut = 8226
+                        end                      
+                        item
+                          Command = ecPageBottom
+                          ShortCut = 16418
+                        end                      
+                        item
+                          Command = ecSelPageBottom
+                          ShortCut = 24610
+                        end                      
+                        item
+                          Command = ecPageUp
+                          ShortCut = 33
+                        end                      
+                        item
+                          Command = ecSelPageUp
+                          ShortCut = 8225
+                        end                      
+                        item
+                          Command = ecPageTop
+                          ShortCut = 16417
+                        end                      
+                        item
+                          Command = ecSelPageTop
+                          ShortCut = 24609
+                        end                      
+                        item
+                          Command = ecLineStart
+                          ShortCut = 36
+                        end                      
+                        item
+                          Command = ecSelLineStart
+                          ShortCut = 8228
+                        end                      
+                        item
+                          Command = ecEditorTop
+                          ShortCut = 16420
+                        end                      
+                        item
+                          Command = ecSelEditorTop
+                          ShortCut = 24612
+                        end                      
+                        item
+                          Command = ecLineEnd
+                          ShortCut = 35
+                        end                      
+                        item
+                          Command = ecSelLineEnd
+                          ShortCut = 8227
+                        end                      
+                        item
+                          Command = ecEditorBottom
+                          ShortCut = 16419
+                        end                      
+                        item
+                          Command = ecSelEditorBottom
+                          ShortCut = 24611
+                        end                      
+                        item
+                          Command = ecToggleMode
+                          ShortCut = 45
+                        end                      
+                        item
+                          Command = ecCopy
+                          ShortCut = 16429
+                        end                      
+                        item
+                          Command = ecPaste
+                          ShortCut = 8237
+                        end                      
+                        item
+                          Command = ecDeleteChar
+                          ShortCut = 46
+                        end                      
+                        item
+                          Command = ecCut
+                          ShortCut = 8238
+                        end                      
+                        item
+                          Command = ecDeleteLastChar
+                          ShortCut = 8
+                        end                      
+                        item
+                          Command = ecDeleteLastChar
+                          ShortCut = 8200
+                        end                      
+                        item
+                          Command = ecDeleteLastWord
+                          ShortCut = 16392
+                        end                      
+                        item
+                          Command = ecUndo
+                          ShortCut = 32776
+                        end                      
+                        item
+                          Command = ecRedo
+                          ShortCut = 40968
+                        end                      
+                        item
+                          Command = ecLineBreak
+                          ShortCut = 13
+                        end                      
+                        item
+                          Command = ecSelectAll
+                          ShortCut = 16449
+                        end                      
+                        item
+                          Command = ecCopy
+                          ShortCut = 16451
+                        end                      
+                        item
+                          Command = ecBlockIndent
+                          ShortCut = 24649
+                        end                      
+                        item
+                          Command = ecLineBreak
+                          ShortCut = 16461
+                        end                      
+                        item
+                          Command = ecInsertLine
+                          ShortCut = 16462
+                        end                      
+                        item
+                          Command = ecDeleteWord
+                          ShortCut = 16468
+                        end                      
+                        item
+                          Command = ecBlockUnindent
+                          ShortCut = 24661
+                        end                      
+                        item
+                          Command = ecPaste
+                          ShortCut = 16470
+                        end                      
+                        item
+                          Command = ecCut
+                          ShortCut = 16472
+                        end                      
+                        item
+                          Command = ecDeleteLine
+                          ShortCut = 16473
+                        end                      
+                        item
+                          Command = ecDeleteEOL
+                          ShortCut = 24665
+                        end                      
+                        item
+                          Command = ecUndo
+                          ShortCut = 16474
+                        end                      
+                        item
+                          Command = ecRedo
+                          ShortCut = 24666
+                        end                      
+                        item
+                          Command = ecGotoMarker0
+                          ShortCut = 16432
+                        end                      
+                        item
+                          Command = ecGotoMarker1
+                          ShortCut = 16433
+                        end                      
+                        item
+                          Command = ecGotoMarker2
+                          ShortCut = 16434
+                        end                      
+                        item
+                          Command = ecGotoMarker3
+                          ShortCut = 16435
+                        end                      
+                        item
+                          Command = ecGotoMarker4
+                          ShortCut = 16436
+                        end                      
+                        item
+                          Command = ecGotoMarker5
+                          ShortCut = 16437
+                        end                      
+                        item
+                          Command = ecGotoMarker6
+                          ShortCut = 16438
+                        end                      
+                        item
+                          Command = ecGotoMarker7
+                          ShortCut = 16439
+                        end                      
+                        item
+                          Command = ecGotoMarker8
+                          ShortCut = 16440
+                        end                      
+                        item
+                          Command = ecGotoMarker9
+                          ShortCut = 16441
+                        end                      
+                        item
+                          Command = ecSetMarker0
+                          ShortCut = 24624
+                        end                      
+                        item
+                          Command = ecSetMarker1
+                          ShortCut = 24625
+                        end                      
+                        item
+                          Command = ecSetMarker2
+                          ShortCut = 24626
+                        end                      
+                        item
+                          Command = ecSetMarker3
+                          ShortCut = 24627
+                        end                      
+                        item
+                          Command = ecSetMarker4
+                          ShortCut = 24628
+                        end                      
+                        item
+                          Command = ecSetMarker5
+                          ShortCut = 24629
+                        end                      
+                        item
+                          Command = ecSetMarker6
+                          ShortCut = 24630
+                        end                      
+                        item
+                          Command = ecSetMarker7
+                          ShortCut = 24631
+                        end                      
+                        item
+                          Command = ecSetMarker8
+                          ShortCut = 24632
+                        end                      
+                        item
+                          Command = ecSetMarker9
+                          ShortCut = 24633
+                        end                      
+                        item
+                          Command = EcFoldLevel1
+                          ShortCut = 41009
+                        end                      
+                        item
+                          Command = EcFoldLevel2
+                          ShortCut = 41010
+                        end                      
+                        item
+                          Command = EcFoldLevel3
+                          ShortCut = 41011
+                        end                      
+                        item
+                          Command = EcFoldLevel4
+                          ShortCut = 41012
+                        end                      
+                        item
+                          Command = EcFoldLevel5
+                          ShortCut = 41013
+                        end                      
+                        item
+                          Command = EcFoldLevel6
+                          ShortCut = 41014
+                        end                      
+                        item
+                          Command = EcFoldLevel7
+                          ShortCut = 41015
+                        end                      
+                        item
+                          Command = EcFoldLevel8
+                          ShortCut = 41016
+                        end                      
+                        item
+                          Command = EcFoldLevel9
+                          ShortCut = 41017
+                        end                      
+                        item
+                          Command = EcFoldLevel0
+                          ShortCut = 41008
+                        end                      
+                        item
+                          Command = EcFoldCurrent
+                          ShortCut = 41005
+                        end                      
+                        item
+                          Command = EcUnFoldCurrent
+                          ShortCut = 41003
+                        end                      
+                        item
+                          Command = EcToggleMarkupWord
+                          ShortCut = 32845
+                        end                      
+                        item
+                          Command = ecNormalSelect
+                          ShortCut = 24654
+                        end                      
+                        item
+                          Command = ecColumnSelect
+                          ShortCut = 24643
+                        end                      
+                        item
+                          Command = ecLineSelect
+                          ShortCut = 24652
+                        end                      
+                        item
+                          Command = ecTab
+                          ShortCut = 9
+                        end                      
+                        item
+                          Command = ecShiftTab
+                          ShortCut = 8201
+                        end                      
+                        item
+                          Command = ecMatchBracket
+                          ShortCut = 24642
+                        end                      
+                        item
+                          Command = ecColSelUp
+                          ShortCut = 40998
+                        end                      
+                        item
+                          Command = ecColSelDown
+                          ShortCut = 41000
+                        end                      
+                        item
+                          Command = ecColSelLeft
+                          ShortCut = 40997
+                        end                      
+                        item
+                          Command = ecColSelRight
+                          ShortCut = 40999
+                        end                      
+                        item
+                          Command = ecColSelPageDown
+                          ShortCut = 40994
+                        end                      
+                        item
+                          Command = ecColSelPageBottom
+                          ShortCut = 57378
+                        end                      
+                        item
+                          Command = ecColSelPageUp
+                          ShortCut = 40993
+                        end                      
+                        item
+                          Command = ecColSelPageTop
+                          ShortCut = 57377
+                        end                      
+                        item
+                          Command = ecColSelLineStart
+                          ShortCut = 40996
+                        end                      
+                        item
+                          Command = ecColSelLineEnd
+                          ShortCut = 40995
+                        end                      
+                        item
+                          Command = ecColSelEditorTop
+                          ShortCut = 57380
+                        end                      
+                        item
+                          Command = ecColSelEditorBottom
+                          ShortCut = 57379
+                        end>
+                      MouseActions = <>
+                      MouseTextActions = <>
+                      MouseSelActions = <>
+                      Options = [eoAutoIndent, eoBracketHighlight, eoGroupUndo, eoScrollPastEol, eoTabIndent, eoTabsToSpaces, eoTrimTrailingSpaces]
+                      VisibleSpecialChars = [vscSpace, vscTabAtLast]
+                      SelectedColor.BackPriority = 50
+                      SelectedColor.ForePriority = 50
+                      SelectedColor.FramePriority = 50
+                      SelectedColor.BoldPriority = 50
+                      SelectedColor.ItalicPriority = 50
+                      SelectedColor.UnderlinePriority = 50
+                      SelectedColor.StrikeOutPriority = 50
+                      BracketHighlightStyle = sbhsBoth
+                      BracketMatchColor.Background = clNone
+                      BracketMatchColor.Foreground = clNone
+                      BracketMatchColor.Style = [fsBold]
+                      FoldedCodeColor.Background = clNone
+                      FoldedCodeColor.Foreground = clGray
+                      FoldedCodeColor.FrameColor = clGray
+                      MouseLinkColor.Background = clNone
+                      MouseLinkColor.Foreground = clBlue
+                      LineHighlightColor.Background = clNone
+                      LineHighlightColor.Foreground = clNone
+                      inline SynLeftGutterPartList1: TSynGutterPartList
+                        object SynGutterCodeFolding1: TSynGutterCodeFolding
+                          AutoSize = False
+                          MouseActions = <>
+                          MarkupInfo.Background = clNone
+                          MarkupInfo.Foreground = clGray
+                          MouseActionsExpanded = <>
+                          MouseActionsCollapsed = <>
+                        end
+                        object SynGutterLineNumber1: TSynGutterLineNumber
+                          Width = 17
+                          Visible = False
+                          MouseActions = <>
+                          MarkupInfo.Background = clBtnFace
+                          MarkupInfo.Foreground = clNone
+                          DigitCount = 2
+                          ShowOnlyLineNumbersMultiplesOf = 1
+                          ZeroStart = False
+                          LeadingZeros = False
+                        end
+                      end
+                    end
+                  end
+                  object tabBodyForm: TTabSheet
+                    Caption = 'tabBodyForm'
+                    ClientHeight = 148
+                    ClientWidth = 547
+                    object gridForm: TStringGrid
+                      Left = 0
+                      Height = 149
+                      Top = 0
+                      Width = 549
+                      Align = alClient
+                      BorderStyle = bsNone
+                      ColCount = 4
+                      ColumnClickSorts = True
+                      Columns = <                      
+                        item
+                          ButtonStyle = cbsCheckboxColumn
+                          MaxSize = 32
+                          Title.Caption = ''
+                          Width = 32
+                        end                      
+                        item
+                          Title.Font.Style = [fsBold]
+                          Title.Caption = 'Name'
+                          Width = 259
+                        end                      
+                        item
+                          Title.Font.Style = [fsBold]
+                          Title.Caption = 'Value'
+                          Width = 259
+                        end                      
+                        item
+                          ButtonStyle = cbsPickList
+                          PickList.Strings = (
+                            'Text'
+                            'File'
+                          )
+                          Title.Font.Style = [fsBold]
+                          Title.Caption = 'Type'
+                          Width = 64
+                        end>
+                      FixedCols = 0
+                      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+                      PopupMenu = popupGridActions
+                      RowCount = 2
+                      TabOrder = 0
+                      TitleStyle = tsNative
+                      OnColRowInserted = gridColRowInserted
+                      OnSelectEditor = gridFormSelectEditor
+                      ColWidths = (
+                        32
+                        259
+                        259
+                        64
+                      )
+                    end
+                  end
+                  object tabBodyOther: TTabSheet
+                    Caption = 'tabBodyOther'
+                    ClientHeight = 148
+                    ClientWidth = 547
+                    object editOther: TMemo
+                      Left = 0
+                      Height = 152
+                      Top = 0
+                      Width = 549
+                      Align = alClient
+                      BorderStyle = bsNone
+                      ScrollBars = ssAutoBoth
+                      TabOrder = 0
+                    end
+                  end
+                end
+                object gnavBody: TGridNavigator
+                  Left = 0
+                  Height = 26
+                  Top = 0
+                  Width = 551
+                  Caption = 'gnavBody'
+                  EdgeBorders = []
+                  ShowCaptions = True
+                  TabOrder = 1
+                  Grid = gridForm
+                  OnNewRow = OnGridNewRow
+                  OnEditRow = OnGridEditRow
+                  OnDeleteRow = OnGridDeleteRow
+                  OnGridClear = OnGridClear
+                  ShowNavButtons = True
+                  object tbtnBodyType: TToolButton
+                    Left = 150
+                    Top = 0
+                    Caption = 'tbtnBodyType'
+                    DropdownMenu = pmBodyType
+                    Style = tbsButtonDrop
+                  end
+                  object tbtnBodyFormat: TToolButton
+                    Left = 254
+                    Top = 0
+                    Caption = 'Format'
+                    OnClick = tbtnBodyFormatClick
+                  end
+                  object tbtnFormUpload: TToolButton
+                    Left = 305
+                    Top = 0
+                    Caption = 'Upload'
+                    OnClick = tbtnFormUploadClick
+                  end
+                  object tbtnJsonLoad: TToolButton
+                    Left = 356
+                    Top = 0
+                    Caption = 'Load'
+                    OnClick = tbtnJsonLoadClick
+                  end
+                end
+              end
+              object tabReqCookie: TTabSheet
+                Caption = 'Cookie'
+                ClientHeight = 181
+                ClientWidth = 417
+                object gridReqCookie: TStringGrid
+                  Left = 0
+                  Height = 152
+                  Top = 26
+                  Width = 551
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ColCount = 3
+                  ColumnClickSorts = True
+                  Columns = <                  
+                    item
+                      ButtonStyle = cbsCheckboxColumn
+                      MaxSize = 32
+                      Title.Caption = ''
+                      Width = 32
+                    end                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Name'
+                      Width = 179
+                    end                  
+                    item
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Value'
+                      Width = 181
+                    end>
+                  FixedCols = 0
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
+                  PopupMenu = popupGridActions
+                  RowCount = 2
+                  TabOrder = 0
+                  TitleStyle = tsNative
+                  ColWidths = (
+                    32
+                    179
+                    181
+                  )
+                end
+                object gnavCookie: TGridNavigator
+                  Left = 0
+                  Height = 26
+                  Top = 0
+                  Width = 551
+                  Caption = 'gnavCookie'
+                  EdgeBorders = []
+                  ShowCaptions = True
+                  TabOrder = 1
+                  Grid = gridReqCookie
+                  OnNewRow = OnGridNewRow
+                  OnEditRow = OnGridEditRow
+                  OnDeleteRow = OnGridDeleteRow
+                  OnGridClear = OnGridClear
+                  ShowNavButtons = True
+                end
+              end
+              object tabAuth: TTabSheet
+                Caption = 'Auth'
+                ClientHeight = 181
+                ClientWidth = 417
+                object toolbarAuth: TToolBar
+                  Left = 0
+                  Height = 26
+                  Top = 0
+                  Width = 417
+                  EdgeBorders = []
+                  ShowCaptions = True
+                  TabOrder = 0
+                  object tbtnAuthType: TToolButton
+                    Left = 1
+                    Top = 0
+                    Caption = 'tbtnAuthType'
+                    DropdownMenu = pmAuthType
+                    Style = tbsButtonDrop
+                  end
+                end
+                object pagesAuth: TPageControl
+                  Left = 0
+                  Height = 155
+                  Top = 26
+                  Width = 417
+                  ActivePage = tabAuthBearer
+                  Align = alClient
+                  ShowTabs = False
+                  TabIndex = 1
+                  TabOrder = 1
+                  object tabAuthBasic: TTabSheet
+                    Caption = 'Basic'
+                    ClientHeight = 151
+                    ClientWidth = 413
+                    object ScrollBox1: TScrollBox
+                      Left = 0
+                      Height = 151
+                      Top = 0
+                      Width = 513
+                      HorzScrollBar.Page = 232
+                      VertScrollBar.Page = 133
+                      Align = alClient
+                      BorderStyle = bsNone
+                      ClientHeight = 151
+                      ClientWidth = 513
+                      Color = clNone
+                      ParentColor = False
+                      TabOrder = 0
+                      object editBasicLogin: TLabeledEdit
+                        Left = 8
+                        Height = 25
+                        Top = 24
+                        Width = 224
+                        EditLabel.AnchorSideLeft.Control = editBasicLogin
+                        EditLabel.AnchorSideRight.Control = editBasicLogin
+                        EditLabel.AnchorSideRight.Side = asrBottom
+                        EditLabel.AnchorSideBottom.Control = editBasicLogin
+                        EditLabel.Left = 8
+                        EditLabel.Height = 17
+                        EditLabel.Top = 4
+                        EditLabel.Width = 224
+                        EditLabel.Caption = 'Login:'
+                        EditLabel.ParentColor = False
+                        TabOrder = 0
+                      end
+                      object editBasicPassword: TLabeledEdit
+                        Left = 8
+                        Height = 25
+                        Top = 80
+                        Width = 224
+                        EchoMode = emPassword
+                        EditLabel.AnchorSideLeft.Control = editBasicPassword
+                        EditLabel.AnchorSideRight.Control = editBasicPassword
+                        EditLabel.AnchorSideRight.Side = asrBottom
+                        EditLabel.AnchorSideBottom.Control = editBasicPassword
+                        EditLabel.Left = 8
+                        EditLabel.Height = 17
+                        EditLabel.Top = 60
+                        EditLabel.Width = 224
+                        EditLabel.Caption = 'Password:'
+                        EditLabel.ParentColor = False
+                        PasswordChar = '*'
+                        TabOrder = 1
+                      end
+                      object cbBasicShowPassword: TCheckBox
+                        Left = 8
+                        Height = 22
+                        Top = 112
+                        Width = 111
+                        Caption = 'Show password'
+                        OnClick = cbBasicShowPasswordClick
+                        TabOrder = 2
+                      end
+                    end
+                  end
+                  object tabAuthBearer: TTabSheet
+                    Caption = 'tabAuthBearer'
+                    ClientHeight = 151
+                    ClientWidth = 413
+                    object ScrollBox2: TScrollBox
+                      Left = 0
+                      Height = 151
+                      Top = 0
+                      Width = 413
+                      HorzScrollBar.Page = 208
+                      VertScrollBar.Page = 105
+                      Align = alClient
+                      BorderStyle = bsNone
+                      ClientHeight = 151
+                      ClientWidth = 413
+                      Color = clNone
+                      ParentColor = False
+                      TabOrder = 0
+                      object editBearerToken: TLabeledEdit
+                        Left = 8
+                        Height = 25
+                        Top = 80
+                        Width = 400
+                        Anchors = [akTop, akLeft, akRight]
+                        EditLabel.AnchorSideLeft.Control = editBearerToken
+                        EditLabel.AnchorSideRight.Control = editBearerToken
+                        EditLabel.AnchorSideRight.Side = asrBottom
+                        EditLabel.AnchorSideBottom.Control = editBearerToken
+                        EditLabel.Left = 8
+                        EditLabel.Height = 17
+                        EditLabel.Top = 60
+                        EditLabel.Width = 400
+                        EditLabel.Caption = 'Token:'
+                        EditLabel.ParentColor = False
+                        TabOrder = 0
+                      end
+                      object editBearerPrefix: TLabeledEdit
+                        Left = 8
+                        Height = 25
+                        Top = 24
+                        Width = 200
+                        EditLabel.AnchorSideLeft.Control = editBearerPrefix
+                        EditLabel.AnchorSideRight.Control = editBearerPrefix
+                        EditLabel.AnchorSideRight.Side = asrBottom
+                        EditLabel.AnchorSideBottom.Control = editBearerPrefix
+                        EditLabel.Left = 8
+                        EditLabel.Height = 17
+                        EditLabel.Top = 4
+                        EditLabel.Width = 200
+                        EditLabel.Caption = 'Prefix:'
+                        EditLabel.ParentColor = False
+                        TabOrder = 1
+                        Text = 'Bearer'
+                      end
+                    end
+                  end
+                end
+              end
+              object tabNotes: TTabSheet
+                Caption = 'Notes'
+                ClientHeight = 181
+                ClientWidth = 417
+                object editNotes: TMemo
+                  Left = 0
+                  Height = 164
+                  Top = 17
+                  Width = 517
+                  Align = alClient
+                  ScrollBars = ssAutoBoth
+                  TabOrder = 0
+                end
+                object lblDesc: TLabel
+                  Left = 0
+                  Height = 17
+                  Top = 0
+                  Width = 517
+                  Align = alTop
+                  Caption = 'Description:'
+                  ParentColor = False
+                end
+              end
+            end
+          end
+        end
+        object splitterSideResponse: TPairSplitterSide
+          Cursor = crArrow
+          Left = 0
+          Height = 301
+          Top = 225
+          Width = 429
+          ClientWidth = 429
+          ClientHeight = 301
+          object panelResponse: TPanel
+            Left = 4
+            Height = 293
+            Top = 4
+            Width = 421
+            Align = alClient
+            BorderSpacing.Around = 4
+            BevelOuter = bvNone
+            ClientHeight = 293
+            ClientWidth = 421
+            TabOrder = 0
+            object pagesResponse: TPageControl
+              Left = 0
+              Height = 293
+              Top = 0
+              Width = 421
+              ActivePage = tabResponse
+              Align = alClient
+              TabIndex = 0
+              TabOrder = 0
+              OnChange = pagesResponseChange
+              object tabResponse: TTabSheet
+                Caption = 'Response'
+                ClientHeight = 262
+                ClientWidth = 417
+                object toolbarResponse: TToolBar
+                  Left = 0
+                  Height = 22
+                  Top = 0
+                  Width = 417
+                  AutoSize = True
+                  EdgeBorders = []
+                  Images = toolbarIcons
+                  List = True
+                  ShowCaptions = True
+                  TabOrder = 0
+                  object tbtnRespList: TToolButton
+                    Left = 1
+                    Top = 0
+                    AutoSize = True
+                    Caption = 'List'
+                    ImageIndex = 0
+                    OnClick = tbtnRespViewClick
+                  end
+                  object tbtnRespText: TToolButton
+                    Left = 46
+                    Top = 0
+                    AutoSize = True
+                    Caption = 'Text'
+                    ImageIndex = 1
+                    OnClick = tbtnRespViewClick
+                  end
+                  object tbtnRespFollow: TToolButton
+                    Left = 165
+                    Top = 0
+                    AutoSize = True
+                    Caption = 'Follow'
+                    ImageIndex = 2
+                    OnClick = tbtnRespFollowClick
+                    Visible = False
+                  end
+                  object tbtnRespTime: TToolButton
+                    Left = 95
+                    Top = 0
+                    AutoSize = True
+                    Caption = 'Timings'
+                    ImageIndex = 3
+                    OnClick = tbtnRespViewClick
+                  end
+                end
+                object pagesRespView: TPageControl
+                  Left = 0
+                  Height = 240
+                  Top = 22
+                  Width = 417
+                  ActivePage = tabRespList
+                  Align = alClient
+                  ShowTabs = False
+                  TabIndex = 0
+                  TabOrder = 1
+                  object tabRespList: TTabSheet
+                    Caption = 'tabRespList'
+                    ClientHeight = 236
+                    ClientWidth = 413
+                    object responseHeaders: TStringGrid
+                      Left = 0
+                      Height = 236
+                      Top = 0
+                      Width = 413
+                      Align = alClient
+                      AutoEdit = False
+                      BorderStyle = bsNone
+                      ColCount = 2
+                      Columns = <                      
+                        item
+                          Title.Font.Style = [fsBold]
+                          Title.Caption = 'Header'
+                          Width = 273
+                        end                      
+                        item
+                          Title.Font.Style = [fsBold]
+                          Title.Caption = 'Value'
+                          Width = 274
+                        end>
+                      FixedCols = 0
+                      MouseWheelOption = mwGrid
+                      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goRowSizing, goColSizing, goTabs, goSmoothScroll, goRowHighlight]
+                      RowCount = 1
+                      TabOrder = 0
+                      TitleFont.Height = -13
+                      TitleFont.Name = 'Sans'
+                      TitleStyle = tsNative
+                      OnDblClick = gridEditDblClick
+                      ColWidths = (
+                        273
+                        274
+                      )
+                    end
+                  end
+                  object tabRespText: TTabSheet
+                    Caption = 'tabRespText'
+                    ClientHeight = 236
+                    ClientWidth = 413
+                    object textResp: TMemo
+                      Left = 0
+                      Height = 236
+                      Top = 0
+                      Width = 545
+                      Align = alClient
+                      BorderStyle = bsNone
+                      ReadOnly = True
+                      ScrollBars = ssAutoBoth
+                      TabOrder = 0
+                    end
+                  end
+                  object tabRespTime: TTabSheet
+                    Caption = 'tabRespTime'
+                  end
+                end
+              end
+              object tabRespCookie: TTabSheet
+                Caption = 'Cookie'
+                ClientHeight = 262
+                ClientWidth = 417
+                TabVisible = False
+                object gridRespCookie: TStringGrid
+                  Left = 0
+                  Height = 214
+                  Top = 0
+                  Width = 553
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ColCount = 9
+                  ColumnClickSorts = True
+                  Columns = <                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Name'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Value'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Domain'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Path'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Expires'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Size'
+                    end                  
+                    item
+                      ButtonStyle = cbsCheckboxColumn
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Http'
+                    end                  
+                    item
+                      ButtonStyle = cbsCheckboxColumn
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'Secure'
+                    end                  
+                    item
+                      ReadOnly = True
+                      Title.Font.Style = [fsBold]
+                      Title.Caption = 'SameSite'
+                    end>
+                  ExtendedSelect = False
+                  FixedCols = 0
+                  MouseWheelOption = mwGrid
+                  Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goSmoothScroll, goRowHighlight]
+                  RowCount = 2
+                  TabOrder = 0
+                  TitleStyle = tsNative
+                  OnDblClick = gridRespCookieDblClick
+                end
+              end
+              object tabContent: TTabSheet
+                Caption = 'Content'
+                ClientHeight = 262
+                ClientWidth = 417
+                object responseRaw: TMemo
+                  Left = 0
+                  Height = 214
+                  Top = 0
+                  Width = 553
+                  Align = alClient
+                  BorderStyle = bsNone
+                  ReadOnly = True
+                  ScrollBars = ssAutoBoth
+                  TabOrder = 0
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
   object AppMenu: TMainMenu
@@ -1684,6 +1718,11 @@ object MainForm: TMainForm
         Caption = '&Horizontal layout'
         RadioItem = True
         OnClick = ViewSwitchLayout
+      end
+      object miBookmarks: TMenuItem
+        Caption = '&Bookmarks'
+        Checked = True
+        OnClick = miBookmarksClick
       end
     end
     object miEdit: TMenuItem
@@ -2098,7 +2137,7 @@ object MainForm: TMainForm
     left = 416
     top = 448
     Bitmap = {
-      4C69040000001000000010000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      4C69060000001000000010000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
       FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00EFC2A37EEFC1A2E3EDC09FFFEBBE
       9DFFEBBC9AFFE9BA96FFE7B793FFE6B590FFE4B28CFFE2AF88FFE0AC84FFDDA9
@@ -2226,7 +2265,71 @@ object MainForm: TMainForm
       B2ED7C5A2F817B582CC07B582CED7B582CED7B582CC07B582C80B3B3B2F2D9D9
       D9FFB4B4B4FBB4B4B423FFFFFF00FFFFFF00A2A2A20CA2A2A2D8A2A2A2F9A2A2
       A22BFFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00A2A2A220A2A2
-      A2F0A2A2A2E5A2A2A218FFFFFF00
+      A2F0A2A2A2E5A2A2A218FFFFFF00000000000000000000000000000000000000
+      0000000000010000000018181864171717640000000000000001000000000000
+      0000000000000000000000000000000000000000000000000000000000000101
+      0102000000001010103D363636F9363636F81010103D00000000010101020000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0004000000002C2C2CC22121218D2222228D2B2B2BC100000000000000040000
+      0000000000000000000000000000010101030101010400000003010101030000
+      00000E0E0E37363636F80808081D0909091E363636F80E0E0E37000000000101
+      0103000000030101010401010103000000000000000000000000010101030303
+      03042B2B2BBE262626A80000000000000000262626A82B2B2BBE030303030101
+      0103000000000000000000000000111111432121219C2B2B2BC7303030DE3434
+      34F1323232E50A0A0A2500000000000000000A0A0A26313131E6343434F13030
+      30DE2B2B2BC72121219C11111143383838FC2F2F2FC219191971141414580C0C
+      0C2E0404040B000000000000000100000001000000000404040B0C0C0C2E1414
+      1459191919712E2E2EC3383838FC2323239F333333DD0B0B0B14000000000000
+      0001000000010000000100000000000000000000000100000001000000010000
+      000009090915323232DE2323239F000000002222229C393939F50E0E0E250000
+      0000000000030000000000000000000000000000000000000003000000000D0D
+      0D26383838F52222229B0000000000000004000000002222229C363636EC0B0B
+      0B1E0000000000000002000000000000000000000002000000000A0A0A1F3535
+      35ED2323239C00000000000000040000000100000003000000002E2E2ECE2222
+      228B0000000001010104010101020101010201010104000000002121218C2E2E
+      2ECD0000000000000003000000010000000000000002000000002D2D2DD21818
+      186C0000000001010107000000000000000001010107000000001818186C2D2D
+      2DD100000000000000020000000000000001000000000404040B333333ED1010
+      104100000000000000000A0A0A26090909260000000000000000101010413333
+      33ED0404040B000000000000000101010102000000000B0B0B2C333333F00606
+      061405050511252525A4353535FB363636FA252525A406060611060606153333
+      33F00B0B0B2B0000000001010102010101040000000014141455323232E91F1F
+      1F85353535FA2B2B2BC50C0C0C2D0C0C0C2D2B2B2BC5353535FA1F1F1F853232
+      32EA14141455000000000101010401010102000000000C0C0C2B343434F53131
+      31E51212124A000000000000000100000001000000001212124A313131E53434
+      34F40C0C0C2B0000000001010102000000000000000000000000000000000000
+      000000020303000000001B7DB3A21B7DB3A10000000000020303000000000000
+      0000000000000000000000000000000000000000000000000000000000000001
+      020100000000061C291B27AAF4F327AAF4F3061C291B00000000000102010000
+      0000000000000000000000000000000000000000000000000000000000000103
+      040500000000196A998326C0FFFF26C0FFFF196A998300000000010304050000
+      0000000000000000000000000000010304030103040400020304000202030000
+      000005161F1426A4ECE720C8F6FF20C7F6FF26A4ECE705161F13000000000002
+      0203000203040103040401030403000000000000000000000000000203020103
+      04001865957F27BEFFFF1DCCF1FC1DCCF1FC28BEFFFF1866957F000304000002
+      03020000000000000000000000000E435E50145D85771C77ADA0208ACBC3259F
+      E6E327B1F9FC20C5F4FF1ECEF4FF1ECEF4FF20C5F4FF27B1F9FC259FE6E2208A
+      CBC31C77ADA0155D85770E435E5027AAEAE12BBEFFFF24C5FEFE23C9FEFF20C9
+      F9FF1ECAF3FE1ECEF4FF1ECDF4FF1ECDF4FF1ECEF4FF1ECAF3FE21C9F9FF23C9
+      FEFF24C5FEFE2BBEFFFF27AAEAE10626332223A5EAD923BFF8FF1CCEEFF91ECE
+      F3FE1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1ECEF3FE1CCE
+      EFF923BFF8FF23A5EAD9062633220000000009293D2428A7F2E324C0FBFF1DCD
+      F2FD1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1DCDF2FD24C0
+      FBFF28A7F2E208293D240000000001030404000000000A2B3E2826A1ECE522C0
+      F7FF1DCEF3FE1ECDF4FF1ECDF4FF1ECDF4FF1ECDF4FF1DCEF3FE22C0F7FF26A2
+      ECE50A2C3E2800000000010304040000000001040606000000001451786828C0
+      FFFF1DCCF0FB1ECDF4FF1ECCF4FF1ECCF4FF1ECDF4FF1DCCF0FB28C0FFFF1452
+      786800000000010406060000000000000000010204040000000017608E8326C4
+      FFFF1DCCF0FB1ECDF4FF1DCEF2FC1DCEF2FC1ECDF4FF1DCCF0FB26C4FFFF1761
+      8E830000000001020404000000000000000000010203000000001E7EB8AD24C7
+      FFFF1CCFF0F91EC9F0FC23C5FBFF23C5FBFF1EC9F0FC1CCFF0F924C7FFFF1E7E
+      B8AD0000000000010203000000000001010000000000010507002395D9CF21C7
+      F8FF21C6F7FC29BFFFFF218ECEC5218ECEC52ABFFFFF21C6F7FC21C7F8FF2295
+      D9CF01050700000000000001010000010201000000000517211526A9F2EE28BB
+      FFFF249CE2DA114A6D5A0107090201070902114A6D5A249BE2DA28BBFFFF26A9
+      F2EE05172115000000000001020100020302000000000724332427ADF8F01867
+      9581030F140900000000000202030002020300000000030F14091867958127AD
+      F8F0082433240000000000020302
     }
   end
 end

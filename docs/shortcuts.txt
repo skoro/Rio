@@ -1,0 +1,43 @@
+Добавление новом клавиатурной комбинации
+========================================
+
+В форме опций `options.pas` в перечислении `TShortCutItem` находятся
+идентификаторы комбинаций. Идентификатор должен начинаться с префикса `sci`:
+
+```
+type
+  TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
+    sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciBookmark,
+    sciToggleTabs, sciQuit);
+```
+
+Далее необходимо установить какие коды клавиш будут обрабатываться.
+Для этого в конце процедуры `procedure TOptionsForm.InitShortcuts` нужно добавить
+вызов `SetShortCut`:
+
+```
+SetShortCut(sciQuit, 81, [ssCtrl]); // Q
+```
+
+Число 81 - это код клавиши, его можно взять из файла `key_codes.txt`,
+`ssCtrl` - модификатор, т.е. ожидаем нажатия Control-q. Другие модификаторы:
+`ssAlt`, `ssShift`.
+
+Название комбинации добавляется в функции `TOptionsForm.GetShortCutName`.
+
+Непосредственно само действие должно выполняться в главной форме, в обработчике
+`TMainForm.FormKeyDown`.
+
+Если комбинация предназначена для одного из элементов главного меню, то
+в главной форме `main.pas` нужно в методе `TMainForm.ApplyOptions`
+добавить обновление вывода клавиатурной комбинации, например:
+```
+miQuit.ShortCut := OptionsForm.GetShortCutValue(sciQuit);
+```
+Тогда при изменении комбинации в форме настроек, соответствующая комбинация
+будет обновлена в меню.
+
+При компиляции и последующем запуске приложения может произойти исключение.
+Это может быть из-за того, что идентификатор комбинации был добавлен в
+середину `TShortCutItem`, а не в конец.

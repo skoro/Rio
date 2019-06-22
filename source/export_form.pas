@@ -65,7 +65,7 @@ var
   ro: TRequestObject;
 begin
   try
-    ro := TRequestObject.Create(MainForm);
+    ro := MainForm.CreateRequestObject;
     ext := '';
     case TExportType(cbExport.ItemIndex) of
       etCurl:    ext := '.sh';
@@ -108,7 +108,7 @@ begin
       etPHPCurl: exp := TPHPCurlExport.Create;
     end;
 
-    req := TRequestObject.Create(MainForm);
+    req := MainForm.CreateRequestObject;
     try
       exp.RequestObject := req;
       MemoResult.Text := exp.Output;

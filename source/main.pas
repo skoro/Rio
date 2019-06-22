@@ -6,14 +6,13 @@ interface
 
 uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
-  fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, SynEdit,
-  SynHighlighterJScript, thread_http_client, response_tabs, key_value,
-  profiler_graph, GridNavigator, SysUtils, jsonparser;
+  fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
+  SynEdit, SynHighlighterJScript, thread_http_client, response_tabs, key_value,
+  profiler_graph, bookmarks, request_object, GridNavigator, SysUtils,
+  jsonparser;
 
 type
 
-  TBodyTab = (btForm, btJson, btOther);
-  TAuthTab = (atNone = -1, atBasic, atBearer);
   TGridOperation = (goNew, goEdit, goDelete, goClear);
   TResponseView = (rvList, rvText, rvTimings);
 
@@ -24,28 +23,30 @@ type
     cbBasicShowPassword: TCheckBox;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
+    dlgFind: TFindDialog;
     editBasicLogin: TLabeledEdit;
     editBasicPassword: TLabeledEdit;
     editBearerPrefix: TLabeledEdit;
     editBearerToken: TLabeledEdit;
     editJson: TSynEdit;
+    editNotes: TMemo;
     editOther: TMemo;
-    dlgFind: TFindDialog;
     gaInsertRow: TMenuItem;
     gaEditRow: TMenuItem;
-    gridForm: TStringGrid;
-    gnavParams: TGridNavigator;
-    gnavHeaders: TGridNavigator;
-    gnavCookie: TGridNavigator;
-    gnavBody: TGridNavigator;
-    gridParams: TStringGrid;
-    gridReqCookie: TStringGrid;
-    gridRespCookie: TStringGrid;
     gaManageHeaders: TMenuItem;
     gaSaveHeader: TMenuItem;
     gaSeparator: TMenuItem;
-    editNotes: TMemo;
+    gnavBody: TGridNavigator;
+    gnavCookie: TGridNavigator;
+    gnavHeaders: TGridNavigator;
+    gnavParams: TGridNavigator;
+    gridForm: TStringGrid;
+    gridParams: TStringGrid;
+    gridReqCookie: TStringGrid;
+    gridRespCookie: TStringGrid;
+    LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
+    miBookmarks: TMenuItem;
     miLayoutVert: TMenuItem;
     miLayoutHor: TMenuItem;
     miTabSep: TMenuItem;
@@ -58,9 +59,55 @@ type
     miTabBody: TMenuItem;
     miTabCookie: TMenuItem;
     miView: TMenuItem;
+    btnBookmark: TSpeedButton;
+    pagesAuth: TPageControl;
+    pagesBody: TPageControl;
+    pagesRequest: TPageControl;
+    pagesResponse: TPageControl;
+    pagesRespView: TPageControl;
+    AppSplitter: TPairSplitter;
+    BookmarkSide: TPairSplitterSide;
+    WorkSide: TPairSplitterSide;
+    panelRequest: TPanel;
+    panelResponse: TPanel;
+    requestHeaders: TStringGrid;
+    responseHeaders: TStringGrid;
+    responseRaw: TMemo;
+    ScrollBox1: TScrollBox;
+    ScrollBox2: TScrollBox;
+    splitterSideRequest: TPairSplitterSide;
+    splitterSideResponse: TPairSplitterSide;
+    tabAuth: TTabSheet;
+    tabAuthBasic: TTabSheet;
+    tabAuthBearer: TTabSheet;
+    tabBody: TTabSheet;
+    tabBodyForm: TTabSheet;
+    tabBodyJson: TTabSheet;
+    tabBodyOther: TTabSheet;
+    tabContent: TTabSheet;
+    tabHeaders: TTabSheet;
+    tabNotes: TTabSheet;
+    tabQuery: TTabSheet;
+    tabReqCookie: TTabSheet;
+    tabRespCookie: TTabSheet;
+    tabRespList: TTabSheet;
+    tabResponse: TTabSheet;
+    tabRespText: TTabSheet;
     tabRespTime: TTabSheet;
-    toolbarIcons: TImageList;
+    tbtnAuthType: TToolButton;
+    tbtnBodyFormat: TToolButton;
+    tbtnBodyType: TToolButton;
+    tbtnFormUpload: TToolButton;
+    tbtnJsonLoad: TToolButton;
+    tbtnManageHeaders: TToolButton;
+    tbtnRespFollow: TToolButton;
+    tbtnRespList: TToolButton;
+    tbtnRespText: TToolButton;
+    tbtnRespTime: TToolButton;
+    tbtnSaveHeader: TToolButton;
     textResp: TMemo;
+    toolbarAuth: TToolBar;
+    toolbarIcons: TImageList;
     miJsonExpand: TMenuItem;
     miJsonCollapse: TMenuItem;
     miExport: TMenuItem;
@@ -70,8 +117,6 @@ type
     miFind: TMenuItem;
     miHelpCmd: TMenuItem;
     miJsonFilter: TMenuItem;
-    pagesRespView: TPageControl;
-    responseHeaders: TStringGrid;
     StatusImageSize: TImage;
     StatusTextInfo: TLabel;
     StatusTextSize: TLabel;
@@ -87,20 +132,10 @@ type
     miBodyOther: TMenuItem;
     miNewWindow: TMenuItem;
     miOptions: TMenuItem;
-    pagesAuth: TPageControl;
-    pagesBody: TPageControl;
-    pagesRequest: TPageControl;
-    pagesResponse: TPageControl;
-    LayoutSplitter: TPairSplitter;
-    splitterSideRequest: TPairSplitterSide;
-    splitterSideResponse: TPairSplitterSide;
     panelUrl: TPanel;
-    panelRequest: TPanel;
-    panelResponse: TPanel;
     popupJsonTree: TPopupMenu;
     pmBodyType: TPopupMenu;
     pmAuthType: TPopupMenu;
-    requestHeaders: TStringGrid;
     miOpenRequest: TMenuItem;
     miSaveRequest: TMenuItem;
     miSaveResponse: TMenuItem;
@@ -120,45 +155,15 @@ type
     miQuit: TMenuItem;
     miAbout: TMenuItem;
     MenuItem6: TMenuItem;
-    responseRaw: TMemo;
-    ScrollBox1: TScrollBox;
-    ScrollBox2: TScrollBox;
     StatusImageTime: TImage;
     StatusPanel: TPanel;
     StatusTextMain: TLabel;
     StatusTextTime: TLabel;
     synJS: TSynJScriptSyn;
-    tabBody: TTabSheet;
-    tabBodyForm: TTabSheet;
-    tabBodyJson: TTabSheet;
-    tabBodyOther: TTabSheet;
-    tabContent: TTabSheet;
-    tabHeaders: TTabSheet;
-    tabQuery: TTabSheet;
-    tabReqCookie: TTabSheet;
-    tabRespCookie: TTabSheet;
-    tabResponse: TTabSheet;
-    tabAuth: TTabSheet;
-    tabAuthBasic: TTabSheet;
-    tabAuthBearer: TTabSheet;
-    tabNotes: TTabSheet;
-    tabRespList: TTabSheet;
-    tabRespText: TTabSheet;
     TimerRequest: TTimer;
     toolbarResponse: TToolBar;
-    toolbarAuth: TToolBar;
     ToolButton1: TToolButton;
-    tbtnManageHeaders: TToolButton;
-    tbtnSaveHeader: TToolButton;
-    tbtnBodyType: TToolButton;
-    tbtnBodyFormat: TToolButton;
-    tbtnFormUpload: TToolButton;
-    tbtnAuthType: TToolButton;
-    tbtnJsonLoad: TToolButton;
-    tbtnRespList: TToolButton;
-    tbtnRespText: TToolButton;
-    tbtnRespFollow: TToolButton;
-    tbtnRespTime: TToolButton;
+    procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
@@ -180,6 +185,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miBookmarksClick(Sender: TObject);
     procedure miExportClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
@@ -204,6 +210,7 @@ type
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure pagesResponseChange(Sender: TObject);
+    procedure PairSplitterResize(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
     procedure pmBodyTypeClick(Sender: TObject);
     procedure popupGridActionsPopup(Sender: TObject);
@@ -231,6 +238,7 @@ type
     FFindTextPos: Integer;
     FRequestSeconds: Integer;
     FProfilerGraph: TProfilerGraph;
+    FBookManager: TBookmarkManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -239,7 +247,6 @@ type
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
     procedure ShowResponseCookie(Headers: TStrings);
-    function GetRequestFilename(ext: string = ''): string;
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     function EditGridRow(Grid: TStringGrid;
@@ -255,15 +262,21 @@ type
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
+    procedure ToggleBookmarksSide(VisibleSide: Boolean);
     procedure FinishRequest;
     procedure ResetFindTextPos;
+    procedure EnableSubmitButton;
+    procedure BookmarkButtonIcon(Added: Boolean);
+    procedure BookmarkEditorShow(Sender: TObject; BM: TBookmark);
+    procedure OnChangeBookmark(Prev, Selected: TBookmark);
+    procedure OnDeleteBookmark(Sender: TObject; BM: TBookmark);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
     procedure AddRequestHeader(AHeader, AValue: string);
     procedure AddFormData(AName, AValue: string; isFile: Boolean = False);
     procedure OpenRequestFile(jsonStr: string);
-    procedure SelectBodyTab(const tab: tbodytab);
+    procedure SelectBodyTab(const tab: TBodyTab);
     procedure SelectAuthTab(const tab: TAuthTab);
     procedure SelectResponseViewTab(rView: TResponseView);
     function GetSelectedBodyTab: TBodyTab;
@@ -273,6 +286,8 @@ type
     function SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
     function SubmitRequest: Boolean;
     procedure FindText;
+    function CreateRequestObject: TRequestObject;
+    procedure SetRequestObject(RO: TRequestObject);
   end;
 
 var
@@ -280,27 +295,48 @@ var
 
 implementation
 
-uses about, headers_editor, cookie_form, uriparser, request_object,
-  app_helpers, fpjsonrtti, strutils, help_form, cmdline, options,
-  import_form, export_form, Clipbrd;
+uses about, headers_editor, cookie_form,
+  app_helpers, strutils, help_form, cmdline, options,
+  import_form, export_form, bookmark_form, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
+  BOOKMARK_IMG_UNSET = 4;
+  BOOKMARK_IMG_SET = 5;
 
 {$R *.lfm}
 
 { TMainForm }
 
 procedure TMainForm.btnSubmitClick(Sender: TObject);
+var
+  RO: TRequestObject;
 begin
   // Don't submit a request when the current request is in progress by pressing
   // shortcut key.
   if not btnSubmit.Enabled then
     Exit; // =>
+
+  // A different url unbookmark the current bookmark.
+  try
+    RO := CreateRequestObject;
+    if not FBookManager.IsCurrentRequest(RO) then begin
+      BookmarkButtonIcon(False);
+      FBookManager.ResetCurrent;
+    end;
+  finally
+    FreeAndNil(RO);
+  end;
+
   TimerRequest.Enabled := False;
   FRequestSeconds := 0;
   if SubmitRequest then
     TimerRequest.Enabled := True;
+end;
+
+procedure TMainForm.btnBookmarkClick(Sender: TObject);
+begin
+  BookmarkEditorShow(Sender, FBookManager.CurrentBookmark);
 end;
 
 function TMainForm.SubmitRequest: Boolean;
@@ -395,6 +431,7 @@ begin
     FHttpClient.RequestBody := TStringStream.Create(formData);
 
   btnSubmit.Enabled := False;
+  btnBookmark.Enabled := False;
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -557,6 +594,66 @@ begin
   end;
 end;
 
+function TMainForm.CreateRequestObject: TRequestObject;
+begin
+  Result := TRequestObject.Create;
+  with Result do begin
+    Method := cbMethod.Text;
+    Url    := cbUrl.Text;
+    Body   := editOther.Text;
+    Json   := editJson.Text;
+    SetCollectionFromGrid(requestHeaders, Headers);
+    SetCollectionFromGrid(gridReqCookie, Cookies);
+    SetCollectionFromGrid(gridParams, Params);
+    GetFormFromGrid(gridForm);
+    AuthType := GetSelectedAuthTab;
+    AuthBasic.Login    := editBasicLogin.Text;
+    AuthBasic.Password := editBasicPassword.Text;
+    AuthBearer.Prefix  := editBearerPrefix.Text;
+    AuthBearer.Token   := editBearerToken.Text;
+    DataType := GetSelectedBodyTab;
+    Notes := editNotes.Text;
+  end;
+end;
+
+procedure TMainForm.SetRequestObject(RO: TRequestObject);
+var
+  bt: TBodyTab;
+begin
+  with RO do begin
+    cbUrl.Text     := Url;
+    cbMethod.Text  := Method;
+    editOther.Text := Body;
+    editJson.Text  := Json;
+    editNotes.Text := Notes;
+
+    SetCollectionToGrid(Headers, requestHeaders);
+    SetCollectionToGrid(Cookies, gridReqCookie);
+    SetCollectionToGrid(Params, gridParams);
+    SetFormToGrid(gridForm);
+
+    SelectAuthTab(AuthType);
+    editBasicLogin.Text    := AuthBasic.Login;
+    editBasicPassword.Text := AuthBasic.Password;
+    editBearerPrefix.Text  := AuthBearer.Prefix;
+    editBearerToken.Text   := AuthBearer.Token;
+
+    // Set body tab depending on data.
+    if IsJson then
+       bt := btJson
+    else
+      if not Body.Trim.IsEmpty then
+        bt := btOther
+    else
+      bt := btForm;
+    SelectBodyTab(bt);
+
+    // Set response content.
+    if Assigned(ResponseInfo) then
+      OnRequestComplete(ResponseInfo);
+  end;
+end;
+
 procedure TMainForm.SelectResponseViewTab(rView: TResponseView);
 begin
   case rView of
@@ -598,6 +695,7 @@ end;
 procedure TMainForm.cbUrlChange(Sender: TObject);
 begin
   SyncURLQueryParams;
+  EnableSubmitButton;
 end;
 
 procedure TMainForm.cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -654,6 +752,14 @@ begin
 
   KeyValueForm := TKeyValueForm.Create(Application);
 
+  // Bookmark manager initialization.
+  FBookManager := TBookmarkManager.Create(Self);
+  FBookManager.Parent := BookmarkSide;
+  FBookManager.OnChangeBookmark := @OnChangeBookmark;
+  FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
+  FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
+  LoadAppBookmarks(FBookManager);
+
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
@@ -663,6 +769,8 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  SaveAppBookmarks(FBookManager);
+
   FreeAndNil(FResponseTabManager);
 
   if Assigned(FProfilerGraph) then
@@ -685,6 +793,7 @@ begin
     sciFocusUrl:    cbUrl.SetFocus;
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
+    sciBookmark:    btnBookmarkClick(Sender);
     sciSwitchView: begin
       // Switch views in the response tab (list or text view).
       if pagesResponse.ActivePage = tabResponse then
@@ -704,6 +813,11 @@ begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
+  ToggleBookmarksSide(miBookmarks.Checked);
+  // OnResize callback should be after ToggleBookmarksSide otherwise
+  // bookmarks will be always opened despite on its status.
+  if not Assigned(BookmarkSide.OnResize) then
+    BookmarkSide.OnResize := @PairSplitterResize;
   // Select and show active visible tab.
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
@@ -811,6 +925,12 @@ begin
   end;
 end;
 
+procedure TMainForm.miBookmarksClick(Sender: TObject);
+begin
+  miBookmarks.Checked := not miBookmarks.Checked;
+  ToggleBookmarksSide(miBookmarks.Checked);
+end;
+
 procedure TMainForm.miExportClick(Sender: TObject);
 begin
   if Trim(cbUrl.Text) = '' then begin
@@ -873,7 +993,7 @@ begin
       if RequestObjects.Count = 0 then
         ERRMsg('Error', 'Data not imported.')
       else
-        RequestObjects.Items[0].RequestObject.LoadToForm(Self);
+        Self.SetRequestObject(RequestObjects.Items[0].RequestObject);
     end;
     Free;
   end;
@@ -1063,34 +1183,31 @@ end;
 procedure TMainForm.miSaveRequestClick(Sender: TObject);
 var
   obj: TRequestObject;
-  streamer: TJSONStreamer;
   json: string;
 begin
-  streamer := TJSONStreamer.Create(nil);
-
   try
-    obj := TRequestObject.Create(Self);
-    json := streamer.ObjectToJSONString(obj);
-
+    obj := CreateRequestObject;
     try
-      dlgSave.FileName := GetRequestFilename('request.json');
+      dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType, 'request.json');
       dlgSave.Title := 'Save the request to a file';
+      json := obj.ToJson;
+      if json = '' then
+        raise Exception.Create('Cannot convert the request to a string.');
       if dlgSave.Execute then
-        if not FilePutContents(dlgSave.Filename, json) then
+        if not FilePutContents(dlgSave.Filename, obj.ToJson) then
           ShowMessage('Cannot create file ' + dlgSave.FileName);
     except on E: Exception do
       ShowMessage(E.Message);
     end;
   finally
     obj.Free;
-    streamer.Free;
   end;
 end;
 
 procedure TMainForm.miSaveResponseClick(Sender: TObject);
 begin
   try
-    dlgSave.FileName := GetRequestFilename;
+    dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType);
     dlgSave.Title := 'Save the response to a file';
     if dlgSave.Execute then begin
       if (FResponseTabManager.OpenedTabs.Count = 0) and (tabContent.TabVisible) then
@@ -1138,6 +1255,18 @@ begin
   ResetFindTextPos;
 end;
 
+procedure TMainForm.PairSplitterResize(Sender: TObject);
+var
+  pss: TPairSplitterSide;
+begin
+  if not (Sender is TPairSplitterSide) then
+    Exit; // =>
+  pss := TPairSplitterSide(Sender);
+  if (pss = BookmarkSide) then begin
+    miBookmarks.Checked := pss.Width > 1;
+  end;
+end;
+
 procedure TMainForm.pmAuthTypeClick(Sender: TObject);
 var
   mi: TMenuItem;
@@ -1176,6 +1305,7 @@ begin
   // Update Query tab and app title.
   SetAppCaption(cbUrl.Text);
   SyncURLQueryParams;
+  EnableSubmitButton;
 end;
 
 procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
@@ -1204,6 +1334,7 @@ begin
     miTabAuth.Checked := ReadBoolean('tabAuth', True);
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
+    miBookmarks.Checked := ReadBoolean('bookmarks', True);
   end;
 end;
 
@@ -1230,6 +1361,7 @@ begin
     WriteBoolean('tabAuth', miTabAuth.Checked);
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
+    WriteBoolean('bookmarks', miBookmarks.Checked);
   end;
 end;
 
@@ -1474,7 +1606,7 @@ begin
   Result := grid.Cells[0, aRow] = '1';
 end;
 
-procedure TMainForm.SelectBodyTab(const tab: tbodytab);
+procedure TMainForm.SelectBodyTab(const tab: TBodyTab);
 begin
   tbtnFormUpload.Visible  := False;
   tbtnBodyFormat.Visible  := False;
@@ -1694,6 +1826,17 @@ begin
   end;
 end;
 
+procedure TMainForm.ToggleBookmarksSide(VisibleSide: Boolean);
+begin
+  if VisibleSide then begin
+    BookmarkSide.Width := 145;
+  end
+  else begin
+    BookmarkSide.Width := 1;
+  end;
+  miBookmarks.Checked := VisibleSide;
+end;
+
 procedure TMainForm.FinishRequest;
 begin
   Screen.Cursor := crDefault;
@@ -1702,6 +1845,74 @@ end;
 procedure TMainForm.ResetFindTextPos;
 begin
   FFindTextPos := 0;
+end;
+
+procedure TMainForm.EnableSubmitButton;
+var
+  isEmpty: Boolean;
+begin
+  isEmpty := False;
+  if Length(Trim(cbUrl.Text)) = 0 then
+    isEmpty := True;
+  btnSubmit.Enabled := not isEmpty;
+  btnBookmark.Enabled := not isEmpty;
+end;
+
+procedure TMainForm.BookmarkButtonIcon(Added: Boolean);
+begin
+  if Added then
+    toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph)
+  else
+    toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
+end;
+
+procedure TMainForm.BookmarkEditorShow(Sender: TObject; BM: TBookmark);
+var
+  RO: TRequestObject;
+begin
+  with TBookmarkForm.Create(Self) do
+  begin
+    RO := CreateRequestObject;
+    BookmarkManager := FBookManager;
+    case ShowModal(BM, RO) of
+      mrAdded: begin
+        BookmarkButtonIcon(True);
+      end;
+      mrDeleted: begin
+        if FBookManager.CurrentBookmark = NIL then
+          BookmarkButtonIcon(False);
+      end;
+      mrOk: begin
+        // stub.
+      end;
+      else begin
+        FreeAndNil(RO);
+      end;
+    end;
+    Free;
+  end;
+end;
+
+procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
+begin
+  if Assigned(Prev) and (not Prev.Locked) then begin
+    Prev.Request.Free;
+    Prev.Request := CreateRequestObject;
+  end;
+  StartNewRequest;
+  BookmarkButtonIcon(True);
+  SetRequestObject(Selected.Request);
+  btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
+end;
+
+procedure TMainForm.OnDeleteBookmark(Sender: TObject; BM: TBookmark);
+var
+  Curr: TBookmark;
+begin
+  Curr := FBookManager.CurrentBookmark;
+  if (Curr = BM) or (Curr = NIL) then
+    BookmarkButtonIcon(False);
 end;
 
 procedure TMainForm.ApplyOptions;
@@ -1749,6 +1960,7 @@ begin
   miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
+  miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 end;
 
@@ -1828,21 +2040,15 @@ end;
 
 procedure TMainForm.OpenRequestFile(jsonStr: string);
 var
-  streamer: TJSONDeStreamer;
   obj: TRequestObject;
 begin
-  streamer := TJSONDeStreamer.Create(nil);
-  obj := TRequestObject.Create;
-
   try
-    streamer.JSONToObject(jsonStr, obj);
+    obj := TRequestObject.CreateFromJson(jsonStr);
     StartNewRequest;
-    obj.LoadToForm(Self);
+    SetRequestObject(obj);
   except on E: Exception do
       ShowMessage(E.Message);
   end;
-
-  streamer.Free;
   obj.Free;
 end;
 
@@ -1857,6 +2063,7 @@ begin
   else
     ShowMessage(E.Message);
   btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
   FinishRequest;
 end;
 
@@ -1900,6 +2107,7 @@ var
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
+  btnBookmark.Enabled := True;
   TimerRequest.Enabled := False;
   SetAppCaption(cbUrl.Text);
 
@@ -2082,33 +2290,6 @@ begin
     else tabRespCookie.TabVisible := False;
 end;
 
-// Creates a filename based on a request.
-// If parameter 'ext' is empty then extension will be detected depending on
-// the document.
-function TMainForm.GetRequestFilename(ext: string): string;
-var
-  uri: TURI;
-  basename: string;
-begin
-  uri := ParseURI(NormalizeUrl(cbUrl.Text));
-  if ext = '' then begin
-    ext := RightStr(FContentType, Length(FContentType) - Pos('/', FContentType));
-    // Get extension name from strings like 'rss+xml', etc.
-    ext := RightStr(ext, Length(ext) - Pos('+', ext));
-  end;
-  basename := TrimSet(uri.Document, ['/']);
-  if basename = '' then
-    basename := uri.Host;
-  // Strip extension from a document name (mainly for images).
-  if RightStr(basename, Length(ext) + 1) = '.' + ext then
-    basename := LeftStr(basename, Length(basename) - Length(ext) - 1);
-  // Don't append a content type extension to a jpeg image if the image
-  // already contains the extension.
-  if (FContentType = 'image/jpeg') and (RightStr(basename, 4) = '.jpg') then
-    Exit(basename);
-  Result := Format('%s.%s', [basename, ext]);
-end;
-
 function TMainForm.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
 var
   Need: Boolean = False;
@@ -2193,6 +2374,12 @@ begin
 
   FResponseTabManager.CloseTabs;
   SetAppCaption;
+
+  // Submit and Bookmark buttons state.
+  btnSubmit.Enabled := False;
+  btnBookmark.Enabled := False;
+  BookmarkButtonIcon(False);
+  FBookManager.ResetCurrent;
 end;
 
 function TMainForm.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;
