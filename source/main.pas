@@ -819,6 +819,10 @@ begin
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
   ToggleBookmarksSide(miBookmarks.Checked);
+  // OnResize callback should be after ToggleBookmarksSide otherwise
+  // bookmarks will be always opened despite on its status.
+  if not Assigned(BookmarkSide.OnResize) then
+    BookmarkSide.OnResize := @PairSplitterResize;
   // Select and show active visible tab.
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
@@ -1830,6 +1834,7 @@ begin
   else begin
     BookmarkSide.Width := 1;
   end;
+  miBookmarks.Checked := VisibleSide;
 end;
 
 procedure TMainForm.FinishRequest;
