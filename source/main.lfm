@@ -4,7 +4,7 @@ object MainForm: TMainForm
   Top = 109
   Width = 579
   Caption = 'HTTP request inspector'
-  ClientHeight = 591
+  ClientHeight = 594
   ClientWidth = 579
   Icon.Data = {
     BE1000000000010001002020000001002000A810000016000000280000002000
@@ -153,7 +153,7 @@ object MainForm: TMainForm
   LCLVersion = '1.8.4.0'
   object panelUrl: TPanel
     Left = 4
-    Height = 27
+    Height = 25
     Top = 4
     Width = 571
     Align = alTop
@@ -163,18 +163,19 @@ object MainForm: TMainForm
     BorderSpacing.Right = 4
     BorderSpacing.Bottom = 4
     BevelOuter = bvNone
-    ClientHeight = 27
+    ClientHeight = 25
     ClientWidth = 571
     TabOrder = 0
     object cbMethod: TComboBox
       Left = 0
-      Height = 27
+      Height = 23
       Top = 0
       Width = 100
       Align = alLeft
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      ItemHeight = 0
+      BorderSpacing.Right = 4
+      ItemHeight = 15
       ItemIndex = 0
       Items.Strings = (
         'GET'
@@ -188,23 +189,23 @@ object MainForm: TMainForm
       Text = 'GET'
     end
     object cbUrl: TComboBox
-      Left = 100
-      Height = 27
+      Left = 104
+      Height = 23
       Top = 0
-      Width = 390
+      Width = 371
       Align = alClient
       AutoComplete = True
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
-      ItemHeight = 0
+      ItemHeight = 15
       OnChange = cbUrlChange
       OnKeyPress = cbUrlKeyPress
       TabOrder = 1
     end
     object btnSubmit: TButton
-      Left = 490
-      Height = 27
+      Left = 475
+      Height = 25
       Top = 0
-      Width = 49
+      Width = 64
       Align = alRight
       AutoSize = True
       Caption = 'Submit'
@@ -213,7 +214,7 @@ object MainForm: TMainForm
     end
     object btnBookmark: TSpeedButton
       Left = 539
-      Height = 27
+      Height = 25
       Top = 0
       Width = 32
       Align = alRight
@@ -223,7 +224,7 @@ object MainForm: TMainForm
   object StatusPanel: TPanel
     Left = 4
     Height = 30
-    Top = 561
+    Top = 564
     Width = 571
     Align = alBottom
     BorderSpacing.Left = 4
@@ -238,7 +239,7 @@ object MainForm: TMainForm
       Left = 0
       Height = 30
       Top = 0
-      Width = 131
+      Width = 124
       Align = alLeft
       Caption = 'HTTP request inspector'
       Layout = tlCenter
@@ -269,7 +270,7 @@ object MainForm: TMainForm
       Height = 30
       Hint = 'Request time'
       Top = 0
-      Width = 86
+      Width = 80
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextTime'
@@ -302,7 +303,7 @@ object MainForm: TMainForm
       Height = 30
       Hint = 'Response body size'
       Top = 0
-      Width = 81
+      Width = 73
       Anchors = [akTop, akLeft, akBottom]
       BorderSpacing.Left = 4
       Caption = 'StatusTextSize'
@@ -312,10 +313,10 @@ object MainForm: TMainForm
       ShowHint = True
     end
     object StatusTextInfo: TLabel
-      Left = 491
+      Left = 497
       Height = 30
       Top = 0
-      Width = 80
+      Width = 74
       Align = alRight
       Caption = 'StatusTextInfo'
       Layout = tlCenter
@@ -324,30 +325,30 @@ object MainForm: TMainForm
   end
   object AppSplitter: TPairSplitter
     Left = 0
-    Height = 526
-    Top = 35
+    Height = 531
+    Top = 33
     Width = 579
     Align = alClient
     Position = 145
     object BookmarkSide: TPairSplitterSide
       Cursor = crArrow
       Left = 0
-      Height = 526
+      Height = 531
       Top = 0
       Width = 145
     end
     object WorkSide: TPairSplitterSide
       Cursor = crArrow
       Left = 150
-      Height = 526
+      Height = 531
       Top = 0
       Width = 429
       ClientWidth = 429
-      ClientHeight = 526
+      ClientHeight = 531
       object LayoutSplitter: TPairSplitter
         Cursor = crVSplit
         Left = 0
-        Height = 526
+        Height = 531
         Top = 0
         Width = 429
         Align = alClient
@@ -1012,7 +1013,7 @@ object MainForm: TMainForm
                           MouseActionsCollapsed = <>
                         end
                         object SynGutterLineNumber1: TSynGutterLineNumber
-                          Width = 17
+                          Width = 19
                           Visible = False
                           MouseActions = <>
                           MarkupInfo.Background = clBtnFace
@@ -1200,13 +1201,13 @@ object MainForm: TMainForm
               end
               object tabAuth: TTabSheet
                 Caption = 'Auth'
-                ClientHeight = 181
-                ClientWidth = 417
+                ClientHeight = 184
+                ClientWidth = 413
                 object toolbarAuth: TToolBar
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 417
+                  Width = 413
                   EdgeBorders = []
                   ShowCaptions = True
                   TabOrder = 0
@@ -1220,9 +1221,9 @@ object MainForm: TMainForm
                 end
                 object pagesAuth: TPageControl
                   Left = 0
-                  Height = 155
+                  Height = 158
                   Top = 26
-                  Width = 417
+                  Width = 413
                   ActivePage = tabAuthBearer
                   Align = alClient
                   ShowTabs = False
@@ -1238,7 +1239,7 @@ object MainForm: TMainForm
                       Top = 0
                       Width = 513
                       HorzScrollBar.Page = 232
-                      VertScrollBar.Page = 133
+                      VertScrollBar.Page = 131
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 151
@@ -1295,43 +1296,43 @@ object MainForm: TMainForm
                   end
                   object tabAuthBearer: TTabSheet
                     Caption = 'tabAuthBearer'
-                    ClientHeight = 151
-                    ClientWidth = 413
+                    ClientHeight = 150
+                    ClientWidth = 405
                     object ScrollBox2: TScrollBox
                       Left = 0
-                      Height = 151
+                      Height = 150
                       Top = 0
-                      Width = 413
+                      Width = 405
                       HorzScrollBar.Page = 208
-                      VertScrollBar.Page = 105
+                      VertScrollBar.Page = 103
                       Align = alClient
                       BorderStyle = bsNone
-                      ClientHeight = 151
-                      ClientWidth = 413
+                      ClientHeight = 150
+                      ClientWidth = 405
                       Color = clNone
                       ParentColor = False
                       TabOrder = 0
                       object editBearerToken: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 23
                         Top = 80
-                        Width = 400
+                        Width = 392
                         Anchors = [akTop, akLeft, akRight]
                         EditLabel.AnchorSideLeft.Control = editBearerToken
                         EditLabel.AnchorSideRight.Control = editBearerToken
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBearerToken
                         EditLabel.Left = 8
-                        EditLabel.Height = 17
-                        EditLabel.Top = 60
-                        EditLabel.Width = 400
+                        EditLabel.Height = 15
+                        EditLabel.Top = 62
+                        EditLabel.Width = 392
                         EditLabel.Caption = 'Token:'
                         EditLabel.ParentColor = False
                         TabOrder = 0
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 23
                         Top = 24
                         Width = 200
                         EditLabel.AnchorSideLeft.Control = editBearerPrefix
@@ -1339,8 +1340,8 @@ object MainForm: TMainForm
                         EditLabel.AnchorSideRight.Side = asrBottom
                         EditLabel.AnchorSideBottom.Control = editBearerPrefix
                         EditLabel.Left = 8
-                        EditLabel.Height = 17
-                        EditLabel.Top = 4
+                        EditLabel.Height = 15
+                        EditLabel.Top = 6
                         EditLabel.Width = 200
                         EditLabel.Caption = 'Prefix:'
                         EditLabel.ParentColor = False
@@ -1380,25 +1381,25 @@ object MainForm: TMainForm
         object splitterSideResponse: TPairSplitterSide
           Cursor = crArrow
           Left = 0
-          Height = 301
+          Height = 306
           Top = 225
           Width = 429
           ClientWidth = 429
-          ClientHeight = 301
+          ClientHeight = 306
           object panelResponse: TPanel
             Left = 4
-            Height = 293
+            Height = 298
             Top = 4
             Width = 421
             Align = alClient
             BorderSpacing.Around = 4
             BevelOuter = bvNone
-            ClientHeight = 293
+            ClientHeight = 298
             ClientWidth = 421
             TabOrder = 0
             object pagesResponse: TPageControl
               Left = 0
-              Height = 293
+              Height = 298
               Top = 0
               Width = 421
               ActivePage = tabResponse
@@ -1408,13 +1409,13 @@ object MainForm: TMainForm
               OnChange = pagesResponseChange
               object tabResponse: TTabSheet
                 Caption = 'Response'
-                ClientHeight = 262
-                ClientWidth = 417
+                ClientHeight = 270
+                ClientWidth = 413
                 object toolbarResponse: TToolBar
                   Left = 0
                   Height = 22
                   Top = 0
-                  Width = 417
+                  Width = 413
                   AutoSize = True
                   EdgeBorders = []
                   Images = toolbarIcons
@@ -1430,7 +1431,7 @@ object MainForm: TMainForm
                     OnClick = tbtnRespViewClick
                   end
                   object tbtnRespText: TToolButton
-                    Left = 46
+                    Left = 45
                     Top = 0
                     AutoSize = True
                     Caption = 'Text'
@@ -1438,7 +1439,7 @@ object MainForm: TMainForm
                     OnClick = tbtnRespViewClick
                   end
                   object tbtnRespFollow: TToolButton
-                    Left = 165
+                    Left = 162
                     Top = 0
                     AutoSize = True
                     Caption = 'Follow'
@@ -1447,7 +1448,7 @@ object MainForm: TMainForm
                     Visible = False
                   end
                   object tbtnRespTime: TToolButton
-                    Left = 95
+                    Left = 93
                     Top = 0
                     AutoSize = True
                     Caption = 'Timings'
@@ -1457,9 +1458,9 @@ object MainForm: TMainForm
                 end
                 object pagesRespView: TPageControl
                   Left = 0
-                  Height = 240
+                  Height = 248
                   Top = 22
-                  Width = 417
+                  Width = 413
                   ActivePage = tabRespList
                   Align = alClient
                   ShowTabs = False
@@ -1467,13 +1468,13 @@ object MainForm: TMainForm
                   TabOrder = 1
                   object tabRespList: TTabSheet
                     Caption = 'tabRespList'
-                    ClientHeight = 236
-                    ClientWidth = 413
+                    ClientHeight = 240
+                    ClientWidth = 405
                     object responseHeaders: TStringGrid
                       Left = 0
-                      Height = 236
+                      Height = 240
                       Top = 0
-                      Width = 413
+                      Width = 405
                       Align = alClient
                       AutoEdit = False
                       BorderStyle = bsNone
