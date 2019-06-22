@@ -619,6 +619,7 @@ begin
   BevelOuter := bvNone;
   FTreeView := CreateTree;
   Popup := TBookmarkPopup.Create(Self);
+  BorderSpacing.Left := 4;
   FCurrentNode := NIL;
   CreateRootNode;
 end;
