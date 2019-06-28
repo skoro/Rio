@@ -86,7 +86,7 @@ type
 
   public
     constructor Create(TheOwner: TComponent); override;
-    destructor Destroy;
+    destructor Destroy; override;
     // Add a bookmark to the tree.
     // BM - the bookmark instance.
     // FolderPath - the bookmark folder path separated by /
@@ -626,6 +626,7 @@ end;
 
 destructor TBookmarkManager.Destroy;
 begin
+  DeleteFolderNode(FRootNode);
   FreeAndNil(FTreeView);
   inherited Destroy;
 end;
