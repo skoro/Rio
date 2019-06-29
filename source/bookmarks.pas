@@ -639,6 +639,8 @@ begin
   FolderNode := FindFolder(FolderPath);
   if FolderNode = NIL then
     raise ENodePathNotFound.CreatePath(FolderPath);
+  if FolderNode.FindNode(BM.Name) <> NIL then
+    raise ENodeException.CreateNode(FolderNode, Format('Name "%s" already exists.', [BM.Name]));
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.Data := BM;
 end;
