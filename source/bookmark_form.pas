@@ -56,7 +56,7 @@ type
     function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
     procedure PrepareEditForm; virtual;
     procedure PrepareAddForm; virtual;
-    function AddBookmark: Boolean; virtual;
+    procedure AddBookmark; virtual;
     procedure UpdateBookmark; virtual;
     procedure DeleteBookmark; virtual;
 
@@ -78,8 +78,6 @@ uses thread_http_client, app_helpers, sysutils;
 { TBookmarkForm }
 
 procedure TBookmarkForm.OKButtonClick(Sender: TObject);
-var
-  IsNew: Boolean;
 begin
   // Don't allow to close form without a bookmark name.
   if Trim(edName.Text) = '' then
@@ -88,11 +86,18 @@ begin
     Exit; //=>
   end;
 
-  IsNew := IsNewBookmark;
-  if IsNew and not AddBookmark then
-    Exit; // =>
-  if not IsNew then
-    UpdateBookmark;
+  try
+    if IsNewBookmark then
+      AddBookmark
+    else
+      UpdateBookmark;
+  except
+    on E: Exception do begin
+      ERRMsg('Error', E.Message);
+      // Don't let close the modal.
+      Exit; // =>
+    end;
+  end;
 
   ModalResult := mrOK;
 end;
@@ -245,13 +250,12 @@ begin
   edName.Text := GetRequestFilename(RequestObject.Url);
 end;
 
-function TBookmarkForm.AddBookmark: Boolean;
+procedure TBookmarkForm.AddBookmark;
 var
   BM: TBookmark;
   NewNode: TTreeNode;
 begin
   try
-    Result := True;
     BM := TBookmark.Create(BookmarkName);
     BM.Request := RequestObject;
     BM.Locked := cbLock.Checked;
@@ -259,10 +263,9 @@ begin
     BookmarkManager.CurrentNode := NewNode;
   except
     on E: Exception do begin
-      ERRMsg('Error', E.Message);
       BM.Request := NIL; // Don't let free the RequestObject !
       BM.Free;
-      Result := False;
+      raise; // rethrow
     end;
   end;
 end;
