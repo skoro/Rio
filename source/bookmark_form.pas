@@ -55,7 +55,7 @@ type
     function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
     procedure PrepareEditForm; virtual;
     procedure PrepareAddForm; virtual;
-    procedure AddBookmark; virtual;
+    function AddBookmark: Boolean; virtual;
     procedure UpdateBookmark; virtual;
     procedure DeleteBookmark; virtual;
 
@@ -241,16 +241,25 @@ begin
   edName.Text := GetRequestFilename(RequestObject.Url);
 end;
 
-procedure TBookmarkForm.AddBookmark;
+function TBookmarkForm.AddBookmark: Boolean;
 var
   BM: TBookmark;
   NewNode: TTreeNode;
 begin
-  BM := TBookmark.Create(BookmarkName);
-  BM.Request := RequestObject;
-  BM.Locked := cbLock.Checked;
-  NewNode := BookmarkManager.AddBookmark(BM, FolderPath);
-  BookmarkManager.CurrentNode := NewNode;
+  try
+    Result := True;
+    BM := TBookmark.Create(BookmarkName);
+    BM.Request := RequestObject;
+    BM.Locked := cbLock.Checked;
+    NewNode := BookmarkManager.AddBookmark(BM, FolderPath);
+    BookmarkManager.CurrentNode := NewNode;
+  except
+    on E: Exception do begin
+      ERRMsg('Error', E.Message);
+      BM.Free;
+      Result := False;
+    end;
+  end;
 end;
 
 procedure TBookmarkForm.UpdateBookmark;
