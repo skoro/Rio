@@ -48,6 +48,7 @@ type
     function GetBookmarkName: string;
     function GetDeleteEnabled: Boolean;
     function GetFolderPath: string;
+    function GetIsNewBookmark: Boolean;
     function GetRequestObject: TRequestObject;
     procedure SetDeleteEnabled(AValue: Boolean);
   public
@@ -65,6 +66,7 @@ type
     property DeleteEnabled: Boolean read GetDeleteEnabled write SetDeleteEnabled;
     property FolderPath: string read GetFolderPath;
     property BookmarkName: string read GetBookmarkName;
+    property IsNewBookmark: Boolean read GetIsNewBookmark;
   end;
 
 var
@@ -79,6 +81,8 @@ uses thread_http_client, app_helpers, sysutils;
 { TBookmarkForm }
 
 procedure TBookmarkForm.OKButtonClick(Sender: TObject);
+var
+  IsNew: Boolean;
 begin
   // Don't allow to close form without a bookmark name.
   if Trim(edName.Text) = '' then
@@ -86,6 +90,13 @@ begin
     edName.SetFocus;
     Exit; //=>
   end;
+
+  IsNew := IsNewBookmark;
+  if IsNew and not AddBookmark then
+    Exit; // =>
+  if not IsNew then
+    UpdateBookmark;
+
   ModalResult := mrOK;
 end;
 
@@ -149,6 +160,11 @@ begin
   Result := fNode.GetTextPath;
 end;
 
+function TBookmarkForm.GetIsNewBookmark: Boolean;
+begin
+  Result := (not Assigned(FBookmark)) and Assigned(FRequestObject);
+end;
+
 function TBookmarkForm.GetRequestObject: TRequestObject;
 begin
   if not Assigned(FRequestObject) then
@@ -187,29 +203,20 @@ end;
 
 function TBookmarkForm.ShowModal(BM: TBookmark; RO: TRequestObject
   ): TModalResult;
-var
-  IsNew: Boolean;
 begin
   FBookmark := BM;
   FRequestObject := RO;
 
-  IsNew := (not Assigned(BM)) and Assigned(RO);
-
   BookmarkManager.AttachFolderNodes(tvFolders);
 
-  if IsNew then
+  if IsNewBookmark then
     PrepareAddForm
   else
     PrepareEditForm;
 
   Result := inherited ShowModal;
-  if IsNew and (Result = mrOK) then begin
-    AddBookmark;
+  if IsNewBookmark and (Result = mrOK) then
     Result := mrAdded;
-  end;
-  if not IsNew and (Result = mrOK) then begin
-    UpdateBookmark;
-  end;
 end;
 
 procedure TBookmarkForm.PrepareEditForm;
@@ -256,6 +263,7 @@ begin
   except
     on E: Exception do begin
       ERRMsg('Error', E.Message);
+      BM.Request := NIL; // Don't let free the RequestObject !
       BM.Free;
       Result := False;
     end;
