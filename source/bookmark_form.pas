@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Classes;
+  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls;
 
 const
   mrAdded = mrLast + 1; // A new bookmark was added.
@@ -68,9 +68,6 @@ type
     property BookmarkName: string read GetBookmarkName;
     property IsNewBookmark: Boolean read GetIsNewBookmark;
   end;
-
-var
-  BookmarkForm: TBookmarkForm;
 
 implementation
 
