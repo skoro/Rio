@@ -2194,7 +2194,7 @@ end;
 
 procedure TMainForm.UpdateStatusLine(Main: string);
 begin
-  StatusTextMain.Caption  := Main;
+  StatusTextMain.Caption  := IfThen(Main = '', ApplicationName, Main);
   StatusTextTime.Caption := '';
   StatusTextSize.Caption := '';
   StatusImageTime.Visible := False;
@@ -2374,6 +2374,7 @@ begin
 
   FResponseTabManager.CloseTabs;
   SetAppCaption;
+  UpdateStatusLine;
 
   // Submit and Bookmark buttons state.
   btnSubmit.Enabled := False;
