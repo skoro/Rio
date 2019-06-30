@@ -317,7 +317,7 @@ begin
   if not btnSubmit.Enabled then
     Exit; // =>
 
-  // A different url unbookmark the current bookmark.
+  // A different url will unbookmark the current bookmark.
   try
     RO := CreateRequestObject;
     if not FBookManager.IsCurrentRequest(RO) then begin
@@ -1875,16 +1875,12 @@ begin
     RO := CreateRequestObject;
     BookmarkManager := FBookManager;
     case ShowModal(BM, RO) of
-      mrAdded: begin
-        BookmarkButtonIcon(True);
-      end;
+      mrAdded:   BookmarkButtonIcon(True);
       mrDeleted: begin
         if FBookManager.CurrentBookmark = NIL then
           BookmarkButtonIcon(False);
       end;
-      mrOk: begin
-        // stub.
-      end;
+      mrOk: begin { stub. } end;
       else begin
         FreeAndNil(RO);
       end;
