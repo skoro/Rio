@@ -755,6 +755,9 @@ begin
   // Bookmark manager initialization.
   FBookManager := TBookmarkManager.Create(Self);
   FBookManager.Parent := BookmarkSide;
+  FBookManager.TreeView.StateImages := toolbarIcons;
+  FBookManager.ImageIndexFolder := 6;
+  FBookManager.ImageIndexBookmark := 7;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
   FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
