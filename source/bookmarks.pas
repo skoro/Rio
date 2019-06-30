@@ -65,6 +65,8 @@ type
     FRootNode: TTreeNode;
     FCurrentNode: TTreeNode;
     FOnChangeBookmark: TOnChangeBookmark;
+    FImgIdxFolder: Integer;
+    FImgIdxBookmark: Integer;
 
     function GetBookmarkPopup: TBookmarkPopup;
     function GetCurrentBookmark: TBookmark;
@@ -133,6 +135,8 @@ type
     property CurrentBookmark: TBookmark read GetCurrentBookmark;
     property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
+    property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
+    property ImageIndexBookmark: Integer read FImgIdxBookmark write FImgIdxBookmark;
   end;
 
   { TBookmarkPopup }
@@ -500,6 +504,7 @@ begin
   Result := FTreeView.Items.AddChild(ParentNode, FolderName);
   Result.Data := NIL;
   Result.MakeVisible;
+  Result.StateIndex := FImgIdxFolder;
 end;
 
 procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
@@ -629,6 +634,8 @@ end;
 constructor TBookmarkManager.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
+  FImgIdxFolder := -1;
+  FImgIdxBookmark := -1;
   Align := alClient;
   Caption := '';
   BevelOuter := bvNone;
@@ -657,6 +664,7 @@ begin
   if FolderNode.FindNode(BM.Name) <> NIL then
     raise ENodeException.CreateNode(FolderNode, Format('Name "%s" already exists.', [BM.Name]));
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
+  Result.StateIndex := FImgIdxBookmark;
   Result.Data := BM;
 end;
 
