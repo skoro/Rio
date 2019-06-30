@@ -116,12 +116,16 @@ type
     function FindNode(BM: TBookmark): TTreeNode;
     // Select bookmark.
     procedure OpenBookmark(BM: TBookmark = NIL);
+    // Select bookmark by its node path.
+    function OpenBookmarkPath(Path: string): TBookmark;
     // Get the node folder path (this is like dirname for files).
     function GetNodeFolderPath(aNode: TTreeNode): string;
     // Save the bookmarks content to a string buffer.
     procedure SaveXmlToStream(S: TStream); virtual;
     // Load bookmarks from the stream.
     procedure LoadXmlFromStream(S: TStream); virtual;
+    // Returns a bookmark tree path.
+    function GetBookmarkPath(BM: TBookmark): string; virtual;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
@@ -611,6 +615,17 @@ begin
   end;
 end;
 
+function TBookmarkManager.GetBookmarkPath(BM: TBookmark): string;
+var
+  bNode: TTreeNode;
+begin
+  Result := '';
+  bNode := FindNode(BM);
+  if bNode = NIL then
+    Exit; // =>
+  Result := bNode.GetTextPath;
+end;
+
 constructor TBookmarkManager.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
@@ -838,6 +853,21 @@ begin
     FCurrentNode := Selected; // Preserve selected node after user callback.
   end;
   FTreeView.Selected := Selected;
+end;
+
+function TBookmarkManager.OpenBookmarkPath(Path: string): TBookmark;
+var
+  bNode: TTreeNode;
+begin
+  Result := NIL;
+  Path := Trim(Path);
+  if Length(Path) = 0 then
+    Exit; // =>
+  bNode := FTreeView.Items.FindNodeWithTextPath(Path);
+  if (bNode = NIL) or (IsFolderNode(bNode)) then
+    Exit; // =>
+  Result := NodeToBookmark(bNode);
+  OpenBookmark(Result);
 end;
 
 end.
