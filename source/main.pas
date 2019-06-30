@@ -1335,6 +1335,7 @@ begin
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
     miBookmarks.Checked := ReadBoolean('bookmarks', True);
+    FBookManager.OpenBookmarkPath(ReadString('selBookmark', ''));
   end;
 end;
 
@@ -1362,6 +1363,8 @@ begin
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
     WriteBoolean('bookmarks', miBookmarks.Checked);
+    with FBookManager do
+      WriteString('selBookmark', IfThen(CurrentBookmark = NIL, '', GetBookmarkPath(CurrentBookmark)));
   end;
 end;
 
