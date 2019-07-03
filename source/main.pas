@@ -230,6 +230,7 @@ type
     procedure ViewSwitchLayout(Sender: TObject);
     procedure ViewSwitchTabs(Sender: TObject);
     procedure ViewToggleTabs(Sender: TObject);
+    procedure ViewToggleTabsMenu(Status: Boolean);
   private
     FContentType: string;
     FHttpClient: TThreadHttpClient;
@@ -1261,12 +1262,21 @@ end;
 procedure TMainForm.PairSplitterResize(Sender: TObject);
 var
   pss: TPairSplitterSide;
+  splSize: Integer;
 begin
   if not (Sender is TPairSplitterSide) then
     Exit; // =>
   pss := TPairSplitterSide(Sender);
   if (pss = BookmarkSide) then begin
     miBookmarks.Checked := pss.Width > 1;
+  end
+  else if (pss = splitterSideRequest) then begin
+    if (LayoutSplitter.SplitterType = pstVertical) then
+      splSize := pss.Height
+    else
+      splSize := pss.Width;
+    miTabToggle.Checked := splSize > 1;
+    ViewToggleTabsMenu(miTabToggle.Checked);
   end;
 end;
 
@@ -1536,20 +1546,24 @@ begin
 end;
 
 procedure TMainForm.ViewToggleTabs(Sender: TObject);
-var
-  Chk: Boolean;
 begin
   if Sender <> nil then
     miTabToggle.Checked := not miTabToggle.Checked;
-  Chk := miTabToggle.Checked;
-  pagesRequest.Visible := Chk;
-  miTabHeaders.Enabled := Chk;
-  miTabQuery.Enabled := Chk;
-  miTabBody.Enabled := Chk;
-  miTabCookie.Enabled := Chk;
-  miTabAuth.Enabled := Chk;
-  miTabNotes.Enabled := Chk;
-  ToggleRequestSide(Chk);
+  with miTabToggle do begin
+    ViewToggleTabsMenu(Checked);
+    ToggleRequestSide(Checked);
+  end;
+end;
+
+procedure TMainForm.ViewToggleTabsMenu(Status: Boolean);
+begin
+  pagesRequest.Visible := Status;
+  miTabHeaders.Enabled := Status;
+  miTabQuery.Enabled   := Status;
+  miTabBody.Enabled    := Status;
+  miTabCookie.Enabled  := Status;
+  miTabAuth.Enabled    := Status;
+  miTabNotes.Enabled   := Status;
 end;
 
 // Synchronizes query parameters from the url.
@@ -1809,23 +1823,17 @@ begin
   miLayoutVert.Enabled := VisibleSide;
   if not VisibleSide then begin
     LayoutSplitter.Cursor := crDefault;
-    if LayoutSplitter.SplitterType = pstVertical then begin
-      splitterSideRequest.Height := 0;
-      splitterSideRequest.Constraints.MaxHeight := 1;
-    end
-    else begin
+    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 0) then
+      splitterSideRequest.Height := 0
+    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 0) then
       splitterSideRequest.Width := 0;
-      splitterSideRequest.Constraints.MaxWidth := 1;
-    end;
   end
   else begin
-    if LayoutSplitter.SplitterType = pstVertical then begin
-      splitterSideRequest.Constraints.MaxHeight := 0;
+    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height <= 1) then begin
       splitterSideRequest.Height := LayoutSplitter.Height div 2;
       LayoutSplitter.Cursor := crVSplit;
     end
-    else begin
-      splitterSideRequest.Constraints.MaxWidth := 0;
+    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width <= 1) then begin
       splitterSideRequest.Width := LayoutSplitter.Width div 2;
       LayoutSplitter.Cursor := crHSplit;
     end;
