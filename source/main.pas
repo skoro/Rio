@@ -1822,21 +1822,16 @@ begin
   miLayoutHor.Enabled := VisibleSide;
   miLayoutVert.Enabled := VisibleSide;
   if not VisibleSide then begin
-    LayoutSplitter.Cursor := crDefault;
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 0) then
       splitterSideRequest.Height := 0
     else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 0) then
       splitterSideRequest.Width := 0;
   end
   else begin
-    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height <= 1) then begin
-      splitterSideRequest.Height := LayoutSplitter.Height div 2;
-      LayoutSplitter.Cursor := crVSplit;
-    end
-    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width <= 1) then begin
+    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height <= 1) then
+      splitterSideRequest.Height := LayoutSplitter.Height div 2
+    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width <= 1) then
       splitterSideRequest.Width := LayoutSplitter.Width div 2;
-      LayoutSplitter.Cursor := crHSplit;
-    end;
   end;
 end;
 
