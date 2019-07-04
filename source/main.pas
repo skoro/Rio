@@ -1557,13 +1557,16 @@ end;
 
 procedure TMainForm.ViewToggleTabsMenu(Status: Boolean);
 begin
-  pagesRequest.Visible := Status;
-  miTabHeaders.Enabled := Status;
-  miTabQuery.Enabled   := Status;
-  miTabBody.Enabled    := Status;
-  miTabCookie.Enabled  := Status;
-  miTabAuth.Enabled    := Status;
-  miTabNotes.Enabled   := Status;
+  pagesRequest.Visible     := Status;
+  OptionsForm.LayoutEnable := Status;
+  miTabHeaders.Enabled     := Status;
+  miTabQuery.Enabled       := Status;
+  miTabBody.Enabled        := Status;
+  miTabCookie.Enabled      := Status;
+  miTabAuth.Enabled        := Status;
+  miTabNotes.Enabled       := Status;
+  miLayoutHor.Enabled      := Status;
+  miLayoutVert.Enabled     := Status;
 end;
 
 // Synchronizes query parameters from the url.
@@ -1818,9 +1821,6 @@ end;
 
 procedure TMainForm.ToggleRequestSide(VisibleSide: Boolean);
 begin
-  OptionsForm.LayoutEnable := VisibleSide;
-  miLayoutHor.Enabled := VisibleSide;
-  miLayoutVert.Enabled := VisibleSide;
   if not VisibleSide then begin
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 0) then
       splitterSideRequest.Height := 0
