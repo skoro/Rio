@@ -716,6 +716,10 @@ var
 begin
   inherited;
 
+  // Earlier options initialization. We need options during
+  // main form creation.
+  OptionsForm := TOptionsForm.Create(Self);
+
   // Defaults. Before configuration is read.
   SelectResponseViewTab(rvList);
 
@@ -788,6 +792,10 @@ begin
   {if Assigned(FHttpClient) then begin
     FHttpClient.Terminate;
   end;}
+
+  // Free and save options.
+  OptionsForm.Free;
+
   inherited;
 end;
 
