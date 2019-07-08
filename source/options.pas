@@ -43,6 +43,7 @@ type
     cbJsonLines: TCheckBox;
     cbEditMethods: TCheckBox;
     cbFitImages: TCheckBox;
+    cbTabContent: TCheckBox;
     editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
     GroupBox1: TGroupBox;
@@ -95,6 +96,7 @@ type
     function GetPropIndexFromKeyName(AKeyName, Prop: string): integer;
     function GetDefaultFont(FontItem: TUIFontItem): TFont;
     function GetRequestTimeout: Integer;
+    function GetTabContent: Boolean;
     procedure SetFontDemo;
     procedure InitFonts;
     procedure InitShortcuts;
@@ -127,6 +129,7 @@ type
     property EditRequestMethods: Boolean read GetEditRequestMethods;
     property FitImages: Boolean read GetFitImages;
     property LayoutEnable: Boolean write SetLayoutEnable;
+    property TabContent: Boolean read GetTabContent;
   end;
 
 var
@@ -392,6 +395,11 @@ end;
 function TOptionsForm.GetRequestTimeout: Integer;
 begin
   Result := seTimeout.Value;
+end;
+
+function TOptionsForm.GetTabContent: Boolean;
+begin
+  Result := cbTabContent.Checked;
 end;
 
 procedure TOptionsForm.SetFontDemo;
