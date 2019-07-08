@@ -2169,8 +2169,10 @@ begin
     ERRMsg('Error', E.TabMessage);
   end;
 
-  if (mime.MimeType = 'text') or ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
-    tabContent.TabVisible := True
+  // Show/hide 'Content' response tab.
+  if (mime.MimeType = 'text') or
+       ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
+    tabContent.TabVisible := not (OptionsForm.HideTabContent and (FResponseTabManager.OpenedTabs.Count > 0))
   else
     tabContent.TabVisible := False;
 
