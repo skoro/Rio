@@ -18,5 +18,4 @@ Setups will be in the root project "dist" directory.
 
 TODO:
 -----
-- one install.iss for both platforms
 - expose application version to the install.iss (avoid manual editing)
