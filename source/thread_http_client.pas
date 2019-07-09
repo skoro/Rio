@@ -505,8 +505,6 @@ begin
   If (URI.Port <> 0) then
     S:=S+':'+IntToStr(URI.Port);
   Buf.Add(S);
-  If Assigned(RequestBody) and (IndexOfHeader('Content-Length')=-1) then
-    Buf.Add('Content-Length: %d', [RequestBody.Size]);
   For I:=0 to RequestHeaders.Count-1 do
   begin
     l := RequestHeaders[i];
