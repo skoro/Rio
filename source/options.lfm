@@ -73,6 +73,8 @@ object OptionsForm: TOptionsForm
         Top = 128
         Width = 284
         Caption = 'Don''t &show Content tab for Json, XML response'
+        Checked = True
+        State = cbChecked
         TabOrder = 3
       end
     end
