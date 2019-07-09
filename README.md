@@ -29,9 +29,9 @@ For compiling from sources you need the following requirements:
 - [FreePascal](https://www.freepascal.org/) 3.0.4
 
 Before compiling the application you need to install a components package
-from the `components/rest_explorer` folder. In Lazarus open in main
-menu `Package / Open package file (.lpk)...` and open the file
-`components/rest_explorer/rest_explorer.lpk` then compile and install the
+`components/rest_explorer`. In Lazarus from the main menu
+`Package / Open package file (.lpk)...` open the file
+`components/rest_explorer/rest_explorer.lpk` and then compile and install the
 package.
 Please ensure that the package *TAChart* is also installed.
 
@@ -40,6 +40,7 @@ For example:
 - `make linux32` for compiling release binary for i386
 - `make linux64` or for amd64
 - `make deb-linux32` creates a deb package for i386
+- `make appimage` creates AppImage binary (only amd64)
 
 For more targets see output of `make`.
 
@@ -52,4 +53,4 @@ The HTTPS requests require the OpenSSL DLLs to be on the system. These DLLs
 you can get from https://indy.fulgan.com/SSL/ or from "install/windows"
 directory. Put these DLLs along compiled exe binary.
 
-Setup distributions already has these OpenSSL DLLs.
+Setup distributions already have these OpenSSL DLLs.
