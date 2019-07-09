@@ -1299,10 +1299,12 @@ class function TFPCustomHTTPClient.IndexOfHeader(HTTPHeaders: TStrings;
 
 Var
   H : String;
+  L : Integer;
 begin
   H:=LowerCase(Aheader);
+  L:=Length(H);
   Result:=HTTPHeaders.Count-1;
-  While (Result>=0) and ((LowerCase(HTTPHeaders[Result]))<>h) do
+  While (Result>=0) and ((LowerCase(Copy(HTTPHeaders[Result], 1, L)))<>h) do
     Dec(Result);
 end;
 
