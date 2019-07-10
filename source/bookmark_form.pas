@@ -20,6 +20,7 @@ type
     btnNewFolder: TButton;
     ButtonPanel: TButtonPanel;
     cbLock: TCheckBox;
+    cbCopy: TCheckBox;
     edName: TEdit;
     lFolder: TLabel;
     lName: TLabel;
@@ -229,6 +230,7 @@ begin
   DeleteEnabled := True;
   edName.Text := FBookmark.Name;
   cbLock.Checked := FBookmark.Locked;
+  cbCopy.Visible := True;
   // Select the bookmark node by default.
   srcNode := FBookmarkManager.FindNode(FBookmark);
   if not Assigned(srcNode) then
@@ -248,6 +250,7 @@ procedure TBookmarkForm.PrepareAddForm;
 begin
   DeleteEnabled := False;
   edName.Text := GetRequestFilename(RequestObject.Url);
+  cbCopy.Visible := False;
 end;
 
 procedure TBookmarkForm.AddBookmark;
@@ -273,7 +276,10 @@ end;
 procedure TBookmarkForm.UpdateBookmark;
 begin
   FBookmark.Locked := cbLock.Checked;
-  BookmarkManager.UpdateBookmark(FBookmark, BookmarkName, FolderPath);
+  if cbCopy.Checked then
+    AddBookmark
+  else
+    BookmarkManager.UpdateBookmark(FBookmark, BookmarkName, FolderPath);
 end;
 
 procedure TBookmarkForm.DeleteBookmark;

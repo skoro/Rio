@@ -69,14 +69,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 173
+    Height = 151
     Top = 60
     Width = 248
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 173
+    ClientHeight = 151
     ClientWidth = 248
     TabOrder = 2
     object lFolder: TLabel
@@ -91,7 +91,7 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 146
+      Top = 124
       Width = 248
       Align = alBottom
       AutoSize = True
@@ -114,7 +114,7 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 125
+      Height = 103
       Top = 17
       Width = 248
       Align = alClient
@@ -128,24 +128,33 @@ object BookmarkForm: TBookmarkForm
   end
   object pOptions: TPanel
     Left = 6
-    Height = 22
-    Top = 239
+    Height = 44
+    Top = 217
     Width = 248
     Align = alBottom
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 22
+    ClientHeight = 44
     ClientWidth = 248
     TabOrder = 3
     object cbLock: TCheckBox
       Left = 0
       Height = 22
-      Top = 0
+      Top = 22
       Width = 248
       Align = alTop
       Caption = '&Lock request data'
       TabOrder = 0
+    end
+    object cbCopy: TCheckBox
+      Left = 0
+      Height = 22
+      Top = 0
+      Width = 248
+      Align = alTop
+      Caption = 'Co&py to the selected folder'
+      TabOrder = 1
     end
   end
 end
