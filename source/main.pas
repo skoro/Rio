@@ -1896,6 +1896,7 @@ begin
       mrDeleted: begin
         if FBookManager.CurrentBookmark = NIL then
           BookmarkButtonIcon(False);
+        FreeAndNil(RO);
       end;
       mrOk: begin { stub. } end;
       else begin
