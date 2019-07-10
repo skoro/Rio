@@ -727,8 +727,10 @@ end;
 
 procedure TBookmarkManager.ResetCurrent;
 begin
-  if Assigned(FCurrentNode) then
+  if Assigned(FCurrentNode) then begin
     FCurrentNode.Selected := False;
+    FCurrentNode.ImageIndex := -1; // Reset selected image.
+  end;
   FCurrentNode := NIL;
 end;
 
