@@ -67,6 +67,7 @@ type
     FOnChangeBookmark: TOnChangeBookmark;
     FImgIdxFolder: Integer;
     FImgIdxBookmark: Integer;
+    FImgIdxSelected: Integer;
 
     function GetBookmarkPopup: TBookmarkPopup;
     function GetCurrentBookmark: TBookmark;
@@ -137,6 +138,7 @@ type
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexBookmark: Integer read FImgIdxBookmark write FImgIdxBookmark;
+    property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
   end;
 
   { TBookmarkPopup }
@@ -855,12 +857,15 @@ begin
   if Selected = FCurrentNode then
     Exit; // =>
   Prev := GetCurrentBookmark;
+  if Assigned(FCurrentNode) then
+    FCurrentNode.ImageIndex := -1;
   FCurrentNode := Selected;
   if Assigned(FOnChangeBookmark) then begin
     FOnChangeBookmark(Prev, GetCurrentBookmark);
     FCurrentNode := Selected; // Preserve selected node after user callback.
   end;
   FTreeView.Selected := Selected;
+  Selected.ImageIndex := FImgIdxSelected;
 end;
 
 function TBookmarkManager.OpenBookmarkPath(Path: string): TBookmark;
