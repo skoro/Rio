@@ -452,6 +452,7 @@ begin
       raise ENodeException.CreateNode(AValue, 'Current node cannot be a folder node.');
     FCurrentNode := AValue;
     FCurrentNode.Selected := True;
+    FCurrentNode.ImageIndex := FImgIdxSelected;
     FCurrentNode.MakeVisible;
   end;
 end;
