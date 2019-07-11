@@ -86,6 +86,8 @@ type
     procedure InternalSaveToXml(Doc: TXMLDocument; XmlRoot: TDOMNode; aNode: TTreeNode); virtual;
     // Populate the tree view from the XML.
     procedure InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode); virtual;
+    // Set or reset the selected image on the node.
+    procedure SetNodeSelectedImage(aNode: TTreeNode; NeedReset: Boolean = False); virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -450,9 +452,12 @@ begin
   else begin
     if IsFolderNode(AValue) then
       raise ENodeException.CreateNode(AValue, 'Current node cannot be a folder node.');
+    // Reset the selected image on the previous node.
+    if Assigned(FCurrentNode) then
+      SetNodeSelectedImage(FCurrentNode, True);
     FCurrentNode := AValue;
     FCurrentNode.Selected := True;
-    FCurrentNode.ImageIndex := FImgIdxSelected;
+    SetNodeSelectedImage(FCurrentNode);
     FCurrentNode.MakeVisible;
   end;
 end;
@@ -571,6 +576,16 @@ begin
     end;
     Child := Child.NextSibling;
   end;
+end;
+
+procedure TBookmarkManager.SetNodeSelectedImage(aNode: TTreeNode;
+  NeedReset: Boolean);
+var
+  i: Integer;
+begin
+  if NeedReset then i := -1 else i := FImgIdxSelected;
+  aNode.SelectedIndex := i;
+  aNode.ImageIndex := i;
 end;
 
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
@@ -730,7 +745,7 @@ procedure TBookmarkManager.ResetCurrent;
 begin
   if Assigned(FCurrentNode) then begin
     FCurrentNode.Selected := False;
-    FCurrentNode.ImageIndex := -1; // Reset selected image.
+    SetNodeSelectedImage(FCurrentNode, True);
   end;
   FCurrentNode := NIL;
 end;
@@ -860,15 +875,12 @@ begin
   if Selected = FCurrentNode then
     Exit; // =>
   Prev := GetCurrentBookmark;
-  if Assigned(FCurrentNode) then
-    FCurrentNode.ImageIndex := -1;
-  FCurrentNode := Selected;
+  CurrentNode := Selected;
   if Assigned(FOnChangeBookmark) then begin
     FOnChangeBookmark(Prev, GetCurrentBookmark);
-    FCurrentNode := Selected; // Preserve selected node after user callback.
+    CurrentNode := Selected; // Preserve selected node after user callback.
   end;
   FTreeView.Selected := Selected;
-  Selected.ImageIndex := FImgIdxSelected;
 end;
 
 function TBookmarkManager.OpenBookmarkPath(Path: string): TBookmark;
