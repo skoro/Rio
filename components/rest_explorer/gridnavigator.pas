@@ -94,12 +94,13 @@ end;
 
 procedure TGridNavigator.OnButtonClearClick(Sender: TObject);
 var
-  Answer: Integer;
+  Answer: TModalResult;
 begin
   if Assigned(FGrid) then begin
     if (FGrid.FixedRows > 0) and (FGrid.RowCount = 1) then Exit;
-    Answer := Application.MessageBox('Are you sure you want to clear all the rows ?', 'Clear rows', MB_ICONQUESTION + MB_YESNO);
-    if Answer = IDNO then Exit;
+    Answer := QuestionDlg('Clear rows', 'Are you sure you want to clear all the rows ?', mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+    if Answer = mrCancel then
+      Exit; // =>
     if FGrid.FixedRows > 0 then
       FGrid.RowCount := FGrid.FixedRows
     else
