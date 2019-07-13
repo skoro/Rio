@@ -31,51 +31,89 @@ object OptionsForm: TOptionsForm
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
       Caption = 'General'
+      ChildSizing.LeftRightSpacing = 4
+      ChildSizing.TopBottomSpacing = 2
       ClientHeight = 306
       ClientWidth = 308
-      object seTimeout: TSpinEdit
-        Left = 8
-        Height = 27
-        Top = 28
-        Width = 80
-        MaxValue = 500
-        MinValue = 2
+      object gboxRequest: TGroupBox
+        Left = 4
+        Height = 93
+        Top = 2
+        Width = 300
+        Align = alTop
+        AutoSize = True
+        Caption = 'Request'
+        ChildSizing.LeftRightSpacing = 4
+        ChildSizing.TopBottomSpacing = 2
+        ClientHeight = 74
+        ClientWidth = 296
         TabOrder = 0
-        Value = 60
+        object lTimeout: TLabel
+          Left = 4
+          Height = 17
+          Top = 2
+          Width = 288
+          Align = alTop
+          Caption = 'Request timeout (sec):'
+          ParentColor = False
+        end
+        object seTimeout: TSpinEdit
+          Left = 4
+          Height = 27
+          Top = 19
+          Width = 288
+          Align = alTop
+          MaxValue = 500
+          MinValue = 2
+          TabOrder = 0
+          Value = 60
+        end
+        object cbEditMethods: TCheckBox
+          Left = 4
+          Height = 22
+          Top = 50
+          Width = 288
+          Align = alTop
+          BorderSpacing.Top = 4
+          Caption = '&Editable request methods'
+          TabOrder = 1
+        end
       end
-      object lTimeout: TLabel
-        Left = 8
-        Height = 17
-        Top = 8
-        Width = 124
-        Caption = 'Request timeout (sec):'
-        ParentColor = False
-      end
-      object cbEditMethods: TCheckBox
-        Left = 8
-        Height = 22
-        Top = 64
-        Width = 167
-        Caption = '&Editable request methods'
+      object gboxResponse: TGroupBox
+        Left = 4
+        Height = 67
+        Top = 101
+        Width = 300
+        Align = alTop
+        AutoSize = True
+        BorderSpacing.Top = 6
+        Caption = 'Response'
+        ChildSizing.LeftRightSpacing = 4
+        ChildSizing.TopBottomSpacing = 2
+        ClientHeight = 48
+        ClientWidth = 296
+        ParentFont = False
         TabOrder = 1
-      end
-      object cbFitImages: TCheckBox
-        Left = 8
-        Height = 22
-        Top = 96
-        Width = 81
-        Caption = '&Fit images'
-        TabOrder = 2
-      end
-      object cbHideTabContent: TCheckBox
-        Left = 8
-        Height = 22
-        Top = 128
-        Width = 284
-        Caption = 'Don''t &show Content tab for Json, XML response'
-        Checked = True
-        State = cbChecked
-        TabOrder = 3
+        object cbFitImages: TCheckBox
+          Left = 4
+          Height = 22
+          Top = 2
+          Width = 288
+          Align = alTop
+          Caption = '&Fit images'
+          TabOrder = 0
+        end
+        object cbHideTabContent: TCheckBox
+          Left = 4
+          Height = 22
+          Top = 24
+          Width = 288
+          Align = alTop
+          Caption = 'Don''t &show Content tab for Json, XML response'
+          Checked = True
+          State = cbChecked
+          TabOrder = 1
+        end
       end
     end
     object tabAppearance: TTabSheet
