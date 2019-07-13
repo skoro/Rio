@@ -2019,7 +2019,6 @@ object MainForm: TMainForm
     end
     object gaDeleteRow: TMenuItem
       Caption = 'Delete'
-      ShortCut = 16452
       OnClick = gaDeleteRowClick
     end
     object gaClearRows: TMenuItem
