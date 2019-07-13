@@ -84,11 +84,20 @@ begin
 end;
 
 procedure TGridNavigator.OnButtonDeleteClick(Sender: TObject);
+var
+  Answer: TModalResult;
+  ColName: string;
 begin
   if Assigned(FGrid) then begin
-    if (FGrid.FixedRows > 0) and (FGrid.RowCount = 1) then Exit;
+    if (FGrid.FixedRows > 0) and (FGrid.RowCount = 1) then
+      Exit; // =>
+    ColName := FGrid.Cells[1, FGrid.Row]; // "Name" column.
+    Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ColName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+    if Answer = mrCancel then
+      Exit; // =>
     FGrid.DeleteRow(FGrid.Row);
-    if Assigned(FOnDeleteRow) then FOnDeleteRow(Self, FGrid);
+    if Assigned(FOnDeleteRow) then
+      FOnDeleteRow(Self, FGrid);
   end;
 end;
 
