@@ -289,6 +289,7 @@ type
     procedure FindText;
     function CreateRequestObject: TRequestObject;
     procedure SetRequestObject(RO: TRequestObject);
+    property BookmarkManager: TBookmarkManager read FBookManager;
   end;
 
 var
