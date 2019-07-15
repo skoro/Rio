@@ -9,7 +9,7 @@ procedure HandleCommandLine;
 
 implementation
 
-uses sysutils, Forms, ValEdit, app_helpers, main, request_object;
+uses sysutils, strutils, Forms, ValEdit, app_helpers, main, request_object;
 
 const CRLF = #13#10;
 
@@ -41,6 +41,10 @@ begin
     '    Data from this option will appear in "Json" view of "Body" tab.' + crlf +
     '-f,--file=<file>' + crlf +
     '    Open request data from the specified file.' + crlf +
+    '-b,--bookmark=<name>' + crlf +
+    '    Load a bookmark. <name> is the bookmark name separated by "/".' + crlf +
+    '    For example, a value /Service/users loads the bookmark "users"' + crlf +
+    '    from the folder "Service".' + crlf +
     '--new' + crlf +
     '    Start a new request. Empty all the request fields and grids.' + crlf +
     crlf,
@@ -50,10 +54,10 @@ end;
 
 procedure HandleCommandLine;
 const
-  LongOpts: array [1..8] of string = ('request:', 'header:', 'form:',
-            'cookie:', 'data:', 'json:', 'file:', 'new'
+  LongOpts: array [1..9] of string = ('request:', 'header:', 'form:',
+            'cookie:', 'data:', 'json:', 'file:', 'new', 'bookmark:'
   );
-  ShortOpts: string = 'X:H:F:C:d:j:f:';
+  ShortOpts: string = 'X:H:F:C:d:j:f:b:';
 var
   ErrorMsg, ReqMethod, Value, FileName: string;
   I: Integer;
@@ -121,6 +125,13 @@ begin
     if not FileGetContents(FileName, Value) then
       raise Exception.Create('cannot read file: ' + FileName);
     MainForm.OpenRequestFile(Value);
+  end;
+  // Load a bookmark.
+  if Application.HasOption('b', 'bookmark') then begin
+    Value := Trim(Application.GetOptionValue('b', 'bookmark'));
+    Value := MainForm.BookmarkManager.RootName + '/' + TrimLeftSet(Value, ['/']);
+    if MainForm.BookmarkManager.OpenBookmarkPath(Value) = NIL then
+      raise Exception.CreateFmt('Could not open bookmark: %s', [Value]);
   end;
   // Set request method.
   if ReqMethod <> '' then
