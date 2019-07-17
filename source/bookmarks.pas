@@ -88,6 +88,10 @@ type
     procedure InternalLoadFromXml(XmlNode: TDOMNode; aNode: TTreeNode); virtual;
     // Set or reset the selected image on the node.
     procedure SetNodeSelectedImage(aNode: TTreeNode; NeedReset: Boolean = False); virtual;
+    // Sort nodes by specific criteria.
+    procedure SortNodes(ParentNode: TTreeNode); virtual;
+    // Sort comparator.
+    function SortNodeCompare(Node1, Node2: TTreeNode): integer; virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -513,6 +517,7 @@ begin
   Result.Data := NIL;
   Result.MakeVisible;
   Result.StateIndex := FImgIdxFolder;
+  SortNodes(ParentNode);
 end;
 
 procedure TBookmarkManager.InternalTreeOnDblClick(Sender: TObject);
@@ -586,6 +591,22 @@ begin
   if NeedReset then i := -1 else i := FImgIdxSelected;
   aNode.SelectedIndex := i;
   aNode.ImageIndex := i;
+end;
+
+procedure TBookmarkManager.SortNodes(ParentNode: TTreeNode);
+begin
+  ParentNode.CustomSort(@SortNodeCompare);
+end;
+
+function TBookmarkManager.SortNodeCompare(Node1, Node2: TTreeNode): integer;
+begin
+  // Folders come first.
+  if (Node1.Data = NIL) and (Node2.Data <> NIL) then Exit(-1);
+  if (Node1.Data <> NIL) and (Node2.Data = NIL) then Exit(1);
+  // Compare folders or bookmarks by name.
+  if ((Node1.Data = NIL) and (Node2.Data = NIL))
+     or ((Node1.Data <> NIL) and (Node2.Data <> NIL)) then
+    Exit(AnsiCompareStr(Node1.Text, Node2.Text));
 end;
 
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
@@ -684,6 +705,7 @@ begin
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.StateIndex := FImgIdxBookmark;
   Result.Data := BM;
+  SortNodes(FolderNode);
 end;
 
 procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
