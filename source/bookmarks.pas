@@ -226,11 +226,10 @@ var
   FS: TFileStream;
   Path: string;
 begin
-  Result := False;
+  Path := GetAppBookmarksFilename(Filename);
+  if not FileExists(Path) then
+    Exit(False); // =>
   try
-    Path := GetAppBookmarksFilename(Filename);
-    if not FileExists(Path) then
-      Exit; // =>
     FS := TFileStream.Create(Path, fmOpenRead);
     BM.LoadXmlFromStream(FS);
     Result := True;
