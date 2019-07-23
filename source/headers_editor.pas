@@ -56,7 +56,7 @@ uses app_helpers;
 
 { THeadersEditorForm }
 
-const DEFAULT_HEADERS : array [1..10, 1..2] of string = (
+const DEFAULT_HEADERS : array [1..11, 1..2] of string = (
       ('Content-Type', 'text/html'),
       ('Content-Type', 'application/json'),
       ('Content-Type', 'application/x-www-form-urlencoded'),
@@ -66,6 +66,7 @@ const DEFAULT_HEADERS : array [1..10, 1..2] of string = (
       ('Referer', ''),
       ('User-Agent', ''),
       ('Accept', 'text/html'),
+      ('Accept', 'application/json'),
       ('X-Requested-With', 'XMLHttpRequest')
 );
 

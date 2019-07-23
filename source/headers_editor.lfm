@@ -16,7 +16,7 @@ object HeadersEditorForm: THeadersEditorForm
   Position = poMainFormCenter
   SessionProperties = 'Height;Width'
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object Panel1: TPanel
     Left = 0
     Height = 258
@@ -126,10 +126,10 @@ object HeadersEditorForm: THeadersEditorForm
     ClientWidth = 416
     TabOrder = 1
     object BtnClose: TButton
-      Left = 66
+      Left = 61
       Height = 38
       Top = 2
-      Width = 59
+      Width = 57
       Align = alLeft
       AutoSize = True
       BorderSpacing.InnerBorder = 8
@@ -143,7 +143,7 @@ object HeadersEditorForm: THeadersEditorForm
       Left = 2
       Height = 38
       Top = 2
-      Width = 64
+      Width = 59
       Align = alLeft
       AutoSize = True
       BorderSpacing.InnerBorder = 8
@@ -154,10 +154,10 @@ object HeadersEditorForm: THeadersEditorForm
       TabOrder = 1
     end
     object btnRestore: TButton
-      Left = 302
+      Left = 313
       Height = 38
       Top = 2
-      Width = 112
+      Width = 101
       Align = alRight
       AutoSize = True
       Caption = '&Restore defaults'
