@@ -487,7 +487,7 @@ begin
   SetShortCut(sciSaveBody,      113, []); // F2
   SetShortCut(sciSwitchView,    115, []); // F4
   SetShortCut(sciSubmit,        120, []); // F9
-  SetShortCut(sciToggleTabs,    84, [ssAlt, ssShift]); // T
+  SetShortCut(sciToggleTabs,    118, []); // F7
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
   SetShortCut(sciBookmark,      68, [ssCtrl]); // T
   SetShortCut(sciToggleBookmarks, 119, []); // F8
