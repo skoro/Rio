@@ -191,9 +191,23 @@ const
   // Get the full path name of the application bookmarks.
   function GetAppBookmarksFilename(Basename: string = BOOKMARK_FILENAME): string;
 
+  // These functions must be used instead of Node.GetTextPath and
+  // Tree.Items.FindNodeWithTextPath. This is because a forward slash can be
+  // inside Node.Text which is used as a path separator between tree nodes
+  // in the above functions.
+  // Returns a safe node path (must be used instead of Node.GetTextPath).
+  function GetNodePath(aNode: TTreeNode): string;
+  // Returns a node by the path (must be used instead of Tree.Items.FindNodeWithTextPath).
+  function FindNodePath(Nodes: TTreeNodes; TextPath: string): TTreeNode;
+
 implementation
 
 uses StdCtrls, Dialogs, app_helpers, strutils, XMLWrite, XMLRead;
+
+const
+  // What symbol to use as forward slash in the node text.
+  // See GetNodePath, FindNodePath.
+  NODE_TEXT_SLASH = #9;
 
 function IsFolderNode(Node: TTreeNode): Boolean;
 begin
@@ -241,6 +255,45 @@ end;
 function GetAppBookmarksFilename(Basename: string): string;
 begin
   Result := GetAppConfigDir(False) + Basename;
+end;
+
+function GetNodePath(aNode: TTreeNode): string;
+var
+  Node: TTreeNode;
+  NText: string;
+begin
+  Result := '';
+  Node := aNode;
+  while Assigned(Node) do
+  begin
+    if Result <> '' then
+      Result := '/' + Result;
+    Result := ReplaceStr(Node.Text, '/', NODE_TEXT_SLASH) + Result;
+    Node := Node.Parent;
+  end;
+end;
+
+function FindNodePath(Nodes: TTreeNodes; TextPath: string): TTreeNode;
+var
+  p: SizeInt;
+  CurText: String;
+begin
+  Result := NIL;
+  repeat
+    p := System.Pos('/', TextPath);
+    if p > 0 then begin
+      CurText := LeftStr(TextPath, p-1);
+      System.Delete(TextPath, 1, p);
+    end else begin
+      CurText := TextPath;
+      TextPath := '';
+    end;
+    CurText := ReplaceStr(CurText, NODE_TEXT_SLASH, '/');
+    if Result = NIL then
+      Result := Nodes.FindTopLvlNode(CurText)
+    else
+      Result := Result.FindNode(CurText);
+  until (Result = NIL) or (TextPath = '');
 end;
 
 { TBookmarkPopup }
@@ -347,7 +400,7 @@ begin
     sNode := sNode.Parent;
   if (not Assigned(sNode)) or (not IsFolderNode(sNode)) then
     Exit; // =>
-  FBookmarkManager.AddFolder(sNode.GetTextPath + '/' + fName);
+  FBookmarkManager.AddFolder(GetNodePath(sNode) + '/' + fName);
 end;
 
 procedure TBookmarkPopup.RenameFolder(FolderNode: TTreeNode);
@@ -357,7 +410,7 @@ begin
   NewName := InputBox('Edit folder', 'A new folder name:', FolderNode.Text);
   if (NewName = FolderNode.Text) or (Trim(NewName) = '') then
     Exit; // =>
-  if not FBookmarkManager.RenameFolder(FolderNode.GetTextPath, NewName) then
+  if not FBookmarkManager.RenameFolder(GetNodePath(FolderNode), NewName) then
     ERRMsg('Error', 'Cannot rename folder. Folder is already exist ?');
 end;
 
@@ -575,7 +628,7 @@ begin
         BM := TBookmark.Create(Elem.GetAttribute('name'));
         BM.Locked := Elem.GetAttribute('locked') = '1';
         BM.Request := TRequestObject.CreateFromJson(Child.TextContent);
-        AddBookmark(BM, aNode.GetTextPath);
+        AddBookmark(BM, GetNodePath(aNode));
       end;
     end;
     Child := Child.NextSibling;
@@ -613,7 +666,7 @@ var
   path: string;
   p: SizeInt;
 begin
-  path := aNode.GetTextPath;
+  path := GetNodePath(aNode);
   if IsFolderNode(aNode) then
     Exit(path);
   p := RPos('/', path);
@@ -666,7 +719,7 @@ begin
   bNode := FindNode(BM);
   if bNode = NIL then
     Exit; // =>
-  Result := bNode.GetTextPath;
+  Result := GetNodePath(bNode);
 end;
 
 constructor TBookmarkManager.Create(TheOwner: TComponent);
@@ -734,7 +787,7 @@ var
   FolderName, CurFolder: string;
   ParentNode: TTreeNode;
 begin
-  if FTreeView.Items.FindNodeWithTextPath(FolderPath) <> NIL then
+  if FindNodePath(FTreeView.Items, FolderPath) <> NIL then
     Exit(NIL); // =>
   p := RPos('/', FolderPath);
   FolderName := RightStr(FolderPath, Length(FolderPath) - p);
@@ -753,7 +806,7 @@ var
 begin
   p := RPos('/', FolderPath);
   newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
-  if FTreeView.Items.FindNodeWithTextPath(newPath) <> NIL then
+  if FindNodePath(FTreeView.Items, newPath) <> NIL then
     Exit(False);
   Folder := FindFolder(FolderPath);
   if Folder = NIL then
@@ -806,7 +859,7 @@ end;
 
 function TBookmarkManager.FindFolder(FolderPath: string): TTreeNode;
 begin
-  Result := FTreeView.Items.FindNodeWithTextPath(FolderPath);
+  Result := FindNodePath(FTreeView.Items, FolderPath);
   if (Result <> NIL) and IsFolderNode(Result) then
     Exit;
   Result := NIL;
@@ -912,7 +965,7 @@ begin
   Path := Trim(Path);
   if Length(Path) = 0 then
     Exit; // =>
-  bNode := FTreeView.Items.FindNodeWithTextPath(Path);
+  bNode := FindNodePath(FTreeView.Items, Path);
   if (bNode = NIL) or (IsFolderNode(bNode)) then
     Exit; // =>
   Result := NodeToBookmark(bNode);
