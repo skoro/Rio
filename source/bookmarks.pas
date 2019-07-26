@@ -784,18 +784,32 @@ end;
 function TBookmarkManager.AddFolder(FolderPath: string): TTreeNode;
 var
   p: SizeInt;
-  FolderName, CurFolder: string;
-  ParentNode: TTreeNode;
+  CurFolder: string;
+  NextNode: TTreeNode;
 begin
-  if FindNodePath(FTreeView.Items, FolderPath) <> NIL then
-    Exit(NIL); // =>
-  p := RPos('/', FolderPath);
-  FolderName := RightStr(FolderPath, Length(FolderPath) - p);
-  CurFolder := LeftStr(FolderPath, p - 1);
-  ParentNode := FindFolder(CurFolder);
-  if ParentNode = NIL then
-    raise ENodePathNotFound.CreatePath(CurFolder);
-  Result := InternalAddFolder(ParentNode, FolderName);
+  Result := NIL;
+  repeat
+    p := system.Pos('/', FolderPath);
+    if p > 0 then begin
+      CurFolder := LeftStr(FolderPath, p-1);
+      system.Delete(FolderPath, 1, p);
+    end
+    else begin
+      CurFolder := FolderPath;
+      FolderPath := '';
+    end;
+    if Result = NIL then begin
+      if CurFolder <> FRootNode.Text then
+        raise ENodePathNotFound.CreatePath(CurFolder);
+      Result := FRootNode;
+    end
+    else begin
+      NextNode := Result.FindNode(CurFolder);
+      if NextNode = NIL then
+        NextNode := InternalAddFolder(Result, CurFolder);
+      Result := NextNode;
+    end;
+  until FolderPath = '';
 end;
 
 function TBookmarkManager.RenameFolder(FolderPath, NewName: string): Boolean;
