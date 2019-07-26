@@ -176,7 +176,6 @@ object MainForm: TMainForm
       AutoCompleteText = [cbactEnabled, cbactEndOfLineComplete, cbactSearchAscending]
       BorderSpacing.Right = 4
       ItemHeight = 0
-      ItemIndex = 0
       Items.Strings = (
         'GET'
         'POST'
@@ -184,6 +183,7 @@ object MainForm: TMainForm
         'OPTIONS'
         'DELETE'
         'PATCH'
+        'HEAD'
       )
       TabOrder = 0
       Text = 'GET'
