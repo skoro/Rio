@@ -260,7 +260,6 @@ end;
 function GetNodePath(aNode: TTreeNode): string;
 var
   Node: TTreeNode;
-  NText: string;
 begin
   Result := '';
   Node := aNode;
