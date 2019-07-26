@@ -1390,7 +1390,8 @@ begin
     WriteBoolean('tabToggle', miTabToggle.Checked);
     WriteBoolean('bookmarks', miBookmarks.Checked);
     with FBookManager do
-      WriteString('selBookmark', IfThen(CurrentBookmark = NIL, '', GetBookmarkPath(CurrentBookmark)));
+      if CurrentBookmark = NIL then WriteString('selBookmark', '')
+      else WriteString('selBookmark', GetBookmarkPath(CurrentBookmark));
   end;
 end;
 
