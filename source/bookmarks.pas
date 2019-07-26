@@ -390,7 +390,7 @@ var
   fName: string;
   sNode: TTreeNode;
 begin
-  fName := InputBox('New folder', 'Folder name:', '');
+  fName := InputBox('New folder', 'Folder name (or folder path separated by /):', '');
   if Trim(fName) = '' then
     Exit; // =>
   sNode := SelectedNode;
