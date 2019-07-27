@@ -769,6 +769,11 @@ begin
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
   FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
+  FBookManager.Popup.Images := toolbarIcons;
+  FBookManager.Popup.Items[0].ImageIndex := 11; // open
+  FBookManager.Popup.Items[1].ImageIndex := 10; // new folder
+  FBookManager.Popup.Items[2].ImageIndex := 9;  // edit
+  FBookManager.Popup.Items[3].ImageIndex := 8;  // delete
   LoadAppBookmarks(FBookManager);
 
   SelectBodyTab(btForm);
