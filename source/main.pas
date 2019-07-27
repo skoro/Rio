@@ -1772,8 +1772,16 @@ procedure TMainForm.OnOpenResponseTab(Tab: TResponseTab;
 var
   ImageTab: TResponseImageTab;
 begin
-  if Tab = FResponseJsonTab then begin
+  if Tab = FResponseJsonTab then
     with FResponseJsonTab do begin
+      // set toolbar icons.
+      with Toolbar do begin
+        Images := toolbarIcons;
+        Buttons[0].ImageIndex := 13; // tree
+        Buttons[1].ImageIndex := 1;  // formatted
+        Buttons[2].ImageIndex := 12; // options
+        Buttons[3].ImageIndex := 14; // filter
+      end;
       TreeView.Images := jsImages;
       TreeView.PopupMenu := popupJsonTree;
       TreeView.OnDblClick := @JsonTreeDblClick;
@@ -1783,9 +1791,7 @@ begin
       ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
       ViewPage := OptionsForm.JsonView;
       LineNumbers := OptionsForm.JsonLines;
-    end;
-  end
-
+    end // with
   else if Tab is TResponseImageTab then begin
     ImageTab := TResponseImageTab(Tab);
     if OptionsForm.FitImages then
