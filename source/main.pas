@@ -767,13 +767,15 @@ begin
   FBookManager.ImageIndexBookmark := 7;
   FBookManager.ImageIndexSelected := 5;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
-  FBookManager.Popup.OnEditClick := @BookmarkEditorShow;
-  FBookManager.Popup.OnDeleteClick := @OnDeleteBookmark;
-  FBookManager.Popup.Images := toolbarIcons;
-  FBookManager.Popup.Items[0].ImageIndex := 11; // open
-  FBookManager.Popup.Items[1].ImageIndex := 10; // new folder
-  FBookManager.Popup.Items[2].ImageIndex := 9;  // edit
-  FBookManager.Popup.Items[3].ImageIndex := 8;  // delete
+  with FBookManager.Popup do begin
+    OnEditClick := @BookmarkEditorShow;
+    OnDeleteClick := @OnDeleteBookmark;
+    Images := toolbarIcons;
+    Items[0].ImageIndex := 11; // open
+    Items[1].ImageIndex := 10; // new folder
+    Items[2].ImageIndex := 9;  // edit
+    Items[3].ImageIndex := 8;  // delete
+  end;
   LoadAppBookmarks(FBookManager);
 
   SelectBodyTab(btForm);
