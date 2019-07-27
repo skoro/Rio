@@ -46,6 +46,8 @@ type
     gridRespCookie: TStringGrid;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
+    miSep3: TMenuItem;
+    miSep2: TMenuItem;
     miBookmarks: TMenuItem;
     miLayoutVert: TMenuItem;
     miLayoutHor: TMenuItem;

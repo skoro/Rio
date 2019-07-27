@@ -1306,7 +1306,7 @@ object MainForm: TMainForm
                       Top = 0
                       Width = 413
                       HorzScrollBar.Page = 208
-                      VertScrollBar.Page = 107
+                      VertScrollBar.Page = 105
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 151
@@ -1316,7 +1316,7 @@ object MainForm: TMainForm
                       TabOrder = 0
                       object editBearerToken: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 80
                         Width = 400
                         Anchors = [akTop, akLeft, akRight]
@@ -1334,7 +1334,7 @@ object MainForm: TMainForm
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 24
                         Width = 200
                         EditLabel.AnchorSideLeft.Control = editBearerPrefix
@@ -2066,6 +2066,9 @@ object MainForm: TMainForm
       ShortCut = 24643
       OnClick = JsonTreePopupMenuClick
     end
+    object miSep2: TMenuItem
+      Caption = '-'
+    end
     object miJsonCollapse: TMenuItem
       Caption = 'Collapse children'
       OnClick = JsonTreePopupMenuClick
@@ -2073,6 +2076,9 @@ object MainForm: TMainForm
     object miJsonExpand: TMenuItem
       Caption = 'Expand children'
       OnClick = JsonTreePopupMenuClick
+    end
+    object miSep3: TMenuItem
+      Caption = '-'
     end
     object miJsonView: TMenuItem
       Caption = 'View...'
