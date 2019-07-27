@@ -1917,7 +1917,10 @@ begin
           BookmarkButtonIcon(False);
         FreeAndNil(RO);
       end;
-      mrOk: begin { stub. } end;
+      mrOk: begin
+        if RO.Url <> Bookmark.Request.Url then
+          cbUrl.Text := Bookmark.Request.Url;
+      end;
       else begin
         FreeAndNil(RO);
       end;
