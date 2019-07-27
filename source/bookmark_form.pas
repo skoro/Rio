@@ -21,9 +21,12 @@ type
     ButtonPanel: TButtonPanel;
     cbLock: TCheckBox;
     cbCopy: TCheckBox;
+    edUrl: TEdit;
     edName: TEdit;
+    lUrl: TLabel;
     lFolder: TLabel;
     lName: TLabel;
+    pInfo: TPanel;
     pOptions: TPanel;
     pFolders: TPanel;
     pFolderBtn: TPanel;
@@ -227,8 +230,10 @@ var
   srcNode, dstNode: TTreeNode;
   path: string;
 begin
+  pInfo.Visible := True;
   DeleteEnabled := True;
   edName.Text := FBookmark.Name;
+  edUrl.Text := FBookmark.Request.Url;
   cbLock.Checked := FBookmark.Locked;
   cbCopy.Visible := True;
   // Select the bookmark node by default.
@@ -248,6 +253,7 @@ end;
 
 procedure TBookmarkForm.PrepareAddForm;
 begin
+  pInfo.Visible := False;
   DeleteEnabled := False;
   edName.Text := GetRequestFilename(RequestObject.Url);
   cbCopy.Visible := False;
@@ -275,6 +281,8 @@ end;
 
 procedure TBookmarkForm.UpdateBookmark;
 begin
+  if Length(Trim(edUrl.Text)) <> 0 then
+    FBookmark.Request.Url := edUrl.Text;
   FBookmark.Locked := cbLock.Checked;
   if cbCopy.Checked then
     AddBookmark
