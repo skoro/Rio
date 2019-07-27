@@ -161,6 +161,7 @@ type
     FOnJsonData: TOnJsonData;
     FSearchNode: TTreeNode;
     FSearchNodePos: Integer;
+    FToolbar: TToolbar;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -205,6 +206,7 @@ type
     property OnJsonFormat: TOnJsonFormat read FOnJsonFormat write SetOnJsonFormat;
     property OnJsonData: TOnJsonData read FOnJsonData write FOnJsonData;
     property LineNumbers: Boolean read FLineNumbers write SetLineNumbers;
+    property Toolbar: TToolbar read FToolbar write FToolbar;
   end;
 
   { TResponseXMLTab }
@@ -504,31 +506,30 @@ begin
 end;
 
 procedure TResponseJsonTab.CreateToolbar(Parent: TWinControl);
-var
-  Toolbar: TToolBar;
 begin
-  Toolbar := TToolBar.Create(Parent);
-  Toolbar.Parent := Parent;
-  Toolbar.EdgeBorders := [];
-  Toolbar.ShowCaptions := True;
+  FToolbar := TToolBar.Create(Parent);
+  FToolbar.Parent := Parent;
+  FToolbar.EdgeBorders := [];
+  FToolbar.ShowCaptions := True;
+  FToolbar.List := True;
 
-  FBtnTree := TToolButton.Create(Toolbar);
-  FBtnTree.Parent := Toolbar;
+  FBtnTree := TToolButton.Create(FToolbar);
+  FBtnTree.Parent := FToolbar;
   FBtnTree.Caption := 'Tree';
   FBtnTree.OnClick := @OnChangeTreeMode;
 
-  FBtnFormatted := TToolButton.Create(Toolbar);
-  FBtnFormatted.Parent := Toolbar;
+  FBtnFormatted := TToolButton.Create(FToolbar);
+  FBtnFormatted.Parent := FToolbar;
   FBtnFormatted.Caption := 'Formatted';
   FBtnFormatted.OnClick := @OnChangeFormatMode;
 
-  FBtnOptions := TToolButton.Create(Toolbar);
-  FBtnOptions.Parent := Toolbar;
+  FBtnOptions := TToolButton.Create(FToolbar);
+  FBtnOptions.Parent := FToolbar;
   FBtnOptions.Caption := 'Options';
 
-  FBtnFilter := TToolButton.Create(Toolbar);
+  FBtnFilter := TToolButton.Create(FToolbar);
   with FBtnFilter do begin
-    Parent  := Toolbar;
+    Parent  := FToolbar;
     Caption := 'Filter';
     Style   := tbsCheck;
     OnClick := @InternalOnSwitchFilter;
