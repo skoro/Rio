@@ -1338,7 +1338,7 @@ end;
 procedure TMainForm.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
-  SetAppCaption(cbUrl.Text);
+  SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
   EnableSubmitButton;
 end;
@@ -2144,7 +2144,7 @@ begin
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
   TimerRequest.Enabled := False;
-  SetAppCaption(cbUrl.Text);
+  SetAppCaption(UrlPath(Info.Url));
 
   // Response headers.
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
