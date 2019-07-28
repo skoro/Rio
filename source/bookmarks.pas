@@ -817,6 +817,10 @@ var
   p: SizeInt;
   newPath: string;
 begin
+  if Length(Trim(NewName)) = 0 then // is empty name ?
+    Exit(False); // =>
+  if system.Pos('/', NewName) <> 0 then // no slashes in the new name.
+    Exit(False); // =>
   p := RPos('/', FolderPath);
   newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
   if FindNodePath(FTreeView.Items, newPath) <> NIL then
