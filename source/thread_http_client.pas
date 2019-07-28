@@ -174,6 +174,9 @@ function ParseContentType(Headers: TStrings): string;
 // the document.
 function GetRequestFilename(Url: string; ContentType: string = ''; DefExt: string = ''): string;
 
+// Returns the url without a query part.
+function UrlPath(Url: string): string;
+
 implementation
 
 uses dateutils, strutils, RtlConsts, base64, ValEdit, app_helpers;
@@ -275,6 +278,20 @@ begin
         Result := Trim(LeftStr(Result, P - 1));
     end;
   end;
+end;
+
+function UrlPath(Url: string): string;
+var
+  uri: TURI;
+begin
+  uri := ParseURI(Url);
+  Result := Format('%s://%s%s%s%s', [
+    uri.Protocol,
+    uri.Host,
+    IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
+    uri.Path,
+    uri.Document
+  ]);
 end;
 
 function GetRequestFilename(Url, ContentType: string; DefExt: string): string;

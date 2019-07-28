@@ -281,17 +281,8 @@ begin
 end;
 
 function TRequestObject.GetUrlPath: string;
-var
-  uri: TURI;
 begin
-  uri := ParseURI(FUrl);
-  Result := Format('%s://%s%s%s%s', [
-    uri.Protocol,
-    uri.Host,
-    IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
-    uri.Path,
-    uri.Document
-  ]);
+  Result := thread_http_client.UrlPath(FUrl);
 end;
 
 constructor TRequestObject.Create;
