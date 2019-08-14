@@ -603,7 +603,7 @@ begin
   Result := TRequestObject.Create;
   with Result do begin
     Method := cbMethod.Text;
-    Url    := cbUrl.Text;
+    Url    := NormalizeUrl(cbUrl.Text);
     Body   := editOther.Text;
     Json   := editJson.Text;
     SetCollectionFromGrid(requestHeaders, Headers);
@@ -1910,21 +1910,27 @@ var
 begin
   with TBookmarkForm.Create(Self) do
   begin
-    RO := CreateRequestObject;
-    BookmarkManager := FBookManager;
-    case ShowModal(BM, RO) of
-      mrAdded:   BookmarkButtonIcon(True);
-      mrDeleted: begin
-        if FBookManager.CurrentBookmark = NIL then
-          BookmarkButtonIcon(False);
-        FreeAndNil(RO);
+    try
+      RO := CreateRequestObject;
+      BookmarkManager := FBookManager;
+      case ShowModal(BM, RO) of
+        mrAdded:   BookmarkButtonIcon(True);
+        mrDeleted: begin
+          if FBookManager.CurrentBookmark = NIL then
+            BookmarkButtonIcon(False);
+          FreeAndNil(RO);
+        end;
+        mrOk: begin
+          if RO.Url <> Bookmark.Request.Url then
+            cbUrl.Text := Bookmark.Request.Url;
+        end;
+        else begin
+          FreeAndNil(RO);
+        end;
       end;
-      mrOk: begin
-        if RO.Url <> Bookmark.Request.Url then
-          cbUrl.Text := Bookmark.Request.Url;
-      end;
-      else begin
-        FreeAndNil(RO);
+    except
+      on E: Exception do begin
+        ERRMsg('Error', E.Message);
       end;
     end;
     Free;
