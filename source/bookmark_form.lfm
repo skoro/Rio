@@ -1,12 +1,12 @@
 object BookmarkForm: TBookmarkForm
-  Left = 456
-  Height = 300
-  Top = 281
-  Width = 260
+  Left = 451
+  Height = 373
+  Top = 236
+  Width = 327
   BorderIcons = [biSystemMenu]
   Caption = 'Bookmark'
-  ClientHeight = 300
-  ClientWidth = 260
+  ClientHeight = 373
+  ClientWidth = 327
   Constraints.MinHeight = 300
   Constraints.MinWidth = 260
   OnCreate = FormCreate
@@ -17,8 +17,8 @@ object BookmarkForm: TBookmarkForm
   object ButtonPanel: TButtonPanel
     Left = 6
     Height = 27
-    Top = 267
-    Width = 248
+    Top = 340
+    Width = 315
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     OKButton.OnClick = OKButtonClick
@@ -39,19 +39,19 @@ object BookmarkForm: TBookmarkForm
     Left = 6
     Height = 48
     Top = 6
-    Width = 248
+    Width = 315
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     ClientHeight = 48
-    ClientWidth = 248
+    ClientWidth = 315
     TabOrder = 1
     object lName: TLabel
       Left = 0
       Height = 17
       Top = 2
-      Width = 248
+      Width = 315
       Align = alTop
       BorderSpacing.Top = 2
       BorderSpacing.Bottom = 2
@@ -62,28 +62,28 @@ object BookmarkForm: TBookmarkForm
       Left = 0
       Height = 27
       Top = 21
-      Width = 248
+      Width = 315
       Align = alTop
       TabOrder = 0
     end
   end
   object pFolders: TPanel
     Left = 6
-    Height = 151
-    Top = 60
-    Width = 248
+    Height = 174
+    Top = 110
+    Width = 315
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 151
-    ClientWidth = 248
+    ClientHeight = 174
+    ClientWidth = 315
     TabOrder = 2
     object lFolder: TLabel
       Left = 0
       Height = 17
       Top = 0
-      Width = 248
+      Width = 315
       Align = alTop
       Caption = 'Folder:'
       ParentColor = False
@@ -91,14 +91,14 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 124
-      Width = 248
+      Top = 147
+      Width = 315
       Align = alBottom
       AutoSize = True
       BorderSpacing.Top = 4
       BevelOuter = bvNone
       ClientHeight = 27
-      ClientWidth = 248
+      ClientWidth = 315
       TabOrder = 0
       object btnNewFolder: TBitBtn
         Left = 0
@@ -150,9 +150,9 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 103
+      Height = 126
       Top = 17
-      Width = 248
+      Width = 315
       Align = alClient
       AutoExpand = True
       ScrollBars = ssAutoBoth
@@ -165,20 +165,20 @@ object BookmarkForm: TBookmarkForm
   object pOptions: TPanel
     Left = 6
     Height = 44
-    Top = 217
-    Width = 248
+    Top = 290
+    Width = 315
     Align = alBottom
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     ClientHeight = 44
-    ClientWidth = 248
+    ClientWidth = 315
     TabOrder = 3
     object cbLock: TCheckBox
       Left = 0
       Height = 22
       Top = 22
-      Width = 248
+      Width = 315
       Align = alTop
       Caption = '&Lock request data'
       TabOrder = 0
@@ -187,10 +187,41 @@ object BookmarkForm: TBookmarkForm
       Left = 0
       Height = 22
       Top = 0
-      Width = 248
+      Width = 315
       Align = alTop
       Caption = 'Co&py to the selected folder'
       TabOrder = 1
+    end
+  end
+  object pInfo: TPanel
+    Left = 6
+    Height = 44
+    Top = 60
+    Width = 315
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Around = 6
+    BevelOuter = bvNone
+    ClientHeight = 44
+    ClientWidth = 315
+    TabOrder = 4
+    Visible = False
+    object lUrl: TLabel
+      Left = 0
+      Height = 17
+      Top = 0
+      Width = 315
+      Align = alTop
+      Caption = 'Url:'
+      ParentColor = False
+    end
+    object edUrl: TEdit
+      Left = 0
+      Height = 27
+      Top = 17
+      Width = 315
+      Align = alTop
+      TabOrder = 0
     end
   end
 end
