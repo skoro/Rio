@@ -55,6 +55,7 @@ type
     function GetIsNewBookmark: Boolean;
     function GetRequestObject: TRequestObject;
     procedure SetDeleteEnabled(AValue: Boolean);
+    procedure SelectAndViewNode(aNode: TTreeNode);
   public
     function ShowModal: TModalResult; override;
     function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
@@ -183,6 +184,15 @@ begin
   ButtonPanel.CloseButton.Visible := AValue;
 end;
 
+procedure TBookmarkForm.SelectAndViewNode(aNode: TTreeNode);
+begin
+  if Assigned(aNode) then
+    with aNode do begin
+      Selected := True;
+      MakeVisible;
+    end;
+end;
+
 function TBookmarkForm.ShowModal: TModalResult;
 begin
   if (not Assigned(FBookmark)) or (not Assigned(FRequestObject)) then
@@ -243,20 +253,31 @@ begin
     Exit; // =>
   path := FBookmarkManager.GetNodeFolderPath(srcNode);
   dstNode := tvFolders.Items.FindNodeWithTextPath(path);
-  if Assigned(dstNode) then
-    with dstNode do begin
-      Selected := True;
-      MakeVisible;
-    end;
+  SelectAndViewNode(dstNode);
   { TODO : path not found. Should be logged ? }
 end;
 
 procedure TBookmarkForm.PrepareAddForm;
+var
+  SelSrc, SelDst: TTreeNode;
 begin
   pInfo.Visible := False;
   DeleteEnabled := False;
   edName.Text := GetRequestFilename(RequestObject.Url);
   cbCopy.Visible := False;
+
+  // Set folder default selection.
+  SelDst := NIL;
+  // We must use TreeView instead CurrentNode because the CurrentNode
+  // can be NILed.
+  SelSrc := FBookmarkManager.TreeView.Selected;
+  if Assigned(SelSrc) then begin
+    if not IsFolderNode(SelSrc) then
+      SelSrc := SelSrc.Parent; // Bookmark selected, move up.
+    if Assigned(SelSrc) then
+      SelDst := FindNodePath(tvFolders.Items, GetNodePath(SelSrc));
+    SelectAndViewNode(SelDst);
+  end;
 end;
 
 procedure TBookmarkForm.AddBookmark;
