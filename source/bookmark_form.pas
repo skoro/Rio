@@ -56,6 +56,7 @@ type
     function GetRequestObject: TRequestObject;
     procedure SetDeleteEnabled(AValue: Boolean);
     procedure SelectAndViewNode(aNode: TTreeNode);
+    procedure SyncTreeNodes(Main, Local: TTreeNode);
   public
     function ShowModal: TModalResult; override;
     function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
@@ -123,6 +124,8 @@ end;
 
 procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
+var
+  Added: TTreeNode;
 begin
   btnNewFolder.Enabled := True;
   // A new node has been added.
@@ -132,10 +135,13 @@ begin
       Node.Delete
     else begin
       Node.Selected := True;
-      if BookmarkManager.AddFolder(Node.GetTextPath) = NIL then begin
+      Added := BookmarkManager.AddFolder(Node.GetTextPath);
+      if Added = NIL then begin
         ERRMsg('Error', 'Cannot add folder: ' + Node.Text);
         Node.Delete;
-      end;
+      end
+      else
+        SyncTreeNodes(Added, Node);
       FIsNewNode := False;
     end;
   end
@@ -191,6 +197,47 @@ begin
       Selected := True;
       MakeVisible;
     end;
+end;
+
+procedure TBookmarkForm.SyncTreeNodes(Main, Local: TTreeNode);
+var
+  p: SizeInt;
+  Cur, Path: string;
+  NextNode, Find, StartSort: TTreeNode;
+begin
+  // Don't synchronize for node without the path splitter.
+  if System.Pos('/', Local.Text) = 0 then
+    Exit;
+  Local.Delete; // It will be recreated later with a new name.
+  NextNode := NIL;
+  StartSort := NIL;
+  Path := Main.GetTextPath;
+  repeat
+    p := System.Pos('/', Path);
+    if p > 0 then begin
+      Cur := LeftStr(Path, p - 1);
+      System.Delete(Path, 1, p);
+    end
+    else begin
+      Cur := Path;
+      Path := '';
+    end;
+    if NextNode = NIL then
+      NextNode := tvFolders.Items.GetFirstNode
+    else begin
+      Find := NextNode.FindNode(Cur);
+      if Find = NIL then begin
+        if StartSort = NIL then
+          StartSort := NextNode;
+        NextNode := tvFolders.Items.AddChild(NextNode, Cur)
+      end
+      else
+        NextNode := Find;
+    end;
+  until Path = '';
+  if Assigned(StartSort) then
+    StartSort.CustomSort(@StartSort.DefaultTreeViewSort);
+  NextNode.Selected := True;
 end;
 
 function TBookmarkForm.ShowModal: TModalResult;
