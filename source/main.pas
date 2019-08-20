@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, thread_http_client, response_tabs, key_value,
   profiler_graph, bookmarks, request_object, GridNavigator, SysUtils,
-  jsonparser, Types;
+  jsonparser;
 
 type
 
@@ -44,7 +44,6 @@ type
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
-    RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
     miSep3: TMenuItem;
@@ -169,8 +168,6 @@ type
     procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
-    procedure cbMethodDrawItem(Control: TWinControl; Index: Integer;
-      ARect: TRect; State: TOwnerDrawState);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure dlgFindFind(Sender: TObject);
@@ -697,19 +694,6 @@ begin
     editBasicPassword.EchoMode := emNormal
   else
     editBasicPassword.EchoMode := emPassword;
-end;
-
-procedure TMainForm.cbMethodDrawItem(Control: TWinControl; Index: Integer;
-  ARect: TRect; State: TOwnerDrawState);
-var
-  ImgWidth: Integer;
-begin
-  ImgWidth := RequestIcons.Width;
-  with cbMethod do begin
-    Canvas.FillRect(ARect);
-    Canvas.TextRect(ARect, ImgWidth + 8, ARect.Top, Items[Index]);
-    RequestIcons.Draw(Canvas, ARect.Left + 1, ARect.Top + 1, Index);
-  end;
 end;
 
 procedure TMainForm.cbUrlChange(Sender: TObject);
