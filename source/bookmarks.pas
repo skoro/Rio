@@ -66,7 +66,6 @@ type
     FCurrentNode: TTreeNode;
     FOnChangeBookmark: TOnChangeBookmark;
     FImgIdxFolder: Integer;
-    FImgIdxBookmark: Integer;
     FImgIdxSelected: Integer;
 
     function GetBookmarkPopup: TBookmarkPopup;
@@ -92,6 +91,8 @@ type
     procedure SortNodes(ParentNode: TTreeNode); virtual;
     // Sort comparator.
     function SortNodeCompare(Node1, Node2: TTreeNode): integer; virtual;
+    // Returns a node name depending on the bookmark data.
+    function GetNodeName(BM: TBookmark): string; virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -143,7 +144,6 @@ type
     property OnChangeBookmark: TOnChangeBookmark read FOnChangeBookmark write FOnChangeBookmark;
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
-    property ImageIndexBookmark: Integer read FImgIdxBookmark write FImgIdxBookmark;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
   end;
 
@@ -660,6 +660,19 @@ begin
     Exit(AnsiCompareStr(Node1.Text, Node2.Text));
 end;
 
+function TBookmarkManager.GetNodeName(BM: TBookmark): string;
+var
+  rMethod: string;
+begin
+  rMethod := BM.Request.Method;
+  case BM.Request.Method of
+    'DELETE':  rMethod := 'DEL';
+    'OPTIONS': rMethod := 'OPT';
+    'PATCH':   rMethod := 'PCH';
+  end;
+  Result := Format('%s %s', [rMethod, BM.Name]);
+end;
+
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
 var
   path: string;
@@ -725,7 +738,6 @@ constructor TBookmarkManager.Create(TheOwner: TComponent);
 begin
   inherited Create(TheOwner);
   FImgIdxFolder := -1;
-  FImgIdxBookmark := -1;
   Align := alClient;
   Caption := '';
   BevelOuter := bvNone;
@@ -753,8 +765,7 @@ begin
     raise ENodePathNotFound.CreatePath(FolderPath);
   if FolderNode.FindNode(BM.Name) <> NIL then
     raise ENodeException.CreateNode(FolderNode, Format('Name "%s" already exists.', [BM.Name]));
-  Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
-  Result.StateIndex := FImgIdxBookmark;
+  Result := FTreeView.Items.AddChild(FolderNode, GetNodeName(BM));
   Result.Data := BM;
   SortNodes(FolderNode);
 end;

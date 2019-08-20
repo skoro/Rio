@@ -766,7 +766,6 @@ begin
   FBookManager.TreeView.Images := toolbarIcons;
   FBookManager.TreeView.StateImages := toolbarIcons;
   FBookManager.ImageIndexFolder := 6;
-  FBookManager.ImageIndexBookmark := 7;
   FBookManager.ImageIndexSelected := 5;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   with FBookManager.Popup do begin
