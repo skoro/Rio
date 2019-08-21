@@ -1920,7 +1920,8 @@ begin
           FreeAndNil(RO);
         end;
         mrOk: begin
-          if RO.Url <> Bookmark.Request.Url then
+          // Update url for the current bookmark.
+          if (FBookManager.CurrentBookmark = BM) and (RO.Url <> Bookmark.Request.Url) then
             cbUrl.Text := Bookmark.Request.Url;
         end;
         else begin
