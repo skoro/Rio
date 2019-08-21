@@ -57,6 +57,10 @@ type
     property Locked: Boolean read FLocked write FLocked;
   end;
 
+  { TNodeView }
+
+  TNodeView = (nvNone, nvText, nvIcon);
+
   { TBookmarkManager }
 
   TBookmarkManager = class(TPanel)
@@ -67,12 +71,14 @@ type
     FOnChangeBookmark: TOnChangeBookmark;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
+    FNodeView: TNodeView;
 
     function GetBookmarkPopup: TBookmarkPopup;
     function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetBookmarkPopup(AValue: TBookmarkPopup);
     procedure SetCurrentNode(AValue: TTreeNode);
+    procedure SetNodeView(AValue: TNodeView);
     procedure SetRootName(AValue: string);
 
   protected
@@ -91,8 +97,8 @@ type
     procedure SortNodes(ParentNode: TTreeNode); virtual;
     // Sort comparator.
     function SortNodeCompare(Node1, Node2: TTreeNode): integer; virtual;
-    // Returns a node name depending on the bookmark data.
-    function GetNodeName(BM: TBookmark): string; virtual;
+    // Set a node name or icon depending on settings.
+    procedure SetNodeName(aNode: TTreeNode; BM: TBookmark); virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -145,6 +151,7 @@ type
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
+    property NodeView: TNodeView read FNodeView write SetNodeView;
   end;
 
   { TBookmarkPopup }
@@ -517,6 +524,13 @@ begin
   end;
 end;
 
+procedure TBookmarkManager.SetNodeView(AValue: TNodeView);
+begin
+  if FNodeView = AValue then
+    Exit; //=>
+  FNodeView := AValue;
+end;
+
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
 begin
   Result := NIL;
@@ -660,17 +674,37 @@ begin
     Exit(AnsiCompareStr(Node1.Text, Node2.Text));
 end;
 
-function TBookmarkManager.GetNodeName(BM: TBookmark): string;
+procedure TBookmarkManager.SetNodeName(aNode: TTreeNode; BM: TBookmark);
 var
-  rMethod: string;
+  rMethod, nText: string;
+  Idx: SmallInt;
 begin
-  rMethod := BM.Request.Method;
-  case BM.Request.Method of
-    'DELETE':  rMethod := 'DEL';
-    'OPTIONS': rMethod := 'OPT';
-    'PATCH':   rMethod := 'PCH';
+  nText := BM.Name;
+  case FNodeView of
+    nvText: begin
+      rMethod := BM.Request.Method;
+      case BM.Request.Method of
+        'DELETE':  rMethod := 'DEL';
+        'OPTIONS': rMethod := 'OPT';
+        'PATCH':   rMethod := 'PCH';
+      end;
+      nText := Format('%s %s', [rMethod, BM.Name]);
+    end;
+    nvIcon: begin
+      case BM.Request.Method of
+        'GET':     Idx := 1;
+        'POST':    Idx := 2;
+        'PUT':     Idx := 3;
+        'OPTIONS': Idx := 4;
+        'DELETE':  Idx := 5;
+        'PATCH':   Idx := 6;
+        'HEAD':    Idx := 7;
+        else       Idx := -1;
+      end;
+      aNode.StateIndex := Idx;
+    end;
   end;
-  Result := Format('%s %s', [rMethod, BM.Name]);
+  aNode.Text := nText;
 end;
 
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
@@ -745,6 +779,7 @@ begin
   Popup := TBookmarkPopup.Create(Self);
   BorderSpacing.Left := 4;
   FCurrentNode := NIL;
+  FNodeView := nvIcon;
   CreateRootNode;
 end;
 
@@ -765,8 +800,9 @@ begin
     raise ENodePathNotFound.CreatePath(FolderPath);
   if FolderNode.FindNode(BM.Name) <> NIL then
     raise ENodeException.CreateNode(FolderNode, Format('Name "%s" already exists.', [BM.Name]));
-  Result := FTreeView.Items.AddChild(FolderNode, GetNodeName(BM));
+  Result := FTreeView.Items.AddChild(FolderNode, '');
   Result.Data := BM;
+  SetNodeName(Result, BM);
   SortNodes(FolderNode);
 end;
 
@@ -862,7 +898,7 @@ begin
   // Rename.
   if (ANewName <> '') and (BM.Name <> ANewName) then begin
     BM.Name := ANewName;
-    bNode.Text := ANewName;
+    SetNodeName(bNode, BM);
   end;
   // Move to another folder.
   if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
