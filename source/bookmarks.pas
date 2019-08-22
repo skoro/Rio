@@ -97,8 +97,6 @@ type
     procedure SortNodes(ParentNode: TTreeNode); virtual;
     // Sort comparator.
     function SortNodeCompare(Node1, Node2: TTreeNode): integer; virtual;
-    // Set a node style: icon or text presentation.
-    procedure SetNodeStyle(aNode: TTreeNode); virtual;
     // Apply node styles (TBookmarkNodeStyle).
     procedure UpdateBookmarkNodeStyle; virtual;
 
@@ -144,6 +142,8 @@ type
     procedure LoadXmlFromStream(S: TStream); virtual;
     // Returns a bookmark tree path.
     function GetBookmarkPath(BM: TBookmark): string; virtual;
+    // Set a node style: icon or text presentation.
+    procedure SetNodeStyle(aNode: TTreeNode); virtual;
 
     property TreeView: TTreeView read FTreeView;
     property RootName: string read GetRootName write SetRootName;
