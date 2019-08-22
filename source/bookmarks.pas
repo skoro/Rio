@@ -59,7 +59,7 @@ type
 
   { TNodeView }
 
-  TNodeView = (nvNone, nvText, nvIcon);
+  TBookmarkNodeStyle = (bnsNone, bnsText, bnsIcon);
 
   { TBookmarkManager }
 
@@ -71,14 +71,14 @@ type
     FOnChangeBookmark: TOnChangeBookmark;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
-    FNodeView: TNodeView;
+    FBookmarkNodeStyle: TBookmarkNodeStyle;
 
     function GetBookmarkPopup: TBookmarkPopup;
     function GetCurrentBookmark: TBookmark;
     function GetRootName: string;
     procedure SetBookmarkPopup(AValue: TBookmarkPopup);
     procedure SetCurrentNode(AValue: TTreeNode);
-    procedure SetNodeView(AValue: TNodeView);
+    procedure SetBookmarkNodeStyle(AValue: TBookmarkNodeStyle);
     procedure SetRootName(AValue: string);
 
   protected
@@ -151,7 +151,7 @@ type
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
-    property NodeView: TNodeView read FNodeView write SetNodeView;
+    property BookmarkNodeStyle: TBookmarkNodeStyle read FBookmarkNodeStyle write SetBookmarkNodeStyle;
   end;
 
   { TBookmarkPopup }
@@ -524,11 +524,11 @@ begin
   end;
 end;
 
-procedure TBookmarkManager.SetNodeView(AValue: TNodeView);
+procedure TBookmarkManager.SetBookmarkNodeStyle(AValue: TBookmarkNodeStyle);
 begin
-  if FNodeView = AValue then
+  if FBookmarkNodeStyle = AValue then
     Exit; //=>
-  FNodeView := AValue;
+  FBookmarkNodeStyle := AValue;
 end;
 
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
@@ -680,8 +680,8 @@ var
   Idx: SmallInt;
 begin
   nText := BM.Name;
-  case FNodeView of
-    nvText: begin
+  case FBookmarkNodeStyle of
+    bnsText: begin
       rMethod := BM.Request.Method;
       case BM.Request.Method of
         'DELETE':  rMethod := 'DEL';
@@ -690,7 +690,7 @@ begin
       end;
       nText := Format('%s %s', [rMethod, BM.Name]);
     end;
-    nvIcon: begin
+    bnsIcon: begin
       case BM.Request.Method of
         'GET':     Idx := 1;
         'POST':    Idx := 2;
@@ -779,7 +779,7 @@ begin
   Popup := TBookmarkPopup.Create(Self);
   BorderSpacing.Left := 4;
   FCurrentNode := NIL;
-  FNodeView := nvIcon;
+  FBookmarkNodeStyle := bnsNone;
   CreateRootNode;
 end;
 
