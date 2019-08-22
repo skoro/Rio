@@ -1340,6 +1340,7 @@ begin
   // Update Query tab and app title.
   SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
+  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
   EnableSubmitButton;
 end;
 
