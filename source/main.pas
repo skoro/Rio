@@ -2007,6 +2007,9 @@ begin
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
+
+  // Change bookmarks node style.
+  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
 end;
 
 procedure TMainForm.SwitchLayout;
