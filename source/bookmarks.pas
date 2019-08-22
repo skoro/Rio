@@ -97,8 +97,10 @@ type
     procedure SortNodes(ParentNode: TTreeNode); virtual;
     // Sort comparator.
     function SortNodeCompare(Node1, Node2: TTreeNode): integer; virtual;
-    // Set a node name or icon depending on settings.
-    procedure SetNodeName(aNode: TTreeNode; BM: TBookmark); virtual;
+    // Set a node style: icon or text presentation.
+    procedure SetNodeStyle(aNode: TTreeNode); virtual;
+    // Apply node styles (TBookmarkNodeStyle).
+    procedure UpdateBookmarkNodeStyle; virtual;
 
   public
     constructor Create(TheOwner: TComponent); override;
@@ -529,6 +531,7 @@ begin
   if FBookmarkNodeStyle = AValue then
     Exit; //=>
   FBookmarkNodeStyle := AValue;
+  UpdateBookmarkNodeStyle;
 end;
 
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
@@ -674,11 +677,13 @@ begin
     Exit(AnsiCompareStr(Node1.Text, Node2.Text));
 end;
 
-procedure TBookmarkManager.SetNodeName(aNode: TTreeNode; BM: TBookmark);
+procedure TBookmarkManager.SetNodeStyle(aNode: TTreeNode);
 var
   rMethod, nText: string;
   Idx: SmallInt;
+  BM: TBookmark;
 begin
+  BM := NodeToBookmark(aNode);
   nText := BM.Name;
   case FBookmarkNodeStyle of
     bnsText: begin
@@ -689,6 +694,7 @@ begin
         'PATCH':   rMethod := 'PCH';
       end;
       nText := Format('%s %s', [rMethod, BM.Name]);
+      aNode.StateIndex := -1;
     end;
     bnsIcon: begin
       case BM.Request.Method of
@@ -705,6 +711,26 @@ begin
     end;
   end;
   aNode.Text := nText;
+end;
+
+procedure TBookmarkManager.UpdateBookmarkNodeStyle;
+  procedure InternalIterate(aNode: TTreeNode);
+  var
+    Child: TTreeNode;
+  begin
+    if not Assigned(aNode) then
+      Exit; //=>
+    Child := aNode.GetFirstChild;
+    while Child <> NIL do begin
+      if IsFolderNode(Child) then
+        InternalIterate(Child)
+      else
+        SetNodeStyle(Child);
+      Child := Child.GetNextSibling;
+    end;
+  end;
+begin
+  InternalIterate(FTreeView.Items.GetFirstNode);
 end;
 
 function TBookmarkManager.GetNodeFolderPath(aNode: TTreeNode): string;
@@ -802,7 +828,7 @@ begin
     raise ENodeException.CreateNode(FolderNode, Format('Name "%s" already exists.', [BM.Name]));
   Result := FTreeView.Items.AddChild(FolderNode, '');
   Result.Data := BM;
-  SetNodeName(Result, BM);
+  SetNodeStyle(Result);
   SortNodes(FolderNode);
 end;
 
@@ -898,7 +924,7 @@ begin
   // Rename.
   if (ANewName <> '') and (BM.Name <> ANewName) then begin
     BM.Name := ANewName;
-    SetNodeName(bNode, BM);
+    SetNodeStyle(bNode);
   end;
   // Move to another folder.
   if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
