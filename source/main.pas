@@ -169,6 +169,7 @@ type
     procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
+    procedure cbMethodChange(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure dlgFindFind(Sender: TObject);
@@ -695,6 +696,20 @@ begin
     editBasicPassword.EchoMode := emNormal
   else
     editBasicPassword.EchoMode := emPassword;
+end;
+
+procedure TMainForm.cbMethodChange(Sender: TObject);
+var
+  BM: TBookmark;
+begin
+  // Update the current bookmark node (icon or text).
+  with FBookManager do begin
+    BM := CurrentBookmark;
+    if Assigned(BM) and (not BM.Locked) then begin
+      BM.Request.Method := cbMethod.Text;
+      SetNodeStyle(CurrentNode);
+    end;
+  end;
 end;
 
 procedure TMainForm.cbUrlChange(Sender: TObject);

@@ -186,6 +186,7 @@ object MainForm: TMainForm
         'PATCH'
         'HEAD'
       )
+      OnChange = cbMethodChange
       TabOrder = 0
       Text = 'GET'
     end
