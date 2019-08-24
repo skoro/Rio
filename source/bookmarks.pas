@@ -756,6 +756,7 @@ begin
   Result := FTreeView.Items.AddChild(FolderNode, BM.Name);
   Result.StateIndex := FImgIdxBookmark;
   Result.Data := BM;
+  Result.Parent.Expanded := True;
   SortNodes(FolderNode);
 end;
 
@@ -856,10 +857,12 @@ begin
   // Move to another folder.
   if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
     isCurrent := (bNode = FCurrentNode);
-    bNode.Delete;
+    FTreeView.Items.Delete(bNode);
     bNode := AddBookmark(BM, FolderPath);
-    if isCurrent then
+    if isCurrent then begin
       CurrentNode := bNode;
+      SetNodeSelectedImage(bNode);
+    end;
   end;
 end;
 
