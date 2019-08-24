@@ -46,8 +46,8 @@ type
     FRequest: TRequestObject;
     FTreeNode: TTreeNode;
     FLocked: Boolean;
-    procedure SetName(AValue: string); virtual;
-    procedure SetTreeNode(AValue: TTreeNode); virtual;
+    procedure SetName(AValue: string);
+    procedure SetTreeNode(AValue: TTreeNode);
   public
     constructor Create(aName: string); virtual;
     destructor Destroy; override;
@@ -269,6 +269,7 @@ end;
 function GetNodePath(aNode: TTreeNode): string;
 var
   Node: TTreeNode;
+  Name: string;
 begin
   Result := '';
   Node := aNode;
@@ -276,7 +277,13 @@ begin
   begin
     if Result <> '' then
       Result := '/' + Result;
-    Result := ReplaceStr(Node.Text, '/', NODE_TEXT_SLASH) + Result;
+    // When finding a node we must treat the node name without a request method.
+    // Folder node name is untouched.
+    if IsFolderNode(Node) then
+      Name := Node.Text
+    else
+      Name := NodeToBookmark(Node).Name;
+    Result := ReplaceStr(Name, '/', NODE_TEXT_SLASH) + Result;
     Node := Node.Parent;
   end;
 end;
@@ -285,6 +292,21 @@ function FindNodePath(Nodes: TTreeNodes; TextPath: string): TTreeNode;
 var
   p: SizeInt;
   CurText: String;
+  function FindNode(Root: TTreeNode; Find: string): TTreeNode;
+  var
+    NodeName: string;
+  begin
+    Result := Root;
+    while Assigned(Result) do begin
+      if IsFolderNode(Result) then
+        NodeName := Result.Text
+      else
+        NodeName := NodeToBookmark(Result).Name;
+      if Find = NodeName then
+        Exit; //=>
+      Result := Result.GetNextSibling;
+    end;
+  end;
 begin
   Result := NIL;
   repeat
@@ -298,9 +320,9 @@ begin
     end;
     CurText := ReplaceStr(CurText, NODE_TEXT_SLASH, '/');
     if Result = NIL then
-      Result := Nodes.FindTopLvlNode(CurText)
+      Result := FindNode(Nodes.GetFirstNode, CurText)
     else
-      Result := Result.FindNode(CurText);
+      Result := FindNode(Result.GetFirstChild, CurText);
   until (Result = NIL) or (TextPath = '');
 end;
 
@@ -679,21 +701,20 @@ end;
 
 procedure TBookmarkManager.SetNodeStyle(aNode: TTreeNode);
 var
-  rMethod, nText: string;
+  Prefix: string;
   Idx: SmallInt;
   BM: TBookmark;
 begin
   BM := NodeToBookmark(aNode);
-  nText := BM.Name;
   case FBookmarkNodeStyle of
     bnsText: begin
-      rMethod := BM.Request.Method;
       case BM.Request.Method of
-        'DELETE':  rMethod := 'DEL';
-        'OPTIONS': rMethod := 'OPT';
-        'PATCH':   rMethod := 'PCH';
+        'DELETE':  Prefix := 'DEL';
+        'OPTIONS': Prefix := 'OPT';
+        'PATCH':   Prefix := 'PAT';
+        else       Prefix := BM.Request.Method;
       end;
-      nText := Format('%s %s', [rMethod, BM.Name]);
+      aNode.Text := Format('%s %s', [Prefix, BM.Name]);
       aNode.StateIndex := -1;
     end;
     bnsIcon: begin
@@ -707,10 +728,14 @@ begin
         'HEAD':    Idx := 7;
         else       Idx := -1;
       end;
+      aNode.Text := BM.Name;
       aNode.StateIndex := Idx;
     end;
+    else begin
+      aNode.Text := BM.Name;
+      aNode.StateIndex := -1;
+    end;
   end;
-  aNode.Text := nText;
 end;
 
 procedure TBookmarkManager.UpdateBookmarkNodeStyle;
