@@ -1,12 +1,12 @@
 object OptionsForm: TOptionsForm
   Left = 388
-  Height = 393
+  Height = 380
   Top = 162
-  Width = 336
+  Width = 344
   BorderIcons = [biSystemMenu]
   Caption = 'Options'
-  ClientHeight = 393
-  ClientWidth = 336
+  ClientHeight = 380
+  ClientWidth = 344
   Constraints.MinHeight = 380
   Constraints.MinWidth = 320
   KeyPreview = True
@@ -20,9 +20,9 @@ object OptionsForm: TOptionsForm
   LCLVersion = '1.8.4.0'
   object pagesOptions: TPageControl
     Left = 4
-    Height = 350
+    Height = 337
     Top = 4
-    Width = 328
+    Width = 336
     ActivePage = tabAppearance
     Align = alClient
     BorderSpacing.Around = 4
@@ -33,26 +33,26 @@ object OptionsForm: TOptionsForm
       Caption = 'General'
       ChildSizing.LeftRightSpacing = 4
       ChildSizing.TopBottomSpacing = 2
-      ClientHeight = 319
-      ClientWidth = 324
+      ClientHeight = 306
+      ClientWidth = 332
       object gboxRequest: TGroupBox
         Left = 4
         Height = 93
         Top = 2
-        Width = 300
+        Width = 324
         Align = alTop
         AutoSize = True
         Caption = 'Request'
         ChildSizing.LeftRightSpacing = 4
         ChildSizing.TopBottomSpacing = 2
         ClientHeight = 74
-        ClientWidth = 296
+        ClientWidth = 320
         TabOrder = 0
         object lTimeout: TLabel
           Left = 4
           Height = 17
           Top = 2
-          Width = 288
+          Width = 312
           Align = alTop
           Caption = 'Request timeout (sec):'
           ParentColor = False
@@ -61,7 +61,7 @@ object OptionsForm: TOptionsForm
           Left = 4
           Height = 27
           Top = 19
-          Width = 288
+          Width = 312
           Align = alTop
           MaxValue = 500
           MinValue = 2
@@ -72,7 +72,7 @@ object OptionsForm: TOptionsForm
           Left = 4
           Height = 22
           Top = 50
-          Width = 288
+          Width = 312
           Align = alTop
           BorderSpacing.Top = 4
           Caption = '&Editable request methods'
@@ -83,7 +83,7 @@ object OptionsForm: TOptionsForm
         Left = 4
         Height = 67
         Top = 101
-        Width = 300
+        Width = 324
         Align = alTop
         AutoSize = True
         BorderSpacing.Top = 6
@@ -91,14 +91,14 @@ object OptionsForm: TOptionsForm
         ChildSizing.LeftRightSpacing = 4
         ChildSizing.TopBottomSpacing = 2
         ClientHeight = 48
-        ClientWidth = 296
+        ClientWidth = 320
         ParentFont = False
         TabOrder = 1
         object cbFitImages: TCheckBox
           Left = 4
           Height = 22
           Top = 2
-          Width = 288
+          Width = 312
           Align = alTop
           Caption = '&Fit images'
           TabOrder = 0
@@ -107,7 +107,7 @@ object OptionsForm: TOptionsForm
           Left = 4
           Height = 22
           Top = 24
-          Width = 288
+          Width = 312
           Align = alTop
           Caption = 'Don''t &show Content tab for Json, XML response'
           Checked = True
@@ -118,113 +118,151 @@ object OptionsForm: TOptionsForm
     end
     object tabAppearance: TTabSheet
       Caption = 'Appearance'
-      ClientHeight = 319
-      ClientWidth = 324
+      ChildSizing.LeftRightSpacing = 4
+      ChildSizing.TopBottomSpacing = 2
+      ClientHeight = 306
+      ClientWidth = 332
       object gbLayout: TGroupBox
-        Left = 8
-        Height = 97
-        Top = 8
-        Width = 314
-        Anchors = [akTop, akLeft, akRight]
+        Left = 4
+        Height = 67
+        Top = 2
+        Width = 324
+        Align = alTop
+        AutoSize = True
         Caption = 'Layout'
-        ClientHeight = 78
-        ClientWidth = 310
+        ChildSizing.LeftRightSpacing = 4
+        ChildSizing.TopBottomSpacing = 2
+        ClientHeight = 48
+        ClientWidth = 320
         TabOrder = 0
         object rbLayoutVert: TRadioButton
-          Left = 8
+          Left = 4
           Height = 22
-          Top = 8
-          Width = 66
+          Top = 2
+          Width = 312
+          Align = alTop
           Caption = '&Vertical'
           Checked = True
           TabOrder = 0
           TabStop = True
         end
         object rbLayoutHor: TRadioButton
-          Left = 8
+          Left = 4
           Height = 22
-          Top = 40
-          Width = 82
+          Top = 24
+          Width = 312
+          Align = alTop
           Caption = '&Horizontal'
           TabOrder = 1
         end
       end
-      object cbHideGridButtons: TCheckBox
-        Left = 8
-        Height = 22
-        Top = 112
-        Width = 251
-        Caption = 'Hide &grid buttons: new, edit, delete, clear'
-        TabOrder = 1
-      end
       object gbFonts: TGroupBox
-        Left = 8
-        Height = 120
-        Top = 136
-        Width = 314
-        Anchors = [akTop, akLeft, akRight]
-        Caption = 'Fonts'
-        ClientHeight = 101
-        ClientWidth = 310
-        TabOrder = 2
+        Left = 4
+        Height = 118
+        Top = 75
+        Width = 324
+        Align = alTop
+        AutoSize = True
+        BorderSpacing.Top = 6
+        Caption = 'Fonts && Grid toolbars'
+        ChildSizing.LeftRightSpacing = 4
+        ChildSizing.TopBottomSpacing = 2
+        ClientHeight = 99
+        ClientWidth = 320
+        TabOrder = 1
         object cboxFontItem: TComboBox
-          Left = 8
+          Left = 4
           Height = 29
-          Top = 0
-          Width = 294
+          Top = 41
+          Width = 312
           Align = alTop
-          BorderSpacing.Left = 8
-          BorderSpacing.Right = 8
           ItemHeight = 0
           OnChange = cboxFontItemChange
           Style = csDropDownList
           TabOrder = 0
         end
-        object btnSelectFont: TButton
-          Left = 8
-          Height = 27
-          Top = 32
-          Width = 34
-          AutoSize = True
-          Caption = '&Font'
-          OnClick = btnSelectFontClick
+        object cbHideGridButtons: TCheckBox
+          Left = 4
+          Height = 22
+          Top = 2
+          Width = 312
+          Align = alTop
+          Caption = 'Hide &grid buttons: new, edit, delete, clear'
           TabOrder = 1
         end
-        object lFontDemo: TLabel
-          Left = 56
+        object lFonts: TLabel
+          Left = 4
           Height = 17
-          Top = 32
-          Width = 61
-          Caption = 'lFontDemo'
+          Top = 24
+          Width = 312
+          Align = alTop
+          Caption = 'Fonts:'
           ParentColor = False
         end
-        object btnResetFont: TButton
-          Left = 8
+        object panFonts: TPanel
+          Left = 4
           Height = 27
-          Top = 64
-          Width = 41
+          Top = 70
+          Width = 312
+          Align = alTop
           AutoSize = True
-          Caption = '&Reset'
-          Enabled = False
-          OnClick = btnResetFontClick
+          BevelOuter = bvNone
+          ClientHeight = 27
+          ClientWidth = 312
           TabOrder = 2
+          object btnSelectFont: TButton
+            Left = 0
+            Height = 27
+            Top = 0
+            Width = 34
+            Align = alLeft
+            AutoSize = True
+            Caption = '&Font'
+            OnClick = btnSelectFontClick
+            TabOrder = 0
+          end
+          object lFontDemo: TLabel
+            Left = 251
+            Height = 27
+            Top = 0
+            Width = 61
+            Align = alRight
+            Caption = 'lFontDemo'
+            ParentColor = False
+          end
+          object btnResetFont: TButton
+            Left = 34
+            Height = 27
+            Top = 0
+            Width = 41
+            Align = alLeft
+            AutoSize = True
+            Caption = '&Reset'
+            Enabled = False
+            OnClick = btnResetFontClick
+            TabOrder = 1
+          end
         end
       end
       object gbBookmarks: TGroupBox
-        Left = 8
-        Height = 57
-        Top = 255
-        Width = 315
+        Left = 4
+        Height = 48
+        Top = 199
+        Width = 324
+        Align = alTop
+        AutoSize = True
+        BorderSpacing.Top = 6
         Caption = 'Bookmarks'
-        ChildSizing.LeftRightSpacing = 6
-        ClientHeight = 38
-        ClientWidth = 311
-        TabOrder = 3
+        ChildSizing.LeftRightSpacing = 4
+        ChildSizing.TopBottomSpacing = 2
+        ClientHeight = 29
+        ClientWidth = 320
+        TabOrder = 2
         object cboxBookmarkNodeStyle: TComboBox
-          Left = 6
+          Left = 4
           Height = 25
-          Top = 0
-          Width = 299
+          Top = 2
+          Width = 312
           Align = alTop
           ItemHeight = 0
           ItemIndex = 0
@@ -241,8 +279,8 @@ object OptionsForm: TOptionsForm
     end
     object tabJson: TTabSheet
       Caption = 'JSON'
-      ClientHeight = 319
-      ClientWidth = 324
+      ClientHeight = 306
+      ClientWidth = 332
       object cbJsonExpanded: TCheckBox
         Left = 8
         Height = 22
@@ -354,8 +392,8 @@ object OptionsForm: TOptionsForm
     end
     object tabShortcuts: TTabSheet
       Caption = 'Shortcuts'
-      ClientHeight = 319
-      ClientWidth = 324
+      ClientHeight = 306
+      ClientWidth = 332
       object gridShortcuts: TStringGrid
         Left = 0
         Height = 260
@@ -430,8 +468,8 @@ object OptionsForm: TOptionsForm
   object ButtonPanel: TButtonPanel
     Left = 6
     Height = 27
-    Top = 360
-    Width = 324
+    Top = 347
+    Width = 332
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
     HelpButton.Name = 'HelpButton'
