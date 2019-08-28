@@ -78,7 +78,7 @@ object BookmarkForm: TBookmarkForm
     Caption = 'pFolders'
     ClientHeight = 174
     ClientWidth = 315
-    TabOrder = 2
+    TabOrder = 3
     object lFolder: TLabel
       Left = 0
       Height = 17
@@ -99,7 +99,7 @@ object BookmarkForm: TBookmarkForm
       BevelOuter = bvNone
       ClientHeight = 27
       ClientWidth = 315
-      TabOrder = 0
+      TabOrder = 1
       object btnNewFolder: TBitBtn
         Left = 0
         Height = 27
@@ -156,7 +156,7 @@ object BookmarkForm: TBookmarkForm
       Align = alClient
       AutoExpand = True
       ScrollBars = ssAutoBoth
-      TabOrder = 1
+      TabOrder = 0
       OnEditing = tvFoldersEditing
       OnEditingEnd = tvFoldersEditingEnd
       Options = [tvoAutoExpand, tvoAutoItemHeight, tvoHideSelection, tvoKeepCollapsedNodes, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
@@ -173,7 +173,7 @@ object BookmarkForm: TBookmarkForm
     BevelOuter = bvNone
     ClientHeight = 44
     ClientWidth = 315
-    TabOrder = 3
+    TabOrder = 4
     object cbLock: TCheckBox
       Left = 0
       Height = 22
@@ -181,7 +181,7 @@ object BookmarkForm: TBookmarkForm
       Width = 315
       Align = alTop
       Caption = '&Lock request data'
-      TabOrder = 0
+      TabOrder = 1
     end
     object cbCopy: TCheckBox
       Left = 0
@@ -190,7 +190,7 @@ object BookmarkForm: TBookmarkForm
       Width = 315
       Align = alTop
       Caption = 'Co&py to the selected folder'
-      TabOrder = 1
+      TabOrder = 0
     end
   end
   object pInfo: TPanel
@@ -204,7 +204,7 @@ object BookmarkForm: TBookmarkForm
     BevelOuter = bvNone
     ClientHeight = 44
     ClientWidth = 315
-    TabOrder = 4
+    TabOrder = 2
     Visible = False
     object lUrl: TLabel
       Left = 0
