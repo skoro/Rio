@@ -40,13 +40,13 @@ type
     cbHideGridButtons: TCheckBox;
     cbHideTabContent: TCheckBox;
     cbJsonExpanded: TCheckBox;
-    cbJsonSaveFmt: TCheckBox;
-    cbJsonFmtArray: TCheckBox;
     cbJsonLines: TCheckBox;
+    cbJsonFmtArray: TCheckBox;
+    cbJsonSaveFmt: TCheckBox;
     cboxBookmarkNodeStyle: TComboBox;
     cboxFontItem: TComboBox;
-    editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
+    editIndentSize: TSpinEdit;
     gbBookmarks: TGroupBox;
     gbFonts: TGroupBox;
     gbLayout: TGroupBox;
@@ -60,6 +60,7 @@ type
     lFonts: TLabel;
     lTimeout: TLabel;
     pagesOptions: TPageControl;
+    panIndentSize: TPanel;
     panFonts: TPanel;
     panRestore: TPanel;
     Props: TJSONPropStorage;
