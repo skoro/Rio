@@ -44,6 +44,7 @@ type
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
+    RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
     miSep3: TMenuItem;
@@ -168,6 +169,7 @@ type
     procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
+    procedure cbMethodChange(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure dlgFindFind(Sender: TObject);
@@ -696,6 +698,20 @@ begin
     editBasicPassword.EchoMode := emPassword;
 end;
 
+procedure TMainForm.cbMethodChange(Sender: TObject);
+var
+  BM: TBookmark;
+begin
+  // Update the current bookmark node (icon or text).
+  with FBookManager do begin
+    BM := CurrentBookmark;
+    if Assigned(BM) and (not BM.Locked) then begin
+      BM.Request.Method := cbMethod.Text;
+      SetNodeStyle(CurrentNode);
+    end;
+  end;
+end;
+
 procedure TMainForm.cbUrlChange(Sender: TObject);
 begin
   SyncURLQueryParams;
@@ -764,9 +780,8 @@ begin
   FBookManager := TBookmarkManager.Create(Self);
   FBookManager.Parent := BookmarkSide;
   FBookManager.TreeView.Images := toolbarIcons;
-  FBookManager.TreeView.StateImages := toolbarIcons;
-  FBookManager.ImageIndexFolder := 6;
-  FBookManager.ImageIndexBookmark := 7;
+  FBookManager.TreeView.StateImages := RequestIcons;
+  FBookManager.ImageIndexFolder := 0;
   FBookManager.ImageIndexSelected := 5;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   with FBookManager.Popup do begin
@@ -1340,6 +1355,7 @@ begin
   // Update Query tab and app title.
   SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
+  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
   EnableSubmitButton;
 end;
 
@@ -1921,7 +1937,8 @@ begin
           FreeAndNil(RO);
         end;
         mrOk: begin
-          if RO.Url <> Bookmark.Request.Url then
+          // Update url for the current bookmark.
+          if (FBookManager.CurrentBookmark = BM) and (RO.Url <> Bookmark.Request.Url) then
             cbUrl.Text := Bookmark.Request.Url;
         end;
         else begin
@@ -2006,6 +2023,9 @@ begin
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
+
+  // Change bookmarks node style.
+  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
 end;
 
 procedure TMainForm.SwitchLayout;

@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
-  PairSplitter, Dialogs, Graphics, Controls, response_tabs, Classes,
+  PairSplitter, Dialogs, Graphics, Controls, response_tabs, bookmarks, Classes,
   PropertyStorage, Grids, ButtonPanel;
 
 type
@@ -44,6 +44,7 @@ type
     cbHideGridButtons: TCheckBox;
     cboxFontItem: TComboBox;
     cbJsonLines: TCheckBox;
+    cboxBookmarkNodeStyle: TComboBox;
     editIndentSize: TSpinEdit;
     dlgFont: TFontDialog;
     GroupBox1: TGroupBox;
@@ -52,6 +53,7 @@ type
     gbFonts: TGroupBox;
     gboxRequest: TGroupBox;
     gboxResponse: TGroupBox;
+    gbBookmarks: TGroupBox;
     Label1: TLabel;
     Label2: TLabel;
     lFontDemo: TLabel;
@@ -85,6 +87,7 @@ type
     FKeyCatch: TPanel; // Panel for reading a new shortcut.
     FKeySet: TShortCutItem; // Current reading they shortcut item.
     FShortCuts: TShortCuts; // List of application shortcuts.
+    function GetBookmarkNodeStyle: TBookmarkNodeStyle;
     function GetEditRequestMethods: Boolean;
     function GetFitImages: Boolean;
     function GetGridButtonsHidden: Boolean;
@@ -132,6 +135,7 @@ type
     property FitImages: Boolean read GetFitImages;
     property LayoutEnable: Boolean write SetLayoutEnable;
     property HideTabContent: Boolean read GetHideTabContent;
+    property BookmarkNodeStyle: TBookmarkNodeStyle read GetBookmarkNodeStyle;
   end;
 
 var
@@ -327,6 +331,11 @@ end;
 function TOptionsForm.GetEditRequestMethods: Boolean;
 begin
   Result := cbEditMethods.Checked;
+end;
+
+function TOptionsForm.GetBookmarkNodeStyle: TBookmarkNodeStyle;
+begin
+  Result := TBookmarkNodeStyle(cboxBookmarkNodeStyle.ItemIndex);
 end;
 
 function TOptionsForm.GetFitImages: Boolean;
