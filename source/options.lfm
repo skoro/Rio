@@ -23,10 +23,10 @@ object OptionsForm: TOptionsForm
     Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabJson
+    ActivePage = tabAppearance
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 2
+    TabIndex = 1
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -209,6 +209,8 @@ object OptionsForm: TOptionsForm
           BevelOuter = bvNone
           ClientHeight = 27
           ClientWidth = 288
+          Color = clNone
+          ParentColor = False
           TabOrder = 2
           object btnSelectFont: TButton
             Left = 0
