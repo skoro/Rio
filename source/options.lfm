@@ -23,10 +23,10 @@ object OptionsForm: TOptionsForm
     Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabShortcuts
+    ActivePage = tabGeneral
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 3
+    TabIndex = 0
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -37,7 +37,7 @@ object OptionsForm: TOptionsForm
       ClientWidth = 308
       object gboxRequest: TGroupBox
         Left = 4
-        Height = 93
+        Height = 76
         Top = 2
         Width = 300
         Align = alTop
@@ -45,44 +45,60 @@ object OptionsForm: TOptionsForm
         Caption = 'Request'
         ChildSizing.LeftRightSpacing = 4
         ChildSizing.TopBottomSpacing = 2
-        ClientHeight = 74
+        ClientHeight = 57
         ClientWidth = 296
         TabOrder = 0
-        object lTimeout: TLabel
-          Left = 4
-          Height = 17
-          Top = 2
-          Width = 288
-          Align = alTop
-          Caption = 'Request timeout (sec):'
-          ParentColor = False
-        end
-        object seTimeout: TSpinEdit
-          Left = 4
-          Height = 27
-          Top = 19
-          Width = 288
-          Align = alTop
-          MaxValue = 500
-          MinValue = 2
-          TabOrder = 0
-          Value = 60
-        end
         object cbEditMethods: TCheckBox
           Left = 4
           Height = 22
-          Top = 50
+          Top = 33
           Width = 288
           Align = alTop
           BorderSpacing.Top = 4
           Caption = '&Editable request methods'
+          TabOrder = 0
+        end
+        object panRespTimeout: TPanel
+          Left = 4
+          Height = 27
+          Top = 2
+          Width = 288
+          Align = alTop
+          AutoSize = True
+          BevelOuter = bvNone
+          ClientHeight = 27
+          ClientWidth = 288
+          Color = clNone
+          ParentColor = False
           TabOrder = 1
+          object lTimeout: TLabel
+            Left = 0
+            Height = 27
+            Top = 0
+            Width = 124
+            Align = alLeft
+            BorderSpacing.Right = 4
+            Caption = 'Request timeout (sec):'
+            Layout = tlCenter
+            ParentColor = False
+          end
+          object seTimeout: TSpinEdit
+            Left = 128
+            Height = 27
+            Top = 0
+            Width = 90
+            Align = alLeft
+            MaxValue = 500
+            MinValue = 2
+            TabOrder = 0
+            Value = 60
+          end
         end
       end
       object gboxResponse: TGroupBox
         Left = 4
         Height = 67
-        Top = 101
+        Top = 84
         Width = 300
         Align = alTop
         AutoSize = True
@@ -333,8 +349,8 @@ object OptionsForm: TOptionsForm
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 23
-          ClientWidth = 284
+          ClientHeight = 27
+          ClientWidth = 288
           Color = clNone
           ParentColor = False
           TabOrder = 3

@@ -60,6 +60,7 @@ type
     lFonts: TLabel;
     lTimeout: TLabel;
     pagesOptions: TPageControl;
+    panRespTimeout: TPanel;
     panIndentSize: TPanel;
     panFonts: TPanel;
     panRestore: TPanel;
