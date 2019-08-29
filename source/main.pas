@@ -804,6 +804,9 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
+  // Save the current bookmark.
+  if Assigned(FBookManager.CurrentBookmark) then
+    FBookManager.CurrentBookmark.UpdateRequest(CreateRequestObject);
   SaveAppBookmarks(FBookManager);
 
   FreeAndNil(FResponseTabManager);
@@ -1956,10 +1959,8 @@ end;
 
 procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
 begin
-  if Assigned(Prev) and (not Prev.Locked) then begin
-    Prev.Request.Free;
-    Prev.Request := CreateRequestObject;
-  end;
+  if Assigned(Prev) then
+    Prev.UpdateRequest(CreateRequestObject);
   StartNewRequest;
   BookmarkButtonIcon(True);
   SetRequestObject(Selected.Request);

@@ -51,6 +51,7 @@ type
   public
     constructor Create(aName: string); virtual;
     destructor Destroy; override;
+    procedure UpdateRequest(ANewRequest: TRequestObject);
     property Request: TRequestObject read FRequest write FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
     property Name: string read FName write SetName;
@@ -513,6 +514,15 @@ begin
   if FRequest <> Nil then
     FreeAndNil(FRequest);
   inherited Destroy;
+end;
+
+procedure TBookmark.UpdateRequest(ANewRequest: TRequestObject);
+begin
+  if Assigned(FRequest) and not FLocked then
+  begin
+    FRequest.Free;
+    FRequest := ANewRequest;
+  end;
 end;
 
 { TBookmarkManager }
