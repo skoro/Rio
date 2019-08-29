@@ -149,7 +149,7 @@ object MainForm: TMainForm
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnShow = FormShow
-  SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;Left;Top;Width;LayoutSplitter.Position'
+  SessionProperties = 'cbMethod.Items;cbMethod.Text;cbUrl.Items;cbUrl.Text;Height;LayoutSplitter.Position;Left;Top;Width;AppSplitter.Position'
   LCLVersion = '1.8.4.0'
   object panelUrl: TPanel
     Left = 4
@@ -1307,7 +1307,7 @@ object MainForm: TMainForm
                       Top = 0
                       Width = 413
                       HorzScrollBar.Page = 208
-                      VertScrollBar.Page = 105
+                      VertScrollBar.Page = 107
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 151
@@ -1317,7 +1317,7 @@ object MainForm: TMainForm
                       TabOrder = 0
                       object editBearerToken: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 80
                         Width = 400
                         Anchors = [akTop, akLeft, akRight]
@@ -1335,7 +1335,7 @@ object MainForm: TMainForm
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 24
                         Width = 200
                         EditLabel.AnchorSideLeft.Control = editBearerPrefix

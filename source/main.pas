@@ -855,7 +855,6 @@ begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
-  ToggleBookmarksSide(miBookmarks.Checked);
   // OnResize callback should be after ToggleBookmarksSide otherwise
   // bookmarks will be always opened despite on its status.
   if not Assigned(BookmarkSide.OnResize) then
