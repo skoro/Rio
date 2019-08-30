@@ -1869,12 +1869,12 @@ end;
 procedure TMainForm.ToggleRequestSide(VisibleSide: Boolean);
 begin
   if not VisibleSide then begin
-    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 0) then
+    if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 1) then
     begin
       AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Height);
       splitterSideRequest.Height := 0;
     end
-    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 0) then
+    else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 1) then
     begin
       AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Width);
       splitterSideRequest.Width := 0;
