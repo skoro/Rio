@@ -303,7 +303,7 @@ implementation
 
 uses about, headers_editor, cookie_form,
   app_helpers, strutils, help_form, cmdline, options,
-  import_form, export_form, bookmark_form, Clipbrd;
+  import_form, export_form, bookmark_form, state, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -1870,24 +1870,31 @@ procedure TMainForm.ToggleRequestSide(VisibleSide: Boolean);
 begin
   if not VisibleSide then begin
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 0) then
-      splitterSideRequest.Height := 0
+    begin
+      AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Height);
+      splitterSideRequest.Height := 0;
+    end
     else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 0) then
+    begin
+      AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Width);
       splitterSideRequest.Width := 0;
+    end;
   end
   else begin
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height <= 1) then
-      splitterSideRequest.Height := LayoutSplitter.Height div 2
+      splitterSideRequest.Height := AppState.ReadInteger('splitterSideRequest', LayoutSplitter.Height div 2)
     else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width <= 1) then
-      splitterSideRequest.Width := LayoutSplitter.Width div 2;
+      splitterSideRequest.Width :=  AppState.ReadInteger('splitterSideRequest', LayoutSplitter.Width div 2);
   end;
 end;
 
 procedure TMainForm.ToggleBookmarksSide(VisibleSide: Boolean);
 begin
   if VisibleSide then begin
-    BookmarkSide.Width := 145;
+    BookmarkSide.Width := AppState.ReadInteger('bookmarkSide', 150);
   end
   else begin
+    AppState.WriteInteger('bookmarkSide', BookmarkSide.Width);
     BookmarkSide.Width := 1;
   end;
   miBookmarks.Checked := VisibleSide;
