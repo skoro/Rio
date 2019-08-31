@@ -195,6 +195,7 @@ var
 begin
   for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do
     FreeAndNil(FFontItemList[I]);
+  inherited;
 end;
 
 procedure TOptionsForm.FormKeyUp(Sender: TObject; var Key: Word;
@@ -307,6 +308,8 @@ var
   Idx: Integer;
 begin
   Idx := cboxFontItem.ItemIndex;
+  if Assigned(FFontItemList[Idx]) then
+    FreeAndNil(FFontItemList[Idx]); // Destory a previously attached font.
   FFontItemList[Idx] := GetDefaultFont(TUIFontItem(Idx));
   SetFontDemo;
 end;
