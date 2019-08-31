@@ -1371,7 +1371,8 @@ procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
       if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
     end;
   end;
-
+var
+  IntVal: integer;
 begin
   SetColumns(requestHeaders);
   SetColumns(responseHeaders);
@@ -1389,6 +1390,13 @@ begin
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
     miBookmarks.Checked := ReadBoolean('bookmarks', True);
     FBookManager.OpenBookmarkPath(ReadString('selBookmark', ''));
+    // Read splitter side sizes.
+    IntVal := ReadInteger('splitterSideRequest', 0);
+    if IntVal > 0 then
+      AppState.WriteInteger('splitterSideRequest', IntVal);
+    IntVal := ReadInteger('bookmarkSide', 0);
+    if IntVal > 0 then
+      AppState.WriteInteger('bookmarkSide', IntVal);
   end;
 end;
 
@@ -1419,6 +1427,11 @@ begin
     with FBookManager do
       if CurrentBookmark = NIL then WriteString('selBookmark', '')
       else WriteString('selBookmark', GetBookmarkPath(CurrentBookmark));
+    // Save splitter side sizes before it hided.
+    if AppState.ReadInteger('splitterSideRequest', 0) > 0 then
+      WriteInteger('splitterSideRequest', AppState.ReadInteger('splitterSideRequest', 0));
+    if AppState.ReadInteger('bookmarkSide', 0) > 0 then
+      WriteInteger('bookmarkSide', AppState.ReadInteger('bookmarkSide', 0));
   end;
 end;
 
