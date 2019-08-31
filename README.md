@@ -24,11 +24,11 @@ Formatted JSON
 
 ### Compile from sources
 
-For compiling from sources you need the following requirements:
+For compiling from sources you will need the following requirements:
 - [Lazarus](http://www.lazarus-ide.org/) 1.8
 - [FreePascal](https://www.freepascal.org/) 3.0.4
 
-Before compiling the application you need to install a components package
+Before compiling the application you will have to install a components package
 `components/rest_explorer`. In Lazarus from the main menu
 `Package / Open package file (.lpk)...` open the file
 `components/rest_explorer/rest_explorer.lpk` and then compile and install the
