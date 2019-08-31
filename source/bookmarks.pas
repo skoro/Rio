@@ -596,6 +596,7 @@ begin
   Result.ScrollBars := ssAutoBoth;
   Result.Options := [tvoReadOnly, tvoShowRoot, tvoShowLines, tvoShowButtons,
                  tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoRightClickSelect];
+  Result.ToolTips := True;
   // Event handlers.
   Result.OnDblClick := @InternalTreeOnDblClick;
 end;
