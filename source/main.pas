@@ -1373,6 +1373,8 @@ procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
   end;
 var
   IntVal: integer;
+  StrVal: string;
+  RO: TRequestObject;
 begin
   SetColumns(requestHeaders);
   SetColumns(responseHeaders);
@@ -1389,7 +1391,20 @@ begin
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
     miBookmarks.Checked := ReadBoolean('bookmarks', True);
-    FBookManager.OpenBookmarkPath(ReadString('selBookmark', ''));
+    StrVal := ReadString('selBookmark', '');
+    if StrVal <> '' then
+      FBookManager.OpenBookmarkPath(StrVal)
+    else begin
+      StrVal := ReadString('currentRequest', '');
+      if StrVal <> '' then begin
+        try
+          RO := TRequestObject.CreateFromJson(StrVal);
+          SetRequestObject(RO);
+        finally
+          RO.Free;
+        end;
+      end;
+    end;
     // Read splitter side sizes.
     IntVal := ReadInteger('splitterSideRequest', 0);
     if IntVal > 0 then
@@ -1408,6 +1423,8 @@ procedure TMainForm.PSMAINSavingProperties(Sender: TObject);
     for I := 0 to grid.Columns.Count - 1 do
       PSMAIN.WriteInteger(grid.Name + 'Col' + IntToStr(I + 1), grid.Columns.Items[I].Width);
   end;
+var
+  RO: TRequestObject;
 begin
   SaveColumns(requestHeaders);
   SaveColumns(gridForm);
@@ -1424,10 +1441,22 @@ begin
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
     WriteBoolean('bookmarks', miBookmarks.Checked);
+    // Save the selected bookmark or the current request.
     with FBookManager do
-      if CurrentBookmark = NIL then WriteString('selBookmark', '')
-      else WriteString('selBookmark', GetBookmarkPath(CurrentBookmark));
-    // Save splitter side sizes before it hided.
+      if CurrentBookmark = NIL then begin
+        WriteString('selBookmark', '');
+        try
+          RO := CreateRequestObject;
+          WriteString('currentRequest', RO.ToJson);
+        finally
+          RO.Free;
+        end;
+      end
+      else begin
+        WriteString('selBookmark', GetBookmarkPath(CurrentBookmark));
+        WriteString('currentRequest', '');
+      end;
+    // Save splitter side sizes before it has been hidden.
     if AppState.ReadInteger('splitterSideRequest', 0) > 0 then
       WriteInteger('splitterSideRequest', AppState.ReadInteger('splitterSideRequest', 0));
     if AppState.ReadInteger('bookmarkSide', 0) > 0 then
