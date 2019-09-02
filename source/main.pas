@@ -310,6 +310,10 @@ const
   BOOKMARK_IMG_UNSET = 4;
   BOOKMARK_IMG_SET = 5;
 
+  // App states for splitters: bookmark and request-response.
+  STATE_BOOKMARK_SIDE = 'bookmarkSide';
+  STATE_SPLITTER_SIDE = 'splitterSideRequest';
+
 {$R *.lfm}
 
 { TMainForm }
@@ -1406,12 +1410,12 @@ begin
       end;
     end;
     // Read splitter side sizes.
-    IntVal := ReadInteger('splitterSideRequest', 0);
+    IntVal := ReadInteger(STATE_SPLITTER_SIDE, 0);
     if IntVal > 0 then
-      AppState.WriteInteger('splitterSideRequest', IntVal);
-    IntVal := ReadInteger('bookmarkSide', 0);
+      AppState.WriteInteger(STATE_SPLITTER_SIDE, IntVal);
+    IntVal := ReadInteger(STATE_BOOKMARK_SIDE, 0);
     if IntVal > 0 then
-      AppState.WriteInteger('bookmarkSide', IntVal);
+      AppState.WriteInteger(STATE_BOOKMARK_SIDE, IntVal);
   end;
 end;
 
@@ -1457,10 +1461,10 @@ begin
         WriteString('currentRequest', '');
       end;
     // Save splitter side sizes before it has been hidden.
-    if AppState.ReadInteger('splitterSideRequest', 0) > 0 then
-      WriteInteger('splitterSideRequest', AppState.ReadInteger('splitterSideRequest', 0));
-    if AppState.ReadInteger('bookmarkSide', 0) > 0 then
-      WriteInteger('bookmarkSide', AppState.ReadInteger('bookmarkSide', 0));
+    if AppState.ReadInteger(STATE_SPLITTER_SIDE, 0) > 0 then
+      WriteInteger(STATE_SPLITTER_SIDE, AppState.ReadInteger(STATE_SPLITTER_SIDE, 0));
+    if AppState.ReadInteger(STATE_BOOKMARK_SIDE, 0) > 0 then
+      WriteInteger(STATE_BOOKMARK_SIDE, AppState.ReadInteger(STATE_BOOKMARK_SIDE, 0));
   end;
 end;
 
@@ -1913,30 +1917,30 @@ begin
   if not VisibleSide then begin
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height > 1) then
     begin
-      AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Height);
+      AppState.WriteInteger(STATE_SPLITTER_SIDE, splitterSideRequest.Height);
       splitterSideRequest.Height := 0;
     end
     else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width > 1) then
     begin
-      AppState.WriteInteger('splitterSideRequest', splitterSideRequest.Width);
+      AppState.WriteInteger(STATE_SPLITTER_SIDE, splitterSideRequest.Width);
       splitterSideRequest.Width := 0;
     end;
   end
   else begin
     if (LayoutSplitter.SplitterType = pstVertical) and (splitterSideRequest.Height <= 1) then
-      splitterSideRequest.Height := AppState.ReadInteger('splitterSideRequest', LayoutSplitter.Height div 2)
+      splitterSideRequest.Height := AppState.ReadInteger(STATE_SPLITTER_SIDE, LayoutSplitter.Height div 2)
     else if (LayoutSplitter.SplitterType = pstHorizontal) and (splitterSideRequest.Width <= 1) then
-      splitterSideRequest.Width :=  AppState.ReadInteger('splitterSideRequest', LayoutSplitter.Width div 2);
+      splitterSideRequest.Width :=  AppState.ReadInteger(STATE_SPLITTER_SIDE, LayoutSplitter.Width div 2);
   end;
 end;
 
 procedure TMainForm.ToggleBookmarksSide(VisibleSide: Boolean);
 begin
   if VisibleSide then begin
-    BookmarkSide.Width := AppState.ReadInteger('bookmarkSide', 150);
+    BookmarkSide.Width := AppState.ReadInteger(STATE_BOOKMARK_SIDE, 150);
   end
   else begin
-    AppState.WriteInteger('bookmarkSide', BookmarkSide.Width);
+    AppState.WriteInteger(STATE_BOOKMARK_SIDE, BookmarkSide.Width);
     BookmarkSide.Width := 1;
   end;
   miBookmarks.Checked := VisibleSide;
