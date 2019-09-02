@@ -56,17 +56,21 @@ uses app_helpers;
 
 { THeadersEditorForm }
 
-const DEFAULT_HEADERS : array [1..11, 1..2] of string = (
+const DEFAULT_HEADERS : array [1..15, 1..2] of string = (
       ('Content-Type', 'text/html'),
       ('Content-Type', 'application/json'),
       ('Content-Type', 'application/x-www-form-urlencoded'),
+      ('Content-Type', 'application/xml'),
       ('Content-Type', 'multipart/form-data'),
       ('Cache-Control', 'no-cache'),
       ('Pragma', 'no-cache'),
       ('Referer', ''),
-      ('User-Agent', ''),
+      ('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'),
+      ('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'),
+      ('User-Agent', 'Googlebot/2.1 (+http://www.google.com/bot.html)'),
       ('Accept', 'text/html'),
       ('Accept', 'application/json'),
+      ('Accept', 'application/xml'),
       ('X-Requested-With', 'XMLHttpRequest')
 );
 
