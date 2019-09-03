@@ -1,6 +1,6 @@
 Package: http-inspector
 Version: @version@
-Depends: libgtk2.0-0 (>= 2.20.0)
+Depends: @depends@
 Maintainer: Skorobogatko Alexei <skorobogatko.alexei@gmail.com>
 Description: The application is for sending and analyzing HTTP requests.
  This application allows you to send an http request and view the response.
