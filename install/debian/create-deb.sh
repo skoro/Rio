@@ -37,6 +37,7 @@ case $WIDGET in
          depends="libgtk2.0-0 (>= 2.20.0)"
          ;;
      qt5)
+         depends="libqt5pas1 (>= 2.6.0)"
          ;;
      *)
          echo "Widget set must be one of: gtk, qt5"
