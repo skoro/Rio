@@ -37,14 +37,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pName: TPanel
     Left = 6
-    Height = 48
+    Height = 46
     Top = 6
     Width = 315
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 48
+    ClientHeight = 46
     ClientWidth = 315
     TabOrder = 1
     object lName: TLabel
@@ -60,7 +60,7 @@ object BookmarkForm: TBookmarkForm
     end
     object edName: TEdit
       Left = 0
-      Height = 27
+      Height = 25
       Top = 21
       Width = 315
       Align = alTop
@@ -69,14 +69,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 174
-    Top = 110
+    Height = 180
+    Top = 106
     Width = 315
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 174
+    ClientHeight = 180
     ClientWidth = 315
     TabOrder = 3
     object lFolder: TLabel
@@ -91,7 +91,7 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 147
+      Top = 153
       Width = 315
       Align = alBottom
       AutoSize = True
@@ -150,7 +150,7 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 126
+      Height = 132
       Top = 17
       Width = 315
       Align = alClient
@@ -164,20 +164,20 @@ object BookmarkForm: TBookmarkForm
   end
   object pOptions: TPanel
     Left = 6
-    Height = 44
-    Top = 290
+    Height = 42
+    Top = 292
     Width = 315
     Align = alBottom
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 44
+    ClientHeight = 42
     ClientWidth = 315
     TabOrder = 4
     object cbLock: TCheckBox
       Left = 0
-      Height = 22
-      Top = 22
+      Height = 21
+      Top = 21
       Width = 315
       Align = alTop
       Caption = '&Lock request data'
@@ -185,7 +185,7 @@ object BookmarkForm: TBookmarkForm
     end
     object cbCopy: TCheckBox
       Left = 0
-      Height = 22
+      Height = 21
       Top = 0
       Width = 315
       Align = alTop
@@ -195,14 +195,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pInfo: TPanel
     Left = 6
-    Height = 44
-    Top = 60
+    Height = 42
+    Top = 58
     Width = 315
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 44
+    ClientHeight = 42
     ClientWidth = 315
     TabOrder = 2
     Visible = False
@@ -217,7 +217,7 @@ object BookmarkForm: TBookmarkForm
     end
     object edUrl: TEdit
       Left = 0
-      Height = 27
+      Height = 25
       Top = 17
       Width = 315
       Align = alTop
