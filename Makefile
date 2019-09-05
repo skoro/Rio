@@ -21,7 +21,8 @@ all:
 	@echo "  linux64-qt-debug Compile for Linux amd64 with QT and debug info"
 	@echo "  linuxarm         Compile for Linux ARM"
 	@echo "  linuxarm-debug   Compile for Linux ARM with debug info"
-	@echo "  linux-all        Compile for all the targets"
+	@echo "  linux-all        Compile for all the targets (32, 64, gtk)"
+	@echo "  linux-qt         Compile binaries, deb package for QT"
 	@echo "  deb-linux32      Create a debian package for i386"
 	@echo "  deb-linux64      Create a debian package for amd64"
 	@echo "  deb-linux64-qt   Create a debian package for amd64 with QT"
@@ -66,6 +67,10 @@ bin-all:
 	make bin-linux32
 	make bin-linux64
 	make bin-linuxarm
+linux-qt:
+	make linux64-qt
+	make bin-linux64-qt
+	make deb-linux64-qt
 
 linux32: linux-arch-32 release-mode build
 linux32-debug: linux-arch-32 debug-mode build
