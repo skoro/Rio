@@ -10,7 +10,7 @@ unit app_helpers;
 interface
 
 uses
-  Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids,
+  Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids, ComCtrls,
   key_value;
 
 type
@@ -60,6 +60,9 @@ function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1; isU
 // delimChar - a delimiter between columns
 // aRow, aCol - row and column offsets
 function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer = 1; aCol: Integer = 0): string;
+
+// Switch to a named tab in the PageControl component.
+procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 
 implementation
 
@@ -382,6 +385,19 @@ begin
   finally
     FreeAndNil(Buf);
   end;
+end;
+
+procedure SwitchTabByName(PC: TPageControl; const TabName: string);
+var
+  i: Integer;
+begin
+  if TabName = '' then
+    Exit; // =>
+  for i := 0 to PC.PageCount - 1 do
+    if PC.Pages[i].Caption = TabName then begin
+      PC.ActivePageIndex := i;
+      break;
+    end;
 end;
 
 end.

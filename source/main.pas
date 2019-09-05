@@ -244,6 +244,7 @@ type
     FRequestSeconds: Integer;
     FProfilerGraph: TProfilerGraph;
     FBookManager: TBookmarkManager;
+    FKeepResponseTab: string;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -293,6 +294,7 @@ type
     procedure FindText;
     function CreateRequestObject: TRequestObject;
     procedure SetRequestObject(RO: TRequestObject);
+    procedure KeepCurrentResponseTab;
     property BookmarkManager: TBookmarkManager read FBookManager;
   end;
 
@@ -664,6 +666,12 @@ begin
   end;
 end;
 
+procedure TMainForm.KeepCurrentResponseTab;
+begin
+  if Assigned(pagesResponse.ActivePage) then
+    FKeepResponseTab := pagesResponse.ActivePage.Caption;
+end;
+
 procedure TMainForm.SelectResponseViewTab(rView: TResponseView);
 begin
   case rView of
@@ -802,6 +810,7 @@ begin
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
+  FKeepResponseTab := '';
 
   StartNewRequest;
 end;
@@ -1300,6 +1309,8 @@ begin
   // This behaviour doesn't affect the search from the response_tabs unit
   // in case when a response tab implements find methods with the internal next position.
   ResetFindTextPos;
+  // Keep an opened response tab for the next request.
+  KeepCurrentResponseTab;
 end;
 
 procedure TMainForm.PairSplitterResize(Sender: TObject);
@@ -2299,6 +2310,9 @@ begin
     responseRaw.CaretPos := Point(0, 0);
   end;
 
+  // Open the same tab as in the previous request (if it's possible).
+  SwitchTabByName(pagesResponse, FKeepResponseTab);
+
   if not Assigned(FProfilerGraph) then
     FProfilerGraph := TProfilerGraph.Create(tabRespTime);
   FProfilerGraph.TimeCheckPoints := info.TimeCheckPoints;
@@ -2474,6 +2488,7 @@ begin
   FContentType := '';
   tabContent.TabVisible := False;
   tabRespCookie.TabVisible := False;
+  KeepCurrentResponseTab;
   pagesResponse.ActivePage := tabResponse;
   if Assigned(FProfilerGraph) then
     FreeAndNil(FProfilerGraph);
