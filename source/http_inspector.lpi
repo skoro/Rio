@@ -142,7 +142,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="23">
+    <Units Count="24">
       <Unit0>
         <Filename Value="http_inspector.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -265,6 +265,11 @@
         <Filename Value="state.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit22>
+      <Unit23>
+        <Filename Value="urlutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UrlUtils"/>
+      </Unit23>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
