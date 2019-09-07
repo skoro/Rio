@@ -24,7 +24,7 @@ unit httpclient;
 interface
 
 uses
-  Classes, SysUtils, ssockets, httpdefs, uriparser, base64;
+  Classes, SysUtils, ssockets, httpdefs, UrlUtils, base64;
 
 Const
   // Socket Read buffer size
