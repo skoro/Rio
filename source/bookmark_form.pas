@@ -290,7 +290,7 @@ begin
   pInfo.Visible := True;
   DeleteEnabled := True;
   edName.Text := FBookmark.Name;
-  edUrl.Text := FBookmark.Request.Url;
+  edUrl.Text := FBookmark.Request.UrlPath;
   cbLock.Checked := FBookmark.Locked;
   cbCopy.Visible := True;
   // Select the bookmark node by default.
