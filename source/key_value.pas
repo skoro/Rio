@@ -90,7 +90,7 @@ end;
 
 function TKeyValueForm.GetValue: string;
 begin
-  Result := textValue.Text;
+  Result := TrimRight(textValue.Text);
 end;
 
 procedure TKeyValueForm.SetKey(AValue: string);

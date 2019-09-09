@@ -13,23 +13,23 @@ object KeyValueForm: TKeyValueForm
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object PanelMain: TPanel
     Left = 2
-    Height = 214
+    Height = 213
     Top = 2
     Width = 253
     Align = alClient
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 214
+    ClientHeight = 213
     ClientWidth = 253
     TabOrder = 0
     object textValue: TMemo
       Left = 2
-      Height = 126
-      Top = 86
+      Height = 122
+      Top = 89
       Width = 249
       Align = alClient
       OnKeyPress = textValueKeyPress
@@ -38,15 +38,15 @@ object KeyValueForm: TKeyValueForm
     end
     object editName: TEdit
       Left = 2
-      Height = 26
-      Top = 40
+      Height = 27
+      Top = 41
       Width = 249
       Align = alTop
       TabOrder = 0
     end
     object LabelName: TLabel
       Left = 2
-      Height = 16
+      Height = 17
       Top = 24
       Width = 249
       Align = alTop
@@ -55,8 +55,8 @@ object KeyValueForm: TKeyValueForm
     end
     object LabelValue: TLabel
       Left = 2
-      Height = 16
-      Top = 70
+      Height = 17
+      Top = 72
       Width = 249
       Align = alTop
       BorderSpacing.Top = 4
@@ -75,8 +75,8 @@ object KeyValueForm: TKeyValueForm
   end
   object ButtonPanel: TButtonPanel
     Left = 6
-    Height = 26
-    Top = 222
+    Height = 27
+    Top = 221
     Width = 245
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
