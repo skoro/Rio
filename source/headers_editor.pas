@@ -18,8 +18,8 @@ type
     btnRestore: TButton;
     ImageList1: TImageList;
     Props: TJSONPropStorage;
-    Panel1: TPanel;
-    Panel2: TPanel;
+    PanClient: TPanel;
+    panButtons: TPanel;
     gridHeaders: TStringGrid;
     ToolBar1: TToolBar;
     btnAddRow: TToolButton;

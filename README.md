@@ -27,6 +27,8 @@ Formatted JSON
 For compiling from sources you will need the following requirements:
 - [Lazarus](http://www.lazarus-ide.org/) 1.8
 - [FreePascal](https://www.freepascal.org/) 3.0.4
+- **Qt5Pas** for Qt5 widget set, can be installed by `sudo apt install libqt5pas1`
+  on Ubuntu
 
 Before compiling the application you will have to install a components package
 `components/rest_explorer`. In Lazarus from the main menu
@@ -37,8 +39,9 @@ Please ensure that the package *TAChart* is also installed.
 
 On Linux you can compile and create the install package (deb) by Makefile.
 For example:
-- `make linux32` for compiling release binary for i386
+- `make linux32` for compiling a release binary for i386
 - `make linux64` or for amd64
+- `make linux64-qt` for compiling a release with Qt5 widget set
 - `make deb-linux32` creates a deb package for i386
 - `make appimage` creates AppImage binary (only amd64)
 

@@ -17,20 +17,20 @@ object HeadersEditorForm: THeadersEditorForm
   SessionProperties = 'Height;Width'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.4.0'
-  object Panel1: TPanel
+  object PanClient: TPanel
     Left = 0
-    Height = 258
+    Height = 253
     Top = 0
     Width = 416
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 4
-    ClientHeight = 258
+    ClientHeight = 253
     ClientWidth = 416
     TabOrder = 0
     object gridHeaders: TStringGrid
       Left = 4
-      Height = 224
+      Height = 219
       Top = 30
       Width = 408
       Align = alClient
@@ -114,20 +114,21 @@ object HeadersEditorForm: THeadersEditorForm
       end
     end
   end
-  object Panel2: TPanel
+  object panButtons: TPanel
     Left = 0
-    Height = 42
-    Top = 258
+    Height = 47
+    Top = 253
     Width = 416
     Align = alBottom
+    AutoSize = True
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 42
+    ClientHeight = 47
     ClientWidth = 416
     TabOrder = 1
     object BtnClose: TButton
-      Left = 61
-      Height = 38
+      Left = 63
+      Height = 43
       Top = 2
       Width = 57
       Align = alLeft
@@ -141,11 +142,12 @@ object HeadersEditorForm: THeadersEditorForm
     end
     object btnInsert: TButton
       Left = 2
-      Height = 38
+      Height = 43
       Top = 2
       Width = 59
       Align = alLeft
       AutoSize = True
+      BorderSpacing.Right = 2
       BorderSpacing.InnerBorder = 8
       Caption = '&Insert'
       ModalResult = 1
@@ -155,7 +157,7 @@ object HeadersEditorForm: THeadersEditorForm
     end
     object btnRestore: TButton
       Left = 313
-      Height = 38
+      Height = 43
       Top = 2
       Width = 101
       Align = alRight

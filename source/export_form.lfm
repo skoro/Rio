@@ -15,24 +15,24 @@ object ExportForm: TExportForm
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object TopPanel: TPanel
     Left = 4
-    Height = 28
+    Height = 29
     Top = 4
     Width = 393
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 4
     BevelOuter = bvNone
-    ClientHeight = 28
+    ClientHeight = 29
     ClientWidth = 393
     TabOrder = 0
     object lExport: TLabel
       Left = 4
-      Height = 28
+      Height = 29
       Top = 0
-      Width = 59
+      Width = 53
       Align = alLeft
       BorderSpacing.Left = 4
       BorderSpacing.Right = 4
@@ -41,10 +41,10 @@ object ExportForm: TExportForm
       ParentColor = False
     end
     object cbExport: TComboBox
-      Left = 67
-      Height = 28
+      Left = 61
+      Height = 29
       Top = 0
-      Width = 174
+      Width = 182
       Align = alClient
       ItemHeight = 0
       OnChange = cbExportChange
@@ -52,23 +52,26 @@ object ExportForm: TExportForm
       TabOrder = 0
     end
     object btnCopy: TButton
-      Left = 278
-      Height = 28
+      Left = 284
+      Height = 29
       Top = 0
-      Width = 115
+      Width = 107
       Align = alRight
       AutoSize = True
+      BorderSpacing.Right = 2
       Caption = 'Copy &to clipboard'
       OnClick = btnCopyClick
       TabOrder = 1
     end
     object btnSave: TButton
-      Left = 241
-      Height = 28
+      Left = 245
+      Height = 29
       Top = 0
       Width = 37
       Align = alRight
       AutoSize = True
+      BorderSpacing.Left = 2
+      BorderSpacing.Right = 2
       Caption = '&Save'
       OnClick = btnSaveClick
       TabOrder = 2
@@ -76,18 +79,18 @@ object ExportForm: TExportForm
   end
   object PanelMain: TPanel
     Left = 4
-    Height = 204
-    Top = 36
+    Height = 202
+    Top = 37
     Width = 393
     Align = alClient
     BorderSpacing.Around = 4
     BevelOuter = bvNone
-    ClientHeight = 204
+    ClientHeight = 202
     ClientWidth = 393
     TabOrder = 1
     object MemoResult: TMemo
       Left = 0
-      Height = 204
+      Height = 202
       Top = 0
       Width = 393
       Align = alClient
@@ -97,8 +100,8 @@ object ExportForm: TExportForm
   end
   object ButtonPanel: TButtonPanel
     Left = 6
-    Height = 26
-    Top = 246
+    Height = 27
+    Top = 245
     Width = 389
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
