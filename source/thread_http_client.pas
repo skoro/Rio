@@ -5,7 +5,7 @@ unit thread_http_client;
 interface
 
 uses
-  Classes, SysUtils, httpclient, fgl, URIParser;
+  Classes, SysUtils, httpclient, fgl, UrlUtils;
 
 type
 
@@ -195,21 +195,21 @@ var
   URI: TURI;
   Params, KV: TStringList;
   I: integer;
+  ParamStr: string;
 begin
   Result := TQueryParams.Create;
   Params := TStringList.Create;
   KV := TStringList.Create;
   try
     URI := ParseURI(url);
-    SplitStrings(URI.Params, '&', Params);
+    ParamStr := EscapeURI(URI.Params);
+    SplitStrings(ParamStr, '&', Params);
     for I := 0 to Params.Count - 1 do
     begin
       SplitStrings(Params[I], '=', KV);
       case KV.Count of
-        1: Result.Add(DecodeURLElement(KV[0]), '');
-        // Fix: DecodeURLElement on empty string leads to use the value from the previous iteration.
-        2: Result.Add(DecodeURLElement(KV[0]), IfThen(KV[1] = '', '',
-            DecodeURLElement(KV[1])));
+        1: Result.Add(UnescapeURI(KV[0]), '');
+        2: Result.Add(UnescapeURI(KV[0]), UnescapeURI(KV[1]));
       end;
     end;
   finally
@@ -236,7 +236,7 @@ begin
 
   URI := ParseURI(url);
   URI.Params := ParamStr;
-  Result := EncodeURI(URI);
+  Result := EncodeURI(URI, False);
 end;
 
 function SplitMimeType(const ContentType: string): TMimeType;
@@ -633,7 +633,7 @@ begin
   // TODO: need better protocol parser.
   if Pos('http', AValue) = 0 then
     AValue := 'http://' + AValue;
-  FUrl := AValue;
+  FUrl := EncodeUrl(AValue);
 end;
 
 procedure TThreadHttpClient.RequestComplete;
@@ -644,7 +644,7 @@ begin
   begin
     info := TResponseInfo.Create;
     info.Method := FHttpMethod;
-    info.Url := FUrl;
+    info.Url := DecodeUrl(FUrl);
     info.RequestHeaders.Assign(FHttpClient.RequestHeaders);
     info.ResponseHeaders.Assign(FHttpClient.ResponseHeaders);
     info.StatusCode := FHttpClient.ResponseStatusCode;
