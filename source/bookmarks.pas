@@ -72,6 +72,7 @@ type
     FOnChangeBookmark: TOnChangeBookmark;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
+    FImgIdxRoot: Integer;
     FBookmarkNodeStyle: TBookmarkNodeStyle;
 
     function GetBookmarkPopup: TBookmarkPopup;
@@ -80,6 +81,7 @@ type
     procedure SetBookmarkPopup(AValue: TBookmarkPopup);
     procedure SetCurrentNode(AValue: TTreeNode);
     procedure SetBookmarkNodeStyle(AValue: TBookmarkNodeStyle);
+    procedure SetImgIdxRoot(AValue: Integer);
     procedure SetRootName(AValue: string);
 
   protected
@@ -154,6 +156,7 @@ type
     property Popup: TBookmarkPopup read GetBookmarkPopup write SetBookmarkPopup;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
+    property ImageIndexRoot: Integer read FImgIdxRoot write SetImgIdxRoot;
     property BookmarkNodeStyle: TBookmarkNodeStyle read FBookmarkNodeStyle write SetBookmarkNodeStyle;
   end;
 
@@ -566,6 +569,14 @@ begin
   UpdateBookmarkNodeStyle;
 end;
 
+procedure TBookmarkManager.SetImgIdxRoot(AValue: Integer);
+begin
+  if FImgIdxRoot = AValue then
+    Exit; // =>
+  FImgIdxRoot := AValue;
+  FRootNode.StateIndex := AValue;
+end;
+
 function TBookmarkManager.GetCurrentBookmark: TBookmark;
 begin
   Result := NIL;
@@ -607,6 +618,7 @@ begin
     Clear;
     FRootNode := Add(NIL, 'My bookmarks');
     FRootNode.Data := NIL;
+    FRootNode.StateIndex := FImgIdxRoot;
     FRootNode.MakeVisible;
   end;
 end;

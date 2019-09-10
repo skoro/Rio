@@ -795,6 +795,7 @@ begin
   FBookManager.TreeView.StateImages := RequestIcons;
   FBookManager.ImageIndexFolder := 0;
   FBookManager.ImageIndexSelected := 5;
+  FBookManager.ImageIndexRoot := 8;
   FBookManager.OnChangeBookmark := @OnChangeBookmark;
   with FBookManager.Popup do begin
     OnEditClick := @BookmarkEditorShow;
