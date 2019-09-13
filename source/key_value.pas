@@ -33,8 +33,8 @@ type
     textValue: TMemo;
     PanelMain: TPanel;
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
-    procedure textValueKeyPress(Sender: TObject; var Key: char);
   private
     FFocusedComponent: TWinControl;
 
@@ -72,15 +72,15 @@ begin
     FFocusedComponent.SetFocus;
 end;
 
-procedure TKeyValueForm.textValueKeyPress(Sender: TObject; var Key: char);
-begin
-  if Key = #27 then
-    ModalResult := mrCancel;
-end;
-
 procedure TKeyValueForm.FormCreate(Sender: TObject);
 begin
   FFocusedComponent := nil;
+end;
+
+procedure TKeyValueForm.FormKeyPress(Sender: TObject; var Key: char);
+begin
+  if Key = #27 then
+    ModalResult := mrCancel;
 end;
 
 function TKeyValueForm.GetKey: string;

@@ -9,7 +9,9 @@ object KeyValueForm: TKeyValueForm
   ClientWidth = 257
   Constraints.MinHeight = 220
   Constraints.MinWidth = 240
+  KeyPreview = True
   OnCreate = FormCreate
+  OnKeyPress = FormKeyPress
   OnShow = FormShow
   Position = poMainFormCenter
   ShowInTaskBar = stNever
@@ -32,7 +34,6 @@ object KeyValueForm: TKeyValueForm
       Top = 89
       Width = 249
       Align = alClient
-      OnKeyPress = textValueKeyPress
       ScrollBars = ssAutoBoth
       TabOrder = 1
     end
