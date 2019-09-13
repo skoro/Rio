@@ -92,9 +92,13 @@ begin
     if (FGrid.FixedRows > 0) and (FGrid.RowCount = 1) then
       Exit; // =>
     ColName := FGrid.Cells[1, FGrid.Row]; // "Name" column.
-    Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ColName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
-    if Answer = mrCancel then
-      Exit; // =>
+    if ColName = '' then // Column is empty, try the next column.
+      ColName := FGrid.Cells[2, FGrid.Row];
+    if ColName <> '' then begin
+      Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ColName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+      if Answer = mrCancel then
+        Exit; // =>
+    end;
     FGrid.DeleteRow(FGrid.Row);
     if Assigned(FOnDeleteRow) then
       FOnDeleteRow(Self, FGrid);
