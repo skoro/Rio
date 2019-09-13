@@ -1281,18 +1281,21 @@ procedure TMainForm.OnGridClear(Sender: TObject; Grid: TStringGrid);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
+  Grid.SetFocus;
 end;
 
 procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
+  Grid.SetFocus;
 end;
 
 procedure TMainForm.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
   const aRow: Integer);
 begin
   EditGridRow(Grid);
+  Grid.SetFocus;
 end;
 
 procedure TMainForm.OnGridNewRow(Sender: TObject; Grid: TStringGrid;
@@ -1302,6 +1305,7 @@ begin
   Grid.Cells[0, aRow] := '1';
   if EditGridRow(Grid) <> mrOK then
     Grid.DeleteRow(aRow);
+  Grid.SetFocus;
 end;
 
 procedure TMainForm.pagesResponseChange(Sender: TObject);
