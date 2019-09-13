@@ -126,6 +126,10 @@ begin
     Result.Key := GetKey;
     Result.Value := GetValue;
     Result.Enabled := cbEnabled.Checked;
+    // Fix #146: don't allow to add empty rows.
+    if (Trim(AKey) = '') and (Trim(AValue) = '')
+       and (Trim(Result.Key) = '') and (Trim(Result.Value) = '') then
+      ModalResult := mrCancel;
   end
   else
   begin
