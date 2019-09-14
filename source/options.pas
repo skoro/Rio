@@ -158,6 +158,13 @@ var
   CF: String;
   I: integer;
 begin
+  {$IFDEF LCLWIN32}
+  panRespTimeout.Color := clNone;
+  panFonts.Color := clNone;
+  panIndentSize.Color := clNone;
+  panRestore.Color := clNone;
+  {$ENDIF}
+
   SetLength(FFontItemList, Ord(High(TUIFontItem)) + 1);
   InitFonts;
 
