@@ -1,10 +1,8 @@
-Package: http-inspector
+Package: rio
 Version: @version@
 Depends: @depends@
 Maintainer: Skorobogatko Alexei <skorobogatko.alexei@gmail.com>
-Description: The application is for sending and analyzing HTTP requests.
- This application allows you to send an http request and view the response.
- It's like curl but with GUI.
+Description: Simple REST Api client.
 Section: net
 Priority: optional
 Architecture: @arch@

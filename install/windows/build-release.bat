@@ -1,7 +1,7 @@
 
 @echo off
 set LAZBUILD=c:\lazarus\lazbuild
-set PROJECT=..\..\source\http_inspector.lpi
+set PROJECT=..\..\source\rio.lpi
 
 set ARCH=%1
 

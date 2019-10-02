@@ -44,23 +44,23 @@ case $WIDGET in
          exit
 esac
 
-if [ ! -f ../../bin/${bin}-linux/http-inspector ]; then
+if [ ! -f ../../bin/${bin}-linux/rio ]; then
     echo "Please, build the project."
     exit 1
 fi
 
 . ../../source/version.inc
 TMP=$(mktemp -d)
-DEB=http-inspector_${APP_VER}_${ARCH}_${WIDGET}.deb
+DEB=rio_${APP_VER}_${ARCH}_${WIDGET}.deb
 
 mkdir -p $TMP/usr/bin
 mkdir -p $TMP/usr/share/applications
 mkdir -p $TMP/usr/share/pixmaps
 mkdir -p $TMP/DEBIAN
 
-cp ../../resources/http-inspector.desktop $TMP/usr/share/applications
-cp ../../resources/icons/http-inspector.png $TMP/usr/share/pixmaps
-cp ../../bin/${bin}-linux/http-inspector $TMP/usr/bin
+cp ../../resources/rio.desktop $TMP/usr/share/applications
+cp ../../resources/icons/rio.png $TMP/usr/share/pixmaps
+cp ../../bin/${bin}-linux/rio $TMP/usr/bin
 
 SIZE=$(du -ks $TMP | awk '{ print $1 }')
 [ -z "$SIZE" ] && { echo "Error. Cannot get size of $TMP"; exit; }
