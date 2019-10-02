@@ -663,6 +663,8 @@ begin
     // Set response content.
     if Assigned(ResponseInfo) then
       OnRequestComplete(ResponseInfo);
+
+    SyncGridQueryParams;
   end;
 end;
 
@@ -2011,6 +2013,8 @@ begin
           // Update url for the current bookmark.
           if (FBookManager.CurrentBookmark = BM) and (RO.Url <> Bookmark.Request.Url) then
             cbUrl.Text := Bookmark.Request.Url;
+          FreeAndNil(RO);
+          SyncGridQueryParams;
         end;
         else begin
           FreeAndNil(RO);
