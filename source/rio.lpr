@@ -1,4 +1,4 @@
-program http_inspector;
+program rio;
 
 {$mode objfpc}{$H+}
 
@@ -14,7 +14,7 @@ uses
 {$R *.res}
 
 begin
-  Application.Title := 'HTTP request inspector';
+  Application.Title:='Rio';
   RequireDerivedFormResource := True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
