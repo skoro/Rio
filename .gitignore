@@ -5,7 +5,7 @@ backup/
 /source/backup/
 
 # IDE session
-/source/http_inspector.lps
+/source/rio.lps
 
 # AppImage temporary dir.
 /AppDir/
