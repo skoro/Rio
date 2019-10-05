@@ -1,9 +1,9 @@
 
 include ./source/version.inc
-PROJECT=source/http_inspector.lpr
+PROJECT=source/rio.lpr
 LAZBUILD?=lazbuild
 LINUXDEPLOY?=linuxdeploy-x86_64.AppImage
-APP=http-inspector
+APP=rio
 APPDIR=AppDir
 WIDGET=gtk
 
@@ -126,15 +126,15 @@ bin-package:
 	gzip $(DIST)
 
 appimage-qt: WIDGET := qt5
-appimage-qt: linux64-qt $(APPDIR) Http_Inspector-x86_64.AppImage
-appimage: linux64 $(APPDIR) Http_Inspector-x86_64.AppImage
+appimage-qt: linux64-qt $(APPDIR) Rio-x86_64.AppImage
+appimage: linux64 $(APPDIR) Rio-x86_64.AppImage
 $(APPDIR):
 	mkdir -p $(APPDIR)/usr/bin
-	cp bin/x86_64-linux/http-inspector $(APPDIR)/usr/bin/$(APP)
-Http_Inspector-x86_64.AppImage:
+	cp bin/x86_64-linux/rio $(APPDIR)/usr/bin/$(APP)
+Rio-x86_64.AppImage:
 	$(LINUXDEPLOY) --appdir=$(APPDIR) \
-		--desktop-file=./resources/http-inspector.desktop \
-		--icon-file=./resources/icons/http-inspector.png \
+		--desktop-file=./resources/rio.desktop \
+		--icon-file=./resources/icons/rio.png \
 		--output appimage
-	mv Http_Inspector-x86_64.AppImage ./dist/$(APP)-$(APP_VER)-$(WIDGET).AppImage
+	mv Rio-x86_64.AppImage ./dist/$(APP)-$(APP_VER)-$(WIDGET).AppImage
 	rm -rf $(APPDIR)

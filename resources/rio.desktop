@@ -1,13 +1,13 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=Http Inspector
-Comment=Send http requests and analyze its responses
-Icon=http-inspector
-Exec=http-inspector
+Name=Rio
+Comment=Simple REST api client
+Icon=rio
+Exec=rio
 Terminal=false
 Type=Application
 Categories=Development;Network;
-GenericName=Http Inspector
+GenericName=Rio
 
-Comment[ru]=Инструмент для анализа Http запросов
-Comment[uk]=Додаток для аналізу Http запитів
+Comment[ru]=Простой REST Api клиент
+Comment[uk]=Простий REST Api кліент

@@ -7,5 +7,5 @@ Section: net
 Priority: optional
 Architecture: @arch@
 Installed-Size: @size@
-Homepage: https://github.com/skoro/http_inspector
+Homepage: https://github.com/skoro/rio
 

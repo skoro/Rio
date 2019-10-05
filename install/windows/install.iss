@@ -4,7 +4,7 @@
 #define MyAppName "Rio"
 #define MyAppVersion "0.6"
 #define MyAppPublisher "Skorobogatko Alexei"
-#define MyAppURL "https://github.com/skoro/http_inspector"
+#define MyAppURL "https://github.com/skoro/rio"
 #define MyAppExeName "rio.exe"
 
 ; WIN32 or WIN64 is passed via command line compiler.
