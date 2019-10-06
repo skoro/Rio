@@ -11,7 +11,7 @@ object AboutForm: TAboutForm
   OnCreate = FormCreate
   Position = poMainFormCenter
   ShowInTaskBar = stNever
-  LCLVersion = '1.8.2.0'
+  LCLVersion = '1.8.4.0'
   object Panel1: TPanel
     Left = 0
     Height = 163
@@ -2217,7 +2217,7 @@ object AboutForm: TAboutForm
       Width = 112
       Alignment = taCenter
       BorderStyle = sbsSunken
-      Caption = 'HTTP'#10'Request'#10'Inspector'
+      Caption = 'Rio'
       Font.Height = -19
       Font.Style = [fsBold, fsItalic]
       ParentFont = False
@@ -2225,15 +2225,15 @@ object AboutForm: TAboutForm
     end
     object LabelVersion: TLabel
       Left = 120
-      Height = 16
+      Height = 17
       Top = 128
-      Width = 48
+      Width = 45
       Caption = 'Version:'
       ParentColor = False
     end
     object Edit1: TEdit
       Left = 8
-      Height = 18
+      Height = 20
       Top = 104
       Width = 224
       BorderStyle = bsNone
@@ -2242,7 +2242,7 @@ object AboutForm: TAboutForm
       ParentFont = False
       ReadOnly = True
       TabOrder = 2
-      Text = 'https://github.com/skoro/http_inspector'
+      Text = 'https://github.com/skoro/rio'
     end
   end
 end
