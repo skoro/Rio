@@ -114,16 +114,18 @@ bin:
 build: bin $(BIN)
 	$(LAZBUILD) --os=$(OS) --cpu=$(CPU) --build-mode=$(BUILD_MODE) $(PROJECT)
 
-deb-package:
+deb-package: mkdist
 	( cd ./install/debian && ./create-deb.sh $(CPU) $(WIDGET) )
 
-bin-package:
-	mkdir -p ./dist
+bin-package: mkdist
 	$(eval DIST=./dist/$(APP)_$(APP_VER)-$(OS)-$(CPU)-$(WIDGET)-bin)
 	rm -f $(DIST)
 	cp ./bin/$(CPU)-$(OS)/$(APP) $(DIST)
 	chmod +x $(DIST)
 	gzip $(DIST)
+
+mkdist:
+	mkdir -p ./dist
 
 appimage-qt: WIDGET := qt5
 appimage-qt: linux64-qt $(APPDIR) Rio-x86_64.AppImage
@@ -131,7 +133,7 @@ appimage: linux64 $(APPDIR) Rio-x86_64.AppImage
 $(APPDIR):
 	mkdir -p $(APPDIR)/usr/bin
 	cp bin/x86_64-linux/rio $(APPDIR)/usr/bin/$(APP)
-Rio-x86_64.AppImage:
+Rio-x86_64.AppImage: mkdist
 	$(LINUXDEPLOY) --appdir=$(APPDIR) \
 		--desktop-file=./resources/rio.desktop \
 		--icon-file=./resources/icons/rio.png \
