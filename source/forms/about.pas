@@ -6,19 +6,22 @@ interface
 
 uses
   Forms, ExtCtrls,
-  StdCtrls;
+  StdCtrls, ButtonPanel;
 
 type
 
   { TAboutForm }
 
   TAboutForm = class(TForm)
-    Button1: TButton;
-    Edit1: TEdit;
-    Image1: TImage;
-    LabelVersion: TLabel;
-    Panel1: TPanel;
-    StaticText1: TStaticText;
+    FormButtons: TButtonPanel;
+    ImgLogo: TImage;
+    LblAppName: TLabel;
+    LblAppVer: TLabel;
+    LblBuidDate: TLabel;
+    LblTargetCPU: TLabel;
+    LblTargetOS: TLabel;
+    LblWidgetSet: TLabel;
+    InfoPanel: TPanel;
     procedure Button1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
   private
@@ -44,7 +47,7 @@ end;
 
 procedure TAboutForm.FormCreate(Sender: TObject);
 begin
-  LabelVersion.Caption := 'Version: ' + APP_VER;
+  //LabelVersion.Caption := 'Version: ' + APP_VER;
 end;
 
 end.
