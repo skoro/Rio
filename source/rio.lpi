@@ -217,7 +217,6 @@
       <Unit0>
         <Filename Value="rio.lpr"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="rio"/>
       </Unit0>
       <Unit1>
         <Filename Value="version.inc"/>
@@ -278,7 +277,9 @@
       <Unit15>
         <Filename Value="forms/about.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="AboutForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit15>
       <Unit16>
         <Filename Value="forms/bookmark_form.pas"/>
