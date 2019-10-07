@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="192.16499mm"
+   height="192.16499mm"
+   viewBox="0 0 192.16499 192.16499"
+   version="1.1"
+   id="svg1513"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="rio_logo4.svg">
+  <defs
+     id="defs1507">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1937">
+      <stop
+         style="stop-color:#e7c66b;stop-opacity:1;"
+         offset="0"
+         id="stop1933" />
+      <stop
+         style="stop-color:#e7c66b;stop-opacity:0"
+         offset="1"
+         id="stop1935" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient1913"
+       osb:paint="gradient">
+      <stop
+         style="stop-color:#e7c66b;stop-opacity:1;"
+         offset="0"
+         id="stop1909" />
+      <stop
+         style="stop-color:#e7c66b;stop-opacity:0;"
+         offset="1"
+         id="stop1911" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1937"
+       id="radialGradient1941"
+       cx="227.54167"
+       cy="254.66667"
+       fx="227.54167"
+       fy="254.66667"
+       r="96.082497"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.4870033,7.9276846e-8,-7.1605985e-8,1.432988,-110.81351,-110.26764)" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.25897321"
+     inkscape:cx="611.22229"
+     inkscape:cy="240.71155"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1320"
+     inkscape:window-height="739"
+     inkscape:window-x="46"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid1515"
+       originx="-131.45915"
+       originy="53.749154" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata1510">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-131.45916,-158.58416)">
+    <circle
+       style="opacity:1;fill:url(#radialGradient1941);fill-opacity:1;stroke:none;stroke-width:1.665;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path1719"
+       cx="227.54166"
+       cy="254.66666"
+       r="95.25" />
+    <path
+       style="fill:#f7f745;fill-opacity:1;stroke:#fff947;stroke-width:0.31081501px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 180.72419,185.15258 c -32.7499,29.62994 -11.92002,131.95574 -11.92002,131.95574 h 42.59791 l 0.26459,-35.98333 26.45833,37.04167 52.38749,-1.05834 L 254,259.95833 c 0,0 29.39504,-17.12778 30.42707,-31.75 1.22348,-17.33476 -15.00277,-34.3282 -30.42706,-42.33333 -21.68048,-11.25206 -55.16247,-17.11018 -73.27582,-0.72242 z"
+       id="path1721"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="accccccaaa" />
+    <ellipse
+       style="opacity:1;fill:#e7c66b;fill-opacity:1;stroke:#e7c66b;stroke-width:1.66499996;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       id="path1723"
+       cx="228.49153"
+       cy="221.70651"
+       rx="23.8125"
+       ry="21.166666" />
+  </g>
+</svg>
