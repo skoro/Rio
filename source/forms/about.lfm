@@ -1,12 +1,12 @@
 object AboutForm: TAboutForm
   Left = 485
-  Height = 212
+  Height = 285
   Top = 206
   Width = 340
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'About'
-  ClientHeight = 212
+  ClientHeight = 285
   ClientWidth = 340
   OnCreate = FormCreate
   Position = poMainFormCenter
@@ -15,7 +15,7 @@ object AboutForm: TAboutForm
   object FormButtons: TButtonPanel
     Left = 6
     Height = 27
-    Top = 179
+    Top = 252
     Width = 328
     OKButton.Name = 'OKButton'
     OKButton.DefaultCaption = True
@@ -32,10 +32,11 @@ object AboutForm: TAboutForm
     ShowBevel = False
   end
   object ImgLogo: TImage
-    Left = 8
-    Height = 128
-    Top = 8
+    Left = 0
+    Height = 200
+    Top = 25
     Width = 128
+    Align = alLeft
     AutoSize = True
     Picture.Data = {
       1754506F727461626C654E6574776F726B477261706869638631000089504E47
@@ -439,33 +440,51 @@ object AboutForm: TAboutForm
     }
   end
   object InfoPanel: TPanel
-    Left = 144
-    Height = 169
-    Top = 4
-    Width = 192
+    Left = 136
+    Height = 198
+    Top = 27
+    Width = 200
     Align = alRight
     BorderSpacing.Left = 4
     BorderSpacing.Top = 4
     BorderSpacing.Right = 4
     BevelOuter = bvNone
-    ClientHeight = 169
-    ClientWidth = 192
+    ClientHeight = 198
+    ClientWidth = 200
     TabOrder = 1
     object LblBuidDate: TLabel
       Left = 0
       Height = 17
-      Top = 25
-      Width = 192
+      Top = 19
+      Width = 200
       Align = alTop
-      BorderSpacing.Bottom = 2
       Caption = 'Build date:'
       ParentColor = False
+    end
+    object LblAppVer: TLabel
+      Left = 0
+      Height = 17
+      Top = 0
+      Width = 200
+      Align = alTop
+      BorderSpacing.Bottom = 2
+      Caption = 'Version:'
+      ParentColor = False
+    end
+    object DivInfo: TDividerBevel
+      Left = 0
+      Height = 17
+      Top = 36
+      Width = 200
+      Align = alTop
+      Font.Style = [fsBold]
+      ParentFont = False
     end
     object LblTargetOS: TLabel
       Left = 0
       Height = 17
-      Top = 44
-      Width = 192
+      Top = 53
+      Width = 200
       Align = alTop
       BorderSpacing.Bottom = 2
       Caption = 'Target OS:'
@@ -474,44 +493,105 @@ object AboutForm: TAboutForm
     object LblTargetCPU: TLabel
       Left = 0
       Height = 17
-      Top = 63
-      Width = 192
+      Top = 72
+      Width = 200
       Align = alTop
       BorderSpacing.Bottom = 2
       Caption = 'Target CPU:'
       ParentColor = False
     end
+    object LblFPCVer: TLabel
+      Left = 0
+      Height = 17
+      Top = 91
+      Width = 200
+      Align = alTop
+      BorderSpacing.Bottom = 2
+      Caption = 'LblFPCVer'
+      ParentColor = False
+    end
     object LblWidgetSet: TLabel
       Left = 0
       Height = 17
-      Top = 82
-      Width = 192
+      Top = 110
+      Width = 200
       Align = alTop
       BorderSpacing.Bottom = 2
       Caption = 'Widget set:'
       ParentColor = False
     end
-    object LblAppVer: TLabel
+    object LblLCLVer: TLabel
       Left = 0
       Height = 17
-      Top = 101
-      Width = 192
+      Top = 129
+      Width = 200
       Align = alTop
       BorderSpacing.Bottom = 2
-      Caption = 'Version:'
+      Caption = 'LCL Version:'
       ParentColor = False
     end
-    object LblAppName: TLabel
+    object BtnCopy: TButton
       Left = 0
-      Height = 17
-      Top = 0
-      Width = 192
+      Height = 27
+      Top = 148
+      Width = 200
       Align = alTop
-      BorderSpacing.Bottom = 8
-      Caption = 'LblAppName'
-      Font.Style = [fsBold]
+      Anchors = [akLeft]
+      AutoSize = True
+      Caption = 'Copy to clipboard'
+      OnClick = BtnCopyClick
+      TabOrder = 0
+    end
+  end
+  object LblAppName: TLabel
+    Left = 4
+    Height = 23
+    Top = 0
+    Width = 332
+    Align = alTop
+    Alignment = taCenter
+    BorderSpacing.Left = 4
+    BorderSpacing.Right = 4
+    BorderSpacing.Bottom = 2
+    Caption = 'LblAppName'
+    Font.Height = -16
+    Font.Style = [fsBold]
+    Layout = tlCenter
+    ParentColor = False
+    ParentFont = False
+  end
+  object LinksPanel: TPanel
+    Left = 0
+    Height = 21
+    Top = 225
+    Width = 336
+    Align = alBottom
+    AutoSize = True
+    BorderSpacing.Right = 4
+    BevelOuter = bvNone
+    ClientHeight = 21
+    ClientWidth = 336
+    TabOrder = 2
+    object LblHomeUrl: TLabel
+      Left = 0
+      Height = 21
+      Top = 0
+      Width = 68
+      Align = alLeft
+      Caption = 'Home page:'
+      Layout = tlCenter
       ParentColor = False
-      ParentFont = False
+    end
+    object EditUrl: TEdit
+      Left = 68
+      Height = 21
+      Top = 0
+      Width = 268
+      Align = alClient
+      BorderStyle = bsNone
+      ReadOnly = True
+      TabOrder = 0
+      Text = 'EditUrl'
     end
   end
 end
