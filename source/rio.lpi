@@ -216,7 +216,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="25">
+    <Units Count="26">
       <Unit0>
         <Filename Value="rio.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -331,6 +331,11 @@
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit24>
+      <Unit25>
+        <Filename Value="common/apptree.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="AppTree"/>
+      </Unit25>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
