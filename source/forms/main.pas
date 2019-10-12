@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, thread_http_client, response_tabs, key_value,
   profiler_graph, bookmarks, request_object, GridNavigator, SysUtils,
-  jsonparser;
+  jsonparser, AppTree;
 
 type
 
@@ -245,6 +245,7 @@ type
     FProfilerGraph: TProfilerGraph;
     FBookManager: TBookmarkManager;
     FKeepResponseTab: string;
+    FAppTreeManager: TAppTreeManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -791,22 +792,26 @@ begin
   KeyValueForm := TKeyValueForm.Create(Application);
 
   // Bookmark manager initialization.
-  FBookManager := TBookmarkManager.Create(Self);
-  FBookManager.Parent := BookmarkSide;
-  FBookManager.TreeView.Images := toolbarIcons;
-  FBookManager.TreeView.StateImages := RequestIcons;
-  FBookManager.ImageIndexFolder := 0;
-  FBookManager.ImageIndexSelected := 5;
-  FBookManager.ImageIndexRoot := 8;
-  FBookManager.OnChangeBookmark := @OnChangeBookmark;
-  with FBookManager.Popup do begin
-    OnEditClick := @BookmarkEditorShow;
-    OnDeleteClick := @OnDeleteBookmark;
-    Images := toolbarIcons;
-    Items[0].ImageIndex := 11; // open
-    Items[1].ImageIndex := 10; // new folder
-    Items[2].ImageIndex := 9;  // edit
-    Items[3].ImageIndex := 8;  // delete
+  FAppTreeManager := TAppTreeManager.Create(Self);
+  with FAppTreeManager do
+  begin
+    Parent := BookmarkSide;
+    FBookManager := BookmarkManager;
+    TreeView.Images := toolbarIcons;
+    TreeView.StateImages := RequestIcons;
+    BookmarkManager.ImageIndexFolder := 0;
+    BookmarkManager.ImageIndexRoot := 8;
+    BookmarkManager.ImageIndexSelected := 5;
+    BookmarkManager.OnChangeBookmark := @OnChangeBookmark;
+    with BookmarkPopup do begin
+      OnEditClick := @BookmarkEditorShow;
+      OnDeleteClick := @OnDeleteBookmark;
+      Images := toolbarIcons;
+      Items[0].ImageIndex := 11; // open
+      Items[1].ImageIndex := 10; // new folder
+      Items[2].ImageIndex := 9;  // edit
+      Items[3].ImageIndex := 8;  // delete
+    end;
   end;
   LoadAppBookmarks(FBookManager);
 
@@ -2005,6 +2010,8 @@ begin
     try
       RO := CreateRequestObject;
       BookmarkManager := FBookManager;
+      SelectedSourceNode := FAppTreeManager.BookmarkSelected;
+      ConfirmDelete := @FAppTreeManager.BookmarkPopup.ConfirmDeleteBookmark;
       case ShowModal(BM, RO) of
         mrAdded:   BookmarkButtonIcon(True);
         mrDeleted: begin

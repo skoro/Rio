@@ -2361,10 +2361,10 @@ object MainForm: TMainForm
               Height = 212
               Top = 0
               Width = 421
-              ActivePage = tabBody
+              ActivePage = tabHeaders
               Align = alClient
               Anchors = [akLeft, akRight, akBottom]
-              TabIndex = 2
+              TabIndex = 0
               TabOrder = 0
               object tabHeaders: TTabSheet
                 Caption = 'Headers'
@@ -2372,9 +2372,9 @@ object MainForm: TMainForm
                 ClientWidth = 415
                 object requestHeaders: TStringGrid
                   Left = 0
-                  Height = 155
+                  Height = 151
                   Top = 26
-                  Width = 517
+                  Width = 415
                   Align = alClient
                   BorderStyle = bsNone
                   ColCount = 3
@@ -2416,7 +2416,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 517
+                  Width = 415
                   Caption = 'gnavHeaders'
                   EdgeBorders = []
                   ShowCaptions = True
@@ -2429,7 +2429,7 @@ object MainForm: TMainForm
                   ShowNavButtons = True
                   object ToolButton1: TToolButton
                     Left = 146
-                    Height = 5
+                    Height = 22
                     Top = 0
                     Caption = 'ToolButton1'
                     Style = tbsDivider
@@ -2454,9 +2454,9 @@ object MainForm: TMainForm
                 ClientWidth = 415
                 object gridParams: TStringGrid
                   Left = 0
-                  Height = 155
+                  Height = 151
                   Top = 26
-                  Width = 417
+                  Width = 415
                   Align = alClient
                   BorderStyle = bsNone
                   ColCount = 3
@@ -2492,7 +2492,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 417
+                  Width = 415
                   Caption = 'gnavParams'
                   EdgeBorders = []
                   ShowCaptions = True
@@ -2521,8 +2521,8 @@ object MainForm: TMainForm
                   TabOrder = 0
                   object tabBodyJson: TTabSheet
                     Caption = 'tabBodyJson'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     inline editJson: TSynEdit
                       Left = 0
                       Height = 151
@@ -3011,8 +3011,8 @@ object MainForm: TMainForm
                   end
                   object tabBodyForm: TTabSheet
                     Caption = 'tabBodyForm'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object gridForm: TStringGrid
                       Left = 0
                       Height = 145
@@ -3067,8 +3067,8 @@ object MainForm: TMainForm
                   end
                   object tabBodyOther: TTabSheet
                     Caption = 'tabBodyOther'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object editOther: TMemo
                       Left = 0
                       Height = 152
@@ -3129,9 +3129,9 @@ object MainForm: TMainForm
                 ClientWidth = 415
                 object gridReqCookie: TStringGrid
                   Left = 0
-                  Height = 152
+                  Height = 151
                   Top = 26
-                  Width = 551
+                  Width = 415
                   Align = alClient
                   BorderStyle = bsNone
                   ColCount = 3
@@ -3169,7 +3169,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 551
+                  Width = 415
                   Caption = 'gnavCookie'
                   EdgeBorders = []
                   ShowCaptions = True
@@ -3190,7 +3190,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 26
                   Top = 0
-                  Width = 417
+                  Width = 415
                   EdgeBorders = []
                   ShowCaptions = True
                   TabOrder = 0
@@ -3204,9 +3204,9 @@ object MainForm: TMainForm
                 end
                 object pagesAuth: TPageControl
                   Left = 0
-                  Height = 155
+                  Height = 151
                   Top = 26
-                  Width = 417
+                  Width = 415
                   ActivePage = tabAuthBearer
                   Align = alClient
                   ShowTabs = False
@@ -3214,8 +3214,8 @@ object MainForm: TMainForm
                   TabOrder = 1
                   object tabAuthBasic: TTabSheet
                     Caption = 'Basic'
-                    ClientHeight = 151
-                    ClientWidth = 413
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object ScrollBox1: TScrollBox
                       Left = 0
                       Height = 151
@@ -3279,27 +3279,27 @@ object MainForm: TMainForm
                   end
                   object tabAuthBearer: TTabSheet
                     Caption = 'tabAuthBearer'
-                    ClientHeight = 151
-                    ClientWidth = 413
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object ScrollBox2: TScrollBox
                       Left = 0
-                      Height = 151
+                      Height = 145
                       Top = 0
-                      Width = 413
+                      Width = 409
                       HorzScrollBar.Page = 208
                       VertScrollBar.Page = 105
                       Align = alClient
                       BorderStyle = bsNone
-                      ClientHeight = 151
-                      ClientWidth = 413
+                      ClientHeight = 145
+                      ClientWidth = 409
                       Color = clNone
                       ParentColor = False
                       TabOrder = 0
                       object editBearerToken: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 80
-                        Width = 400
+                        Width = 396
                         Anchors = [akTop, akLeft, akRight]
                         EditLabel.AnchorSideLeft.Control = editBearerToken
                         EditLabel.AnchorSideRight.Control = editBearerToken
@@ -3308,14 +3308,14 @@ object MainForm: TMainForm
                         EditLabel.Left = 8
                         EditLabel.Height = 17
                         EditLabel.Top = 60
-                        EditLabel.Width = 400
+                        EditLabel.Width = 396
                         EditLabel.Caption = 'Token:'
                         EditLabel.ParentColor = False
                         TabOrder = 0
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 24
                         Width = 200
                         EditLabel.AnchorSideLeft.Control = editBearerPrefix
@@ -3341,9 +3341,9 @@ object MainForm: TMainForm
                 ClientWidth = 415
                 object editNotes: TMemo
                   Left = 0
-                  Height = 164
+                  Height = 160
                   Top = 17
-                  Width = 517
+                  Width = 415
                   Align = alClient
                   ScrollBars = ssAutoBoth
                   TabOrder = 0
@@ -3352,7 +3352,7 @@ object MainForm: TMainForm
                   Left = 0
                   Height = 17
                   Top = 0
-                  Width = 517
+                  Width = 415
                   Align = alTop
                   Caption = 'Description:'
                   ParentColor = False
