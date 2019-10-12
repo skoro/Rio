@@ -14,6 +14,8 @@ const
 
 type
 
+  TConfirmDeleteBookmark = function (BM: TBookmark): Boolean of object;
+
   { TBookmarkForm }
 
   TBookmarkForm = class(TForm)
@@ -48,6 +50,8 @@ type
     FPrevName: string; // Keep an source node name before editing node.
     FRequestObject: TRequestObject;
     FBookmark: TBookmark; // Edited bookmark.
+    FSelectedSourceNode: TTreeNode;
+    FConfirmDelete: TConfirmDeleteBookmark;
     function GetBookmarkManager: TBookmarkManager;
     function GetBookmarkName: string;
     function GetDeleteEnabled: Boolean;
@@ -73,6 +77,8 @@ type
     property FolderPath: string read GetFolderPath;
     property BookmarkName: string read GetBookmarkName;
     property IsNewBookmark: Boolean read GetIsNewBookmark;
+    property SelectedSourceNode: TTreeNode read FSelectedSourceNode write FSelectedSourceNode;
+    property ConfirmDelete: TConfirmDeleteBookmark read FConfirmDelete write FConfirmDelete;
   end;
 
 implementation
@@ -306,7 +312,7 @@ end;
 
 procedure TBookmarkForm.PrepareAddForm;
 var
-  SelSrc, SelDst: TTreeNode;
+  SelDst: TTreeNode;
 begin
   pInfo.Visible := False;
   DeleteEnabled := False;
@@ -317,12 +323,11 @@ begin
   SelDst := NIL;
   // We must use TreeView instead CurrentNode because the CurrentNode
   // can be NILed.
-  SelSrc := FBookmarkManager.TreeView.Selected;
-  if Assigned(SelSrc) then begin
-    if not IsFolderNode(SelSrc) then
-      SelSrc := SelSrc.Parent; // Bookmark selected, move up.
-    if Assigned(SelSrc) then
-      SelDst := FindNodePath(tvFolders.Items, GetNodePath(SelSrc));
+  if Assigned(FSelectedSourceNode) then begin
+    if not IsFolderNode(FSelectedSourceNode) then
+      FSelectedSourceNode := FSelectedSourceNode.Parent; // Bookmark selected, move up.
+    if Assigned(FSelectedSourceNode) then
+      SelDst := FindNodePath(tvFolders.Items.GetFirstNode, GetNodePath(FSelectedSourceNode));
     SelectAndViewNode(SelDst);
   end;
 end;
@@ -405,7 +410,7 @@ end;
 procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
 begin
   ModalResult := mrNone;
-  if not BookmarkManager.Popup.ConfirmDeleteBookmark(FBookmark) then
+  if assigned(FConfirmDelete) and not FConfirmDelete(FBookmark) then
     Exit; // =>
   DeleteBookmark;
   ModalResult := mrDeleted;
