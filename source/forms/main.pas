@@ -8,7 +8,7 @@ uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
-  profiler_graph, Bookmarks, RequestObject, GridNavigator, SysUtils,
+  ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
   jsonparser, AppTree;
 
 type

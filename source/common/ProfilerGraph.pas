@@ -1,4 +1,4 @@
-unit profiler_graph;
+unit ProfilerGraph;
 
 {$mode objfpc}{$H+}
 

@@ -254,7 +254,7 @@
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>
-        <Filename Value="common/profiler_graph.pas"/>
+        <Filename Value="common/ProfilerGraph.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit9>
       <Unit10>
