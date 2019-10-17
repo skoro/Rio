@@ -83,7 +83,7 @@ type
 
 implementation
 
-uses thread_http_client, AppHelpers, sysutils;
+uses ThreadHttpClient, AppHelpers, sysutils;
 
 {$R *.lfm}
 

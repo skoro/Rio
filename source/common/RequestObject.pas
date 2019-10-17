@@ -5,7 +5,7 @@ unit RequestObject;
 interface
 
 uses
-  Classes, SysUtils, Grids, thread_http_client;
+  Classes, SysUtils, Grids, ThreadHttpClient;
 
 type
 
@@ -342,7 +342,7 @@ end;
 
 function TRequestObject.GetUrlPath: string;
 begin
-  Result := thread_http_client.UrlPath(FUrl);
+  Result := ThreadHttpClient.UrlPath(FUrl);
 end;
 
 constructor TRequestObject.Create;

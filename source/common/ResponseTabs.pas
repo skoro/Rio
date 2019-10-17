@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, json_parser, ComCtrls, ExtCtrls, Controls, Forms,
-  StdCtrls, Dialogs, SynEdit, SynEditTypes, thread_http_client, inputbuttons;
+  StdCtrls, Dialogs, SynEdit, SynEditTypes, ThreadHttpClient, inputbuttons;
 
 type
 

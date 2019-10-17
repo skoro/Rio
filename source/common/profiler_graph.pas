@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, TAGraph, TASources, TAMultiSeries, Controls,
-  thread_http_client;
+  ThreadHttpClient;
 
 type
 

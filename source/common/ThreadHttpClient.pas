@@ -1,4 +1,4 @@
-unit thread_http_client;
+unit ThreadHttpClient;
 
 {$mode objfpc}{$H+}
 
