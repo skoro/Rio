@@ -1,4 +1,4 @@
-unit response_tabs;
+unit ResponseTabs;
 
 {$mode objfpc}{$H+}
 {$Interfaces corba}

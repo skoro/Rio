@@ -262,7 +262,7 @@
         <IsPartOfProject Value="True"/>
       </Unit10>
       <Unit11>
-        <Filename Value="common/response_tabs.pas"/>
+        <Filename Value="common/ResponseTabs.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit11>
       <Unit12>
