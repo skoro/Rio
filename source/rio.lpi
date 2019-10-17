@@ -276,6 +276,7 @@
       <Unit14>
         <Filename Value="common/urlutils.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="UrlUtils"/>
       </Unit14>
       <Unit15>
         <Filename Value="forms/about.pas"/>
@@ -332,9 +333,8 @@
         <HasResources Value="True"/>
       </Unit24>
       <Unit25>
-        <Filename Value="common/apptree.pas"/>
+        <Filename Value="common/AppTree.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="AppTree"/>
       </Unit25>
     </Units>
   </ProjectOptions>
