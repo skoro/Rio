@@ -38,7 +38,7 @@ type
 
 implementation
 
-uses options, export_req, RequestObject, main, AppHelpers, Clipbrd;
+uses options, ExportReq, RequestObject, main, AppHelpers, Clipbrd;
 
 {$R *.lfm}
 
