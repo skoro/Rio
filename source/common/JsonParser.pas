@@ -1,6 +1,6 @@
 {$mode objfpc}
 {$h+}
-unit json_parser;
+unit JsonParser;
 
 interface
 
