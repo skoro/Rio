@@ -65,7 +65,7 @@ type
 
 implementation
 
-uses strutils, ValEdit, app_helpers;
+uses strutils, ValEdit, AppHelpers;
 
 { TRequestObjectItem }
 

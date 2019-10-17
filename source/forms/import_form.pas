@@ -36,7 +36,7 @@ type
 
 implementation
 
-uses options, app_helpers;
+uses options, AppHelpers;
 
 {$R *.lfm}
 

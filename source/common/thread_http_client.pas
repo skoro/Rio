@@ -179,7 +179,7 @@ function UrlPath(Url: string): string;
 
 implementation
 
-uses dateutils, strutils, RtlConsts, base64, ValEdit, app_helpers;
+uses dateutils, strutils, RtlConsts, base64, ValEdit, AppHelpers;
 
 const
   CRLF = #13#10;

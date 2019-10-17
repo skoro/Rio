@@ -215,7 +215,7 @@ const
 
 implementation
 
-uses Dialogs, app_helpers, strutils, XMLWrite, XMLRead;
+uses Dialogs, AppHelpers, strutils, XMLWrite, XMLRead;
 
 const
   // What symbol to use as forward slash in the node text.

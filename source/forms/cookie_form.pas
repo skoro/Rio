@@ -46,7 +46,7 @@ type
 
 implementation
 
-uses SysUtils, strutils, app_helpers;
+uses SysUtils, strutils, AppHelpers;
 
 {$R *.lfm}
 

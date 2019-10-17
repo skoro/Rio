@@ -9,7 +9,7 @@ procedure HandleCommandLine;
 
 implementation
 
-uses sysutils, strutils, Forms, ValEdit, app_helpers, main, request_object;
+uses sysutils, strutils, Forms, ValEdit, AppHelpers, main, request_object;
 
 const CRLF = #13#10;
 

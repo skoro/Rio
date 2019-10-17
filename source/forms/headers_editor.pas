@@ -50,7 +50,7 @@ var
 
 implementation
 
-uses app_helpers;
+uses AppHelpers;
 
 {$R *.lfm}
 

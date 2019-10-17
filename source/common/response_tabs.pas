@@ -220,7 +220,7 @@ type
 
 implementation
 
-uses app_helpers, options, strutils, SynHighlighterXML;
+uses AppHelpers, options, strutils, SynHighlighterXML;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =

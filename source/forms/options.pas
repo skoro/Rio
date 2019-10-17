@@ -147,7 +147,7 @@ var
 
 implementation
 
-uses app_helpers, SynEdit, Menus, fpjsonrtti;
+uses AppHelpers, SynEdit, Menus, fpjsonrtti;
 
 {$R *.lfm}
 

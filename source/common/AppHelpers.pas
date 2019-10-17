@@ -3,7 +3,7 @@
 Global application helpers.
 =============================================================================
 }
-unit app_helpers;
+unit AppHelpers;
 
 {$mode objfpc}{$H+}
 
