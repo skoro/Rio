@@ -375,6 +375,12 @@
         </Win32>
       </Options>
     </Linking>
+    <Other>
+      <CustomOptions Value="-dDEBUGLEAKS"/>
+      <OtherDefines Count="1">
+        <Define0 Value="DEBUGLEAKS"/>
+      </OtherDefines>
+    </Other>
   </CompilerOptions>
   <Debugging>
     <Exceptions Count="3">
