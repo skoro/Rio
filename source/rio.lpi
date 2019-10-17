@@ -230,7 +230,7 @@
         <IsPartOfProject Value="True"/>
       </Unit2>
       <Unit3>
-        <Filename Value="common/bookmarks.pas"/>
+        <Filename Value="common/Bookmarks.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit3>
       <Unit4>

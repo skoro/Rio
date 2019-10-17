@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, ExtCtrls, StdCtrls, JSONPropStorage, Spin, ComCtrls, fpjson,
-  PairSplitter, Dialogs, Graphics, Controls, ResponseTabs, bookmarks, Classes,
+  PairSplitter, Dialogs, Graphics, Controls, ResponseTabs, Bookmarks, Classes,
   PropertyStorage, Grids, ButtonPanel;
 
 type

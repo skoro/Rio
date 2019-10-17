@@ -1,4 +1,4 @@
-unit bookmarks;
+unit Bookmarks;
 
 {$mode objfpc}{$H+}
 
