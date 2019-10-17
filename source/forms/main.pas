@@ -306,7 +306,7 @@ implementation
 
 uses about, headers_editor, cookie_form,
   AppHelpers, strutils, help_form, cmdline, options,
-  import_form, export_form, bookmark_form, state, Clipbrd;
+  import_form, export_form, bookmark_form, State, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.

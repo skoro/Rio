@@ -1,6 +1,6 @@
 // Global application state.
 
-unit state;
+unit State;
 
 {$mode objfpc}{$H+}
 
