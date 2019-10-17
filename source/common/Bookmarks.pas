@@ -167,7 +167,6 @@ type
     FSelectedNode: TTreeNode;
     FRootNode: TTreeNode;
     function GetBookmarkManager: TBookmarkManager;
-    function GetSelectedNode: TTreeNode;
   protected
     function CreateItem(const caption: string): TMenuItem; virtual;
     procedure CreateDefaultItems; virtual;
@@ -340,10 +339,6 @@ begin
   if not Assigned(FBookmarkManager) then
     raise Exception.Create('Bookmark manager is required for popup menu.');
   Result := FBookmarkManager;
-end;
-
-function TBookmarkPopup.GetSelectedNode: TTreeNode;
-begin
 end;
 
 function TBookmarkPopup.CreateItem(const caption: string): TMenuItem;
@@ -851,7 +846,7 @@ procedure TBookmarkManager.AttachFolderNodes(CustomTree: TCustomTreeView);
     end;
   end;
 var
-  FirstNode, NewParent: TTreeNode;
+  NewParent: TTreeNode;
 begin
   CustomTree.Items.Clear;
   NewParent := CustomTree.Items.AddChild(NIL, FRootNode.Text);
