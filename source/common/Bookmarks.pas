@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, DOM, ComCtrls, Controls, Menus,
-  request_object;
+  RequestObject;
 
 type
   // Forward declarations.

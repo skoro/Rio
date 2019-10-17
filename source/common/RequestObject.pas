@@ -1,4 +1,4 @@
-unit request_object;
+unit RequestObject;
 
 {$mode objfpc}{$H+}
 

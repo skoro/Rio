@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, bookmarks, request_object, Controls, Buttons;
+  ExtCtrls, StdCtrls, ComCtrls, Bookmarks, RequestObject, Controls, Buttons;
 
 const
   mrAdded = mrLast + 1; // A new bookmark was added.

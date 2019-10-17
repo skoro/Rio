@@ -5,7 +5,7 @@ unit export_req;
 interface
 
 uses
-  Classes, SysUtils, request_object;
+  Classes, SysUtils, RequestObject;
 
 type
 
