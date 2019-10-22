@@ -1250,8 +1250,9 @@ var
   json: string;
 begin
   try
-    obj := CreateRequestObject;
+    obj := nil;
     try
+      obj := CreateRequestObject;
       dlgSave.FileName := GetRequestFilename(cbUrl.Text, FContentType, 'request.json');
       dlgSave.Title := 'Save the request to a file';
       json := obj.ToJson;
@@ -1264,7 +1265,8 @@ begin
       ShowMessage(E.Message);
     end;
   finally
-    obj.Free;
+    if Assigned(obj) then
+      obj.Free;
   end;
 end;
 
