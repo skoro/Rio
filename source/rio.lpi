@@ -222,7 +222,7 @@
         <PackageName Value="LCL"/>
       </Item5>
     </RequiredPackages>
-    <Units Count="26">
+    <Units Count="27">
       <Unit0>
         <Filename Value="rio.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -294,7 +294,9 @@
       <Unit16>
         <Filename Value="forms/bookmark_form.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="BookmarkForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit16>
       <Unit17>
         <Filename Value="forms/cookie_form.pas"/>
@@ -342,6 +344,13 @@
         <Filename Value="common/AppTree.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit25>
+      <Unit26>
+        <Filename Value="forms/frmEnv.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="EnvForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit26>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
