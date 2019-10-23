@@ -5,9 +5,9 @@ unit frmEnv;
 interface
 
 uses
-  Classes, SysUtils, FileUtil, DividerBevel, Forms, Controls, Graphics, Dialogs,
-  ButtonPanel, ExtCtrls, Grids, StdCtrls, Buttons, ComCtrls, Menus,
-  GridNavigator;
+  DividerBevel, Forms,
+  ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
+  GridNavigator, Classes;
 
 type
 
@@ -38,15 +38,20 @@ type
     tbEdit: TToolButton;
     tbDelete: TToolButton;
     tbEnv: TToolButton;
+    procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure tbAddClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
   private
 
   public
-
+    procedure ShowEnv;
+    procedure HideEnv;
   end;
 
 implementation
+
+uses sysutils;
 
 {$R *.lfm}
 
@@ -54,12 +59,45 @@ implementation
 
 procedure TEnvForm.FormCreate(Sender: TObject);
 begin
-  panEnv.Visible := False;
+  HideEnv;
+end;
+
+procedure TEnvForm.editNameChange(Sender: TObject);
+begin
+  btnSave.Enabled := not (Length(Trim(editName.Text)) = 0);
+end;
+
+procedure TEnvForm.tbAddClick(Sender: TObject);
+begin
+  if panEnv.Visible then
+    HideEnv
+  else begin
+    dbEnv.Caption := 'New environment';
+    editName.Text := '';
+    chkInherit.Checked := False;
+    btnSave.Enabled := False;
+    ShowEnv;
+  end;
 end;
 
 procedure TEnvForm.tbEditClick(Sender: TObject);
 begin
-  panEnv.Visible := not panEnv.Visible;
+  if PanEnv.Visible then
+    HideEnv
+  else begin
+    dbEnv.Caption := 'Edit environment: ';
+    ShowEnv;
+  end;
+end;
+
+procedure TEnvForm.ShowEnv;
+begin
+  PanEnv.Visible := True;
+end;
+
+procedure TEnvForm.HideEnv;
+begin
+  PanEnv.Visible := False;
 end;
 
 end.

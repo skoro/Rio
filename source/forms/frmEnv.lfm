@@ -52,6 +52,7 @@ object EnvForm: TEnvForm
       AutoSize = True
       Caption = 'Add'
       ImageIndex = 10
+      OnClick = tbAddClick
     end
     object tbEdit: TToolButton
       Left = 101
@@ -188,6 +189,7 @@ object EnvForm: TEnvForm
         Top = 0
         Width = 409
         Align = alClient
+        OnChange = editNameChange
         TabOrder = 0
         Text = 'editName'
       end
