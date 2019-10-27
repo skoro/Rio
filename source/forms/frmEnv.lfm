@@ -206,7 +206,7 @@ object EnvForm: TEnvForm
       ClientHeight = 29
       ClientWidth = 452
       TabOrder = 1
-      object chkInherit: TCheckBox
+      object chkParent: TCheckBox
         Left = 0
         Height = 29
         Top = 0
@@ -214,6 +214,7 @@ object EnvForm: TEnvForm
         Align = alLeft
         BorderSpacing.Right = 6
         Caption = 'Inherit from:'
+        OnClick = chkParentClick
         TabOrder = 0
       end
       object cbParent: TComboBox

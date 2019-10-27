@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Classes;
+  GridNavigator, Env, Classes;
 
 type
 
@@ -16,7 +16,7 @@ type
   TEnvForm = class(TForm)
     btnSave: TButton;
     ButtonPanel: TButtonPanel;
-    chkInherit: TCheckBox;
+    chkParent: TCheckBox;
     cbParent: TComboBox;
     dbVars: TDividerBevel;
     dbEnv: TDividerBevel;
@@ -38,15 +38,21 @@ type
     tbEdit: TToolButton;
     tbDelete: TToolButton;
     tbEnv: TToolButton;
+    procedure chkParentClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
   private
-
+    type
+      TOpState = (opNone, opAdd, opEdit);
+  private
+    FOpState: TOpState;
+    FEnvManager: TEnvManager;
   public
     procedure ShowEnv;
     procedure HideEnv;
+    property EnvManager: TEnvManager read FEnvManager write FEnvManager;
   end;
 
 implementation
@@ -67,27 +73,37 @@ begin
   btnSave.Enabled := not (Length(Trim(editName.Text)) = 0);
 end;
 
+procedure TEnvForm.chkParentClick(Sender: TObject);
+begin
+  cbParent.Enabled := chkParent.Checked;
+end;
+
 procedure TEnvForm.tbAddClick(Sender: TObject);
 begin
-  if panEnv.Visible then
-    HideEnv
-  else begin
-    dbEnv.Caption := 'New environment';
-    editName.Text := '';
-    chkInherit.Checked := False;
-    btnSave.Enabled := False;
-    ShowEnv;
+  if panEnv.Visible and (FOpState = opAdd) then
+  begin
+    HideEnv;
+    Exit; // =>
   end;
+  dbEnv.Caption := 'New environment';
+  editName.Text := '';
+  chkParent.Checked := False;
+  cbParent.Enabled := False;
+  btnSave.Enabled := False;
+  ShowEnv;
+  FOpState := opAdd;
 end;
 
 procedure TEnvForm.tbEditClick(Sender: TObject);
 begin
-  if PanEnv.Visible then
-    HideEnv
-  else begin
-    dbEnv.Caption := 'Edit environment: ';
-    ShowEnv;
+  if PanEnv.Visible and (FOpState = opEdit) then
+  begin
+    HideEnv;
+    Exit; // =>
   end;
+  dbEnv.Caption := 'Edit environment: ';
+  ShowEnv;
+  FOpState := opEdit;
 end;
 
 procedure TEnvForm.ShowEnv;
@@ -98,6 +114,7 @@ end;
 procedure TEnvForm.HideEnv;
 begin
   PanEnv.Visible := False;
+  FOpState := opNone;
 end;
 
 end.
