@@ -9,12 +9,26 @@ uses
 
 type
 
+  { TVariable }
+
+  TVariable = class
+  private
+    FName: string;
+    FValue: string;
+  public
+    constructor Create(const VarName: string); virtual;
+    constructor Create(const VarName, VarValue: string); overload;
+    function Replace(const Txt: string): string; virtual;
+    property Name: string read FName write FName;
+    property Value: string read FValue write FValue;
+  end;
+
   { TEnvironment }
 
   TEnvironment = class
   private
     type
-      TVarList = specialize TFPGMap<string, string>;
+    TVarList = specialize TFPGObjectList<TVariable>;
   private
     FParent: TEnvironment;
     FName: string;
@@ -22,17 +36,18 @@ type
   protected
     procedure SetName(const AValue: string);
     procedure SetParent(const AValue: TEnvironment);
-    procedure SetValue(const VarName, AValue: string);
-    function GetValue(VarName: string): string;
+    function GetVariable(VarName: string): TVariable;
     function GetVarNames: TStringArray;
+    function FindVar(const VarName: string): TVariable;
   public
     constructor Create(const AName: string; const AParent: TEnvironment); virtual;
     destructor Destroy; override;
     procedure DeleteVar(const VarName: string);
+    procedure Add(const Variable: TVariable);
     property Parent: TEnvironment read FParent write SetParent;
     property Name: string read FName write SetName;
     property VarNames: TStringArray read GetVarNames;
-    property Value[VarName: string]: string read GetValue write SetValue; default;
+    property Variable[VarName: string]: TVariable read GetVariable; default;
   end;
 
   { EVariableNotFound }
@@ -47,7 +62,7 @@ type
   TEnvManager = class
   private
     type
-      TEnvList = specialize TFPGObjectList<TEnvironment>;
+    TEnvList = specialize TFPGObjectList<TEnvironment>;
   private
     FEnvList: TEnvList;
     function GetEnv(EnvName: string): TEnvironment;
@@ -64,6 +79,26 @@ type
   end;
 
 implementation
+
+{ TVariable }
+
+constructor TVariable.Create(const VarName: string);
+begin
+  inherited Create;
+  FName := VarName;
+end;
+
+constructor TVariable.Create(const VarName, VarValue: string);
+begin
+  inherited Create;
+  FName := VarName;
+  FValue := VarValue;
+end;
+
+function TVariable.Replace(const Txt: string): string;
+begin
+
+end;
 
 { TEnvManager }
 
@@ -145,16 +180,14 @@ begin
   FName := AValue;
 end;
 
-function TEnvironment.GetValue(VarName: string): string;
-var
-  KeyIdx: integer;
+function TEnvironment.GetVariable(VarName: string): TVariable;
 begin
-  if not FVarList.Find(VarName, KeyIdx) then
-    if Assigned(FParent) then
-      Exit(FParent[VarName])
+  Result := FindVar(VarName);
+  if not Assigned(Result) then
+    if not Assigned(FParent) then
+      raise EVariableNotFound.Create(VarName)
     else
-      raise EVariableNotFound.Create(VarName);
-  Result := FVarList.Data[KeyIdx];
+      Result := FParent.Variable[VarName];
 end;
 
 procedure TEnvironment.SetParent(const AValue: TEnvironment);
@@ -164,16 +197,6 @@ begin
   if AValue = Self then
     raise Exception.Create('Cannot set self to parent.');
   FParent := AValue;
-end;
-
-procedure TEnvironment.SetValue(const VarName, AValue: string);
-var
-  KeyIdx: integer;
-begin
-  if not FVarList.Find(VarName, KeyIdx) then
-    FVarList.Add(VarName, AValue)
-  else
-    FVarList.Data[KeyIdx] := AValue;
 end;
 
 constructor TEnvironment.Create(const AName: string; const AParent: TEnvironment);
@@ -191,11 +214,26 @@ end;
 
 procedure TEnvironment.DeleteVar(const VarName: string);
 var
-  KeyIdx: integer;
+  i: integer;
+  V: TVariable;
 begin
-  if not FVarList.Find(VarName, KeyIdx) then
+  V := nil;
+  for i := 0 to FVarList.Count - 1 do
+    if FVarList[i].Name = VarName then
+    begin
+      V := FVarList[i];
+      break;
+    end;
+  if V = nil then
     raise EVariableNotFound.Create(VarName);
-  FVarList.Delete(KeyIdx);
+  FVarList.Delete(i);
+end;
+
+procedure TEnvironment.Add(const Variable: TVariable);
+begin
+  if FindVar(Variable.Name) <> nil then
+    raise Exception.CreateFmt('Variable "%s" is already exist.', [Variable.Name]);
+  FVarList.Add(Variable);
 end;
 
 function TEnvironment.GetVarNames: TStringArray;
@@ -204,7 +242,15 @@ var
 begin
   SetLength(Result, FVarList.Count);
   for i := 0 to FVarList.Count - 1 do
-    Result[i] := FVarList.Data[i];
+    Result[i] := FVarList[i].Name;
+end;
+
+function TEnvironment.FindVar(const VarName: string): TVariable;
+begin
+  for Result in FVarList do
+    if Result.Name = VarName then
+      Exit; // =>
+  Result := nil;
 end;
 
 end.
