@@ -44,6 +44,7 @@ type
     destructor Destroy; override;
     procedure DeleteVar(const VarName: string);
     procedure Add(const Variable: TVariable);
+    function Apply(const Txt: string): string;
     property Parent: TEnvironment read FParent write SetParent;
     property Name: string read FName write SetName;
     property VarNames: TStringArray read GetVarNames;
@@ -80,6 +81,8 @@ type
 
 implementation
 
+uses strutils;
+
 { TVariable }
 
 constructor TVariable.Create(const VarName: string);
@@ -96,8 +99,19 @@ begin
 end;
 
 function TVariable.Replace(const Txt: string): string;
+var
+  start: SizeInt;
+  LName, LTxt: string;
 begin
-
+  Result := Txt;
+  LTxt := LowerCase(Txt);
+  LName := LowerCase(FName);
+  repeat
+    start := PosEx('{{' + LName + '}}', LTxt);
+    if start = 0 then
+      Exit; // =>
+    Result := ReplaceText(Txt, '{{' + FName + '}}', FValue);
+  until True;
 end;
 
 { TEnvManager }
@@ -234,6 +248,30 @@ begin
   if FindVar(Variable.Name) <> nil then
     raise Exception.CreateFmt('Variable "%s" is already exist.', [Variable.Name]);
   FVarList.Add(Variable);
+end;
+
+function TEnvironment.Apply(const Txt: string): string;
+var
+  start, stop: SizeInt;
+  VarName: string;
+  V: TVariable;
+begin
+  Result := Txt;
+  start := 1;
+  repeat
+    start := PosEx('{{', Txt, start);
+    if start = 0 then
+      Exit; // =>
+    Inc(start, 2);
+    stop := PosEx('}}', Txt, start);
+    if stop = 0 then
+      Exit; // =>
+    VarName := MidStr(Txt, start, stop - start);
+    if VarName = '' then
+      Exit; // =>
+    V := GetVariable(VarName);
+    Result := LeftStr(Txt, start - 2) + V.Value + RightStr(Txt, Length(Txt) - stop);
+  until True;
 end;
 
 function TEnvironment.GetVarNames: TStringArray;
