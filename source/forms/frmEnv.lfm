@@ -50,7 +50,7 @@ object EnvForm: TEnvForm
       Left = 53
       Top = 0
       AutoSize = True
-      Caption = 'Add'
+      Caption = '&Add'
       ImageIndex = 10
       OnClick = tbAddClick
     end
@@ -58,14 +58,14 @@ object EnvForm: TEnvForm
       Left = 101
       Top = 0
       AutoSize = True
-      Caption = 'Edit'
+      Caption = '&Edit'
       ImageIndex = 9
       OnClick = tbEditClick
     end
     object tbDelete: TToolButton
       Left = 148
       Top = 0
-      Caption = 'Delete'
+      Caption = '&Delete'
       ImageIndex = 8
     end
     object tbEnv: TToolButton
@@ -213,7 +213,7 @@ object EnvForm: TEnvForm
         Width = 93
         Align = alLeft
         BorderSpacing.Right = 6
-        Caption = 'Inherit from:'
+        Caption = '&Inherit from:'
         OnClick = chkParentClick
         TabOrder = 0
       end
@@ -234,7 +234,8 @@ object EnvForm: TEnvForm
         Top = 0
         Width = 75
         Align = alRight
-        Caption = 'Save'
+        Caption = '&Save'
+        OnClick = btnSaveClick
         TabOrder = 2
       end
     end
@@ -242,17 +243,5 @@ object EnvForm: TEnvForm
   object menuEnv: TPopupMenu
     left = 288
     top = 216
-    object MenuItem1: TMenuItem
-      Caption = 'MenuItem1'
-    end
-    object MenuItem2: TMenuItem
-      Caption = 'MenuItem2'
-    end
-    object MenuItem3: TMenuItem
-      Caption = 'MenuItem3'
-    end
-    object MenuItem4: TMenuItem
-      Caption = 'MenuItem4'
-    end
   end
 end
