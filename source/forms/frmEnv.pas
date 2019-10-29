@@ -46,13 +46,14 @@ type
   private
     FOpState: TOpState;
     FEnvManager: TEnvManager;
-    function CreateMenuItem(const Env: TEnvironment): TMenuItem;
+    function CreateMenuItem(const EnvName: string): TMenuItem;
     procedure OnSelectEnv(Sender: TObject);
+    procedure SetEnvManager(AValue: TEnvManager);
   public
     procedure ShowEnv;
     procedure HideEnv;
     function ShowModal(const EnvName: string): TModalResult;
-    property EnvManager: TEnvManager read FEnvManager write FEnvManager;
+    property EnvManager: TEnvManager read FEnvManager write SetEnvManager;
   end;
 
 implementation
@@ -82,7 +83,6 @@ end;
 procedure TEnvForm.btnSaveClick(Sender: TObject);
 var
   Env, EnvParent: TEnvironment;
-  mi: TMenuItem;
 begin
   EnvParent := nil;
   if chkParent.Checked and (cbParent.ItemIndex > -1) then
@@ -93,9 +93,8 @@ begin
       Env := TEnvironment.Create(editName.Text, EnvParent);
       try
         FEnvManager.Add(Env);
-        mi := CreateMenuItem(Env);
-        menuEnv.Items.Add(mi);
-        tbEnv.Caption := mi.Caption;
+        CreateMenuItem(Env.Name);
+        tbEnv.Caption := Env.Name;
       except
         on E: Exception do begin
           ERRMsg('Error', E.Message);
@@ -140,12 +139,13 @@ begin
   FOpState := opEdit;
 end;
 
-function TEnvForm.CreateMenuItem(const Env: TEnvironment): TMenuItem;
+function TEnvForm.CreateMenuItem(const EnvName: string): TMenuItem;
 begin
   Result := TMenuItem.Create(menuEnv);
-  Result.Caption := Env.Name;
+  Result.Caption := EnvName;
   Result.RadioItem := True;
   Result.OnClick := @onSelectEnv;
+  menuEnv.Items.Add(Result);
 end;
 
 procedure TEnvForm.OnSelectEnv(Sender: TObject);
@@ -157,6 +157,18 @@ begin
     MI := TMenuItem(Sender);
     tbEnv.Caption := MI.Caption;
   end;
+end;
+
+procedure TEnvForm.SetEnvManager(AValue: TEnvManager);
+var
+  EnvName: string;
+begin
+  if FEnvManager = AValue then
+    Exit; // =>
+  menuEnv.Items.Clear;
+  for EnvName in AValue.EnvNames do
+    CreateMenuItem(EnvName);
+  FEnvManager := AValue;
 end;
 
 procedure TEnvForm.ShowEnv;
