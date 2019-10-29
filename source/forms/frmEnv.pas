@@ -23,10 +23,6 @@ type
     editName: TEdit;
     navVars: TGridNavigator;
     labName: TLabel;
-    MenuItem1: TMenuItem;
-    MenuItem2: TMenuItem;
-    MenuItem3: TMenuItem;
-    MenuItem4: TMenuItem;
     panEnv: TPanel;
     panName: TPanel;
     panVars: TPanel;
@@ -38,6 +34,7 @@ type
     tbEdit: TToolButton;
     tbDelete: TToolButton;
     tbEnv: TToolButton;
+    procedure btnSaveClick(Sender: TObject);
     procedure chkParentClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -49,15 +46,18 @@ type
   private
     FOpState: TOpState;
     FEnvManager: TEnvManager;
+    function CreateMenuItem(const Env: TEnvironment): TMenuItem;
+    procedure OnSelectEnv(Sender: TObject);
   public
     procedure ShowEnv;
     procedure HideEnv;
+    function ShowModal(const EnvName: string): TModalResult;
     property EnvManager: TEnvManager read FEnvManager write FEnvManager;
   end;
 
 implementation
 
-uses sysutils;
+uses sysutils, AppHelpers;
 
 {$R *.lfm}
 
@@ -66,6 +66,7 @@ uses sysutils;
 procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   HideEnv;
+  tbEnv.Caption := '------';
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
@@ -76,6 +77,38 @@ end;
 procedure TEnvForm.chkParentClick(Sender: TObject);
 begin
   cbParent.Enabled := chkParent.Checked;
+end;
+
+procedure TEnvForm.btnSaveClick(Sender: TObject);
+var
+  Env, EnvParent: TEnvironment;
+  mi: TMenuItem;
+begin
+  EnvParent := nil;
+  if chkParent.Checked and (cbParent.ItemIndex > -1) then
+    EnvParent := FEnvManager.Env[cbParent.Items[cbParent.ItemIndex]];
+
+  case FOpState of
+    opAdd: begin
+      Env := TEnvironment.Create(editName.Text, EnvParent);
+      try
+        FEnvManager.Add(Env);
+        mi := CreateMenuItem(Env);
+        menuEnv.Items.Add(mi);
+        tbEnv.Caption := mi.Caption;
+      except
+        on E: Exception do begin
+          ERRMsg('Error', E.Message);
+          FreeAndNil(Env);
+        end;
+      end;
+    end;
+    opEdit: begin
+
+    end;
+  end;
+
+  HideEnv;
 end;
 
 procedure TEnvForm.tbAddClick(Sender: TObject);
@@ -89,6 +122,7 @@ begin
   editName.Text := '';
   chkParent.Checked := False;
   cbParent.Enabled := False;
+  cbParent.Items.AddStrings(FEnvManager.EnvNames, True);
   btnSave.Enabled := False;
   ShowEnv;
   FOpState := opAdd;
@@ -106,15 +140,40 @@ begin
   FOpState := opEdit;
 end;
 
+function TEnvForm.CreateMenuItem(const Env: TEnvironment): TMenuItem;
+begin
+  Result := TMenuItem.Create(menuEnv);
+  Result.Caption := Env.Name;
+  Result.RadioItem := True;
+  Result.OnClick := @onSelectEnv;
+end;
+
+procedure TEnvForm.OnSelectEnv(Sender: TObject);
+var
+  MI: TMenuItem;
+begin
+  if (Sender is TMenuItem) then
+  begin
+    MI := TMenuItem(Sender);
+    tbEnv.Caption := MI.Caption;
+  end;
+end;
+
 procedure TEnvForm.ShowEnv;
 begin
   PanEnv.Visible := True;
+  editName.SetFocus;
 end;
 
 procedure TEnvForm.HideEnv;
 begin
   PanEnv.Visible := False;
   FOpState := opNone;
+end;
+
+function TEnvForm.ShowModal(const EnvName: string): TModalResult;
+begin
+  Result := inherited ShowModal;
 end;
 
 end.
