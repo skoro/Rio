@@ -42,7 +42,7 @@ type
     procedure tbEditClick(Sender: TObject);
   private
     type
-      TOpState = (opNone, opAdd, opEdit);
+    TOpState = (opNone, opAdd, opEdit);
   private
     FOpState: TOpState;
     FEnvManager: TEnvManager;
@@ -59,7 +59,7 @@ type
 
 implementation
 
-uses sysutils, AppHelpers;
+uses SysUtils, AppHelpers;
 
 {$R *.lfm}
 
@@ -93,7 +93,8 @@ begin
     EnvParent := FEnvManager.Env[cbParent.Items[cbParent.ItemIndex]];
 
   case FOpState of
-    opAdd: begin
+    opAdd:
+    begin
       Env := TEnvironment.Create(editName.Text, EnvParent);
       try
         FEnvManager.Add(Env);
@@ -101,16 +102,19 @@ begin
         OnSelectEnv(MI); // Set selection on the current menu.
         tbEnv.Caption := Env.Name;
       except
-        on E: Exception do begin
+        on E: Exception do
+        begin
           ERRMsg('Error', E.Message);
           FreeAndNil(Env);
         end;
       end;
     end;
-    opEdit: begin
+
+    opEdit:
+    begin
 
     end;
-  end;
+  end; // case
 
   HideEnv;
 end;
@@ -226,4 +230,3 @@ begin
 end;
 
 end.
-
