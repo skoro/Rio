@@ -83,6 +83,7 @@ end;
 procedure TEnvForm.btnSaveClick(Sender: TObject);
 var
   Env, EnvParent: TEnvironment;
+  MI: TMenuItem;
 begin
   EnvParent := nil;
   if chkParent.Checked and (cbParent.ItemIndex > -1) then
@@ -93,7 +94,8 @@ begin
       Env := TEnvironment.Create(editName.Text, EnvParent);
       try
         FEnvManager.Add(Env);
-        CreateMenuItem(Env.Name);
+        MI := CreateMenuItem(Env.Name);
+        OnSelectEnv(MI); // Set selection on the current menu.
         tbEnv.Caption := Env.Name;
       except
         on E: Exception do begin
@@ -143,19 +145,22 @@ function TEnvForm.CreateMenuItem(const EnvName: string): TMenuItem;
 begin
   Result := TMenuItem.Create(menuEnv);
   Result.Caption := EnvName;
-  Result.RadioItem := True;
   Result.OnClick := @onSelectEnv;
   menuEnv.Items.Add(Result);
 end;
 
 procedure TEnvForm.OnSelectEnv(Sender: TObject);
 var
-  MI: TMenuItem;
+  Sel, MI: TMenuItem;
 begin
   if (Sender is TMenuItem) then
   begin
-    MI := TMenuItem(Sender);
-    tbEnv.Caption := MI.Caption;
+    Sel := TMenuItem(Sender);
+    tbEnv.Caption := Sel.Caption;
+    // Something strange on RadioItem, emulate Radio by using checked.
+    for MI in menuEnv.Items do
+      MI.Checked := False;
+    Sel.Checked := True;
   end;
 end;
 
