@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Classes;
+  GridNavigator, Env;
 
 type
 
@@ -49,6 +49,7 @@ type
     function CreateMenuItem(const EnvName: string): TMenuItem;
     procedure OnSelectEnv(Sender: TObject);
     procedure SetEnvManager(AValue: TEnvManager);
+    procedure PrepareEditEnv;
   public
     procedure ShowEnv;
     procedure HideEnv;
@@ -68,6 +69,8 @@ procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   HideEnv;
   tbEnv.Caption := '------';
+  tbEdit.Enabled := False;
+  tbDelete.Enabled := False;
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
@@ -136,7 +139,7 @@ begin
     HideEnv;
     Exit; // =>
   end;
-  dbEnv.Caption := 'Edit environment: ';
+  PrepareEditEnv;
   ShowEnv;
   FOpState := opEdit;
 end;
@@ -161,6 +164,10 @@ begin
     for MI in menuEnv.Items do
       MI.Checked := False;
     Sel.Checked := True;
+    tbEdit.Enabled := True;
+    tbDelete.Enabled := True;
+    if FOpState = opEdit then
+      PrepareEditEnv;
   end;
 end;
 
@@ -174,6 +181,31 @@ begin
   for EnvName in AValue.EnvNames do
     CreateMenuItem(EnvName);
   FEnvManager := AValue;
+end;
+
+procedure TEnvForm.PrepareEditEnv;
+var
+  Env: TEnvironment;
+  EnvName: string;
+  PIdx: integer;
+begin
+  Env := FEnvManager.Env[tbEnv.Caption];
+  dbEnv.Caption := 'Edit environment: ' + Env.Name;
+  editName.Text := Env.Name;
+  chkParent.Checked := False;
+  cbParent.Items.Clear;
+  for EnvName in FEnvManager.EnvNames do
+    if EnvName <> Env.Name then
+    begin
+      cbParent.Items.Add(EnvName);
+      if Assigned(Env.Parent) and (Env.Parent.Name = EnvName) then
+        PIdx := cbParent.Items.Count - 1;
+    end;
+  if Assigned(Env.Parent) then
+  begin
+    chkParent.Checked := True;
+    cbParent.ItemIndex := PIdx;
+  end;
 end;
 
 procedure TEnvForm.ShowEnv;
