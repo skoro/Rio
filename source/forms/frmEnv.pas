@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env;
+  GridNavigator, Env, Classes;
 
 type
 
@@ -39,6 +39,7 @@ type
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
+    procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
   private
     type
@@ -46,20 +47,25 @@ type
   private
     FOpState: TOpState;
     FEnvManager: TEnvManager;
+    FCurrentEnv: TEnvironment;
     function CreateMenuItem(const EnvName: string): TMenuItem;
     procedure OnSelectEnv(Sender: TObject);
+    procedure SetCurrentEnv(AValue: TEnvironment);
     procedure SetEnvManager(AValue: TEnvManager);
+    procedure SetParentsForEnv(const Env: TEnvironment);
     procedure PrepareEditEnv;
+    procedure DisableIfEnvEmpty;
   public
-    procedure ShowEnv;
-    procedure HideEnv;
+    procedure ShowPanelEnv;
+    procedure HidePanelEnv;
     function ShowModal(const EnvName: string): TModalResult;
     property EnvManager: TEnvManager read FEnvManager write SetEnvManager;
+    property CurrentEnv: TEnvironment read FCurrentEnv write SetCurrentEnv;
   end;
 
 implementation
 
-uses SysUtils, AppHelpers;
+uses SysUtils, Controls, AppHelpers;
 
 {$R *.lfm}
 
@@ -67,10 +73,8 @@ uses SysUtils, AppHelpers;
 
 procedure TEnvForm.FormCreate(Sender: TObject);
 begin
-  HideEnv;
-  tbEnv.Caption := '------';
-  tbEdit.Enabled := False;
-  tbDelete.Enabled := False;
+  HidePanelEnv;
+  DisableIfEnvEmpty;
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
@@ -116,35 +120,55 @@ begin
     end;
   end; // case
 
-  HideEnv;
+  HidePanelEnv;
 end;
 
 procedure TEnvForm.tbAddClick(Sender: TObject);
 begin
   if panEnv.Visible and (FOpState = opAdd) then
   begin
-    HideEnv;
+    HidePanelEnv;
     Exit; // =>
   end;
   dbEnv.Caption := 'New environment';
   editName.Text := '';
-  chkParent.Checked := False;
-  cbParent.Enabled := False;
-  cbParent.Items.AddStrings(FEnvManager.EnvNames, True);
+  SetParentsForEnv(nil);
   btnSave.Enabled := False;
-  ShowEnv;
+  ShowPanelEnv;
   FOpState := opAdd;
+end;
+
+procedure TEnvForm.tbDeleteClick(Sender: TObject);
+var
+  Env: TEnvironment;
+  Mi: TMenuItem;
+begin
+  Env := FEnvManager.Env[tbEnv.Caption];
+  if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + Env.Name + ' ?') = mrCancel then
+    Exit; // =>
+
+  for MI in menuEnv.Items do
+    if MI.Caption = Env.Name then
+    begin
+      menuEnv.Items.Remove(MI);
+      break;
+    end;
+
+  FEnvManager.Delete(Env.Name);
+  if FOpState = opAdd then
+    SetParentsForEnv(nil);
+  DisableIfEnvEmpty;
 end;
 
 procedure TEnvForm.tbEditClick(Sender: TObject);
 begin
   if PanEnv.Visible and (FOpState = opEdit) then
   begin
-    HideEnv;
+    HidePanelEnv;
     Exit; // =>
   end;
   PrepareEditEnv;
-  ShowEnv;
+  ShowPanelEnv;
   FOpState := opEdit;
 end;
 
@@ -157,22 +181,26 @@ begin
 end;
 
 procedure TEnvForm.OnSelectEnv(Sender: TObject);
-var
-  Sel, MI: TMenuItem;
 begin
   if (Sender is TMenuItem) then
-  begin
-    Sel := TMenuItem(Sender);
-    tbEnv.Caption := Sel.Caption;
-    // Something strange on RadioItem, emulate Radio by using checked.
-    for MI in menuEnv.Items do
-      MI.Checked := False;
-    Sel.Checked := True;
-    tbEdit.Enabled := True;
-    tbDelete.Enabled := True;
-    if FOpState = opEdit then
-      PrepareEditEnv;
-  end;
+    SetCurrentEnv(FEnvManager.EnvIndex[TMenuItem(Sender).MenuIndex]);
+end;
+
+procedure TEnvForm.SetCurrentEnv(AValue: TEnvironment);
+var
+  MI: TMenuItem;
+begin
+  if FCurrentEnv = AValue then
+    Exit; // =>
+  FCurrentEnv := AValue;
+  tbEnv.Caption := AValue.Name;
+  // Something strange on RadioItem, emulate Radio by using checked.
+  for MI in menuEnv.Items do
+    MI.Checked := (MI.Caption = AValue.Name);
+  tbEdit.Enabled := True;
+  tbDelete.Enabled := True;
+  if FOpState = opEdit then
+    PrepareEditEnv;
 end;
 
 procedure TEnvForm.SetEnvManager(AValue: TEnvManager);
@@ -187,38 +215,69 @@ begin
   FEnvManager := AValue;
 end;
 
+procedure TEnvForm.SetParentsForEnv(const Env: TEnvironment);
+var
+  ParentEnabled: Boolean;
+begin
+  cbParent.Items.Clear;
+  ParentEnabled := (FEnvManager.Count = 0);
+  chkParent.Checked := ParentEnabled;
+  cbParent.Enabled := ParentEnabled;
+  if ParentEnabled then
+    cbParent.Items.AddStrings(FEnvManager.EnvNames);
+end;
+
 procedure TEnvForm.PrepareEditEnv;
 var
-  Env: TEnvironment;
   EnvName: string;
   PIdx: integer;
 begin
-  Env := FEnvManager.Env[tbEnv.Caption];
-  dbEnv.Caption := 'Edit environment: ' + Env.Name;
-  editName.Text := Env.Name;
+  dbEnv.Caption := 'Edit environment: ' + FCurrentEnv.Name;
+  editName.Text := FCurrentEnv.Name;
   chkParent.Checked := False;
   cbParent.Items.Clear;
   for EnvName in FEnvManager.EnvNames do
-    if EnvName <> Env.Name then
+    if EnvName <> FCurrentEnv.Name then
     begin
       cbParent.Items.Add(EnvName);
-      if Assigned(Env.Parent) and (Env.Parent.Name = EnvName) then
+      if Assigned(FCurrentEnv.Parent) and (FCurrentEnv.Parent.Name = EnvName) then
         PIdx := cbParent.Items.Count - 1;
     end;
-  if Assigned(Env.Parent) then
+  if Assigned(FCurrentEnv.Parent) then
   begin
     chkParent.Checked := True;
     cbParent.ItemIndex := PIdx;
   end;
 end;
 
-procedure TEnvForm.ShowEnv;
+procedure TEnvForm.DisableIfEnvEmpty;
+var
+  EnableSwitch: Boolean;
+begin
+  if FEnvManager.Count = 0 then
+  begin
+    EnableSwitch := False;
+    tbEnv.Caption := 'No enviroments!';
+    if FOpState = opEdit then
+      HidePanelEnv;
+    FCurrentEnv := nil;
+  end
+  else begin
+    EnableSwitch := True;
+    CurrentEnv := FEnvManager.First;
+  end;
+  tbEdit.Enabled := EnableSwitch;
+  tbDelete.Enabled := EnableSwitch;
+  tbEnv.Enabled := EnableSwitch;
+end;
+
+procedure TEnvForm.ShowPanelEnv;
 begin
   PanEnv.Visible := True;
   editName.SetFocus;
 end;
 
-procedure TEnvForm.HideEnv;
+procedure TEnvForm.HidePanelEnv;
 begin
   PanEnv.Visible := False;
   FOpState := opNone;

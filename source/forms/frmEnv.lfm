@@ -67,6 +67,7 @@ object EnvForm: TEnvForm
       Top = 0
       Caption = '&Delete'
       ImageIndex = 8
+      OnClick = tbDeleteClick
     end
     object tbEnv: TToolButton
       Left = 1
