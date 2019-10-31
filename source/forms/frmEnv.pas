@@ -38,6 +38,7 @@ type
     procedure chkParentClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormShow(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
@@ -72,6 +73,10 @@ uses SysUtils, Controls, AppHelpers;
 { TEnvForm }
 
 procedure TEnvForm.FormCreate(Sender: TObject);
+begin
+end;
+
+procedure TEnvForm.FormShow(Sender: TObject);
 begin
   HidePanelEnv;
   DisableIfEnvEmpty;
@@ -193,6 +198,7 @@ begin
   if FCurrentEnv = AValue then
     Exit; // =>
   FCurrentEnv := AValue;
+  tbEnv.Enabled := True;
   tbEnv.Caption := AValue.Name;
   // Something strange on RadioItem, emulate Radio by using checked.
   for MI in menuEnv.Items do
@@ -220,7 +226,8 @@ var
   ParentEnabled: Boolean;
 begin
   cbParent.Items.Clear;
-  ParentEnabled := (FEnvManager.Count = 0);
+  ParentEnabled := (FEnvManager.Count > 0);
+  chkParent.Enabled := ParentEnabled;
   chkParent.Checked := ParentEnabled;
   cbParent.Enabled := ParentEnabled;
   if ParentEnabled then
