@@ -66,8 +66,11 @@ type
     TEnvList = specialize TFPGObjectList<TEnvironment>;
   private
     FEnvList: TEnvList;
+    function GetCount: Integer;
     function GetEnv(EnvName: string): TEnvironment;
+    function GetEnvIndex(Index: integer): TEnvironment;
     function GetEnvNames: TStringArray;
+    function GetFirst: TEnvironment;
   protected
     function FindEnv(const EnvName: string): TEnvironment;
   public
@@ -77,6 +80,9 @@ type
     procedure Delete(const EnvName: string);
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
+    property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
+    property Count: Integer read GetCount;
+    property First: TEnvironment read GetFirst;
   end;
 
 implementation
@@ -123,6 +129,16 @@ begin
     raise Exception.CreateFmt('Environment "%s" not found.', [EnvName]);
 end;
 
+function TEnvManager.GetEnvIndex(Index: integer): TEnvironment;
+begin
+  Result := FEnvList.Items[Index];
+end;
+
+function TEnvManager.GetCount: Integer;
+begin
+  Result := FEnvList.Count;
+end;
+
 function TEnvManager.GetEnvNames: TStringArray;
 var
   i: integer;
@@ -130,6 +146,11 @@ begin
   SetLength(Result, FEnvList.Count);
   for i := 0 to FEnvList.Count - 1 do
     Result[i] := FEnvList[i].Name;
+end;
+
+function TEnvManager.GetFirst: TEnvironment;
+begin
+  Result := FEnvList.First;
 end;
 
 function TEnvManager.FindEnv(const EnvName: string): TEnvironment;
