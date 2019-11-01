@@ -66,7 +66,7 @@ type
 
 implementation
 
-uses SysUtils, Controls, AppHelpers;
+uses SysUtils, Controls, Graphics, AppHelpers;
 
 {$R *.lfm}
 
@@ -74,6 +74,7 @@ uses SysUtils, Controls, AppHelpers;
 
 procedure TEnvForm.FormCreate(Sender: TObject);
 begin
+  tbEnv.Font.Style := [fsBold];
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
