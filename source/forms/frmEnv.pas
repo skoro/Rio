@@ -223,38 +223,38 @@ end;
 
 procedure TEnvForm.SetParentsForEnv(const Env: TEnvironment);
 var
-  ParentEnabled: Boolean;
+  IsOn: Boolean;
+  EnvName: string;
+  Idx: integer;
 begin
   cbParent.Items.Clear;
-  ParentEnabled := (FEnvManager.Count > 0);
-  chkParent.Enabled := ParentEnabled;
-  chkParent.Checked := ParentEnabled;
-  cbParent.Enabled := ParentEnabled;
-  if ParentEnabled then
-    cbParent.Items.AddStrings(FEnvManager.EnvNames);
+  if not Assigned(Env) then
+    cbParent.Items.AddStrings(FEnvManager.EnvNames)
+  else
+  begin
+    Idx := -1;
+    for EnvName in FEnvManager.EnvNames do
+      if EnvName <> Env.Name then
+      begin
+        cbParent.Items.Add(EnvName);
+        if Assigned(Env.Parent) and (Env.Parent.Name = EnvName) then
+          Idx := cbParent.Items.Count - 1;
+      end;
+    cbParent.ItemIndex := Idx;
+  end;
+  IsOn := (cbParent.Items.Count > 0);
+  chkParent.Enabled := IsOn;
+  chkParent.Checked := False;
+  cbParent.Enabled := IsOn;
 end;
 
 procedure TEnvForm.PrepareEditEnv;
-var
-  EnvName: string;
-  PIdx: integer;
 begin
   dbEnv.Caption := 'Edit environment: ' + FCurrentEnv.Name;
   editName.Text := FCurrentEnv.Name;
-  chkParent.Checked := False;
-  cbParent.Items.Clear;
-  for EnvName in FEnvManager.EnvNames do
-    if EnvName <> FCurrentEnv.Name then
-    begin
-      cbParent.Items.Add(EnvName);
-      if Assigned(FCurrentEnv.Parent) and (FCurrentEnv.Parent.Name = EnvName) then
-        PIdx := cbParent.Items.Count - 1;
-    end;
+  SetParentsForEnv(FCurrentEnv);
   if Assigned(FCurrentEnv.Parent) then
-  begin
     chkParent.Checked := True;
-    cbParent.ItemIndex := PIdx;
-  end;
 end;
 
 procedure TEnvForm.DisableIfEnvEmpty;
