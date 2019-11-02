@@ -220,17 +220,24 @@ end;
 procedure TEnvManager.Delete(const EnvName: string);
 var
   i: integer;
-  e: TEnvironment;
+  e, x: TEnvironment;
 begin
   E := nil;
+  // Get the index of the deleted env.
   for i := 0 to FEnvList.Count - 1 do
     if FEnvList[i].Name = EnvName then
     begin
       E := FEnvList[i];
       break;
     end;
+  // Not found.
   if E = nil then
     raise EEnvironmentNotFound.Create(EnvName);
+  // Detach the env from the parents.
+  for x in FEnvList do
+    if x.Parent = E then
+      x.Parent := nil;
+  // Delete.
   FEnvList.Delete(i);
 end;
 
