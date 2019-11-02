@@ -160,13 +160,9 @@ begin
   if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + Env.Name + ' ?') = mrCancel then
     Exit; // =>
 
-  { TODO : Use TMenu.Items.Find() }
-  for MI in menuEnv.Items do
-    if MI.Caption = Env.Name then
-    begin
-      menuEnv.Items.Remove(MI);
-      break;
-    end;
+  MI := menuEnv.Items.Find(Env.Name);
+  if Assigned(MI) then
+    menuEnv.Items.Remove(MI);
 
   FEnvManager.Delete(Env.Name);
   if FOpState = opAdd then
