@@ -123,13 +123,21 @@ begin
 
     opEdit:
     begin
-      if (editName.Text <> FCurrentEnv.Name) then
-      begin
-        FEnvManager.Rename(FCurrentEnv, editName.Text);
-        FCurrentMenu.Caption := FCurrentEnv.Name;
-        tbEnv.Caption := FCurrentEnv.Name;
+      try
+        if (editName.Text <> FCurrentEnv.Name) then
+        begin
+          FEnvManager.Rename(FCurrentEnv, editName.Text);
+          FCurrentMenu.Caption := FCurrentEnv.Name;
+          tbEnv.Caption := FCurrentEnv.Name;
+        end;
+        FCurrentEnv.Parent := EnvParent;
+      except
+        on E: Exception do
+        begin
+          ERRMsg('Error', E.Message);
+          Exit; // =>
+        end;
       end;
-      FCurrentEnv.Parent := EnvParent;
     end;
   end; // case
 
