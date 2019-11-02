@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Classes;
+  GridNavigator, Env;
 
 type
 
@@ -16,8 +16,8 @@ type
   TEnvForm = class(TForm)
     btnSave: TButton;
     ButtonPanel: TButtonPanel;
-    chkParent: TCheckBox;
     cbParent: TComboBox;
+    labParent: TLabel;
     dbVars: TDividerBevel;
     dbEnv: TDividerBevel;
     editName: TEdit;
@@ -35,7 +35,6 @@ type
     tbDelete: TToolButton;
     tbEnv: TToolButton;
     procedure btnSaveClick(Sender: TObject);
-    procedure chkParentClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -89,18 +88,13 @@ begin
   btnSave.Enabled := not (Length(Trim(editName.Text)) = 0);
 end;
 
-procedure TEnvForm.chkParentClick(Sender: TObject);
-begin
-  cbParent.Enabled := chkParent.Checked;
-end;
-
 procedure TEnvForm.btnSaveClick(Sender: TObject);
 var
   Env, EnvParent: TEnvironment;
   MI: TMenuItem;
 begin
   EnvParent := nil;
-  if chkParent.Checked and (cbParent.ItemIndex > -1) then
+  if cbParent.ItemIndex > 0 then
     EnvParent := FEnvManager.EnvIndex[cbParent.ItemIndex];
 
   case FOpState of
@@ -241,11 +235,11 @@ end;
 
 procedure TEnvForm.SetParentsForEnv(const Env: TEnvironment);
 var
-  IsOn: Boolean;
   EnvName: string;
   Idx: integer;
 begin
   cbParent.Items.Clear;
+  cbParent.Items.Add(' '); // No Parent choice.
   if not Assigned(Env) then
     cbParent.Items.AddStrings(FEnvManager.EnvNames)
   else
@@ -260,10 +254,7 @@ begin
       end;
     cbParent.ItemIndex := Idx;
   end;
-  IsOn := (cbParent.Items.Count > 0);
-  chkParent.Enabled := IsOn;
-  chkParent.Checked := False;
-  cbParent.Enabled := IsOn;
+  cbParent.Enabled := (cbParent.Items.Count > 1);
 end;
 
 procedure TEnvForm.PrepareEditEnv;
@@ -271,8 +262,6 @@ begin
   dbEnv.Caption := 'Edit environment: ' + FCurrentEnv.Name;
   editName.Text := FCurrentEnv.Name;
   SetParentsForEnv(FCurrentEnv);
-  if Assigned(FCurrentEnv.Parent) then
-    chkParent.Checked := True;
 end;
 
 procedure TEnvForm.DisableIfEnvEmpty;

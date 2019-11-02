@@ -81,15 +81,15 @@ object EnvForm: TEnvForm
   end
   object panVars: TPanel
     Left = 4
-    Height = 208
-    Top = 123
+    Height = 210
+    Top = 121
     Width = 452
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Top = 4
     BorderSpacing.Right = 4
     BevelOuter = bvNone
-    ClientHeight = 208
+    ClientHeight = 210
     ClientWidth = 452
     TabOrder = 2
     object dbVars: TDividerBevel
@@ -116,7 +116,7 @@ object EnvForm: TEnvForm
     end
     object gridVars: TStringGrid
       Left = 0
-      Height = 169
+      Height = 171
       Top = 39
       Width = 452
       Align = alClient
@@ -138,7 +138,7 @@ object EnvForm: TEnvForm
   end
   object panEnv: TPanel
     Left = 4
-    Height = 81
+    Height = 79
     Top = 30
     Width = 452
     Align = alTop
@@ -148,7 +148,7 @@ object EnvForm: TEnvForm
     BorderSpacing.Right = 4
     BorderSpacing.Bottom = 12
     BevelOuter = bvNone
-    ClientHeight = 81
+    ClientHeight = 79
     ClientWidth = 452
     TabOrder = 3
     object dbEnv: TDividerBevel
@@ -198,47 +198,47 @@ object EnvForm: TEnvForm
     end
     object panOpts: TPanel
       Left = 0
-      Height = 29
+      Height = 27
       Top = 52
       Width = 452
       Align = alTop
       AutoSize = True
       BorderSpacing.Top = 4
       BevelOuter = bvNone
-      ClientHeight = 29
+      ClientHeight = 27
       ClientWidth = 452
       TabOrder = 1
-      object chkParent: TCheckBox
-        Left = 0
-        Height = 29
-        Top = 0
-        Width = 93
-        Align = alLeft
-        BorderSpacing.Right = 6
-        Caption = '&Inherit from:'
-        OnClick = chkParentClick
-        TabOrder = 0
-      end
       object cbParent: TComboBox
-        Left = 99
-        Height = 29
+        Left = 46
+        Height = 27
         Top = 0
-        Width = 266
+        Width = 319
         Align = alClient
         BorderSpacing.Right = 12
         ItemHeight = 0
         Style = csDropDownList
-        TabOrder = 1
+        TabOrder = 0
       end
       object btnSave: TButton
         Left = 377
-        Height = 29
+        Height = 27
         Top = 0
         Width = 75
         Align = alRight
         Caption = '&Save'
         OnClick = btnSaveClick
-        TabOrder = 2
+        TabOrder = 1
+      end
+      object labParent: TLabel
+        Left = 0
+        Height = 27
+        Top = 0
+        Width = 40
+        Align = alLeft
+        BorderSpacing.Right = 6
+        Caption = 'Parent:'
+        Layout = tlCenter
+        ParentColor = False
       end
     end
   end
