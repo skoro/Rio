@@ -95,7 +95,7 @@ var
 begin
   EnvParent := nil;
   if cbParent.ItemIndex > 0 then
-    EnvParent := FEnvManager.EnvIndex[cbParent.ItemIndex];
+    EnvParent := FEnvManager.Env[cbParent.Items[cbParent.ItemIndex]];
 
   case FOpState of
     opAdd:
