@@ -80,12 +80,13 @@ type
     constructor Create(const EnvName: string);
   end;
 
+  { TEnvList }
+
+  TEnvList = specialize TFPGObjectList<TEnvironment>;
+
   { TEnvManager }
 
   TEnvManager = class
-  private
-    type
-    TEnvList = specialize TFPGObjectList<TEnvironment>;
   private
     FEnvList: TEnvList;
     function GetCount: Integer;
@@ -101,6 +102,7 @@ type
     procedure Add(const Env: TEnvironment);
     procedure Delete(const EnvName: string);
     procedure Rename(const Env:TEnvironment; const NewName: string);
+    function FindAvailParents(const Env: TEnvironment): TEnvList;
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
@@ -248,6 +250,32 @@ begin
   if FindEnv(Env.Name) = nil then
     raise EEnvironmentNotFound.Create(Env.Name);
   Env.Name := NewName;
+end;
+
+function TEnvManager.FindAvailParents(const Env: TEnvironment): TEnvList;
+var
+  Iter: TEnvironment;
+  function IsMyParent(Check, Base: TEnvironment): Boolean;
+  begin
+    if Check.Parent = nil then
+      Exit(False); // =>
+    if Check.Parent = Base then
+      Exit(True); // =>
+    Result := IsMyParent(Check.Parent, Base);
+  end;
+
+begin
+  Result := TEnvList.Create(False);
+  // nil - passed - all available envs can be parents.
+  if Env = nil then
+  begin
+    Result.Assign(FEnvList);
+    Exit; // =>
+  end;
+  // Add only environment which is not parent (and via parents, etc...) for Env.
+  for Iter in FEnvList do
+    if (Env <> Iter) and (not IsMyParent(Iter, Env)) then
+      Result.Add(Iter);
 end;
 
 { EVariableNotFound }

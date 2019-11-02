@@ -235,25 +235,19 @@ end;
 
 procedure TEnvForm.SetParentsForEnv(const Env: TEnvironment);
 var
-  EnvName: string;
-  Idx: integer;
+  EnvList: TEnvList;
+  Iter: TEnvironment;
 begin
   cbParent.Items.Clear;
   cbParent.Items.Add(' '); // No Parent choice.
-  if not Assigned(Env) then
-    cbParent.Items.AddStrings(FEnvManager.EnvNames)
-  else
+  EnvList := FEnvManager.FindAvailParents(Env);
+  for Iter in EnvList do
   begin
-    Idx := -1;
-    for EnvName in FEnvManager.EnvNames do
-      if EnvName <> Env.Name then
-      begin
-        cbParent.Items.Add(EnvName);
-        if Assigned(Env.Parent) and (Env.Parent.Name = EnvName) then
-          Idx := cbParent.Items.Count - 1;
-      end;
-    cbParent.ItemIndex := Idx;
+    cbParent.Items.Add(Iter.Name);
+    if (Env <> nil) and (Env.Parent = Iter) then
+      cbParent.ItemIndex := cbParent.Items.Count - 1;
   end;
+  FreeAndNil(EnvList);
   cbParent.Enabled := (cbParent.Items.Count > 1);
 end;
 
