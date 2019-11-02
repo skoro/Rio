@@ -49,6 +49,7 @@ type
     FOpState: TOpState;
     FEnvManager: TEnvManager;
     FCurrentEnv: TEnvironment;
+    FCurrentMenu: TMenuItem;
     function CreateMenuItem(const EnvName: string): TMenuItem;
     procedure OnSelectEnv(Sender: TObject);
     procedure SetCurrentEnv(AValue: TEnvironment);
@@ -100,7 +101,7 @@ var
 begin
   EnvParent := nil;
   if chkParent.Checked and (cbParent.ItemIndex > -1) then
-    EnvParent := FEnvManager.Env[cbParent.Items[cbParent.ItemIndex]];
+    EnvParent := FEnvManager.EnvIndex[cbParent.ItemIndex];
 
   case FOpState of
     opAdd:
@@ -122,7 +123,13 @@ begin
 
     opEdit:
     begin
-
+      if (editName.Text <> FCurrentEnv.Name) then
+      begin
+        FEnvManager.Rename(FCurrentEnv, editName.Text);
+        FCurrentMenu.Caption := FCurrentEnv.Name;
+        tbEnv.Caption := FCurrentEnv.Name;
+      end;
+      FCurrentEnv.Parent := EnvParent;
     end;
   end; // case
 
@@ -153,6 +160,7 @@ begin
   if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + Env.Name + ' ?') = mrCancel then
     Exit; // =>
 
+  { TODO : Use TMenu.Items.Find() }
   for MI in menuEnv.Items do
     if MI.Caption = Env.Name then
     begin
@@ -201,9 +209,14 @@ begin
   FCurrentEnv := AValue;
   tbEnv.Enabled := True;
   tbEnv.Caption := AValue.Name;
+  FCurrentMenu := nil;
   // Something strange on RadioItem, emulate Radio by using checked.
   for MI in menuEnv.Items do
+  begin
     MI.Checked := (MI.Caption = AValue.Name);
+    if MI.Caption = AValue.Name then
+      FCurrentMenu := MI;
+  end;
   tbEdit.Enabled := True;
   tbDelete.Enabled := True;
   if FOpState = opEdit then

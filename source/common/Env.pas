@@ -53,6 +53,7 @@ type
 
   { EVariableNotFound }
 
+  { TODO : EVariableException is base variable exceptions. }
   EVariableNotFound = class(Exception)
   public
     constructor Create(const VarName: string);
@@ -78,6 +79,7 @@ type
     destructor Destroy; override;
     procedure Add(const Env: TEnvironment);
     procedure Delete(const EnvName: string);
+    procedure Rename(const Env:TEnvironment; const NewName: string);
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
@@ -193,8 +195,20 @@ begin
       break;
     end;
   if E = nil then
+    { TODO : Create EEnvNotFound exception. }
     raise Exception.CreateFmt('Environment "%s" not found.', [EnvName]);
   FEnvList.Delete(i);
+end;
+
+procedure TEnvManager.Rename(const Env: TEnvironment; const NewName: string);
+begin
+  if FindEnv(NewName) <> nil then
+    { TODO : Create EEnvExists exception. }
+    raise Exception.CreateFmt('Cannot rename: "%s" already exists.', [NewName]);
+  if FindEnv(Env.Name) = nil then
+    { TODO : Create EEnvNotFound exception. }
+    raise Exception.CreateFmt('"%s" not found.', [Env.Name]);
+  Env.Name := NewName;
 end;
 
 { EVariableNotFound }
