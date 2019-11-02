@@ -51,12 +51,33 @@ type
     property Variable[VarName: string]: TVariable read GetVariable; default;
   end;
 
+  { EVariableBase }
+
+  EVariableBase = class(Exception);
+
   { EVariableNotFound }
 
-  { TODO : EVariableException is base variable exceptions. }
-  EVariableNotFound = class(Exception)
+  EVariableNotFound = class(EVariableBase)
   public
     constructor Create(const VarName: string);
+  end;
+
+  { EEnvironmentBase }
+
+  EEnvironmentBase = class(Exception);
+
+  { EEnvironmentNotFound }
+
+  EEnvironmentNotFound = class(EEnvironmentBase)
+  public
+    constructor Create(const EnvName: string);
+  end;
+
+  { EEnvironmentExists }
+
+  EEnvironmentExists = class(EEnvironmentBase)
+  public
+    constructor Create(const EnvName: string);
   end;
 
   { TEnvManager }
@@ -90,6 +111,20 @@ type
 implementation
 
 uses strutils;
+
+{ EEnvironmentExists }
+
+constructor EEnvironmentExists.Create(const EnvName: string);
+begin
+  inherited CreateFmt('"%s" already exists.', [EnvName]);
+end;
+
+{ EEnvironmentNotFound }
+
+constructor EEnvironmentNotFound.Create(const EnvName: string);
+begin
+  inherited CreateFmt('"%s" not found.', [EnvName]);
+end;
 
 { TVariable }
 
@@ -128,7 +163,7 @@ function TEnvManager.GetEnv(EnvName: string): TEnvironment;
 begin
   Result := FindEnv(EnvName);
   if not Assigned(Result) then
-    raise Exception.CreateFmt('Environment "%s" not found.', [EnvName]);
+    raise EEnvironmentNotFound.Create(EnvName);
 end;
 
 function TEnvManager.GetEnvIndex(Index: integer): TEnvironment;
@@ -178,7 +213,7 @@ end;
 procedure TEnvManager.Add(const Env: TEnvironment);
 begin
   if FindEnv(Env.Name) <> nil then
-    raise Exception.CreateFmt('Environment "%s" is already exist.', [Env.Name]);
+    raise EEnvironmentExists.Create(Env.Name);
   FEnvList.Add(Env);
 end;
 
@@ -195,19 +230,16 @@ begin
       break;
     end;
   if E = nil then
-    { TODO : Create EEnvNotFound exception. }
-    raise Exception.CreateFmt('Environment "%s" not found.', [EnvName]);
+    raise EEnvironmentNotFound.Create(EnvName);
   FEnvList.Delete(i);
 end;
 
 procedure TEnvManager.Rename(const Env: TEnvironment; const NewName: string);
 begin
   if FindEnv(NewName) <> nil then
-    { TODO : Create EEnvExists exception. }
-    raise Exception.CreateFmt('Cannot rename: "%s" already exists.', [NewName]);
+    raise EEnvironmentExists.Create(NewName);
   if FindEnv(Env.Name) = nil then
-    { TODO : Create EEnvNotFound exception. }
-    raise Exception.CreateFmt('"%s" not found.', [Env.Name]);
+    raise EEnvironmentNotFound.Create(Env.Name);
   Env.Name := NewName;
 end;
 
