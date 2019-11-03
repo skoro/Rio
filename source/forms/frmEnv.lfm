@@ -112,6 +112,7 @@ object EnvForm: TEnvForm
       EdgeBorders = []
       ShowCaptions = True
       TabOrder = 0
+      Grid = gridVars
       ShowNavButtons = True
     end
     object gridVars: TStringGrid
@@ -125,10 +126,14 @@ object EnvForm: TEnvForm
       ColumnClickSorts = True
       Columns = <      
         item
+          Title.Font.Style = [fsBold]
           Title.Caption = 'Name'
+          Width = 120
         end      
         item
+          Title.Font.Style = [fsBold]
           Title.Caption = 'Value'
+          Width = 200
         end>
       FixedCols = 0
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goDblClickAutoSize, goSmoothScroll]

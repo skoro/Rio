@@ -265,10 +265,11 @@ begin
   if FEnvManager.Count = 0 then
   begin
     EnableSwitch := False;
-    tbEnv.Caption := 'No enviroments!';
+    tbEnv.Caption := 'No environments!';
     if FOpState = opEdit then
       HidePanelEnv;
     FCurrentEnv := nil;
+    gridVars.RowCount := 1;
   end
   else begin
     EnableSwitch := True;
