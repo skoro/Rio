@@ -75,6 +75,7 @@ uses SysUtils, Controls, Graphics, AppHelpers;
 procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   tbEnv.Font.Style := [fsBold];
+  navVars.NavButtons := [nbNew, nbDelete, nbClear];
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);

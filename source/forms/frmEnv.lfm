@@ -81,15 +81,15 @@ object EnvForm: TEnvForm
   end
   object panVars: TPanel
     Left = 4
-    Height = 210
-    Top = 121
+    Height = 208
+    Top = 123
     Width = 452
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Top = 4
     BorderSpacing.Right = 4
     BevelOuter = bvNone
-    ClientHeight = 210
+    ClientHeight = 208
     ClientWidth = 452
     TabOrder = 2
     object dbVars: TDividerBevel
@@ -117,7 +117,7 @@ object EnvForm: TEnvForm
     end
     object gridVars: TStringGrid
       Left = 0
-      Height = 171
+      Height = 169
       Top = 39
       Width = 452
       Align = alClient
@@ -143,7 +143,7 @@ object EnvForm: TEnvForm
   end
   object panEnv: TPanel
     Left = 4
-    Height = 79
+    Height = 81
     Top = 30
     Width = 452
     Align = alTop
@@ -153,7 +153,7 @@ object EnvForm: TEnvForm
     BorderSpacing.Right = 4
     BorderSpacing.Bottom = 12
     BevelOuter = bvNone
-    ClientHeight = 79
+    ClientHeight = 81
     ClientWidth = 452
     TabOrder = 3
     object dbEnv: TDividerBevel
@@ -203,19 +203,19 @@ object EnvForm: TEnvForm
     end
     object panOpts: TPanel
       Left = 0
-      Height = 27
+      Height = 29
       Top = 52
       Width = 452
       Align = alTop
       AutoSize = True
       BorderSpacing.Top = 4
       BevelOuter = bvNone
-      ClientHeight = 27
+      ClientHeight = 29
       ClientWidth = 452
       TabOrder = 1
       object cbParent: TComboBox
         Left = 46
-        Height = 27
+        Height = 29
         Top = 0
         Width = 319
         Align = alClient
@@ -226,7 +226,7 @@ object EnvForm: TEnvForm
       end
       object btnSave: TButton
         Left = 377
-        Height = 27
+        Height = 29
         Top = 0
         Width = 75
         Align = alRight
@@ -236,7 +236,7 @@ object EnvForm: TEnvForm
       end
       object labParent: TLabel
         Left = 0
-        Height = 27
+        Height = 29
         Top = 0
         Width = 40
         Align = alLeft
