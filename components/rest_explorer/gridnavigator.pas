@@ -10,6 +10,13 @@ uses
 
 type
 
+  TNavButton = (nbNew, nbEdit, nbDelete, nbClear);
+  TNavButtons = set of TNavButton;
+
+const
+  DefNavButtons = [nbNew, nbEdit, nbDelete, nbClear];
+
+type
   TGridChangeRowEvent = procedure (Sender: TObject; Grid: TStringGrid;
     const aRow: Integer) of object;
 
@@ -29,13 +36,15 @@ type
     FOnDeleteRow: TGridDeleteRowEvent;
     FOnClearRows: TGridDeleteRowEvent;
     FShowNavButtons: Boolean;
+    FNavButtons: TNavButtons;
     procedure OnButtonNewClick(Sender: TObject);
     procedure OnButtonEditClick(Sender: TObject);
     procedure OnButtonDeleteClick(Sender: TObject);
     procedure OnButtonClearClick(Sender: TObject);
+    procedure SetNavButtons(AValue: TNavButtons);
     procedure SetShowNavButtons(AValue: Boolean);
   protected
-
+    function IsColCheckbox(aCol: integer = 1): Boolean;
   public
     constructor Create(TheOwner: TComponent); override;
     procedure SetButtonsOrder;
@@ -50,6 +59,7 @@ type
     property OnDeleteRow: TGridDeleteRowEvent read FOnDeleteRow write FOnDeleteRow;
     property OnGridClear: TGridDeleteRowEvent read FOnClearRows write FOnClearRows;
     property ShowNavButtons: Boolean read FShowNavButtons write SetShowNavButtons;
+    property NavButtons: TNavButtons read FNavButtons write SetNavButtons default DefNavButtons;
   end;
 
 procedure Register;
@@ -87,13 +97,19 @@ procedure TGridNavigator.OnButtonDeleteClick(Sender: TObject);
 var
   Answer: TModalResult;
   ColName: string;
+  StartCol: integer;
 begin
   if Assigned(FGrid) then begin
     if (FGrid.FixedRows > 0) and (FGrid.RowCount = 1) then
       Exit; // =>
-    ColName := FGrid.Cells[1, FGrid.Row]; // "Name" column.
-    if ColName = '' then // Column is empty, try the next column.
-      ColName := FGrid.Cells[2, FGrid.Row];
+    // Detect which column is a checkbox column.
+    if IsColCheckbox(0) then
+      StartCol := 1
+    else
+      StartCol := 0;
+    ColName := FGrid.Cells[StartCol, FGrid.Row]; // "Name" column.
+    if (ColName = '') and (FGrid.ColCount > 2) then // Column is empty, try the next column.
+      ColName := FGrid.Cells[StartCol + 1, FGrid.Row];
     if ColName <> '' then begin
       Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ColName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
       if Answer = mrCancel then
@@ -122,6 +138,17 @@ begin
   end;
 end;
 
+procedure TGridNavigator.SetNavButtons(AValue: TNavButtons);
+begin
+  if FNavButtons = AValue then
+    Exit; // =>
+  FNavButtons := AValue;
+  FBtnNew.Visible := (nbNew in FNavButtons);
+  FBtnEdit.Visible := (nbEdit in FNavButtons);
+  FBtnDelete.Visible := (nbDelete in FNavButtons);
+  FBtnClear.Visible := (nbClear in FNavButtons);
+end;
+
 procedure TGridNavigator.SetShowNavButtons(AValue: Boolean);
 begin
   if FShowNavButtons = AValue then Exit;
@@ -130,6 +157,11 @@ begin
   FBtnEdit.Visible := AValue;
   FBtnDelete.Visible := AValue;
   FBtnClear.Visible := AValue;
+end;
+
+function TGridNavigator.IsColCheckbox(aCol: integer): Boolean;
+begin
+  Result := (FGrid.Columns[aCol].ButtonStyle = cbsCheckboxColumn);
 end;
 
 constructor TGridNavigator.Create(TheOwner: TComponent);
