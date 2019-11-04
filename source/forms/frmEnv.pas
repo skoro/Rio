@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env;
+  GridNavigator, Env, Classes;
 
 type
 
@@ -38,6 +38,7 @@ type
     procedure editNameChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure gridVarsEditingDone(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
@@ -56,6 +57,7 @@ type
     procedure SetParentsForEnv(const Env: TEnvironment);
     procedure PrepareEditEnv;
     procedure DisableIfEnvEmpty;
+    procedure FillEnvVars;
   public
     procedure ShowPanelEnv;
     procedure HidePanelEnv;
@@ -82,6 +84,27 @@ procedure TEnvForm.FormShow(Sender: TObject);
 begin
   HidePanelEnv;
   DisableIfEnvEmpty;
+end;
+
+procedure TEnvForm.gridVarsEditingDone(Sender: TObject);
+var
+  V: TVariable;
+  R: integer;
+  VarName, VarVal: string;
+begin
+  if not Assigned(FCurrentEnv) then
+    Exit; // =>
+  R := gridVars.Row;
+  VarName := gridVars.Cells[0, R];
+  if VarName = '' then
+    Exit; // =>
+  VarVal := gridVars.Cells[1, R];
+  try
+    FCurrentEnv.Variable[VarName].Value := VarVal;
+  except
+    on E: EVariableNotFound do
+      FCurrentEnv.Add(TVariable.Create(VarName, VarVal));
+  end;
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
@@ -202,6 +225,7 @@ end;
 procedure TEnvForm.SetCurrentEnv(AValue: TEnvironment);
 var
   MI: TMenuItem;
+  i: integer;
 begin
   if FCurrentEnv = AValue then
     Exit; // =>
@@ -220,6 +244,7 @@ begin
   tbDelete.Enabled := True;
   if FOpState = opEdit then
     PrepareEditEnv;
+  FillEnvVars;
 end;
 
 procedure TEnvForm.SetEnvManager(AValue: TEnvManager);
@@ -279,6 +304,24 @@ begin
   tbEdit.Enabled := EnableSwitch;
   tbDelete.Enabled := EnableSwitch;
   tbEnv.Enabled := EnableSwitch;
+end;
+
+procedure TEnvForm.FillEnvVars;
+var
+  VL: TVarList;
+  R: integer;
+begin
+  gridVars.RowCount := FCurrentEnv.Count + 1;
+  VL := FCurrentEnv.Vars;
+  try
+    for R := 0 to VL.Count - 1 do
+    begin
+      gridVars.Cells[0, R + 1] := VL[R].Name;
+      gridVars.Cells[1, R + 1] := VL[R].Value;
+    end;
+  finally
+    FreeAndNil(VL);
+  end;
 end;
 
 procedure TEnvForm.ShowPanelEnv;
