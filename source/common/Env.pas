@@ -23,12 +23,13 @@ type
     property Value: string read FValue write FValue;
   end;
 
+  { TVarList }
+
+  TVarList = specialize TFPGObjectList<TVariable>;
+
   { TEnvironment }
 
   TEnvironment = class
-  private
-    type
-    TVarList = specialize TFPGObjectList<TVariable>;
   private
     FParent: TEnvironment;
     FName: string;
@@ -37,8 +38,11 @@ type
     procedure SetName(const AValue: string);
     procedure SetParent(const AValue: TEnvironment);
     function GetVariable(VarName: string): TVariable;
-    function GetVarNames: TStringArray;
     function FindVar(const VarName: string): TVariable;
+    function GetVars: TVarList;
+    function GetOwnVars: TVarList;
+    function GetVarIndex(Index: integer): TVariable;
+    function GetVarsCount: integer;
   public
     constructor Create(const AName: string; const AParent: TEnvironment); virtual;
     destructor Destroy; override;
@@ -47,8 +51,11 @@ type
     function Apply(const Txt: string): string;
     property Parent: TEnvironment read FParent write SetParent;
     property Name: string read FName write SetName;
-    property VarNames: TStringArray read GetVarNames;
     property Variable[VarName: string]: TVariable read GetVariable; default;
+    property VarIndex[Index: integer]: TVariable read GetVarIndex;
+    property Vars: TVarList read GetVars;
+    property OwnVars: TVarList read GetOwnVars;
+    property Count: integer read GetVarsCount;
   end;
 
   { EVariableBase }
@@ -287,6 +294,43 @@ end;
 
 { TEnvironment }
 
+function TEnvironment.GetVars: TVarList;
+var
+  V: TVariable;
+  EnvParent: TEnvironment;
+begin
+  Result := GetOwnVars;
+  EnvParent := FParent;
+  while Assigned(EnvParent) do
+  begin
+    for V in EnvParent.Vars do
+      if FindVar(V.Name) = nil then
+        Result.Add(V);
+    EnvParent := EnvParent.Parent;
+  end;
+end;
+
+function TEnvironment.GetOwnVars: TVarList;
+var
+  V: TVariable;
+begin
+  Result := TVarList.Create(False); // Don't let free objects outside.
+  for V in FVarList do
+    Result.Add(V);
+end;
+
+function TEnvironment.GetVarIndex(Index: integer): TVariable;
+begin
+  Result := FVarList[Index];
+end;
+
+function TEnvironment.GetVarsCount: integer;
+begin
+  Result := FVarList.Count;
+  if Assigned(FParent) then
+    Result := Result + FParent.Count;
+end;
+
 procedure TEnvironment.SetName(const AValue: string);
 begin
   if FName = AValue then
@@ -374,15 +418,6 @@ begin
     V := GetVariable(VarName);
     Result := LeftStr(Txt, start - 2) + V.Value + RightStr(Txt, Length(Txt) - stop);
   until True;
-end;
-
-function TEnvironment.GetVarNames: TStringArray;
-var
-  i: integer;
-begin
-  SetLength(Result, FVarList.Count);
-  for i := 0 to FVarList.Count - 1 do
-    Result[i] := FVarList[i].Name;
 end;
 
 function TEnvironment.FindVar(const VarName: string): TVariable;
