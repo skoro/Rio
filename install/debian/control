@@ -1,7 +1,7 @@
 Package: rio
 Version: @version@
 Depends: @depends@
-Maintainer: Skorobogatko Alexei <skorobogatko.alexei@gmail.com>
+Maintainer: Skorobogatko Alexei <skorobogatko.oleksii@gmail.com>
 Description: Simple REST Api client.
 Section: net
 Priority: optional
