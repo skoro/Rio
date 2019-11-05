@@ -102,7 +102,7 @@ begin
     FCurrentEnv.Variable[VarName].Value := VarVal;
   except
     on E: EVariableNotFound do
-      FCurrentEnv.Add(TVariable.Create(VarName, VarVal));
+      FCurrentEnv.Add(VarName, VarVal);
   end;
 end;
 

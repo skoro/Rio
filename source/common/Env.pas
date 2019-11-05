@@ -47,7 +47,8 @@ type
     constructor Create(const AName: string; const AParent: TEnvironment); virtual;
     destructor Destroy; override;
     procedure DeleteVar(const VarName: string);
-    procedure Add(const Variable: TVariable);
+    function Add(const Variable: TVariable): TVariable;
+    function Add(const VarName, VarVal: string): TVariable; overload;
     function Apply(const Txt: string): string;
     property Parent: TEnvironment read FParent write SetParent;
     property Name: string read FName write SetName;
@@ -389,11 +390,17 @@ begin
   FVarList.Delete(i);
 end;
 
-procedure TEnvironment.Add(const Variable: TVariable);
+function TEnvironment.Add(const Variable: TVariable): TVariable;
 begin
   if FindVar(Variable.Name) <> nil then
     raise Exception.CreateFmt('Variable "%s" is already exist.', [Variable.Name]);
   FVarList.Add(Variable);
+  Result := Variable;
+end;
+
+function TEnvironment.Add(const VarName, VarVal: string): TVariable;
+begin
+  Result := Add(TVariable.Create(VarName, VarVal));
 end;
 
 function TEnvironment.Apply(const Txt: string): string;
