@@ -88,7 +88,6 @@ end;
 
 procedure TEnvForm.gridVarsEditingDone(Sender: TObject);
 var
-  V: TVariable;
   R: integer;
   VarName, VarVal: string;
 begin
@@ -225,7 +224,6 @@ end;
 procedure TEnvForm.SetCurrentEnv(AValue: TEnvironment);
 var
   MI: TMenuItem;
-  i: integer;
 begin
   if FCurrentEnv = AValue then
     Exit; // =>
