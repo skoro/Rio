@@ -47,6 +47,7 @@ type
     constructor Create(const AName: string; const AParent: TEnvironment); virtual;
     destructor Destroy; override;
     procedure DeleteVar(const VarName: string);
+    procedure DeleteAllVars;
     function Add(const Variable: TVariable): TVariable;
     function Add(const VarName, VarVal: string): TVariable; overload;
     function Apply(const Txt: string): string;
@@ -364,7 +365,7 @@ constructor TEnvironment.Create(const AName: string; const AParent: TEnvironment
 begin
   Name := AName;
   FParent := AParent;
-  FVarList := TVarList.Create;
+  FVarList := TVarList.Create(True);
 end;
 
 destructor TEnvironment.Destroy;
@@ -388,6 +389,11 @@ begin
   if V = nil then
     raise EVariableNotFound.Create(VarName);
   FVarList.Delete(i);
+end;
+
+procedure TEnvironment.DeleteAllVars;
+begin
+  FVarList.Clear;
 end;
 
 function TEnvironment.Add(const Variable: TVariable): TVariable;

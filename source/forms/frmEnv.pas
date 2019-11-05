@@ -39,6 +39,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
+    procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid);
+    procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
@@ -104,6 +106,24 @@ begin
     on E: EVariableNotFound do
       FCurrentEnv.Add(VarName, VarVal);
   end;
+end;
+
+procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid);
+var
+  VarName: string;
+begin
+  if not Assigned(FCurrentEnv) then
+    Exit; // =>
+  VarName := Grid.Cells[0, Grid.Row];
+  if VarName = '' then
+    Exit; // =>
+  FCurrentEnv.DeleteVar(VarName);
+end;
+
+procedure TEnvForm.navVarsGridClear(Sender: TObject; Grid: TStringGrid);
+begin
+  if Assigned(FCurrentEnv) then
+    FCurrentEnv.DeleteAllVars;
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
@@ -309,8 +329,8 @@ var
   VL: TVarList;
   R: integer;
 begin
-  gridVars.RowCount := FCurrentEnv.Count + 1;
   VL := FCurrentEnv.Vars;
+  gridVars.RowCount := VL.Count + 1;
   try
     for R := 0 to VL.Count - 1 do
     begin

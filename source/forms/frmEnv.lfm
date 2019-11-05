@@ -113,6 +113,8 @@ object EnvForm: TEnvForm
       ShowCaptions = True
       TabOrder = 0
       Grid = gridVars
+      OnDeleteRow = navVarsDeleteRow
+      OnGridClear = navVarsGridClear
       ShowNavButtons = True
     end
     object gridVars: TStringGrid
