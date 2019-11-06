@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Classes;
+  GridNavigator, Env, Classes, Controls;
 
 type
 
@@ -36,6 +36,7 @@ type
     tbEnv: TToolButton;
     procedure btnSaveClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
+    procedure editNameKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
@@ -70,7 +71,7 @@ type
 
 implementation
 
-uses SysUtils, Controls, Graphics, AppHelpers;
+uses SysUtils, Graphics, AppHelpers;
 
 {$R *.lfm}
 
@@ -129,6 +130,15 @@ end;
 procedure TEnvForm.editNameChange(Sender: TObject);
 begin
   btnSave.Enabled := not (Length(Trim(editName.Text)) = 0);
+end;
+
+procedure TEnvForm.editNameKeyPress(Sender: TObject; var Key: char);
+begin
+  case Key of
+    #27: HidePanelEnv;
+    #13: if btnSave.Enabled then
+            btnSaveClick(Sender);
+  end;
 end;
 
 procedure TEnvForm.btnSaveClick(Sender: TObject);
@@ -201,6 +211,8 @@ var
   Env: TEnvironment;
   Mi: TMenuItem;
 begin
+  if not Assigned(FCurrentEnv) then
+    Exit; // When invoked via shortcut =>
   Env := FEnvManager.Env[tbEnv.Caption];
   if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + Env.Name + ' ?') = mrCancel then
     Exit; // =>
@@ -217,6 +229,8 @@ end;
 
 procedure TEnvForm.tbEditClick(Sender: TObject);
 begin
+  if not Assigned(FCurrentEnv) then
+    Exit; // When invoked via shortcut =>
   if PanEnv.Visible and (FOpState = opEdit) then
   begin
     HidePanelEnv;

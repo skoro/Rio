@@ -200,6 +200,7 @@ object EnvForm: TEnvForm
         Width = 409
         Align = alClient
         OnChange = editNameChange
+        OnKeyPress = editNameKeyPress
         TabOrder = 0
         Text = 'editName'
       end
