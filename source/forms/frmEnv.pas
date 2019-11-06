@@ -330,6 +330,7 @@ var
   R: integer;
 begin
   VL := FCurrentEnv.Vars;
+  gridVars.Clear;
   gridVars.RowCount := VL.Count + 1;
   try
     for R := 0 to VL.Count - 1 do
