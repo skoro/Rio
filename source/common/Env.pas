@@ -38,7 +38,6 @@ type
     procedure SetName(const AValue: string);
     procedure SetParent(const AValue: TEnvironment);
     function GetVariable(VarName: string): TVariable;
-    function FindVar(const VarName: string): TVariable;
     function GetVars: TVarList;
     function GetOwnVars: TVarList;
     function GetVarIndex(Index: integer): TVariable;
@@ -48,6 +47,7 @@ type
     destructor Destroy; override;
     procedure DeleteVar(const VarName: string);
     procedure DeleteAllVars;
+    function FindVar(const VarName: string): TVariable;
     function Add(const Variable: TVariable): TVariable;
     function Add(const VarName, VarVal: string): TVariable; overload;
     function Apply(const Txt: string): string;
