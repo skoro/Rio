@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Classes, Controls;
+  GridNavigator, Env, Controls;
 
 type
 
@@ -93,6 +93,7 @@ procedure TEnvForm.gridVarsEditingDone(Sender: TObject);
 var
   R: integer;
   VarName, VarVal: string;
+  V: TVariable;
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // =>
@@ -101,12 +102,11 @@ begin
   if VarName = '' then
     Exit; // =>
   VarVal := gridVars.Cells[1, R];
-  try
-    FCurrentEnv.Variable[VarName].Value := VarVal;
-  except
-    on E: EVariableNotFound do
-      FCurrentEnv.Add(VarName, VarVal);
-  end;
+  V := FCurrentEnv.FindVar(VarName);
+  if Assigned(V) then
+     V.Value := VarVal
+  else
+     FCurrentEnv.Add(VarName, VarVal);
 end;
 
 procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid);
@@ -178,6 +178,7 @@ begin
           tbEnv.Caption := FCurrentEnv.Name;
         end;
         FCurrentEnv.Parent := EnvParent;
+        FillEnvVars;
       except
         on E: Exception do
         begin
