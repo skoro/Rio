@@ -224,7 +224,8 @@ begin
   if FExtList = AValue then
     Exit; // =>
   FExtList := AValue;
-  FExtList.AddStrings(EnvNames, True);
+  if Assigned(FExtList) then
+    FExtList.AddStrings(EnvNames, True);
 end;
 
 function TEnvManager.FindExt(const EnvName: string; out Index: integer): Boolean;
@@ -293,6 +294,9 @@ begin
   for x in FEnvList do
     if x.Parent = E then
       x.Parent := nil;
+  // If deleted env is current - detach it.
+  if FCurrent = E then
+    FCurrent := nil;
   // Delete.
   FEnvList.Delete(i);
   // Sync the external list.
