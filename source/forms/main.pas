@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
   ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
-  jsonparser, AppTree;
+  jsonparser, AppTree, Env;
 
 type
 
@@ -23,6 +23,7 @@ type
     cbBasicShowPassword: TCheckBox;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
+    cbEnv: TComboBox;
     dlgFind: TFindDialog;
     editBasicLogin: TLabeledEdit;
     editBasicPassword: TLabeledEdit;
@@ -44,6 +45,7 @@ type
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
+    EnvPanel: TPanel;
     RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
@@ -70,6 +72,7 @@ type
     pagesRespView: TPageControl;
     AppSplitter: TPairSplitter;
     BookmarkSide: TPairSplitterSide;
+    btnEnv: TSpeedButton;
     WorkSide: TPairSplitterSide;
     panelRequest: TPanel;
     panelResponse: TPanel;
@@ -169,6 +172,7 @@ type
     procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
+    procedure cbEnvChange(Sender: TObject);
     procedure cbMethodChange(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -223,6 +227,7 @@ type
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
+    procedure btnEnvClick(Sender: TObject);
     procedure tbtnFormUploadClick(Sender: TObject);
     procedure tbtnJsonLoadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
@@ -246,6 +251,7 @@ type
     FBookManager: TBookmarkManager;
     FKeepResponseTab: string;
     FAppTreeManager: TAppTreeManager;
+    FEnvManager: TEnvManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
@@ -306,7 +312,7 @@ implementation
 
 uses about, headers_editor, cookie_form,
   AppHelpers, strutils, help_form, cmdline, options,
-  import_form, export_form, bookmark_form, State, Clipbrd;
+  import_form, export_form, bookmark_form, frmEnv, State, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -713,6 +719,12 @@ begin
     editBasicPassword.EchoMode := emPassword;
 end;
 
+procedure TMainForm.cbEnvChange(Sender: TObject);
+begin
+  if cbEnv.ItemIndex > -1 then
+    FEnvManager.Current := FEnvManager.Env[cbEnv.Items[cbEnv.ItemIndex]];
+end;
+
 procedure TMainForm.cbMethodChange(Sender: TObject);
 var
   BM: TBookmark;
@@ -815,6 +827,10 @@ begin
   end;
   LoadAppBookmarks(FBookManager);
 
+  // Environment manager initialization.
+  FEnvManager := TEnvManager.Create;
+  FEnvManager.ExtList := cbEnv.Items;
+
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
@@ -831,6 +847,7 @@ begin
   SaveAppBookmarks(FBookManager);
 
   FreeAndNil(FResponseTabManager);
+  FreeAndNil(FEnvManager);
 
   if Assigned(FProfilerGraph) then
     FreeAndNil(FProfilerGraph);
@@ -1502,6 +1519,15 @@ begin
   header := Trim(GetRowKV(requestHeaders, aRow).Key);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
+end;
+
+procedure TMainForm.btnEnvClick(Sender: TObject);
+begin
+  With TEnvForm.Create(Self) do begin
+    EnvManager := FEnvManager;
+    ShowModal(FEnvManager.Current);
+    Close;
+  end;
 end;
 
 procedure TMainForm.tbtnFormUploadClick(Sender: TObject);
