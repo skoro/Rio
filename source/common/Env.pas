@@ -475,19 +475,23 @@ begin
   Result := Txt;
   start := 1;
   repeat
-    start := PosEx('{{', Txt, start);
+    start := PosEx('{{', Result, start);
     if start = 0 then
       Exit; // =>
     Inc(start, 2);
-    stop := PosEx('}}', Txt, start);
+    stop := PosEx('}}', Result, start);
     if stop = 0 then
       Exit; // =>
-    VarName := MidStr(Txt, start, stop - start);
+    VarName := MidStr(Result, start, stop - start);
     if VarName = '' then
       Exit; // =>
-    V := GetVariable(VarName);
-    Result := LeftStr(Txt, start - 2) + V.Value + RightStr(Txt, Length(Txt) - stop);
-  until True;
+    try
+      V := GetVariable(VarName);
+      Result := LeftStr(Result, start - 3) + V.Value + RightStr(Result, Length(Result) - stop - 1);
+    except
+      // Nothing to do. Just skip.
+    end;
+  until False;
 end;
 
 function TEnvironment.FindVar(const VarName: string): TVariable;
