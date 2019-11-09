@@ -49,26 +49,35 @@ object EnvForm: TEnvForm
     TabOrder = 1
     object tbAdd: TToolButton
       Left = 53
+      Hint = 'Add a new environment'
       Top = 0
       AutoSize = True
       Caption = '&Add'
       ImageIndex = 10
       OnClick = tbAddClick
+      ParentShowHint = False
+      ShowHint = True
     end
     object tbEdit: TToolButton
       Left = 101
+      Hint = 'Change the current environment'
       Top = 0
       AutoSize = True
       Caption = '&Edit'
       ImageIndex = 9
       OnClick = tbEditClick
+      ParentShowHint = False
+      ShowHint = True
     end
     object tbDelete: TToolButton
       Left = 148
+      Hint = 'Delete environment'
       Top = 0
       Caption = '&Delete'
       ImageIndex = 8
       OnClick = tbDeleteClick
+      ParentShowHint = False
+      ShowHint = True
     end
     object tbEnv: TToolButton
       Left = 1
