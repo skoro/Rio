@@ -98,11 +98,16 @@ type
   TEnvManager = class
   private
     FEnvList: TEnvList;
+    FCurrent: TEnvironment;
+    FExtList: TStrings;
     function GetCount: Integer;
     function GetEnv(EnvName: string): TEnvironment;
     function GetEnvIndex(Index: integer): TEnvironment;
     function GetEnvNames: TStringArray;
     function GetFirst: TEnvironment;
+    procedure SetCurrent(AValue: TEnvironment);
+    procedure SetExtList(AValue: TStrings);
+    function FindExt(const EnvName: string; out Index: integer): Boolean;
   protected
     function FindEnv(const EnvName: string): TEnvironment;
   public
@@ -117,6 +122,10 @@ type
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
     property Count: Integer read GetCount;
     property First: TEnvironment read GetFirst;
+    // Selected environment (in the owner).
+    property Current: TEnvironment read FCurrent write SetCurrent;
+    // Synchronize the env names with an external string list.
+    property ExtList: TStrings read FExtList write SetExtList;
   end;
 
 implementation
@@ -201,6 +210,37 @@ begin
   Result := FEnvList.First;
 end;
 
+procedure TEnvManager.SetCurrent(AValue: TEnvironment);
+begin
+  if FCurrent = AValue then
+    Exit; // =>
+  if FindEnv(AValue.Name) = NIL then
+    raise EEnvironmentNotFound.Create(AValue.Name);
+  FCurrent := AValue;
+end;
+
+procedure TEnvManager.SetExtList(AValue: TStrings);
+begin
+  if FExtList = AValue then
+    Exit; // =>
+  FExtList := AValue;
+  FExtList.AddStrings(EnvNames, True);
+end;
+
+function TEnvManager.FindExt(const EnvName: string; out Index: integer): Boolean;
+var
+  i: integer;
+begin
+  Result := false;
+  Index := -1;
+  for i := 0 to FExtList.Count - 1 do
+    if AnsiCompareText(FExtList[i], EnvName) = 0 then
+    begin
+      Index := i;
+      Exit(True);
+    end;
+end;
+
 function TEnvManager.FindEnv(const EnvName: string): TEnvironment;
 begin
   for Result in FEnvList do
@@ -213,6 +253,7 @@ constructor TEnvManager.Create;
 begin
   inherited;
   FEnvList := TEnvList.Create(True);
+  FCurrent := nil;
 end;
 
 destructor TEnvManager.Destroy;
@@ -223,9 +264,13 @@ end;
 
 procedure TEnvManager.Add(const Env: TEnvironment);
 begin
+  // Env must belong to our container.
   if FindEnv(Env.Name) <> nil then
     raise EEnvironmentExists.Create(Env.Name);
   FEnvList.Add(Env);
+  // Sync the external list.
+  if Assigned(FExtList) then
+    FExtList.Add(Env.Name);
 end;
 
 procedure TEnvManager.Delete(const EnvName: string);
@@ -250,15 +295,23 @@ begin
       x.Parent := nil;
   // Delete.
   FEnvList.Delete(i);
+  // Sync the external list.
+  if Assigned(FExtList) and FindExt(EnvName, i) then
+    FExtList.Delete(i);
 end;
 
 procedure TEnvManager.Rename(const Env: TEnvironment; const NewName: string);
+var
+  i: integer;
 begin
   if FindEnv(NewName) <> nil then
     raise EEnvironmentExists.Create(NewName);
   if FindEnv(Env.Name) = nil then
     raise EEnvironmentNotFound.Create(Env.Name);
   Env.Name := NewName;
+  // Sync the external list.
+  if Assigned(FExtList) and FindExt(Env.Name, i) then
+    FExtList[i] := NewName;
 end;
 
 function TEnvManager.FindAvailParents(const Env: TEnvironment): TEnvList;
