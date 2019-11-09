@@ -64,7 +64,7 @@ type
   public
     procedure ShowPanelEnv;
     procedure HidePanelEnv;
-    function ShowModal(const EnvName: string): TModalResult;
+    function ShowModal(const Env: TEnvironment): TModalResult; overload;
     property EnvManager: TEnvManager read FEnvManager write SetEnvManager;
     property CurrentEnv: TEnvironment read FCurrentEnv write SetCurrentEnv;
   end;
@@ -81,6 +81,7 @@ procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   tbEnv.Font.Style := [fsBold];
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
+  FCurrentEnv := nil;
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
@@ -209,20 +210,19 @@ end;
 
 procedure TEnvForm.tbDeleteClick(Sender: TObject);
 var
-  Env: TEnvironment;
   Mi: TMenuItem;
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // When invoked via shortcut =>
-  Env := FEnvManager.Env[tbEnv.Caption];
-  if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + Env.Name + ' ?') = mrCancel then
+  if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + FCurrentEnv.Name + ' ?') = mrCancel then
     Exit; // =>
 
-  MI := menuEnv.Items.Find(Env.Name);
+  MI := menuEnv.Items.Find(FCurrentEnv.Name);
   if Assigned(MI) then
     menuEnv.Items.Remove(MI);
 
-  FEnvManager.Delete(Env.Name);
+  FEnvManager.Delete(FCurrentEnv.Name);
+  FCurrentEnv := nil;
   if FOpState = opAdd then
     SetParentsForEnv(nil);
   DisableIfEnvEmpty;
@@ -332,7 +332,8 @@ begin
   end
   else begin
     EnableSwitch := True;
-    CurrentEnv := FEnvManager.First;
+    if not Assigned(FCurrentEnv) then
+      CurrentEnv := FEnvManager.First;
   end;
   tbEdit.Enabled := EnableSwitch;
   tbDelete.Enabled := EnableSwitch;
@@ -370,8 +371,10 @@ begin
   FOpState := opNone;
 end;
 
-function TEnvForm.ShowModal(const EnvName: string): TModalResult;
+function TEnvForm.ShowModal(const Env: TEnvironment): TModalResult;
 begin
+  if Assigned(Env) then
+    CurrentEnv := Env;
   Result := inherited ShowModal;
 end;
 
