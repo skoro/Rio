@@ -347,13 +347,10 @@ var
 begin
   VL := FCurrentEnv.Vars;
   gridVars.Clear;
-  gridVars.RowCount := VL.Count + 1;
+  gridVars.RowCount := 1;
   try
     for R := 0 to VL.Count - 1 do
-    begin
-      gridVars.Cells[0, R + 1] := VL[R].Name;
-      gridVars.Cells[1, R + 1] := VL[R].Value;
-    end;
+      gridVars.InsertRowWithValues(R + 1, [VL[R].Name, VL[R].Value]);
   finally
     FreeAndNil(VL);
   end;
