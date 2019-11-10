@@ -81,7 +81,6 @@ procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   tbEnv.Font.Style := [fsBold];
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
-  FCurrentEnv := nil;
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
