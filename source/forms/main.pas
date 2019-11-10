@@ -212,7 +212,7 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure OnGridClear(Sender: TObject; Grid: TStringGrid);
-    procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+    procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure OnGridEditRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
@@ -366,13 +366,11 @@ var
   FileNames, FormValues: TStringList;
 begin
   Result := False;
-  try
-    url := NormalizeUrl(cbUrl.Text);
-  except on E: Exception do
-    begin
-      cbUrl.SetFocus;
-      Exit; //=>
-    end;
+  url := Trim(cbUrl.Text);
+  if Length(url) = 0 then
+  begin
+    cbUrl.SetFocus;
+    Exit; // =>
   end;
 
   Screen.Cursor:=crHourGlass;
@@ -1310,7 +1308,7 @@ begin
   Grid.SetFocus;
 end;
 
-procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
@@ -2076,6 +2074,7 @@ begin
   SetRequestObject(Selected.Request);
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
+  SetAppCaption(Selected.Name);
 end;
 
 procedure TMainForm.OnDeleteBookmark(Sender: TObject; BM: TBookmark);
@@ -2278,13 +2277,16 @@ end;
 
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 var
-  i, p: integer;
+  i: integer;
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
   TimerRequest.Enabled := False;
-  SetAppCaption(UrlPath(Info.Url));
+
+  // Update the app window caption.
+  if not Assigned(FBookManager.CurrentBookmark) then
+    SetAppCaption(UrlPath(cbUrl.Text));
 
   // Response headers.
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
@@ -2301,17 +2303,7 @@ begin
   UpdateStatusLine(Info);
 
   if (Info.StatusCode <> 404) then
-  begin
-    p := cbUrl.Items.IndexOf(Info.Url);
-    if p = -1 then begin // Add a new url.
-      if cbUrl.Items.Count >= MAX_URLS then
-        cbUrl.Items.Delete(cbUrl.Items.Count - 1);
-      cbUrl.Items.Insert(0, Info.Url);
-    end
-    else // Move an existing url to the top of the list.
-      cbUrl.Items.Move(p, 0);
-    cbUrl.Text := Info.Url;
-  end;
+    cbUrl.AddHistoryItem(cbUrl.Text, MAX_URLS, True, True);
 
   // Fill response cookie grid or hide it.
   ShowResponseCookie(Info.ResponseHeaders);
