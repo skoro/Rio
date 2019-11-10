@@ -5,7 +5,7 @@ unit ThreadHttpClient;
 interface
 
 uses
-  Classes, SysUtils, httpclient, fgl, UrlUtils;
+  Classes, SysUtils, httpclient, fgl, UrlUtils, Env;
 
 type
 
@@ -130,6 +130,7 @@ type
     FOnClientException: TOnException;
     FException: Exception;
     FCookies: TStrings;
+    FEnv: TEnvironment;
     function GetRequestBody: TStream;
     procedure SetHttpMethod(AValue: string);
     procedure SetRequestBody(AValue: TStream);
@@ -139,7 +140,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(CreateSuspened: boolean);
+    constructor Create(CreateSuspened: boolean; const AEnv: TEnvironment); overload;
     destructor Destroy; override;
     procedure AddHeader(const AHeader, AValue: string);
     procedure AddCookie(const AName, AValue: string; EncodeValue: boolean = True);
@@ -630,6 +631,7 @@ procedure TThreadHttpClient.SetUrl(AValue: string);
 begin
   if FUrl = AValue then
     Exit; // =>
+  AValue := FEnv.Apply(AValue);
   // TODO: need better protocol parser.
   if Pos('http', AValue) = 0 then
     AValue := 'http://' + AValue;
@@ -684,7 +686,7 @@ begin
   end;
 end;
 
-constructor TThreadHttpClient.Create(CreateSuspened: boolean);
+constructor TThreadHttpClient.Create(CreateSuspened: boolean; const AEnv: TEnvironment);
 begin
   inherited Create(CreateSuspened);
   FreeOnTerminate := True;
@@ -693,6 +695,9 @@ begin
   FOnClientException := nil;
   FOnRequestComplete := nil;
   FCookies := nil;
+  FEnv := AEnv;
+  if not Assigned(FEnv) then
+    FEnv := TEnvironment.Create('', nil); // Fake env.
 end;
 
 destructor TThreadHttpClient.Destroy;
