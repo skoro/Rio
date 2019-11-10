@@ -312,10 +312,11 @@ begin
     raise EEnvironmentExists.Create(NewName);
   if FindEnv(Env.Name) = nil then
     raise EEnvironmentNotFound.Create(Env.Name);
-  Env.Name := NewName;
   // Sync the external list.
   if Assigned(FExtList) and FindExt(Env.Name, i) then
     FExtList[i] := NewName;
+  // Rename.
+  Env.Name := NewName;
 end;
 
 function TEnvManager.FindAvailParents(const Env: TEnvironment): TEnvList;
