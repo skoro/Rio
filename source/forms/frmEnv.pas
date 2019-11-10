@@ -40,7 +40,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
-    procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid);
+    procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
@@ -109,22 +109,23 @@ begin
      FCurrentEnv.Add(VarName, VarVal);
 end;
 
-procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid);
-var
-  VarName: string;
+procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // =>
-  VarName := Grid.Cells[0, Grid.Row];
-  if VarName = '' then
-    Exit; // =>
-  FCurrentEnv.DeleteVar(VarName);
+  FCurrentEnv.DeleteVar(ColName);
+  // Force to update parent variables.
+  FillEnvVars;
 end;
 
 procedure TEnvForm.navVarsGridClear(Sender: TObject; Grid: TStringGrid);
 begin
   if Assigned(FCurrentEnv) then
+  begin
     FCurrentEnv.DeleteAllVars;
+    // Force to update parent variables.
+    FillEnvVars;
+  end;
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);
