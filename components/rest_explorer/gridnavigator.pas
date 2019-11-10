@@ -20,7 +20,7 @@ type
   TGridChangeRowEvent = procedure (Sender: TObject; Grid: TStringGrid;
     const aRow: Integer) of object;
 
-  TGridDeleteRowEvent = procedure (Sender: TObject; Grid: TStringGrid) of object;
+  TGridDeleteRowEvent = procedure (Sender: TObject; Grid: TStringGrid; const ColName: string) of object;
 
   { TGridNavigator }
 
@@ -117,7 +117,7 @@ begin
     end;
     FGrid.DeleteRow(FGrid.Row);
     if Assigned(FOnDeleteRow) then
-      FOnDeleteRow(Self, FGrid);
+      FOnDeleteRow(Self, FGrid, ColName);
   end;
 end;
 
@@ -134,7 +134,8 @@ begin
       FGrid.RowCount := FGrid.FixedRows
     else
       FGrid.RowCount := 0;
-    if Assigned(FOnClearRows) then FOnClearRows(Self, FGrid);
+    if Assigned(FOnClearRows) then
+      FOnClearRows(Self, FGrid, '');
   end;
 end;
 
