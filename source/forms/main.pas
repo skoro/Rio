@@ -380,7 +380,7 @@ begin
   formData := '';
   contentType := '';
 
-  FHttpClient := TThreadHttpClient.Create(true);
+  FHttpClient := TThreadHttpClient.Create(true, FEnvManager.Current);
   FHttpClient.OnRequestComplete := @OnRequestComplete;
   FHttpClient.OnException := @OnHttpException;
   FHttpClient.Client.IOTimeout := OptionsForm.Timeout * TimerRequest.Interval;
@@ -829,7 +829,6 @@ begin
 
   // Environment manager initialization.
   FEnvManager := TEnvManager.Create;
-  FEnvManager.ExtList := cbEnv.Items;
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
@@ -903,6 +902,9 @@ begin
       pagesRequest.ActivePageIndex := I;
       break;
     end;
+  // Sync combobox items with EnvManager.
+  // Warning! It must be here, it won't work if it in FormCreate (why?).
+  FEnvManager.ExtList := cbEnv.Items;
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
