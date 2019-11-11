@@ -1531,8 +1531,11 @@ begin
   With TEnvForm.Create(Self) do begin
     EnvManager := FEnvManager;
     ShowModal(FEnvManager.Current);
-    Close;
+    Free;
   end;
+  // Auto select the first env when no env is selected.
+  if (cbEnv.ItemIndex = -1) and (FEnvManager.Count > 0) then
+    cbEnv.ItemIndex := 0;
 end;
 
 procedure TMainForm.tbtnFormUploadClick(Sender: TObject);
