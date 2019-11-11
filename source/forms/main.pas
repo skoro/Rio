@@ -1399,7 +1399,10 @@ end;
 procedure TMainForm.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
-  SetAppCaption(UrlPath(cbUrl.Text));
+  if Assigned(FBookManager.CurrentBookmark) then
+    SetAppCaption(FBookManager.CurrentBookmark.Name)
+  else
+    SetAppCaption(cbUrl.Text);
   SyncURLQueryParams;
   FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
   EnableSubmitButton;
@@ -2286,7 +2289,7 @@ begin
 
   // Update the app window caption.
   if not Assigned(FBookManager.CurrentBookmark) then
-    SetAppCaption(UrlPath(cbUrl.Text));
+    SetAppCaption(UrlPath(Info.Url));
 
   // Response headers.
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
