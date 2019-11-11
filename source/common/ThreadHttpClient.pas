@@ -287,8 +287,10 @@ var
 begin
   if Url = '' then Exit('');
   uri := ParseURI(Url);
-  Result := Format('%s://%s%s%s%s', [
-    uri.Protocol,
+  Result := '';
+  if uri.Protocol <> '' then
+    Result := uri.Protocol + '://';
+  Result := Format('%s%s%s%s', [
     uri.Host,
     IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
     uri.Path,
