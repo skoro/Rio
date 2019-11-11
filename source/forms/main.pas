@@ -615,8 +615,10 @@ function TMainForm.CreateRequestObject: TRequestObject;
 begin
   Result := TRequestObject.Create;
   with Result do begin
+    Url    := Trim(cbUrl.Text);
+    if Length(Url) = 0 then
+      raise Exception.Create('Url cannot be empty.');
     Method := cbMethod.Text;
-    Url    := NormalizeUrl(cbUrl.Text);
     Body   := editOther.Text;
     Json   := editJson.Text;
     SetCollectionFromGrid(requestHeaders, Headers);
@@ -1402,7 +1404,7 @@ begin
   if Assigned(FBookManager.CurrentBookmark) then
     SetAppCaption(FBookManager.CurrentBookmark.Name)
   else
-    SetAppCaption(cbUrl.Text);
+    SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
   FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
   EnableSubmitButton;
@@ -2042,16 +2044,26 @@ begin
       SelectedSourceNode := FAppTreeManager.BookmarkSelected;
       ConfirmDelete := @FAppTreeManager.BookmarkPopup.ConfirmDeleteBookmark;
       case ShowModal(BM, RO) of
-        mrAdded:   BookmarkButtonIcon(True);
+        mrAdded:   begin
+          BookmarkButtonIcon(True);
+          SetAppCaption(FBookManager.CurrentBookmark.Name);
+        end;
         mrDeleted: begin
           if FBookManager.CurrentBookmark = NIL then
+          begin
             BookmarkButtonIcon(False);
+            SetAppCaption(UrlPath(RO.Url));
+          end;
           FreeAndNil(RO);
         end;
         mrOk: begin
           // Update url for the current bookmark.
-          if (FBookManager.CurrentBookmark = BM) and (RO.Url <> Bookmark.Request.Url) then
-            cbUrl.Text := Bookmark.Request.Url;
+          if FBookManager.CurrentBookmark = BM then
+          begin
+            SetAppCaption(BM.Name);
+            if RO.Url <> Bookmark.Request.Url then
+              cbUrl.Text := Bookmark.Request.Url;
+          end;
           FreeAndNil(RO);
           SyncGridQueryParams;
         end;
@@ -2086,7 +2098,10 @@ var
 begin
   Curr := FBookManager.CurrentBookmark;
   if (Curr = BM) or (Curr = NIL) then
+  begin
     BookmarkButtonIcon(False);
+    SetAppCaption(UrlPath(BM.Request.Url));
+  end;
 end;
 
 procedure TMainForm.ApplyOptions;
