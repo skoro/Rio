@@ -255,7 +255,7 @@ type
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
-    function EncodeFormData: string;
+    function EncodeFormData(const Env: TEnvironment): string;
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
@@ -364,9 +364,13 @@ var
   i: integer;
   KV: TKeyValue;
   FileNames, FormValues: TStringList;
+  Env: TEnvironment;
 begin
   Result := False;
-  url := Trim(cbUrl.Text);
+  Env := FEnvManager.Current;
+  if not Assigned(Env) then
+    Env := TEnvironment.Create('', nil);
+  url := Trim(Env.Apply(cbUrl.Text));
   if Length(url) = 0 then
   begin
     cbUrl.SetFocus;
@@ -378,7 +382,7 @@ begin
   formData := '';
   contentType := '';
 
-  FHttpClient := TThreadHttpClient.Create(true, FEnvManager.Current);
+  FHttpClient := TThreadHttpClient.Create(true);
   FHttpClient.OnRequestComplete := @OnRequestComplete;
   FHttpClient.OnException := @OnHttpException;
   FHttpClient.Client.IOTimeout := OptionsForm.Timeout * TimerRequest.Interval;
@@ -389,7 +393,7 @@ begin
   // Post the form data.
   if (method = 'POST') and (GetSelectedBodyTab = btForm) then begin
     if gridForm.Cols[3].IndexOf('File') = -1 then begin
-      formData := EncodeFormData;
+      formData := EncodeFormData(Env);
       contentType := 'application/x-www-form-urlencoded';
     end
     else begin
@@ -401,9 +405,9 @@ begin
           if IsRowEnabled(gridForm, I) then begin
             KV := GetRowKV(gridForm, I);
             if gridForm.Cells[3, I] = 'File' then
-              FileNames.Values[KV.Key] := KV.Value
+              FileNames.Values[KV.Key] := Env.Apply(KV.Value)
             else
-              FormValues.Values[KV.Key] := KV.Value;
+              FormValues.Values[KV.Key] := Env.Apply(KV.Value);
           end;
         end;
         try
@@ -437,10 +441,10 @@ begin
   if (method <> 'GET') and (GetSelectedBodyTab <> btForm) then begin
     case GetSelectedBodyTab of
       btJson : begin
-        formData := editJson.Text;
+        formData := Env.Apply(editJson.Text);
         contentType := 'application/json';
       end;
-      btOther: formData:=editOther.Text;
+      btOther: formData := Env.Apply(editOther.Text);
     end;
   end;
 
@@ -454,6 +458,8 @@ begin
   for i:=1 to requestHeaders.RowCount-1 do
   begin
     KV := GetRowKV(requestHeaders, i);
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
     if (LowerCase(KV.Key) = 'content-type') and (contentType <> '') then begin
       if LowerCase(KV.Value) <> contentType then begin
         requestHeaders.Cells[2, i] := contentType;
@@ -477,7 +483,10 @@ begin
   begin
     if not IsRowEnabled(gridReqCookie, I) then continue;
     kv := GetRowKV(gridReqCookie, I);
-    if kv.key = '' then continue;
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
+    if kv.key = '' then
+      continue;
     FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
@@ -488,13 +497,13 @@ begin
            and (Length(editBearerToken.Text) > 0)
       then
         FHttpClient.AddHeader('Authorization', Format('%s %s', [
-          editBearerPrefix.Text,
-          editBearerToken.Text
+          Env.Apply(editBearerPrefix.Text),
+          Env.Apply(editBearerToken.Text)
         ]));
     end;
     atBasic: begin
-      FHttpClient.Client.UserName := editBasicLogin.Text;
-      FHttpClient.Client.Password := editBasicPassword.Text;
+      FHttpClient.Client.UserName := Env.Apply(editBasicLogin.Text);
+      FHttpClient.Client.Password := Env.Apply(editBasicPassword.Text);
     end;
   end;
 
@@ -1519,7 +1528,10 @@ begin
   end;
   // Auto select the first env when no env is selected.
   if (cbEnv.ItemIndex = -1) and (FEnvManager.Count > 0) then
+  begin
     cbEnv.ItemIndex := 0;
+    FEnvManager.Current := FEnvManager.EnvIndex[0];
+  end;
 end;
 
 procedure TMainForm.tbtnFormUploadClick(Sender: TObject);
@@ -2264,7 +2276,7 @@ begin
   end;
 end;
 
-function TMainForm.EncodeFormData: string;
+function TMainForm.EncodeFormData(const Env: TEnvironment): string;
 var
   i: integer;
   KV: TKeyValue;
@@ -2276,6 +2288,8 @@ begin
     KV := GetRowKV(gridForm, i);
     if KV.Key = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
     Result := Result + EncodeURLElement(KV.Key) + '=' + EncodeURLElement(KV.Value);
   end;
 end;
