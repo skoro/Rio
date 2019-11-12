@@ -7,9 +7,12 @@ object EnvForm: TEnvForm
   Caption = 'Environment'
   ClientHeight = 370
   ClientWidth = 460
+  Constraints.MinHeight = 320
+  Constraints.MinWidth = 360
   OnCreate = FormCreate
   OnShow = FormShow
   Position = poMainFormCenter
+  SessionProperties = 'Height;Width;Top;Left'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.4.0'
   object ButtonPanel: TButtonPanel
@@ -263,5 +266,13 @@ object EnvForm: TEnvForm
   object menuEnv: TPopupMenu
     left = 288
     top = 216
+  end
+  object Props: TJSONPropStorage
+    StoredValues = <>
+    Formatted = True
+    OnSavingProperties = PropsSavingProperties
+    OnRestoringProperties = PropsRestoringProperties
+    left = 274
+    top = 149
   end
 end

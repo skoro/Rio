@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Controls;
+  GridNavigator, Env, Controls, JSONPropStorage, Classes;
 
 type
 
@@ -17,6 +17,7 @@ type
     btnSave: TButton;
     ButtonPanel: TButtonPanel;
     cbParent: TComboBox;
+    Props: TJSONPropStorage;
     labParent: TLabel;
     dbVars: TDividerBevel;
     dbEnv: TDividerBevel;
@@ -42,6 +43,8 @@ type
     procedure gridVarsEditingDone(Sender: TObject);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
+    procedure PropsRestoringProperties(Sender: TObject);
+    procedure PropsSavingProperties(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
@@ -81,6 +84,8 @@ procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   tbEnv.Font.Style := [fsBold];
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
+  Props.JSONFileName := ConfigFile('Env');
+  Props.Active := True;
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
@@ -126,6 +131,16 @@ begin
     // Force to update parent variables.
     FillEnvVars;
   end;
+end;
+
+procedure TEnvForm.PropsRestoringProperties(Sender: TObject);
+begin
+  PropsRestoreGridColumns(Props, gridVars);
+end;
+
+procedure TEnvForm.PropsSavingProperties(Sender: TObject);
+begin
+  PropsSaveGridColumns(Props, gridVars);
 end;
 
 procedure TEnvForm.editNameChange(Sender: TObject);

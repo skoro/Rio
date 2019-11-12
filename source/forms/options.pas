@@ -155,7 +155,6 @@ uses AppHelpers, SynEdit, Menus, fpjsonrtti;
 
 procedure TOptionsForm.FormCreate(Sender: TObject);
 var
-  CF: String;
   I: integer;
 begin
   {$IFDEF LCLWIN32}
@@ -179,8 +178,7 @@ begin
       OnRestore := @OnPropsShortcutRestore;
     end;
 
-  CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
-  Props.JSONFileName := CF;
+  Props.JSONFileName := ConfigFile('Options');
 
   // Save/restore fonts.
   for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do

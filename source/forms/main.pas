@@ -1411,26 +1411,17 @@ begin
 end;
 
 procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
-  procedure SetColumns(grid: TStringGrid);
-  var
-    Val, col: Integer;
-  begin
-    for col := 1 to grid.ColCount do begin
-      Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
-      if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
-    end;
-  end;
 var
   IntVal: integer;
   StrVal: string;
   RO: TRequestObject;
 begin
-  SetColumns(requestHeaders);
-  SetColumns(responseHeaders);
-  SetColumns(gridForm);
-  SetColumns(gridReqCookie);
-  SetColumns(gridRespCookie);
-  SetColumns(gridParams);
+  PropsRestoreGridColumns(PSMAIN, requestHeaders);
+  PropsRestoreGridColumns(PSMAIN, responseHeaders);
+  PropsRestoreGridColumns(PSMAIN, gridForm);
+  PropsRestoreGridColumns(PSMAIN, gridReqCookie);
+  PropsRestoreGridColumns(PSMAIN, gridRespCookie);
+  PropsRestoreGridColumns(PSMAIN, gridParams);
   with PSMAIN do begin
     miTabHeaders.Checked := ReadBoolean('tabHeaders', True);
     miTabQuery.Checked := ReadBoolean('tabQuery', True);
@@ -1465,22 +1456,15 @@ begin
 end;
 
 procedure TMainForm.PSMAINSavingProperties(Sender: TObject);
-  procedure SaveColumns(grid: TStringGrid);
-  var
-    I: Integer;
-  begin
-    for I := 0 to grid.Columns.Count - 1 do
-      PSMAIN.WriteInteger(grid.Name + 'Col' + IntToStr(I + 1), grid.Columns.Items[I].Width);
-  end;
 var
   RO: TRequestObject;
 begin
-  SaveColumns(requestHeaders);
-  SaveColumns(gridForm);
-  SaveColumns(responseHeaders);
-  SaveColumns(gridReqCookie);
-  SaveColumns(gridRespCookie);
-  SaveColumns(gridParams);
+  PropsSaveGridColumns(PSMAIN, requestHeaders);
+  PropsSaveGridColumns(PSMAIN, gridForm);
+  PropsSaveGridColumns(PSMAIN, responseHeaders);
+  PropsSaveGridColumns(PSMAIN, gridReqCookie);
+  PropsSaveGridColumns(PSMAIN, gridRespCookie);
+  PropsSaveGridColumns(PSMAIN, gridParams);
   with PSMAIN do begin
     WriteBoolean('tabHeaders', miTabHeaders.Checked);
     WriteBoolean('tabQuery', miTabQuery.Checked);
