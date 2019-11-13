@@ -65,7 +65,7 @@ function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer = 1; 
 procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 
 // Returns a specific config filename.
-function ConfigFile(const Name: string): string;
+function ConfigFile(const Name: string; Ext: string = ''): string;
 
 // Save and restore a grid column sizes to the property storage component.
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
@@ -407,9 +407,13 @@ begin
     end;
 end;
 
-function ConfigFile(const Name: string): string;
+function ConfigFile(const Name: string; Ext: string = ''): string;
 begin
-  Result := GetAppConfigDir(False) + DirectorySeparator + Name + ConfigExtension;
+  if Ext = '' then
+    Ext := ConfigExtension;
+  if Ext[1] <> '.' then
+    Ext := '.' + Ext;
+  Result := GetAppConfigDir(False) + DirectorySeparator + Name + Ext;
 end;
 
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
