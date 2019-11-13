@@ -117,6 +117,8 @@ type
     procedure Delete(const EnvName: string);
     procedure Rename(const Env:TEnvironment; const NewName: string);
     function FindAvailParents(const Env: TEnvironment): TEnvList;
+    procedure SaveToStream(const AStream: TStream);
+    procedure SaveToFile(const FileName: string);
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
@@ -130,7 +132,7 @@ type
 
 implementation
 
-uses strutils;
+uses strutils, XMLRead, DOM, XMLWrite;
 
 { EEnvironmentExists }
 
@@ -343,6 +345,52 @@ begin
   for Iter in FEnvList do
     if (Env <> Iter) and (not IsMyParent(Iter, Env)) then
       Result.Add(Iter);
+end;
+
+procedure TEnvManager.SaveToStream(const AStream: TStream);
+var
+  Doc: TXMLDocument;
+  XmlRoot, EnvElem, VarElem: TDOMNode;
+  EnvIter: TEnvironment;
+  VarIter: TVariable;
+begin
+  try
+    Doc := TXMLDocument.Create;
+    XmlRoot := Doc.CreateElement('Environments');
+    Doc.AppendChild(XmlRoot);
+    for EnvIter in FEnvList do
+    begin
+      EnvElem := Doc.CreateElement('Env');
+      TDOMElement(EnvElem).SetAttribute('name', EnvIter.Name);
+      if FCurrent = EnvIter then
+        TDOMElement(EnvElem).SetAttribute('current', '1');
+      if Assigned(EnvIter.Parent) then
+        TDOMElement(EnvElem).SetAttribute('parent', EnvIter.Parent.Name);
+      for VarIter in EnvIter.OwnVars do
+      begin
+        VarElem := Doc.CreateElement('Var');
+        TDOMElement(VarElem).SetAttribute('name', VarIter.Name);
+        TDOMElement(VarElem).SetAttribute('value', VarIter.Value);
+        EnvElem.AppendChild(VarElem);
+      end;
+      XmlRoot.AppendChild(EnvElem);
+    end;
+    WriteXML(XmlRoot, AStream);
+  finally
+    Doc.Free;
+  end;
+end;
+
+procedure TEnvManager.SaveToFile(const FileName: string);
+var
+  FS: TFileStream;
+begin
+  FS := TFileStream.Create(FileName, fmCreate);
+  try
+    SaveToStream(FS);
+  finally
+    FreeAndNil(FS);
+  end;
 end;
 
 { EVariableNotFound }
