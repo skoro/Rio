@@ -375,7 +375,7 @@ begin
       end;
       XmlRoot.AppendChild(EnvElem);
     end;
-    WriteXML(XmlRoot, AStream);
+    WriteXML(Doc, AStream);
   finally
     Doc.Free;
   end;
