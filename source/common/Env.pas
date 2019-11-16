@@ -119,7 +119,7 @@ type
     procedure SaveToStream(const AStream: TStream);
     procedure SaveToFile(const FileName: string);
     procedure LoadFromStream(const AStream: TStream);
-    procedure LoadFromFile(const FileName: string);
+    function LoadFromFile(const FileName: string): Boolean;
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
@@ -439,13 +439,17 @@ begin
   end;
 end;
 
-procedure TEnvManager.LoadFromFile(const FileName: string);
+function TEnvManager.LoadFromFile(const FileName: string): Boolean;
 var
   FS: TFileStream;
 begin
+  Result := False;
+  if not FileExists(FileName) then
+    Exit; // =>
   FS := TFileStream.Create(FileName, fmOpenRead);
   try
     LoadFromStream(FS);
+    Result := True;
   finally
     FreeAndNil(FS);
   end;
