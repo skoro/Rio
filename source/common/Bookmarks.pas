@@ -239,8 +239,8 @@ procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string);
 var
   FS: TFileStream;
 begin
+  FS := TFileStream.Create(GetAppBookmarksFilename(Filename), fmCreate);
   try
-    FS := TFileStream.Create(GetAppBookmarksFilename(Filename), fmCreate);
     BM.SaveXmlToStream(FS);
   finally
     FS.Free;
