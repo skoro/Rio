@@ -108,8 +108,6 @@ type
     procedure SetCurrent(AValue: TEnvironment);
     procedure SetExtList(AValue: TStrings);
     function FindExt(const EnvName: string; out Index: integer): Boolean;
-  protected
-    function FindEnv(const EnvName: string): TEnvironment;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -117,8 +115,11 @@ type
     procedure Delete(const EnvName: string);
     procedure Rename(const Env:TEnvironment; const NewName: string);
     function FindAvailParents(const Env: TEnvironment): TEnvList;
+    function FindEnv(const EnvName: string): TEnvironment;
     procedure SaveToStream(const AStream: TStream);
     procedure SaveToFile(const FileName: string);
+    procedure LoadFromStream(const AStream: TStream);
+    procedure LoadFromFile(const FileName: string);
     property EnvNames: TStringArray read GetEnvNames;
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
@@ -361,16 +362,16 @@ begin
     for EnvIter in FEnvList do
     begin
       EnvElem := Doc.CreateElement('Env');
-      TDOMElement(EnvElem).SetAttribute('name', EnvIter.Name);
+      TDOMElement(EnvElem).SetAttribute('Name', EnvIter.Name);
       if FCurrent = EnvIter then
-        TDOMElement(EnvElem).SetAttribute('current', '1');
+        TDOMElement(EnvElem).SetAttribute('Current', '1');
       if Assigned(EnvIter.Parent) then
-        TDOMElement(EnvElem).SetAttribute('parent', EnvIter.Parent.Name);
+        TDOMElement(EnvElem).SetAttribute('Parent', EnvIter.Parent.Name);
       for VarIter in EnvIter.OwnVars do
       begin
         VarElem := Doc.CreateElement('Var');
-        TDOMElement(VarElem).SetAttribute('name', VarIter.Name);
-        TDOMElement(VarElem).SetAttribute('value', VarIter.Value);
+        TDOMElement(VarElem).SetAttribute('Name', VarIter.Name);
+        TDOMElement(VarElem).SetAttribute('Value', VarIter.Value);
         EnvElem.AppendChild(VarElem);
       end;
       XmlRoot.AppendChild(EnvElem);
@@ -388,6 +389,63 @@ begin
   FS := TFileStream.Create(FileName, fmCreate);
   try
     SaveToStream(FS);
+  finally
+    FreeAndNil(FS);
+  end;
+end;
+
+procedure TEnvManager.LoadFromStream(const AStream: TStream);
+var
+  Doc: TXMLDocument;
+  EnvNode, VarNode: TDOMNode;
+  EnvName, ParentName: string;
+  EnvObj, ParentEnv: TEnvironment;
+begin
+  try
+    ReadXMLFile(Doc, AStream);
+    EnvNode := Doc.FindNode('Environments');
+    if not Assigned(EnvNode) then
+      raise Exception.Create('Cannot read env xml data from stream.');
+    EnvNode := EnvNode.FirstChild;
+    while EnvNode <> NIL do
+    begin
+      if EnvNode.NodeName <> 'Env' then
+        Continue; { TODO : May be log needed ? }
+      EnvName := TDOMElement(EnvNode).AttribStrings['Name'];
+      if EnvName = '' then
+        Continue;
+      ParentName := TDOMElement(EnvNode).AttribStrings['Parent'];
+      ParentEnv := Nil;
+      if ParentName <> '' then
+        ParentEnv := FindEnv(ParentName);
+      EnvObj := TEnvironment.Create(EnvName, ParentEnv);
+      // Read variables for the environment.
+      VarNode := EnvNode.FirstChild;
+      while VarNode <> NIL do
+      begin
+        if VarNode.NodeName <> 'Var' then
+          Continue; { TODO : May be log needed ? }
+        with TDOMElement(VarNode) do
+          EnvObj.Add(AttribStrings['Name'], AttribStrings['Value']);
+        VarNode := VarNode.NextSibling;
+      end;
+      Add(EnvObj);
+      if TDOMElement(EnvNode).AttribStrings['Current'] = '1' then
+        Current := EnvObj;
+      EnvNode := EnvNode.NextSibling;
+    end;
+  finally
+    FreeAndNil(Doc);
+  end;
+end;
+
+procedure TEnvManager.LoadFromFile(const FileName: string);
+var
+  FS: TFileStream;
+begin
+  FS := TFileStream.Create(FileName, fmOpenRead);
+  try
+    LoadFromStream(FS);
   finally
     FreeAndNil(FS);
   end;
@@ -503,9 +561,26 @@ begin
 end;
 
 function TEnvironment.Add(const Variable: TVariable): TVariable;
+var
+  ParentEnv: TEnvironment;
+  PV: TVariable;
 begin
   if FindVar(Variable.Name) <> nil then
     raise Exception.CreateFmt('Variable "%s" is already exist.', [Variable.Name]);
+  // Search if the variable exists in the parent.
+  ParentEnv := FParent;
+  while Assigned(ParentEnv) do
+  begin
+    PV := ParentEnv.FindVar(Variable.Name);
+    if Assigned(PV) then
+    begin
+      // The variable exists and the value equals. No need to add a new one.
+      if PV.Value = Variable.Value then
+        Exit(PV); // =>
+      break; // The value differs, override the parent variable.
+    end;
+    ParentEnv := ParentEnv.Parent;
+  end;
   FVarList.Add(Variable);
   Result := Variable;
 end;
