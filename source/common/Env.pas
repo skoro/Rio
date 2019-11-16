@@ -99,7 +99,7 @@ type
   private
     FEnvList: TEnvList;
     FCurrent: TEnvironment;
-    FExtList: TStrings;
+    FExtList: TStrings; // Env names external list pointer.
     function GetCount: Integer;
     function GetEnv(EnvName: string): TEnvironment;
     function GetEnvIndex(Index: integer): TEnvironment;
@@ -107,6 +107,7 @@ type
     function GetFirst: TEnvironment;
     procedure SetCurrent(AValue: TEnvironment);
     procedure SetExtList(AValue: TStrings);
+    // Finds the env name in the external list.
     function FindExt(const EnvName: string; out Index: integer): Boolean;
   public
     constructor Create; virtual;
@@ -114,16 +115,26 @@ type
     procedure Add(const Env: TEnvironment);
     procedure Delete(const EnvName: string);
     procedure Rename(const Env:TEnvironment; const NewName: string);
+    // Finds the available parents for the specified env.
     function FindAvailParents(const Env: TEnvironment): TEnvList;
+    // Finds env by name.
     function FindEnv(const EnvName: string): TEnvironment;
     procedure SaveToStream(const AStream: TStream);
     procedure SaveToFile(const FileName: string);
+    // Loads the environments data from the stream.
     procedure LoadFromStream(const AStream: TStream);
+    // Loads the environments data from the file.
+    // False - when file isn't existing.
     function LoadFromFile(const FileName: string): Boolean;
+    // Gets the array list of the env names.
     property EnvNames: TStringArray read GetEnvNames;
+    // Gets the env by name.
     property Env[EnvName: string]: TEnvironment read GetEnv; default;
+    // Gets the env by index (from 0).
     property EnvIndex[Index: integer]: TEnvironment read GetEnvIndex;
+    // The total count of environments.
     property Count: Integer read GetCount;
+    // The first environment.
     property First: TEnvironment read GetFirst;
     // Selected environment (in the owner).
     property Current: TEnvironment read FCurrent write SetCurrent;
@@ -362,16 +373,16 @@ begin
     for EnvIter in FEnvList do
     begin
       EnvElem := Doc.CreateElement('Env');
-      TDOMElement(EnvElem).SetAttribute('Name', EnvIter.Name);
+      TDOMElement(EnvElem).SetAttribute('name', EnvIter.Name);
       if FCurrent = EnvIter then
-        TDOMElement(EnvElem).SetAttribute('Current', '1');
+        TDOMElement(EnvElem).SetAttribute('current', '1');
       if Assigned(EnvIter.Parent) then
-        TDOMElement(EnvElem).SetAttribute('Parent', EnvIter.Parent.Name);
+        TDOMElement(EnvElem).SetAttribute('parent', EnvIter.Parent.Name);
       for VarIter in EnvIter.OwnVars do
       begin
         VarElem := Doc.CreateElement('Var');
-        TDOMElement(VarElem).SetAttribute('Name', VarIter.Name);
-        TDOMElement(VarElem).SetAttribute('Value', VarIter.Value);
+        TDOMElement(VarElem).SetAttribute('name', VarIter.Name);
+        TDOMElement(VarElem).SetAttribute('value', VarIter.Value);
         EnvElem.AppendChild(VarElem);
       end;
       XmlRoot.AppendChild(EnvElem);
@@ -386,6 +397,8 @@ procedure TEnvManager.SaveToFile(const FileName: string);
 var
   FS: TFileStream;
 begin
+  if FEnvList.Count = 0 then
+    Exit; // =>
   FS := TFileStream.Create(FileName, fmCreate);
   try
     SaveToStream(FS);
@@ -411,10 +424,10 @@ begin
     begin
       if EnvNode.NodeName <> 'Env' then
         Continue; { TODO : May be log needed ? }
-      EnvName := TDOMElement(EnvNode).AttribStrings['Name'];
+      EnvName := TDOMElement(EnvNode).AttribStrings['name'];
       if EnvName = '' then
         Continue;
-      ParentName := TDOMElement(EnvNode).AttribStrings['Parent'];
+      ParentName := TDOMElement(EnvNode).AttribStrings['parent'];
       ParentEnv := Nil;
       if ParentName <> '' then
         ParentEnv := FindEnv(ParentName);
@@ -426,11 +439,11 @@ begin
         if VarNode.NodeName <> 'Var' then
           Continue; { TODO : May be log needed ? }
         with TDOMElement(VarNode) do
-          EnvObj.Add(AttribStrings['Name'], AttribStrings['Value']);
+          EnvObj.Add(AttribStrings['name'], AttribStrings['value']);
         VarNode := VarNode.NextSibling;
       end;
       Add(EnvObj);
-      if TDOMElement(EnvNode).AttribStrings['Current'] = '1' then
+      if TDOMElement(EnvNode).AttribStrings['current'] = '1' then
         Current := EnvObj;
       EnvNode := EnvNode.NextSibling;
     end;
