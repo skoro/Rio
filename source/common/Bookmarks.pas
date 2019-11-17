@@ -196,6 +196,13 @@ const
   function IsFolderNode(Node: TTreeNode): Boolean;
   function NodeToBookmark(Node: TTreeNode): TBookmark;
 
+  { TODO : See Env.pas as the example for Load/Save data into/from class.
+   Also there will be needed an interface for load and save data:
+    interface
+      procedure LoadFromStream
+      procedure SaveToStream
+  }
+
   // Save the application bookmarks.
   procedure SaveAppBookmarks(BM: TBookmarkManager; Filename: string = BOOKMARK_FILENAME);
   // Load the application bookmarks.
