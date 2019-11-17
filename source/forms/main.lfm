@@ -2336,7 +2336,7 @@ object MainForm: TMainForm
         object btnEnv: TSpeedButton
           Left = 119
           Height = 29
-          Hint = 'Environments management'
+          Hint = 'Configure environments'
           Top = 0
           Width = 24
           Align = alRight
@@ -2384,7 +2384,7 @@ object MainForm: TMainForm
         object cbEnv: TComboBox
           Left = 0
           Height = 29
-          Hint = 'Current environment'
+          Hint = 'Environment'
           Top = 0
           Width = 119
           Align = alClient
