@@ -838,6 +838,7 @@ begin
 
   // Environment manager initialization.
   FEnvManager := TEnvManager.Create;
+  FEnvManager.LoadFromFile(ConfigFile('EnvVars'));
 
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
@@ -855,6 +856,7 @@ begin
   SaveAppBookmarks(FBookManager);
 
   FreeAndNil(FResponseTabManager);
+  FEnvManager.SaveToFile(ConfigFile('EnvVars'));
   FreeAndNil(FEnvManager);
 
   if Assigned(FProfilerGraph) then
@@ -896,7 +898,7 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 var
-  I: Byte;
+  I: integer;
 begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
@@ -914,6 +916,8 @@ begin
   // Sync combobox items with EnvManager.
   // Warning! It must be here, it won't work if it in FormCreate (why?).
   FEnvManager.ExtList := cbEnv.Items;
+  if Assigned(FEnvManager.Current) and FEnvManager.FindExt(FEnvManager.Current.Name, I) then
+    cbEnv.ItemIndex := I;
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
