@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Controls, JSONPropStorage, Classes;
+  GridNavigator, Env, Controls, JSONPropStorage;
 
 type
 
@@ -39,6 +39,7 @@ type
     procedure editNameChange(Sender: TObject);
     procedure editNameKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
@@ -86,6 +87,12 @@ begin
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
   Props.JSONFileName := ConfigFile('Env');
   Props.Active := True;
+end;
+
+procedure TEnvForm.FormKeyPress(Sender: TObject; var Key: char);
+begin
+  if (Key = #27) and (FOpState = opNone) then
+    Close;
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
@@ -381,6 +388,7 @@ procedure TEnvForm.HidePanelEnv;
 begin
   PanEnv.Visible := False;
   FOpState := opNone;
+  gridVars.SetFocus;
 end;
 
 function TEnvForm.ShowModal(const Env: TEnvironment): TModalResult;
