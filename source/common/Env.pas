@@ -107,14 +107,14 @@ type
     function GetFirst: TEnvironment;
     procedure SetCurrent(AValue: TEnvironment);
     procedure SetExtList(AValue: TStrings);
-    // Finds the env name in the external list.
-    function FindExt(const EnvName: string; out Index: integer): Boolean;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure Add(const Env: TEnvironment);
     procedure Delete(const EnvName: string);
     procedure Rename(const Env:TEnvironment; const NewName: string);
+    // Finds the env name in the external list.
+    function FindExt(const EnvName: string; out Index: integer): Boolean;
     // Finds the available parents for the specified env.
     function FindAvailParents(const Env: TEnvironment): TEnvList;
     // Finds env by name.
