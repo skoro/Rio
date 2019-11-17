@@ -9,7 +9,9 @@ object EnvForm: TEnvForm
   ClientWidth = 460
   Constraints.MinHeight = 320
   Constraints.MinWidth = 360
+  KeyPreview = True
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   OnShow = FormShow
   Position = poMainFormCenter
   SessionProperties = 'Height;Width;Top;Left'
@@ -84,10 +86,13 @@ object EnvForm: TEnvForm
     end
     object tbEnv: TToolButton
       Left = 1
+      Hint = 'Ctrl-Up or Ctrl-Down - switch environments'
       Top = 0
       AutoSize = True
       Caption = 'tbEnv'
       DropdownMenu = menuEnv
+      ParentShowHint = False
+      ShowHint = True
       Style = tbsButtonDrop
     end
   end

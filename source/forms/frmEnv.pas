@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Controls, JSONPropStorage;
+  GridNavigator, Env, Controls, JSONPropStorage, Classes;
 
 type
 
@@ -39,6 +39,7 @@ type
     procedure editNameChange(Sender: TObject);
     procedure editNameKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
@@ -86,6 +87,35 @@ begin
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
   Props.JSONFileName := ConfigFile('Env');
   Props.Active := True;
+end;
+
+procedure TEnvForm.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState
+  );
+var
+  Idx: integer;
+begin
+  // Ctrl-Up, Ctrl-Down - switch environments.
+  if ((FOpState = opNone) or (FOpState = opEdit)) and (ssCtrl in Shift)
+     and Assigned(FCurrentEnv)
+  then
+  begin
+    Idx := menuEnv.Items.IndexOfCaption(FCurrentEnv.Name);
+    case Key of
+      40: // Down
+      begin
+        Inc(Idx, 1);
+        if Idx = menuEnv.Items.Count then
+          Idx := 0;
+      end;
+      38: // Up
+      begin
+        Dec(Idx, 1);
+        if Idx = -1 then
+          Idx := menuEnv.Items.Count - 1;
+      end;
+    end;
+    SetCurrentEnv(FEnvManager.EnvIndex[Idx]);
+  end;
 end;
 
 procedure TEnvForm.FormShow(Sender: TObject);
