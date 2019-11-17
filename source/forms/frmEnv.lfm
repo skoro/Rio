@@ -9,9 +9,7 @@ object EnvForm: TEnvForm
   ClientWidth = 460
   Constraints.MinHeight = 320
   Constraints.MinWidth = 360
-  KeyPreview = True
   OnCreate = FormCreate
-  OnKeyPress = FormKeyPress
   OnShow = FormShow
   Position = poMainFormCenter
   SessionProperties = 'Height;Width;Top;Left'

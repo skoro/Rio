@@ -39,7 +39,6 @@ type
     procedure editNameChange(Sender: TObject);
     procedure editNameKeyPress(Sender: TObject; var Key: char);
     procedure FormCreate(Sender: TObject);
-    procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
     procedure gridVarsEditingDone(Sender: TObject);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
@@ -89,16 +88,11 @@ begin
   Props.Active := True;
 end;
 
-procedure TEnvForm.FormKeyPress(Sender: TObject; var Key: char);
-begin
-  if (Key = #27) and (FOpState = opNone) then
-    Close;
-end;
-
 procedure TEnvForm.FormShow(Sender: TObject);
 begin
   HidePanelEnv;
   DisableIfEnvEmpty;
+  gridVars.SetFocus;
 end;
 
 procedure TEnvForm.gridVarsEditingDone(Sender: TObject);
@@ -228,6 +222,8 @@ begin
   btnSave.Enabled := False;
   ShowPanelEnv;
   FOpState := opAdd;
+  tbAdd.Down := True;
+  tbEdit.Down := False;
 end;
 
 procedure TEnvForm.tbDeleteClick(Sender: TObject);
@@ -262,6 +258,8 @@ begin
   PrepareEditEnv;
   ShowPanelEnv;
   FOpState := opEdit;
+  tbAdd.Down := False;
+  tbEdit.Down := True;
 end;
 
 function TEnvForm.CreateMenuItem(const EnvName: string): TMenuItem;
@@ -389,6 +387,8 @@ begin
   PanEnv.Visible := False;
   FOpState := opNone;
   gridVars.SetFocus;
+  tbAdd.Down := False;
+  tbEdit.Down := False;
 end;
 
 function TEnvForm.ShowModal(const Env: TEnvironment): TModalResult;
