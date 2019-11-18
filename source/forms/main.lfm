@@ -3799,6 +3799,10 @@ object MainForm: TMainForm
         ShortCut = 16572
         OnClick = miOptionsClick
       end
+      object miEnv: TMenuItem
+        Caption = '&Environments...'
+        OnClick = btnEnvClick
+      end
       object miSep1: TMenuItem
         Caption = '-'
       end

@@ -46,6 +46,7 @@ type
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
     EnvPanel: TPanel;
+    miEnv: TMenuItem;
     RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
@@ -2154,6 +2155,7 @@ begin
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
+  miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 
   // Change bookmarks node style.
