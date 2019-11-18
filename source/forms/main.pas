@@ -1033,7 +1033,11 @@ begin
     OKMsg('Export', 'Request url is missing.');
     Exit;
   end;
-  with TExportForm.Create(Self) do begin
+  with TExportForm.Create(Self) do
+  begin
+    RequestObject := CreateRequestObject;
+    if Assigned(FEnvManager.Current) then
+      RequestObject.ApplyEnv(FEnvManager.Current);
     ShowModal;
     Free;
   end;
