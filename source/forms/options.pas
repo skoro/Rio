@@ -17,7 +17,7 @@ type
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciBookmark,
-    sciToggleTabs, sciToggleBookmarks, sciQuit);
+    sciToggleTabs, sciToggleBookmarks, sciEnv, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -155,7 +155,6 @@ uses AppHelpers, SynEdit, Menus, fpjsonrtti;
 
 procedure TOptionsForm.FormCreate(Sender: TObject);
 var
-  CF: String;
   I: integer;
 begin
   {$IFDEF LCLWIN32}
@@ -179,8 +178,7 @@ begin
       OnRestore := @OnPropsShortcutRestore;
     end;
 
-  CF := GetAppConfigDir(False) + DirectorySeparator + 'Options' + ConfigExtension;
-  Props.JSONFileName := CF;
+  Props.JSONFileName := ConfigFile('Options');
 
   // Save/restore fonts.
   for I := Ord(Low(TUIFontItem)) to Ord(High(TUIFontItem)) do
@@ -514,6 +512,7 @@ begin
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
   SetShortCut(sciBookmark,      68, [ssCtrl]); // T
   SetShortCut(sciToggleBookmarks, 119, []); // F8
+  SetShortCut(sciEnv,           69, [ssCtrl, ssAlt]); // E
 end;
 
 procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
@@ -618,6 +617,7 @@ begin
     sciToggleTabs:    Result := 'Toggle request pane';
     sciQuit:          Result := 'Quit';
     sciBookmark:      Result := 'Add/edit bookmark';
+    sciEnv:           Result := 'Configure environments';
     sciToggleBookmarks: Result := 'Toggle bookmarks pane';
   end;
 end;

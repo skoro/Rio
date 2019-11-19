@@ -5,7 +5,7 @@ unit RequestObject;
 interface
 
 uses
-  Classes, SysUtils, Grids, ThreadHttpClient;
+  Classes, SysUtils, Grids, ThreadHttpClient, Env;
 
 type
 
@@ -153,6 +153,8 @@ type
     function ToJson: string;
     // Unserialize from a json string.
     class function CreateFromJson(json: string): TRequestObject;
+    // Process a request object by the environment variables.
+    procedure ApplyEnv(const AEnv: TEnvironment);
     property ResponseInfo: TResponseInfo read FResponseInfo write FResponseInfo;
   published
     property Method: string read FMethod write SetMethod;
@@ -523,6 +525,32 @@ begin
   finally
     streamer.Free;
   end;
+end;
+
+procedure TRequestObject.ApplyEnv(const AEnv: TEnvironment);
+  procedure ProcessParams(ParamsList: TRequestParamList);
+  var
+    Param: TRequestParamItem;
+  begin
+    for Param in ParamsList do
+    begin
+      Param.Name  := AEnv.Apply(Param.Name);
+      Param.Value := AEnv.Apply(Param.Value);
+    end;
+  end;
+begin
+  FUrl    := AEnv.Apply(FUrl);
+  FMethod := AEnv.Apply(FMethod);
+  FBody   := AEnv.Apply(FBody);
+  FJson   := AEnv.Apply(FJson);
+  FNotes  := AEnv.Apply(FNotes);
+  FAuthBasic.Login    := AEnv.Apply(FAuthBasic.Login);
+  FAuthBasic.Password := AEnv.Apply(FAuthBasic.Password);
+  FAuthBearer.Prefix  := AEnv.Apply(FAuthBearer.Prefix);
+  FAuthBearer.Token   := AEnv.Apply(FAuthBearer.Token);
+  ProcessParams(FCookies);
+  ProcessParams(FHeaders);
+  ProcessParams(FParams);
 end;
 
 end.

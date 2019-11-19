@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, Dialogs, ButtonPanel,
-  ExtCtrls, StdCtrls;
+  ExtCtrls, StdCtrls, RequestObject;
 
 type
 
@@ -31,14 +31,15 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
   private
+    FRequestObject: TRequestObject;
     procedure ExportRequest;
   public
-
+    property RequestObject: TRequestObject read FRequestObject write FRequestObject;
   end;
 
 implementation
 
-uses options, ExportReq, RequestObject, main, AppHelpers, Clipbrd;
+uses options, ExportReq, AppHelpers, Clipbrd;
 
 {$R *.lfm}
 
@@ -62,21 +63,15 @@ end;
 procedure TExportForm.btnSaveClick(Sender: TObject);
 var
   ext: string;
-  ro: TRequestObject;
 begin
-  try
-    ro := MainForm.CreateRequestObject;
-    ext := '';
-    case TExportType(cbExport.ItemIndex) of
-      etCurl:    ext := '.sh';
-      etPHPCurl: ext := '.php';
-    end;
-    SaveDialog.FileName := ro.Filename + ext;
-    if SaveDialog.Execute then
-      MemoResult.Lines.SaveToFile(SaveDialog.FileName);
-  finally
-    FreeAndNil(ro);
+  ext := '';
+  case TExportType(cbExport.ItemIndex) of
+    etCurl:    ext := '.sh';
+    etPHPCurl: ext := '.php';
   end;
+  SaveDialog.FileName := FRequestObject.Filename + ext;
+  if SaveDialog.Execute then
+    MemoResult.Lines.SaveToFile(SaveDialog.FileName);
 end;
 
 procedure TExportForm.btnCopyClick(Sender: TObject);
@@ -97,20 +92,17 @@ end;
 procedure TExportForm.ExportRequest;
 var
   exp: TExport;
-  req: TRequestObject;
 begin
-  btnCopy.Enabled := True;
-  btnSave.Enabled := True;
-
   try
     case TExportType(cbExport.ItemIndex) of
       etCurl:    exp := TCurlExport.Create;
       etPHPCurl: exp := TPHPCurlExport.Create;
     end;
 
-    req := MainForm.CreateRequestObject;
     try
-      exp.RequestObject := req;
+      if not Assigned(FRequestObject) then
+        raise Exception.Create('Request object is not initialized.');
+      exp.RequestObject := FRequestObject;
       MemoResult.Text := exp.Output;
     except on E: Exception do
       begin
@@ -121,9 +113,11 @@ begin
       end;
     end;
 
+    btnCopy.Enabled := True;
+    btnSave.Enabled := True;
+
   finally
     FreeAndNil(exp);
-    FreeAndNil(req);
   end;
 end;
 

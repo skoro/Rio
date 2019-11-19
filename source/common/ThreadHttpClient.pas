@@ -139,7 +139,7 @@ type
   protected
     procedure Execute; override;
   public
-    constructor Create(CreateSuspened: boolean);
+    constructor Create(CreateSuspened: boolean); overload;
     destructor Destroy; override;
     procedure AddHeader(const AHeader, AValue: string);
     procedure AddCookie(const AName, AValue: string; EncodeValue: boolean = True);
@@ -286,8 +286,10 @@ var
 begin
   if Url = '' then Exit('');
   uri := ParseURI(Url);
-  Result := Format('%s://%s%s%s%s', [
-    uri.Protocol,
+  Result := '';
+  if uri.Protocol <> '' then
+    Result := uri.Protocol + '://';
+  Result := Format('%s%s%s%s', [
     uri.Host,
     IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
     uri.Path,
@@ -715,8 +717,10 @@ procedure TThreadHttpClient.AddCookie(const AName, AValue: string;
 begin
   if not Assigned(FCookies) then
     FCookies := TStringList.Create;
-  FCookies.Add(Format('%s=%s',
-    [AName, IfThen(EncodeValue, EncodeURLElement(AValue), AValue)]));
+  if EncodeValue then
+    FCookies.Add(AName + '=' + EncodeURLElement(AValue))
+  else
+    FCookies.Add(AName + '=' + AValue);
 end;
 
 end.

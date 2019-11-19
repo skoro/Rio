@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids, ComCtrls,
-  key_value;
+  PropertyStorage, key_value;
 
 type
 
@@ -63,6 +63,13 @@ function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer = 1; 
 
 // Switch to a named tab in the PageControl component.
 procedure SwitchTabByName(PC: TPageControl; const TabName: string);
+
+// Returns a specific config filename.
+function ConfigFile(const Name: string; Ext: string = ''): string;
+
+// Save and restore a grid column sizes to the property storage component.
+procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
 
 implementation
 
@@ -398,6 +405,35 @@ begin
       PC.ActivePageIndex := i;
       break;
     end;
+end;
+
+function ConfigFile(const Name: string; Ext: string = ''): string;
+begin
+  if Ext = '' then
+    Ext := ConfigExtension;
+  if Ext[1] <> '.' then
+    Ext := '.' + Ext;
+  Result := GetAppConfigDir(False) + DirectorySeparator + Name + Ext;
+end;
+
+procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+var
+  I: Integer;
+begin
+  for I := 0 to AGrid.Columns.Count - 1 do
+    Props.WriteInteger(AGrid.Name + 'Col' + IntToStr(I + 1), AGrid.Columns.Items[I].Width);
+end;
+
+procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+var
+  Val, col: Integer;
+begin
+  for col := 1 to AGrid.ColCount do
+  begin
+    Val := Props.ReadInteger(AGrid.Name + 'Col' + IntToStr(col), 0);
+    if Val > 0 then
+      AGrid.Columns.Items[col - 1].Width := Val;
+  end;
 end;
 
 end.

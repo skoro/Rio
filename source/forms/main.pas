@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
   ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
-  jsonparser, AppTree;
+  jsonparser, AppTree, Env;
 
 type
 
@@ -23,6 +23,7 @@ type
     cbBasicShowPassword: TCheckBox;
     cbMethod: TComboBox;
     cbUrl: TComboBox;
+    cbEnv: TComboBox;
     dlgFind: TFindDialog;
     editBasicLogin: TLabeledEdit;
     editBasicPassword: TLabeledEdit;
@@ -44,6 +45,8 @@ type
     gridParams: TStringGrid;
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
+    EnvPanel: TPanel;
+    miEnv: TMenuItem;
     RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
     lblDesc: TLabel;
@@ -70,6 +73,7 @@ type
     pagesRespView: TPageControl;
     AppSplitter: TPairSplitter;
     BookmarkSide: TPairSplitterSide;
+    btnEnv: TSpeedButton;
     WorkSide: TPairSplitterSide;
     panelRequest: TPanel;
     panelResponse: TPanel;
@@ -169,6 +173,7 @@ type
     procedure btnBookmarkClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
+    procedure cbEnvChange(Sender: TObject);
     procedure cbMethodChange(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
@@ -208,7 +213,7 @@ type
     procedure miSaveRequestClick(Sender: TObject);
     procedure miSaveResponseClick(Sender: TObject);
     procedure OnGridClear(Sender: TObject; Grid: TStringGrid);
-    procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+    procedure OnGridDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure OnGridEditRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
@@ -223,6 +228,7 @@ type
     procedure PSMAINSavingProperties(Sender: TObject);
     procedure requestHeadersBeforeSelection(Sender: TObject; aCol, aRow: Integer
       );
+    procedure btnEnvClick(Sender: TObject);
     procedure tbtnFormUploadClick(Sender: TObject);
     procedure tbtnJsonLoadClick(Sender: TObject);
     procedure tbtnManageHeadersClick(Sender: TObject);
@@ -246,10 +252,11 @@ type
     FBookManager: TBookmarkManager;
     FKeepResponseTab: string;
     FAppTreeManager: TAppTreeManager;
+    FEnvManager: TEnvManager;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
-    function EncodeFormData: string;
+    function EncodeFormData(const Env: TEnvironment): string;
     procedure OnRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
@@ -306,7 +313,7 @@ implementation
 
 uses about, headers_editor, cookie_form,
   AppHelpers, strutils, help_form, cmdline, options,
-  import_form, export_form, bookmark_form, State, Clipbrd;
+  import_form, export_form, bookmark_form, frmEnv, State, Clipbrd;
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
@@ -358,15 +365,17 @@ var
   i: integer;
   KV: TKeyValue;
   FileNames, FormValues: TStringList;
+  Env: TEnvironment;
 begin
   Result := False;
-  try
-    url := NormalizeUrl(cbUrl.Text);
-  except on E: Exception do
-    begin
-      cbUrl.SetFocus;
-      Exit; //=>
-    end;
+  Env := FEnvManager.Current;
+  if not Assigned(Env) then
+    Env := TEnvironment.Create('', nil);
+  url := Trim(Env.Apply(cbUrl.Text));
+  if Length(url) = 0 then
+  begin
+    cbUrl.SetFocus;
+    Exit; // =>
   end;
 
   Screen.Cursor:=crHourGlass;
@@ -385,7 +394,7 @@ begin
   // Post the form data.
   if (method = 'POST') and (GetSelectedBodyTab = btForm) then begin
     if gridForm.Cols[3].IndexOf('File') = -1 then begin
-      formData := EncodeFormData;
+      formData := EncodeFormData(Env);
       contentType := 'application/x-www-form-urlencoded';
     end
     else begin
@@ -397,9 +406,9 @@ begin
           if IsRowEnabled(gridForm, I) then begin
             KV := GetRowKV(gridForm, I);
             if gridForm.Cells[3, I] = 'File' then
-              FileNames.Values[KV.Key] := KV.Value
+              FileNames.Values[KV.Key] := Env.Apply(KV.Value)
             else
-              FormValues.Values[KV.Key] := KV.Value;
+              FormValues.Values[KV.Key] := Env.Apply(KV.Value);
           end;
         end;
         try
@@ -433,10 +442,10 @@ begin
   if (method <> 'GET') and (GetSelectedBodyTab <> btForm) then begin
     case GetSelectedBodyTab of
       btJson : begin
-        formData := editJson.Text;
+        formData := Env.Apply(editJson.Text);
         contentType := 'application/json';
       end;
-      btOther: formData:=editOther.Text;
+      btOther: formData := Env.Apply(editOther.Text);
     end;
   end;
 
@@ -450,6 +459,8 @@ begin
   for i:=1 to requestHeaders.RowCount-1 do
   begin
     KV := GetRowKV(requestHeaders, i);
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
     if (LowerCase(KV.Key) = 'content-type') and (contentType <> '') then begin
       if LowerCase(KV.Value) <> contentType then begin
         requestHeaders.Cells[2, i] := contentType;
@@ -473,7 +484,10 @@ begin
   begin
     if not IsRowEnabled(gridReqCookie, I) then continue;
     kv := GetRowKV(gridReqCookie, I);
-    if kv.key = '' then continue;
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
+    if kv.key = '' then
+      continue;
     FHttpClient.AddCookie(kv.key, kv.value);
   end;
 
@@ -484,13 +498,13 @@ begin
            and (Length(editBearerToken.Text) > 0)
       then
         FHttpClient.AddHeader('Authorization', Format('%s %s', [
-          editBearerPrefix.Text,
-          editBearerToken.Text
+          Env.Apply(editBearerPrefix.Text),
+          Env.Apply(editBearerToken.Text)
         ]));
     end;
     atBasic: begin
-      FHttpClient.Client.UserName := editBasicLogin.Text;
-      FHttpClient.Client.Password := editBasicPassword.Text;
+      FHttpClient.Client.UserName := Env.Apply(editBasicLogin.Text);
+      FHttpClient.Client.Password := Env.Apply(editBasicPassword.Text);
     end;
   end;
 
@@ -611,8 +625,10 @@ function TMainForm.CreateRequestObject: TRequestObject;
 begin
   Result := TRequestObject.Create;
   with Result do begin
+    Url    := Trim(cbUrl.Text);
+    if Length(Url) = 0 then
+      raise Exception.Create('Url cannot be empty.');
     Method := cbMethod.Text;
-    Url    := NormalizeUrl(cbUrl.Text);
     Body   := editOther.Text;
     Json   := editJson.Text;
     SetCollectionFromGrid(requestHeaders, Headers);
@@ -711,6 +727,12 @@ begin
     editBasicPassword.EchoMode := emNormal
   else
     editBasicPassword.EchoMode := emPassword;
+end;
+
+procedure TMainForm.cbEnvChange(Sender: TObject);
+begin
+  if cbEnv.ItemIndex > -1 then
+    FEnvManager.Current := FEnvManager.Env[cbEnv.Items[cbEnv.ItemIndex]];
 end;
 
 procedure TMainForm.cbMethodChange(Sender: TObject);
@@ -815,6 +837,10 @@ begin
   end;
   LoadAppBookmarks(FBookManager);
 
+  // Environment manager initialization.
+  FEnvManager := TEnvManager.Create;
+  FEnvManager.LoadFromFile(ConfigFile('EnvVars'));
+
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
@@ -831,6 +857,8 @@ begin
   SaveAppBookmarks(FBookManager);
 
   FreeAndNil(FResponseTabManager);
+  FEnvManager.SaveToFile(ConfigFile('EnvVars'));
+  FreeAndNil(FEnvManager);
 
   if Assigned(FProfilerGraph) then
     FreeAndNil(FProfilerGraph);
@@ -857,6 +885,7 @@ begin
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
     sciBookmark:    btnBookmarkClick(Sender);
+    sciEnv:         btnEnvClick(Sender);
     sciSwitchView: begin
       // Switch views in the response tab (list or text view).
       if pagesResponse.ActivePage = tabResponse then
@@ -871,7 +900,7 @@ end;
 
 procedure TMainForm.FormShow(Sender: TObject);
 var
-  I: Byte;
+  I: integer;
 begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
@@ -886,6 +915,11 @@ begin
       pagesRequest.ActivePageIndex := I;
       break;
     end;
+  // Sync combobox items with EnvManager.
+  // Warning! It must be here, it won't work if it in FormCreate (why?).
+  FEnvManager.ExtList := cbEnv.Items;
+  if Assigned(FEnvManager.Current) and FEnvManager.FindExt(FEnvManager.Current.Name, I) then
+    cbEnv.ItemIndex := I;
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
@@ -999,7 +1033,11 @@ begin
     OKMsg('Export', 'Request url is missing.');
     Exit;
   end;
-  with TExportForm.Create(Self) do begin
+  with TExportForm.Create(Self) do
+  begin
+    RequestObject := CreateRequestObject;
+    if Assigned(FEnvManager.Current) then
+      RequestObject.ApplyEnv(FEnvManager.Current);
     ShowModal;
     Free;
   end;
@@ -1293,7 +1331,7 @@ begin
   Grid.SetFocus;
 end;
 
-procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid);
+procedure TMainForm.OnGridDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
 begin
   // Force to update url query params.
   if Grid = gridParams then SyncGridQueryParams;
@@ -1384,33 +1422,27 @@ end;
 procedure TMainForm.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
-  SetAppCaption(UrlPath(cbUrl.Text));
+  if Assigned(FBookManager.CurrentBookmark) then
+    SetAppCaption(FBookManager.CurrentBookmark.Name)
+  else
+    SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
   FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
   EnableSubmitButton;
 end;
 
 procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
-  procedure SetColumns(grid: TStringGrid);
-  var
-    Val, col: Integer;
-  begin
-    for col := 1 to grid.ColCount do begin
-      Val := PSMAIN.ReadInteger(grid.Name + 'Col' + IntToStr(col), 0);
-      if Val > 0 then grid.Columns.Items[col - 1].Width := Val;
-    end;
-  end;
 var
   IntVal: integer;
   StrVal: string;
   RO: TRequestObject;
 begin
-  SetColumns(requestHeaders);
-  SetColumns(responseHeaders);
-  SetColumns(gridForm);
-  SetColumns(gridReqCookie);
-  SetColumns(gridRespCookie);
-  SetColumns(gridParams);
+  PropsRestoreGridColumns(PSMAIN, requestHeaders);
+  PropsRestoreGridColumns(PSMAIN, responseHeaders);
+  PropsRestoreGridColumns(PSMAIN, gridForm);
+  PropsRestoreGridColumns(PSMAIN, gridReqCookie);
+  PropsRestoreGridColumns(PSMAIN, gridRespCookie);
+  PropsRestoreGridColumns(PSMAIN, gridParams);
   with PSMAIN do begin
     miTabHeaders.Checked := ReadBoolean('tabHeaders', True);
     miTabQuery.Checked := ReadBoolean('tabQuery', True);
@@ -1445,22 +1477,15 @@ begin
 end;
 
 procedure TMainForm.PSMAINSavingProperties(Sender: TObject);
-  procedure SaveColumns(grid: TStringGrid);
-  var
-    I: Integer;
-  begin
-    for I := 0 to grid.Columns.Count - 1 do
-      PSMAIN.WriteInteger(grid.Name + 'Col' + IntToStr(I + 1), grid.Columns.Items[I].Width);
-  end;
 var
   RO: TRequestObject;
 begin
-  SaveColumns(requestHeaders);
-  SaveColumns(gridForm);
-  SaveColumns(responseHeaders);
-  SaveColumns(gridReqCookie);
-  SaveColumns(gridRespCookie);
-  SaveColumns(gridParams);
+  PropsSaveGridColumns(PSMAIN, requestHeaders);
+  PropsSaveGridColumns(PSMAIN, gridForm);
+  PropsSaveGridColumns(PSMAIN, responseHeaders);
+  PropsSaveGridColumns(PSMAIN, gridReqCookie);
+  PropsSaveGridColumns(PSMAIN, gridRespCookie);
+  PropsSaveGridColumns(PSMAIN, gridParams);
   with PSMAIN do begin
     WriteBoolean('tabHeaders', miTabHeaders.Checked);
     WriteBoolean('tabQuery', miTabQuery.Checked);
@@ -1504,6 +1529,21 @@ begin
   header := Trim(GetRowKV(requestHeaders, aRow).Key);
   if header <> '' then
     HeadersEditorForm.FillHeaderValues(header, requestHeaders.Columns.Items[2].PickList);
+end;
+
+procedure TMainForm.btnEnvClick(Sender: TObject);
+begin
+  With TEnvForm.Create(Self) do begin
+    EnvManager := FEnvManager;
+    ShowModal(FEnvManager.Current);
+    Free;
+  end;
+  // Auto select the first env when no env is selected.
+  if (cbEnv.ItemIndex = -1) and (FEnvManager.Count > 0) then
+  begin
+    cbEnv.ItemIndex := 0;
+    FEnvManager.Current := FEnvManager.EnvIndex[0];
+  end;
 end;
 
 procedure TMainForm.tbtnFormUploadClick(Sender: TObject);
@@ -2015,16 +2055,26 @@ begin
       SelectedSourceNode := FAppTreeManager.BookmarkSelected;
       ConfirmDelete := @FAppTreeManager.BookmarkPopup.ConfirmDeleteBookmark;
       case ShowModal(BM, RO) of
-        mrAdded:   BookmarkButtonIcon(True);
+        mrAdded:   begin
+          BookmarkButtonIcon(True);
+          SetAppCaption(FBookManager.CurrentBookmark.Name);
+        end;
         mrDeleted: begin
           if FBookManager.CurrentBookmark = NIL then
+          begin
             BookmarkButtonIcon(False);
+            SetAppCaption(UrlPath(RO.Url));
+          end;
           FreeAndNil(RO);
         end;
         mrOk: begin
           // Update url for the current bookmark.
-          if (FBookManager.CurrentBookmark = BM) and (RO.Url <> Bookmark.Request.Url) then
-            cbUrl.Text := Bookmark.Request.Url;
+          if FBookManager.CurrentBookmark = BM then
+          begin
+            SetAppCaption(BM.Name);
+            if RO.Url <> Bookmark.Request.Url then
+              cbUrl.Text := Bookmark.Request.Url;
+          end;
           FreeAndNil(RO);
           SyncGridQueryParams;
         end;
@@ -2050,6 +2100,7 @@ begin
   SetRequestObject(Selected.Request);
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
+  SetAppCaption(Selected.Name);
 end;
 
 procedure TMainForm.OnDeleteBookmark(Sender: TObject; BM: TBookmark);
@@ -2058,7 +2109,10 @@ var
 begin
   Curr := FBookManager.CurrentBookmark;
   if (Curr = BM) or (Curr = NIL) then
+  begin
     BookmarkButtonIcon(False);
+    SetAppCaption(UrlPath(BM.Request.Url));
+  end;
 end;
 
 procedure TMainForm.ApplyOptions;
@@ -2107,6 +2161,7 @@ begin
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
+  miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 
   // Change bookmarks node style.
@@ -2234,7 +2289,7 @@ begin
   end;
 end;
 
-function TMainForm.EncodeFormData: string;
+function TMainForm.EncodeFormData(const Env: TEnvironment): string;
 var
   i: integer;
   KV: TKeyValue;
@@ -2246,19 +2301,24 @@ begin
     KV := GetRowKV(gridForm, i);
     if KV.Key = '' then continue; // Skip empty names
     if Result <> '' then Result := Result + '&';
+    KV.Key := Env.Apply(KV.Key);
+    KV.Value := Env.Apply(KV.Value);
     Result := Result + EncodeURLElement(KV.Key) + '=' + EncodeURLElement(KV.Value);
   end;
 end;
 
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 var
-  i, p: integer;
+  i: integer;
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
   TimerRequest.Enabled := False;
-  SetAppCaption(UrlPath(Info.Url));
+
+  // Update the app window caption.
+  if not Assigned(FBookManager.CurrentBookmark) then
+    SetAppCaption(UrlPath(Info.Url));
 
   // Response headers.
   responseHeaders.RowCount := Info.ResponseHeaders.Count + 1;
@@ -2275,17 +2335,7 @@ begin
   UpdateStatusLine(Info);
 
   if (Info.StatusCode <> 404) then
-  begin
-    p := cbUrl.Items.IndexOf(Info.Url);
-    if p = -1 then begin // Add a new url.
-      if cbUrl.Items.Count >= MAX_URLS then
-        cbUrl.Items.Delete(cbUrl.Items.Count - 1);
-      cbUrl.Items.Insert(0, Info.Url);
-    end
-    else // Move an existing url to the top of the list.
-      cbUrl.Items.Move(p, 0);
-    cbUrl.Text := Info.Url;
-  end;
+    cbUrl.AddHistoryItem(cbUrl.Text, MAX_URLS, True, True);
 
   // Fill response cookie grid or hide it.
   ShowResponseCookie(Info.ResponseHeaders);

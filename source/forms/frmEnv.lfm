@@ -1,0 +1,282 @@
+object EnvForm: TEnvForm
+  Left = 421
+  Height = 370
+  Top = 178
+  Width = 460
+  BorderIcons = [biSystemMenu]
+  Caption = 'Environment'
+  ClientHeight = 370
+  ClientWidth = 460
+  Constraints.MinHeight = 320
+  Constraints.MinWidth = 360
+  KeyPreview = True
+  OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
+  OnShow = FormShow
+  Position = poMainFormCenter
+  SessionProperties = 'Height;Width;Top;Left'
+  ShowInTaskBar = stNever
+  LCLVersion = '1.8.4.0'
+  object ButtonPanel: TButtonPanel
+    Left = 6
+    Height = 27
+    Top = 337
+    Width = 448
+    OKButton.Name = 'OKButton'
+    OKButton.DefaultCaption = True
+    HelpButton.Name = 'HelpButton'
+    HelpButton.DefaultCaption = True
+    CloseButton.Name = 'CloseButton'
+    CloseButton.DefaultCaption = True
+    CancelButton.Name = 'CancelButton'
+    CancelButton.DefaultCaption = True
+    TabOrder = 0
+    ShowButtons = [pbClose]
+    ShowGlyphs = []
+    ShowBevel = False
+  end
+  object TBControls: TToolBar
+    Left = 4
+    Height = 22
+    Top = 4
+    Width = 452
+    AutoSize = True
+    BorderSpacing.Left = 4
+    BorderSpacing.Top = 4
+    BorderSpacing.Right = 4
+    Caption = 'TBControls'
+    EdgeBorders = []
+    EdgeInner = esNone
+    EdgeOuter = esNone
+    Images = MainForm.toolbarIcons
+    List = True
+    ShowCaptions = True
+    TabOrder = 1
+    object tbAdd: TToolButton
+      Left = 53
+      Hint = 'Add a new environment'
+      Top = 0
+      AutoSize = True
+      Caption = '&Add'
+      ImageIndex = 10
+      OnClick = tbAddClick
+      ParentShowHint = False
+      ShowHint = True
+    end
+    object tbEdit: TToolButton
+      Left = 101
+      Hint = 'Change the current environment'
+      Top = 0
+      AutoSize = True
+      Caption = '&Edit'
+      ImageIndex = 9
+      OnClick = tbEditClick
+      ParentShowHint = False
+      ShowHint = True
+    end
+    object tbDelete: TToolButton
+      Left = 148
+      Hint = 'Delete environment'
+      Top = 0
+      Caption = '&Delete'
+      ImageIndex = 8
+      OnClick = tbDeleteClick
+      ParentShowHint = False
+      ShowHint = True
+    end
+    object tbEnv: TToolButton
+      Left = 1
+      Hint = 'Ctrl-Up or Ctrl-Down - switch environments'
+      Top = 0
+      AutoSize = True
+      Caption = 'tbEnv'
+      DropdownMenu = menuEnv
+      ParentShowHint = False
+      ShowHint = True
+      Style = tbsButtonDrop
+    end
+  end
+  object panVars: TPanel
+    Left = 4
+    Height = 208
+    Top = 123
+    Width = 452
+    Align = alClient
+    BorderSpacing.Left = 4
+    BorderSpacing.Top = 4
+    BorderSpacing.Right = 4
+    BevelOuter = bvNone
+    ClientHeight = 208
+    ClientWidth = 452
+    TabOrder = 2
+    object dbVars: TDividerBevel
+      Left = 0
+      Height = 17
+      Top = 0
+      Width = 452
+      Caption = 'Variables'
+      Align = alTop
+      Font.Style = [fsBold]
+      ParentFont = False
+      Style = gsButton
+    end
+    object navVars: TGridNavigator
+      Left = 0
+      Height = 22
+      Top = 17
+      Width = 452
+      Caption = 'navVars'
+      EdgeBorders = []
+      ShowCaptions = True
+      TabOrder = 0
+      Grid = gridVars
+      OnDeleteRow = navVarsDeleteRow
+      OnGridClear = navVarsGridClear
+      ShowNavButtons = True
+    end
+    object gridVars: TStringGrid
+      Left = 0
+      Height = 169
+      Top = 39
+      Width = 452
+      Align = alClient
+      BorderStyle = bsNone
+      ColCount = 2
+      Columns = <      
+        item
+          Title.Font.Style = [fsBold]
+          Title.Caption = 'Name'
+          Width = 120
+        end      
+        item
+          Title.Font.Style = [fsBold]
+          Title.Caption = 'Value'
+          Width = 200
+        end>
+      FixedCols = 0
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goDblClickAutoSize, goSmoothScroll]
+      TabOrder = 1
+      TitleStyle = tsNative
+      OnEditingDone = gridVarsEditingDone
+    end
+  end
+  object panEnv: TPanel
+    Left = 4
+    Height = 81
+    Top = 30
+    Width = 452
+    Align = alTop
+    AutoSize = True
+    BorderSpacing.Left = 4
+    BorderSpacing.Top = 4
+    BorderSpacing.Right = 4
+    BorderSpacing.Bottom = 12
+    BevelOuter = bvNone
+    ClientHeight = 81
+    ClientWidth = 452
+    TabOrder = 3
+    object dbEnv: TDividerBevel
+      Left = 0
+      Height = 17
+      Top = 0
+      Width = 452
+      Caption = 'Edit environment'
+      Align = alTop
+      Font.Style = [fsBold]
+      ParentFont = False
+      Style = gsButton
+    end
+    object panName: TPanel
+      Left = 0
+      Height = 27
+      Top = 21
+      Width = 452
+      Align = alTop
+      AutoSize = True
+      BorderSpacing.Top = 4
+      BevelOuter = bvNone
+      ClientHeight = 27
+      ClientWidth = 452
+      TabOrder = 0
+      object labName: TLabel
+        Left = 0
+        Height = 27
+        Top = 0
+        Width = 37
+        Align = alLeft
+        BorderSpacing.Right = 6
+        Caption = 'Name:'
+        Layout = tlCenter
+        ParentColor = False
+      end
+      object editName: TEdit
+        Left = 43
+        Height = 27
+        Top = 0
+        Width = 409
+        Align = alClient
+        OnChange = editNameChange
+        OnKeyPress = editNameKeyPress
+        TabOrder = 0
+        Text = 'editName'
+      end
+    end
+    object panOpts: TPanel
+      Left = 0
+      Height = 29
+      Top = 52
+      Width = 452
+      Align = alTop
+      AutoSize = True
+      BorderSpacing.Top = 4
+      BevelOuter = bvNone
+      ClientHeight = 29
+      ClientWidth = 452
+      TabOrder = 1
+      object cbParent: TComboBox
+        Left = 46
+        Height = 29
+        Top = 0
+        Width = 319
+        Align = alClient
+        BorderSpacing.Right = 12
+        ItemHeight = 0
+        Style = csDropDownList
+        TabOrder = 0
+      end
+      object btnSave: TButton
+        Left = 377
+        Height = 29
+        Top = 0
+        Width = 75
+        Align = alRight
+        Caption = '&Save'
+        OnClick = btnSaveClick
+        TabOrder = 1
+      end
+      object labParent: TLabel
+        Left = 0
+        Height = 29
+        Top = 0
+        Width = 40
+        Align = alLeft
+        BorderSpacing.Right = 6
+        Caption = 'Parent:'
+        Layout = tlCenter
+        ParentColor = False
+      end
+    end
+  end
+  object menuEnv: TPopupMenu
+    left = 288
+    top = 216
+  end
+  object Props: TJSONPropStorage
+    StoredValues = <>
+    Formatted = True
+    OnSavingProperties = PropsSavingProperties
+    OnRestoringProperties = PropsRestoringProperties
+    left = 274
+    top = 149
+  end
+end
