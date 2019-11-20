@@ -284,8 +284,9 @@ function UrlPath(Url: string): string;
 var
   uri: TURI;
 begin
-  if Url = '' then Exit('');
-  uri := ParseURI(Url);
+  if Url = '' then
+    Exit(''); // =>
+  uri := ParseURI(NormalizeUrl(Url));
   Result := '';
   if uri.Protocol <> '' then
     Result := uri.Protocol + '://';
