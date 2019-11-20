@@ -687,7 +687,9 @@ end;
 
 procedure TMainForm.KeepCurrentResponseTab;
 begin
-  if Assigned(pagesResponse.ActivePage) then
+  // Keep the response tab only when the latest request is completed (it has
+  // the filled content type as a condition).
+  if Assigned(pagesResponse.ActivePage) and (FContentType <> '') then
     FKeepResponseTab := pagesResponse.ActivePage.Caption;
 end;
 
