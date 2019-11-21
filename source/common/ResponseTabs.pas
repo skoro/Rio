@@ -6,7 +6,7 @@ unit ResponseTabs;
 interface
 
 uses
-  Classes, SysUtils, fpjson, JsonParser, ComCtrls, ExtCtrls, Controls, Forms,
+  Classes, SysUtils, fpjson, JsonParserMod, ComCtrls, ExtCtrls, Controls, Forms,
   StdCtrls, Dialogs, SynEdit, SynEditTypes, ThreadHttpClient, inputbuttons;
 
 type

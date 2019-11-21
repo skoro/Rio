@@ -256,7 +256,7 @@
         <IsPartOfProject Value="True"/>
       </Unit7>
       <Unit8>
-        <Filename Value="common/JsonParser.pas"/>
+        <Filename Value="common/JsonParserMod.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit8>
       <Unit9>

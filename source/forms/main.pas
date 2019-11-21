@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
   ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
-  jsonparser, AppTree, Env;
+  JsonParserMod, AppTree, Env;
 
 type
 
