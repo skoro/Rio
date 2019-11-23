@@ -66,6 +66,8 @@ procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 
 // Returns a specific config filename.
 function ConfigFile(const Name: string; Ext: string = ''): string;
+// Application cache directory.
+function AppCacheDir(const aDir: string = ''): string;
 
 // Save and restore a grid column sizes to the property storage component.
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
@@ -414,6 +416,19 @@ begin
   if Ext[1] <> '.' then
     Ext := '.' + Ext;
   Result := GetAppConfigDir(False) + DirectorySeparator + Name + Ext;
+end;
+
+function AppCacheDir(const aDir: string): string;
+begin
+  { TODO : How about Windows ? }
+  Result := GetEnvironmentVariable('XDG_CACHE_HOME');
+  if Result = '' then
+    Result := IncludeTrailingPathDelimiter(GetUserDir + '.cache')
+  else
+    Result := IncludeTrailingPathDelimiter(Result);
+  Result := IncludeTrailingPathDelimiter(Result + ApplicationName);
+  if aDir <> '' then
+    Result := IncludeTrailingPathDelimiter(Result + aDir);
 end;
 
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
