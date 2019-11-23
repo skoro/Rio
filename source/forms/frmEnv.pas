@@ -17,6 +17,7 @@ type
     btnSave: TButton;
     ButtonPanel: TButtonPanel;
     cbParent: TComboBox;
+    dbMain: TDividerBevel;
     Props: TJSONPropStorage;
     labParent: TLabel;
     dbVars: TDividerBevel;
@@ -182,7 +183,9 @@ end;
 procedure TEnvForm.editNameKeyPress(Sender: TObject; var Key: char);
 begin
   case Key of
+    // Esc - close add/edit env panel.
     #27: HidePanelEnv;
+    // Enter - submit env name.
     #13: if btnSave.Enabled then
             btnSaveClick(Sender);
   end;
@@ -246,7 +249,7 @@ begin
     HidePanelEnv;
     Exit; // =>
   end;
-  dbEnv.Caption := 'New environment';
+  dbEnv.Caption := 'New';
   editName.Text := '';
   SetParentsForEnv(nil);
   btnSave.Enabled := False;
@@ -262,7 +265,7 @@ var
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // When invoked via shortcut =>
-  if ConfirmDlg('Delete', 'Are you sure you want to delete: ' + FCurrentEnv.Name + ' ?') = mrCancel then
+  if ConfirmDlg('Delete', 'Are you sure you want to delete environment: '+ #13 + FCurrentEnv.Name + ' ?') = mrCancel then
     Exit; // =>
 
   MI := menuEnv.Items.Find(FCurrentEnv.Name);
@@ -362,7 +365,7 @@ end;
 
 procedure TEnvForm.PrepareEditEnv;
 begin
-  dbEnv.Caption := 'Edit environment: ' + FCurrentEnv.Name;
+  dbEnv.Caption := 'Edit: ' + FCurrentEnv.Name;
   editName.Text := FCurrentEnv.Name;
   SetParentsForEnv(FCurrentEnv);
 end;
