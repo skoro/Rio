@@ -7,7 +7,7 @@ interface
 uses
   DividerBevel, Forms,
   ButtonPanel, ExtCtrls, Grids, StdCtrls, ComCtrls, Menus,
-  GridNavigator, Env, Controls, JSONPropStorage, Classes;
+  GridNavigator, Env, Controls, JSONPropStorage, Classes, Types;
 
 type
 
@@ -42,6 +42,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure gridVarsDrawCell(Sender: TObject; aCol, aRow: Integer;
+      aRect: TRect; aState: TGridDrawState);
     procedure gridVarsEditingDone(Sender: TObject);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
@@ -124,6 +126,25 @@ begin
   HidePanelEnv;
   DisableIfEnvEmpty;
   gridVars.SetFocus;
+end;
+
+procedure TEnvForm.gridVarsDrawCell(Sender: TObject; aCol, aRow: Integer;
+  aRect: TRect; aState: TGridDrawState);
+var
+  varName: string;
+begin
+  if gdFixed in aState then
+    Exit;
+  // The parent variables will be drawn by bold font.
+  if Assigned(FCurrentEnv) then
+  begin
+    varName := Trim(gridVars.Cells[0, aRow]);
+    if (length(varName) > 0) and (FCurrentEnv.FindVar(varName) = nil) then
+    begin
+      gridVars.Canvas.Font.Style := [fsBold];
+      gridVars.DefaultDrawCell(aCol, aRow, aRect, aState);
+    end;
+  end;
 end;
 
 procedure TEnvForm.gridVarsEditingDone(Sender: TObject);

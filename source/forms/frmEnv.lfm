@@ -157,6 +157,7 @@ object EnvForm: TEnvForm
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goDblClickAutoSize, goSmoothScroll]
       TabOrder = 1
       TitleStyle = tsNative
+      OnDrawCell = gridVarsDrawCell
       OnEditingDone = gridVarsEditingDone
     end
   end
