@@ -613,6 +613,7 @@ begin
     if IsFolderNode(Child) then begin // Folder node.
       XmlNode := Doc.CreateElement('Folder');
       TDOMElement(XmlNode).SetAttribute('name', Child.Text);
+      TDOMElement(XmlNode).SetAttribute('expanded', IfThen(Child.Expanded, '1', '0'));
       XmlRoot.AppendChild(XmlNode);
       InternalSaveToXml(Doc, XmlNode, Child);
     end
@@ -636,22 +637,30 @@ var
   Child: TDOMNode;
   BM: TBookmark;
   fNode: TTreeNode;
+  ExpandedState: Boolean; // preserve a node expanded state when adding the bookmark
+  NodePath: string;
 begin
   if XmlNode = NIL then // Stops if reached a leaf.
     Exit; // =>
   Child := XmlNode.FirstChild;
+  NodePath := GetNodePath(aNode);
+  // save the expanded state and restore it after adding a bookmark.
+  ExpandedState := aNode.Expanded;
   while Child <> NIL do begin
     Elem := TDOMElement(Child);
     case LowerCase(Child.NodeName) of
       'folder': begin
         fNode := InternalAddFolder(aNode, Elem.GetAttribute('name'));
         InternalLoadFromXml(Child, fNode);
+        fNode.Expanded := (Elem.GetAttribute('expanded') = '1');
       end;
       'bookmark': begin
         BM := TBookmark.Create(Elem.GetAttribute('name'));
         BM.Locked := Elem.GetAttribute('locked') = '1';
         BM.Request := TRequestObject.CreateFromJson(Child.TextContent);
-        AddBookmark(BM, GetNodePath(aNode));
+        fNode := AddBookmark(BM, NodePath);
+        // preserve the bookmark parent folder collapsed/expanded state
+        fNode.Parent.Expanded := ExpandedState;
       end;
     end;
     Child := Child.NextSibling;
