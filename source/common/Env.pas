@@ -410,16 +410,16 @@ end;
 procedure TEnvManager.LoadFromStream(const AStream: TStream);
 var
   Doc: TXMLDocument;
-  EnvNode, VarNode: TDOMNode;
+  RootNode, EnvNode, VarNode: TDOMNode;
   EnvName, ParentName: string;
   EnvObj, ParentEnv: TEnvironment;
 begin
   try
     ReadXMLFile(Doc, AStream);
-    EnvNode := Doc.FindNode('Environments');
-    if not Assigned(EnvNode) then
+    RootNode := Doc.FindNode('Environments');
+    if not Assigned(RootNode) then
       raise Exception.Create('Cannot read env xml data from stream.');
-    EnvNode := EnvNode.FirstChild;
+    EnvNode := RootNode.FirstChild;
     while EnvNode <> NIL do
     begin
       if EnvNode.NodeName <> 'Env' then
@@ -427,11 +427,7 @@ begin
       EnvName := TDOMElement(EnvNode).AttribStrings['name'];
       if EnvName = '' then
         Continue;
-      ParentName := TDOMElement(EnvNode).AttribStrings['parent'];
-      ParentEnv := Nil;
-      if ParentName <> '' then
-        ParentEnv := FindEnv(ParentName);
-      EnvObj := TEnvironment.Create(EnvName, ParentEnv);
+      EnvObj := TEnvironment.Create(EnvName, NIL);
       // Read variables for the environment.
       VarNode := EnvNode.FirstChild;
       while VarNode <> NIL do
@@ -445,6 +441,18 @@ begin
       Add(EnvObj);
       if TDOMElement(EnvNode).AttribStrings['current'] = '1' then
         Current := EnvObj;
+      EnvNode := EnvNode.NextSibling;
+    end;
+    // Rescan tree again and set parents to the environments.
+    EnvNode := RootNode.FirstChild;
+    while EnvNode <> NIL do
+    begin
+      EnvName := TDOMElement(EnvNode).AttribStrings['name'];
+      EnvObj := FindEnv(EnvName);
+      if EnvObj = Nil then
+        Continue;
+      ParentName := TDOMElement(EnvNode).AttribStrings['parent'];
+      EnvObj.Parent := FindEnv(ParentName);
       EnvNode := EnvNode.NextSibling;
     end;
   finally
