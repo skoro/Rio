@@ -12,11 +12,14 @@ type
   { TCacheAbstract }
 
   TCacheAbstract = class
+  private
   protected
     function GetKeyValue(const Key: string): string; virtual; abstract;
     procedure SetKeyValue(const Key, Value: string); virtual; abstract;
   public
-    procedure Put(const Key, Value: string); virtual; abstract;
+    procedure Put(const Key, Value: string); virtual;
+    procedure Put(const Key, Value: string; const Expired: TDateTime); virtual; abstract; overload;
+    procedure Put(const Key, Value: string; const Minutes: Int64); virtual; overload;
     function Delete(const Key: string): Boolean; virtual; abstract;
     function Exists(const Key: string): Boolean; virtual; abstract;
     property KeyValue[const Key: string]: string read GetKeyValue write SetKeyValue; default;
@@ -70,8 +73,7 @@ type
   public
     constructor Create(const ACacheDir: string);
     destructor Destroy; override;
-    procedure Put(const Key, Value: string); override;
-    procedure Put(const Key, Value: string; const Expired: TDateTime); overload;
+    procedure Put(const Key, Value: string; const Expired: TDateTime); override; overload;
     function Delete(const Key: string): Boolean; override;
     function Exists(const Key: string): Boolean; override;
     property CacheDir: string read FCacheDir write SetCacheDir;
@@ -82,14 +84,26 @@ var
 
 implementation
 
-uses md5, IniFiles;
+uses md5, IniFiles, dateutils;
+
+{ TCacheAbstract }
+
+procedure TCacheAbstract.Put(const Key, Value: string);
+begin
+  Put(Key, Value, TDateTime(0));
+end;
+
+procedure TCacheAbstract.Put(const Key, Value: string; const Minutes: Int64);
+begin
+  Put(Key, Value, IncMinute(Now, Minutes));
+end;
 
 { TFileMeta }
 
 function TFileMeta.GetHash: string;
 begin
   if FHash = '' then
-    FHash := GenId(FHash);
+    FHash := GenId(FKey);
   Result := FHash;
 end;
 
@@ -216,10 +230,11 @@ begin
       raise ECacheKeyNotFound.CreateFmt('Cache key "%s" is not exists.', [Key]);
     if not FileExists(Meta.DataFile) then
       raise EFileNotFoundException.CreateFmt('Cache data file not found: %s', [Meta.DataFile]);
-    H := FileOpen(Meta.DataFile, fmOpenRead or fmShareDenyWrite);
+    H := FileOpen(Meta.DataFile, fmOpenRead);
     if H = -1 then
       raise EInOutError.CreateFmt('Cannot open cache data: %s', [Meta.DataFile]);
-    S := FileRead(H, Buf, Meta.DataSize);
+    SetLength(Buf, Meta.DataSize);
+    S := FileRead(H, Buf[1], Meta.DataSize);
     if S <> Meta.DataSize then
       raise EInOutError.CreateFmt('Cannot read cache data: %s', [Meta.DataSize]);
     FileClose(H);
@@ -240,11 +255,6 @@ begin
   inherited Destroy;
 end;
 
-procedure TFileCache.Put(const Key, Value: string);
-begin
-  Put(Key, Value, 0);
-end;
-
 procedure TFileCache.Put(const Key, Value: string; const Expired: TDateTime);
 var
   Meta: TFileMeta;
@@ -256,7 +266,7 @@ begin
     Meta.Expired := Expired;
     Meta.DataSize := S;
     Meta.Save;
-    H := FileCreate(Meta.DataFile, fmShareDenyNone);
+    H := FileCreate(Meta.DataFile);
     if H = -1 then
       raise EInOutError.CreateFmt('Cannot create cache data file: %s', [Meta.DataFile]);
     if FileWrite(H, Value[1], S) <> S then
