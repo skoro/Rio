@@ -139,6 +139,9 @@ begin
   try
     Ini := TIniFile.Create(MetaFile);
     Ini.WriteString(ClassName, 'Key', FKey);
+    // Just for information.
+    Ini.WriteString(ClassName, 'Created', DateTimeToStr(Now));
+    // Expired time.
     if FExpired = 0 then
       Ini.WriteInteger(ClassName, 'Expired', 0)
     else
