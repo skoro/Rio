@@ -66,16 +66,17 @@ procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 
 // Returns a specific config filename.
 function ConfigFile(const Name: string; Ext: string = ''): string;
-// Application cache directory.
-function AppCacheDir(const aDir: string = ''): string;
 
 // Save and restore a grid column sizes to the property storage component.
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
 procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
 
+// Serialize an object to the json string.
+function ObjToJsonStr(Obj: TObject): string;
+
 implementation
 
-uses process, LazUTF8, SynEditTypes, options, strutils;
+uses process, fpjsonrtti, LazUTF8, SynEditTypes, options, strutils;
 
 function FilePutContents(const filename, contents: ansistring): Boolean;
 var
@@ -418,19 +419,6 @@ begin
   Result := GetAppConfigDir(False) + DirectorySeparator + Name + Ext;
 end;
 
-function AppCacheDir(const aDir: string): string;
-begin
-  { TODO : How about Windows ? }
-  Result := GetEnvironmentVariable('XDG_CACHE_HOME');
-  if Result = '' then
-    Result := IncludeTrailingPathDelimiter(GetUserDir + '.cache')
-  else
-    Result := IncludeTrailingPathDelimiter(Result);
-  Result := IncludeTrailingPathDelimiter(Result + ApplicationName);
-  if aDir <> '' then
-    Result := IncludeTrailingPathDelimiter(Result + aDir);
-end;
-
 procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
 var
   I: Integer;
@@ -448,6 +436,19 @@ begin
     Val := Props.ReadInteger(AGrid.Name + 'Col' + IntToStr(col), 0);
     if Val > 0 then
       AGrid.Columns.Items[col - 1].Width := Val;
+  end;
+end;
+
+function ObjToJsonStr(Obj: TObject): string;
+var
+  streamer: TJSONStreamer;
+begin
+  Result := '';
+  streamer := TJSONStreamer.Create(Nil);
+  try
+    Result := streamer.ObjectToJSONString(Obj);
+  finally
+    streamer.Free;
   end;
 end;
 
