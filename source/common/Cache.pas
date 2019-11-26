@@ -1,3 +1,6 @@
+{ TODO : No locking is implemented ! }
+{ TODO : Memory cache needed. When file cache initialization is failed switch to the memory cache. }
+
 unit Cache;
 
 {$mode objfpc}{$H+}
@@ -79,12 +82,28 @@ type
     property CacheDir: string read FCacheDir write SetCacheDir;
   end;
 
+// Application cache directory.
+function AppCacheDir(const aDir: string = ''): string;
+
 var
   AppCache: TCacheAbstract;
 
 implementation
 
 uses md5, IniFiles, dateutils;
+
+function AppCacheDir(const aDir: string): string;
+begin
+  { TODO : How about Windows ? }
+  Result := GetEnvironmentVariable('XDG_CACHE_HOME');
+  if Result = '' then
+    Result := IncludeTrailingPathDelimiter(GetUserDir + '.cache')
+  else
+    Result := IncludeTrailingPathDelimiter(Result);
+  Result := IncludeTrailingPathDelimiter(Result + ApplicationName);
+  if aDir <> '' then
+    Result := IncludeTrailingPathDelimiter(Result + aDir);
+end;
 
 { TCacheAbstract }
 
