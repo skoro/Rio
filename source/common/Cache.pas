@@ -1,5 +1,8 @@
-{ TODO : No locking is implemented ! }
-{ TODO : Memory cache needed. When file cache initialization is failed switch to the memory cache. }
+{
+  TODO : No locking is implemented !
+  TODO : Memory cache needed. When file cache initialization is failed
+         switch to the memory cache.
+}
 
 unit Cache;
 
