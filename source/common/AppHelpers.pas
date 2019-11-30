@@ -73,6 +73,8 @@ procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGr
 
 // Serialize an object to the json string.
 function ObjToJsonStr(Obj: TObject): string;
+// Unserialize a json string to the object.
+procedure JsonStrToObj(json: string; Obj: TObject);
 
 implementation
 
@@ -447,6 +449,18 @@ begin
   streamer := TJSONStreamer.Create(Nil);
   try
     Result := streamer.ObjectToJSONString(Obj);
+  finally
+    streamer.Free;
+  end;
+end;
+
+procedure JsonStrToObj(json: string; Obj: TObject);
+var
+  streamer: TJSONDeStreamer;
+begin
+  streamer := TJSONDeStreamer.Create(nil);
+  try
+    streamer.JSONToObject(json, Obj);
   finally
     streamer.Free;
   end;
