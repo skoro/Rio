@@ -46,6 +46,7 @@ type
     FRequest: TRequestObject;
     FTreeNode: TTreeNode;
     FLocked: Boolean;
+    function GetPath: string;
     procedure SetName(AValue: string);
     procedure SetTreeNode(AValue: TTreeNode);
   public
@@ -55,6 +56,7 @@ type
     property Request: TRequestObject read FRequest write FRequest;
     property TreeNode: TTreeNode read FTreeNode write SetTreeNode;
     property Name: string read FName write SetName;
+    property Path: string read GetPath;
     property Locked: Boolean read FLocked write FLocked;
   end;
 
@@ -497,11 +499,18 @@ begin
   FName := AValue;
 end;
 
+function TBookmark.GetPath: string;
+begin
+  Result := '';
+  if Assigned(FTreeNode) then
+    Result := GetNodePath(FTreeNode);
+end;
+
 procedure TBookmark.SetTreeNode(AValue: TTreeNode);
 begin
   if FTreeNode = AValue then
     Exit; // =>
-  if not Assigned(avalue) then
+  if not Assigned(AValue) then
     raise Exception.Create('Bookmark must be assigned to tree node.');
   if IsFolderNode(AValue) then
     raise ENodeException.CreateNode(AValue, 'The node is a folder node.');
@@ -845,6 +854,7 @@ begin
   Result := AddChildNode(FolderNode, '');
   Result.Data := BM;
   Result.Parent.Expanded := True;
+  BM.TreeNode := Result;
   SetNodeStyle(Result);
   SortNodes(FolderNode);
 end;
