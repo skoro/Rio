@@ -176,7 +176,7 @@ type
 
 implementation
 
-uses strutils, URIParser, fpjsonrtti;
+uses strutils, URIParser, AppHelpers;
 
 { TFormParamItem }
 
@@ -502,29 +502,14 @@ begin
 end;
 
 function TRequestObject.ToJson: string;
-var
-  streamer: TJSONStreamer;
 begin
-  Result := '';
-  streamer := TJSONStreamer.Create(Nil);
-  try
-    Result := streamer.ObjectToJSONString(Self);
-  finally
-    streamer.Free;
-  end;
+  Result := ObjToJsonStr(Self);
 end;
 
 class function TRequestObject.CreateFromJson(json: string): TRequestObject;
-var
-  streamer: TJSONDeStreamer;
 begin
-  streamer := TJSONDeStreamer.Create(nil);
-  try
-    Result := TRequestObject.Create;
-    streamer.JSONToObject(json, Result);
-  finally
-    streamer.Free;
-  end;
+  Result := TRequestObject.Create;
+  JsonStrToObj(json, Result);
 end;
 
 procedure TRequestObject.ApplyEnv(const AEnv: TEnvironment);
