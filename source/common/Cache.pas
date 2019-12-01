@@ -1,7 +1,6 @@
 {
   TODO : No locking is implemented !
-  TODO : Memory cache needed. When file cache initialization is failed
-         switch to the memory cache.
+  TODO : add crc for cache data for avoid rewriting data on the file system.
 }
 
 unit Cache;
@@ -102,16 +101,17 @@ type
   end;
 
 // Application cache directory.
-function AppCacheDir(const aDir: string = ''): string;
-
-var
-  AppCache: TCacheAbstract;
+//
+// Parameter 'Create' will create as the base directory and the additional
+// 'aDir' directory. If one of these directories cannot be created then
+// the exception EInOutError will be thrown.
+function AppCacheDir(const aDir: string = ''; Create: boolean = false): string;
 
 implementation
 
 uses md5, IniFiles, dateutils;
 
-function AppCacheDir(const aDir: string): string;
+function AppCacheDir(const aDir: string; Create: boolean = false): string;
 begin
   { TODO : How about Windows ? }
   Result := GetEnvironmentVariable('XDG_CACHE_HOME');
@@ -120,8 +120,14 @@ begin
   else
     Result := IncludeTrailingPathDelimiter(Result);
   Result := IncludeTrailingPathDelimiter(Result + ApplicationName);
+  if Create and (not DirectoryExists(Result)) and (not CreateDir(Result)) then
+    raise EInOutError.CreateFmt('Could not create cache directory: %s', [Result]);
   if aDir <> '' then
+  begin
     Result := IncludeTrailingPathDelimiter(Result + aDir);
+    if Create and (not DirectoryExists(Result)) and (not CreateDir(Result)) then
+      raise EInOutError.CreateFmt('Could not create cache directory: %s', [Result]);
+  end;
 end;
 
 { TNullCache }
