@@ -88,6 +88,19 @@ type
     property CacheDir: string read FCacheDir write SetCacheDir;
   end;
 
+  { TNullCache }
+
+  TNullCache = class(TCacheAbstract)
+  protected
+    function GetKeyValue(const Key: string): string; override;
+    procedure SetKeyValue(const Key, Value: string); override;
+  public
+    procedure Put(const Key, Value: string; const Expired: TDateTime);
+      override; overload;
+    function Delete(const Key: string): boolean; override;
+    function Exists(const Key: string): boolean; override;
+  end;
+
 // Application cache directory.
 function AppCacheDir(const aDir: string = ''): string;
 
@@ -109,6 +122,33 @@ begin
   Result := IncludeTrailingPathDelimiter(Result + ApplicationName);
   if aDir <> '' then
     Result := IncludeTrailingPathDelimiter(Result + aDir);
+end;
+
+{ TNullCache }
+
+function TNullCache.GetKeyValue(const Key: string): string;
+begin
+  Result := '';
+end;
+
+procedure TNullCache.SetKeyValue(const Key, Value: string);
+begin
+  // It does nothing.
+end;
+
+procedure TNullCache.Put(const Key, Value: string; const Expired: TDateTime);
+begin
+  // It does nothing.
+end;
+
+function TNullCache.Delete(const Key: string): boolean;
+begin
+  Result := True;
+end;
+
+function TNullCache.Exists(const Key: string): boolean;
+begin
+  Result := False;
 end;
 
 { TCacheAbstract }
