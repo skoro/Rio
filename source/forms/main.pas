@@ -9,7 +9,7 @@ uses
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
   SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
   ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
-  JsonParserMod, AppTree, Env;
+  JsonParserMod, AppTree, Env, Cache;
 
 type
 
@@ -253,11 +253,13 @@ type
     FKeepResponseTab: string;
     FAppTreeManager: TAppTreeManager;
     FEnvManager: TEnvManager;
+    FCacheResponse: TCacheAbstract;
     procedure OnHttpException(Url, Method: string; E: Exception);
     function ParseHeaderLine(line: string; delim: char = ':'; all: Boolean = False): TKeyValuePair;
     procedure UpdateHeadersPickList;
     function EncodeFormData(const Env: TEnvironment): string;
     procedure OnRequestComplete(Info: TResponseInfo);
+    procedure DoRequestComplete(Info: TResponseInfo);
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
     procedure ShowResponseCookie(Headers: TStrings);
@@ -679,7 +681,7 @@ begin
 
     // Set response content.
     if Assigned(ResponseInfo) then
-      OnRequestComplete(ResponseInfo);
+      DoRequestComplete(ResponseInfo);
 
     SyncGridQueryParams;
   end;
@@ -843,6 +845,15 @@ begin
   FEnvManager := TEnvManager.Create;
   FEnvManager.LoadFromFile(ConfigFile('EnvVars'));
 
+  // Response cache initialization.
+  try
+    FCacheResponse := TFileCache.Create(AppCacheDir('responses', True));
+  except
+    { TODO : log the reason why cache cannot be created. }
+    // Switch to null cache when file cache is not available.
+    FCacheResponse := TNullCache.Create;
+  end;
+
   SelectBodyTab(btForm);
   SelectAuthTab(atNone);
   pagesRequest.ActivePage := tabHeaders;
@@ -877,6 +888,9 @@ begin
   // Free and save options.
   OptionsForm.Free;
 
+  // Destroy cache instance.
+  FCacheResponse.Free;
+
   inherited;
 end;
 
@@ -903,6 +917,8 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 var
   I: integer;
+  StrVal: string;
+  RO: TRequestObject;
 begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
@@ -922,6 +938,22 @@ begin
   FEnvManager.ExtList := cbEnv.Items;
   if Assigned(FEnvManager.Current) and FEnvManager.FindExt(FEnvManager.Current.Name, I) then
     cbEnv.ItemIndex := I;
+
+  // Open the previous selected bookmark or request.
+  StrVal := PSMAIN.ReadString('selBookmark', '');
+  if StrVal <> '' then
+    FBookManager.OpenBookmarkPath(StrVal)
+  else begin
+    StrVal := PSMAIN.ReadString('currentRequest', '');
+    if StrVal <> '' then begin
+      try
+        RO := TRequestObject.CreateFromJson(StrVal);
+        SetRequestObject(RO);
+      finally
+        RO.Free;
+      end;
+    end;
+  end;
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
@@ -1436,8 +1468,6 @@ end;
 procedure TMainForm.PSMAINRestoringProperties(Sender: TObject);
 var
   IntVal: integer;
-  StrVal: string;
-  RO: TRequestObject;
 begin
   PropsRestoreGridColumns(PSMAIN, requestHeaders);
   PropsRestoreGridColumns(PSMAIN, responseHeaders);
@@ -1454,20 +1484,6 @@ begin
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
     miBookmarks.Checked := ReadBoolean('bookmarks', True);
-    StrVal := ReadString('selBookmark', '');
-    if StrVal <> '' then
-      FBookManager.OpenBookmarkPath(StrVal)
-    else begin
-      StrVal := ReadString('currentRequest', '');
-      if StrVal <> '' then begin
-        try
-          RO := TRequestObject.CreateFromJson(StrVal);
-          SetRequestObject(RO);
-        finally
-          RO.Free;
-        end;
-      end;
-    end;
     // Read splitter side sizes.
     IntVal := ReadInteger(STATE_SPLITTER_SIDE, 0);
     if IntVal > 0 then
@@ -2094,12 +2110,29 @@ begin
 end;
 
 procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
+var
+  RI: TResponseInfo;
 begin
   if Assigned(Prev) then
     Prev.UpdateRequest(CreateRequestObject);
   StartNewRequest;
   BookmarkButtonIcon(True);
-  SetRequestObject(Selected.Request);
+  RI := NIL;
+  if FCacheResponse.Exists(Selected.Path) then
+  begin
+    RI := TResponseInfo.Create;
+    Selected.Request.ResponseInfo := RI;
+    JsonStrToObj(FCacheResponse.KeyValue[Selected.Path], RI);
+  end;
+  try
+    SetRequestObject(Selected.Request);
+  finally
+    if Assigned(RI) then
+    begin
+      FreeAndNil(RI);
+      Selected.Request.ResponseInfo := NIL;
+    end;
+  end;
   btnSubmit.Enabled := True;
   btnBookmark.Enabled := True;
   SetAppCaption(Selected.Name);
@@ -2310,6 +2343,18 @@ begin
 end;
 
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
+begin
+  try
+    DoRequestComplete(Info);
+    if Assigned(FBookManager.CurrentBookmark) then
+      FCacheResponse.Put(FBookManager.CurrentBookmark.Path, ObjToJsonStr(Info));
+    FinishRequest;
+  finally
+    Info.Free;
+  end;
+end;
+
+procedure TMainForm.DoRequestComplete(Info: TResponseInfo);
 var
   i: integer;
   mime: TMimeType;
@@ -2392,10 +2437,6 @@ begin
 
   tbtnRespFollow.Visible := (Info.Location <> '');
   textResp.CaretPos := Point(0, 0);
-
-  // Finally, dispose response info data.
-  Info.Free;
-  FinishRequest;
 end;
 
 procedure TMainForm.UpdateStatusLine(Main: string);
