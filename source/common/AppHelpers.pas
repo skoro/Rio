@@ -16,28 +16,30 @@ uses
 type
 
   TFindPos = record
-    Pos: Integer;
-    SelStart: Integer;
-    SelLength: Integer;
+    Pos: integer;
+    SelStart: integer;
+    SelLength: integer;
   end;
 
 { Save string contents to a file }
-function FilePutContents(const filename, contents: ansistring): Boolean;
+function FilePutContents(const filename, contents: ansistring): boolean;
 { Load string contents from a file }
-function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
+function FileGetContents(const filename: ansistring; out buffer: ansistring): boolean;
 { Execute an app and don't wait when it exits. }
 procedure AppExec(const exename: string; params: array of string);
 { Split input string to list of strings delimited by character }
 procedure SplitStrings(const Input: string; const Delim: char; Strings: TStringList);
 function SplitKV(const Input: string; const Delim: char): TKeyValuePair;
 { Approximate milliseconds }
-function FormatMsApprox(ms: Int64): string;
+function FormatMsApprox(ms: int64): string;
 { Separate number parts by dot. }
-function NumberFormat(num: Int64; dot: string = '.'): string;
+function NumberFormat(num: int64; dot: string = '.'): string;
 { Finds all the named controls in an owner control. }
-procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
+procedure EnumControls(const Owner: TWinControl; const ControlName: string;
+  Controls: TList);
 
-function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer = 0): TFindPos;
+function FindInText(AText, Search: string; Options: TFindOptions;
+  FromPos: integer = 0): TFindPos;
 procedure Tokenize(txt: string; Tokens: TStrings);
 
 // Show the confirmation dialog.
@@ -53,13 +55,15 @@ procedure WarnMsg(Caption, Txt: string);
 function FormatJson(json: TJSONData): string;
 
 // Grid helpers
-function GetRowKV(const grid: TStringGrid; aRow: Integer = -1): TKeyValue;
-function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer = -1; isUnique: Boolean = True): Integer;
+function GetRowKV(const grid: TStringGrid; aRow: integer = -1): TKeyValue;
+function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: integer = -1;
+  isUnique: boolean = True): integer;
 
 // Converts a TStringGrid component to the string.
 // delimChar - a delimiter between columns
 // aRow, aCol - row and column offsets
-function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer = 1; aCol: Integer = 0): string;
+function GridToString(aGrid: TStringGrid; delimChar: string;
+  aRow: integer = 1; aCol: integer = 0): string;
 
 // Switch to a named tab in the PageControl component.
 procedure SwitchTabByName(PC: TPageControl; const TabName: string);
@@ -68,8 +72,10 @@ procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 function ConfigFile(const Name: string; Ext: string = ''): string;
 
 // Save and restore a grid column sizes to the property storage component.
-procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
-procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage;
+  const AGrid: TStringGrid);
+procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage;
+  const AGrid: TStringGrid);
 
 // Serialize an object to the json string.
 function ObjToJsonStr(Obj: TObject): string;
@@ -80,7 +86,7 @@ implementation
 
 uses process, fpjsonrtti, LazUTF8, SynEditTypes, options, strutils;
 
-function FilePutContents(const filename, contents: ansistring): Boolean;
+function FilePutContents(const filename, contents: ansistring): boolean;
 var
   fs: TFileStream;
 begin
@@ -94,7 +100,7 @@ begin
   end;
 end;
 
-function FileGetContents(const filename: ansistring; out buffer: ansistring): Boolean;
+function FileGetContents(const filename: ansistring; out buffer: ansistring): boolean;
 var
   str: TStringList;
 begin
@@ -113,7 +119,8 @@ procedure AppExec(const exename: string; params: array of string);
 var
   par: string;
 begin
-  with TProcess.Create(nil) do begin
+  with TProcess.Create(nil) do
+  begin
     Executable := exename;
     for par in params do
       Parameters.Add(par);
@@ -132,7 +139,7 @@ end;
 
 function SplitKV(const Input: string; const Delim: char): TKeyValuePair;
 var
-  p: Integer;
+  p: integer;
 begin
   p := Pos(delim, Input);
   if p = 0 then
@@ -145,19 +152,22 @@ begin
   Result.Value := Trim(RightStr(Input, Length(Input) - p));
 end;
 
-function FormatMsApprox(ms: Int64): string;
+function FormatMsApprox(ms: int64): string;
 var
-  seconds, minutes, hours: Integer;
+  seconds, minutes, hours: integer;
 begin
   Result := Format('%d ms', [ms]);
-  if ms >= 1000 then begin
+  if ms >= 1000 then
+  begin
     seconds := round(ms / 1000);
     Result := Format('~ %d sec', [seconds]);
-    if seconds >= 60 then begin
+    if seconds >= 60 then
+    begin
       minutes := round(seconds / 60);
       seconds := seconds mod 60;
       Result := Format('~ %d min %d sec', [minutes, seconds]);
-      if minutes >= 60 then begin
+      if minutes >= 60 then
+      begin
         hours := round(minutes / 60);
         minutes := minutes mod 60;
         Result := Format('%d h %d min', [hours, minutes]);
@@ -166,60 +176,69 @@ begin
   end;
 end;
 
-function NumberFormat(num: Int64; dot: string): string;
+function NumberFormat(num: int64; dot: string): string;
 var
   s: string;
-  i, n: Integer;
+  i, n: integer;
 begin
   n := 1;
   s := IntToStr(num);
   Result := '';
-  for i := Length(s) downto 1 do begin
-    Result := s[i] + result;
+  for i := Length(s) downto 1 do
+  begin
+    Result := s[i] + Result;
     if (i <> 1) and (n mod 3 = 0) then
-      Result := dot + result;
+      Result := dot + Result;
     Inc(n);
   end;
 end;
 
-procedure EnumControls(const Owner: TWinControl; const ControlName: string; Controls: TList);
+procedure EnumControls(const Owner: TWinControl; const ControlName: string;
+  Controls: TList);
 var
   cnt: integer;
   ctrl: TControl;
 begin
-  for cnt := 0 to Owner.ControlCount - 1 do begin
+  for cnt := 0 to Owner.ControlCount - 1 do
+  begin
     ctrl := Owner.Controls[cnt];
     if ctrl is TWinControl then
       EnumControls(TWinControl(ctrl), ControlName, Controls);
-    if ctrl.ClassName = ControlName then begin
+    if ctrl.ClassName = ControlName then
+    begin
       Controls.Add(ctrl);
     end;
   end;
 end;
 
 // http://wiki.freepascal.org/TMemo#Search_text
-function FindInText(AText, Search: string; Options: TFindOptions; FromPos: Integer): TFindPos;
+function FindInText(AText, Search: string; Options: TFindOptions;
+  FromPos: integer): TFindPos;
 const
   WordDelims = TSynWordBreakChars + TSynWhiteChars;
 var
-  p, wlen: Integer;
+  p, wlen: integer;
   StrRes: string;
-  done: Boolean;
+  done: boolean;
 begin
   done := False;
 
-  while not done do begin
-    if not (frMatchCase in Options) then begin
+  while not done do
+  begin
+    if not (frMatchCase in Options) then
+    begin
       AText := Utf8LowerCase(AText);
       Search := Utf8LowerCase(Search);
     end;
 
-    if frDown in Options then begin
+    if frDown in Options then
+    begin
       if FromPos = 0 then
         FromPos := 1;
       p := PosEx(Search, AText, FromPos);
     end
-    else begin
+    else
+    begin
       if FromPos = 0 then
         FromPos := UTF8Length(AText);
       if FromPos < 0 then
@@ -238,15 +257,18 @@ begin
     Result.SelStart := UTF8Length(PChar(AText), p - 1);
     Result.SelLength := UTF8Length(Search);
 
-    if frWholeWord in Options then begin
-      if (p = 1) then begin
+    if frWholeWord in Options then
+    begin
+      if (p = 1) then
+      begin
         if AText = Search then
           Done := True
         else
-          if AText[Length(Search) + 1] in WordDelims then
-            Done := True;
+        if AText[Length(Search) + 1] in WordDelims then
+          Done := True;
       end
-      else begin
+      else
+      begin
         StrRes := MidBStr(AText, p - 1, Length(Search) + 2);
         wlen := Length(StrRes);
         if (wlen = Length(Search) + 2) then
@@ -270,7 +292,7 @@ var
   Items: TStringArray;
   Token, buf: string;
   Quote: char;
-  isString: Boolean;
+  isString: boolean;
 
   procedure AddStr(s: string);
   begin
@@ -279,15 +301,19 @@ var
 
 begin
   Tokens.Clear;
-  Items := AnsiString(txt).Split([' ']);
+  Items := ansistring(txt).Split([' ']);
   isString := False;
-  for Token in Items do begin
+  for Token in Items do
+  begin
     if not isString and Token.IsEmpty then
       Continue;
-    if (not isString) and (not Token.IsEmpty) and ((Token[1] = '"') or (Token[1] = '''')) then begin
+    if (not isString) and (not Token.IsEmpty) and
+      ((Token[1] = '"') or (Token[1] = '''')) then
+    begin
       Quote := Token[1];
       Buf := Token.TrimRight;
-      if (Buf.Length > 1) and (Buf.EndsWith(Quote)) then begin
+      if (Buf.Length > 1) and (Buf.EndsWith(Quote)) then
+      begin
         AddStr(Buf);
         Continue;
       end;
@@ -295,14 +321,17 @@ begin
       Buf := Token + ' ';
       Continue;
     end;
-    if isString then begin
+    if isString then
+    begin
       Buf := Buf + IfThen(Token.IsEmpty, ' ', Token + ' ');
-      if Token.TrimRight.EndsWith(Quote) then begin
+      if Token.TrimRight.EndsWith(Quote) then
+      begin
         AddStr(Buf.TrimRight);
         isString := False;
       end;
     end
-    else begin
+    else
+    begin
       if not Token.Trim.IsEmpty then
         Tokens.Add(Token.TrimRight);
     end;
@@ -311,7 +340,8 @@ end;
 
 function ConfirmDlg(Caption, Txt: string): TModalResult;
 begin
-  Result := QuestionDlg(Caption, Txt, mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+  Result := QuestionDlg(Caption, Txt, mtConfirmation,
+    [mrOk, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
 end;
 
 procedure OKMsg(Caption, Txt: string);
@@ -334,34 +364,38 @@ begin
   Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
-function GetRowKV(const grid: TStringGrid; aRow: Integer): TKeyValue;
+function GetRowKV(const grid: TStringGrid; aRow: integer): TKeyValue;
 var
-  Offset: ShortInt;
+  Offset: shortint;
 begin
-  if aRow = -1 then aRow := grid.Row;
+  if aRow = -1 then
+    aRow := grid.Row;
   // Grids with more two columns should have first column with checkboxes.
   if grid.ColCount = 2 then
     Offset := 0
-  else begin
+  else
+  begin
     Offset := 1;
     Result.Enabled := (grid.Cells[0, aRow] = '1');
   end;
   Result.Key := Trim(grid.Cells[Offset, aRow]); // Key cannot be whitespaced.
-  Result.Value := grid.Cells[Offset+1, aRow];
+  Result.Value := grid.Cells[Offset + 1, aRow];
 end;
 
-function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: Integer;
-  isUnique: Boolean): Integer;
+function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: integer;
+  isUnique: boolean): integer;
 var
-  Start: SmallInt;
+  Start: smallint;
 begin
   Start := 0;
-  with AGrid do begin
+  with AGrid do
+  begin
     if Columns[0].ButtonStyle <> cbsAuto then
       Start := 1;
     if isUnique and (Cols[Start].IndexOf(KV.Key) > 0) then
       Exit;
-    if aRow = -1 then begin
+    if aRow = -1 then
+    begin
       RowCount := RowCount + 1;
       ARow := RowCount - 1;
     end;
@@ -373,16 +407,17 @@ begin
   Result := ARow;
 end;
 
-function GridToString(aGrid: TStringGrid; delimChar: string; aRow: Integer;
-  aCol: Integer): string;
+function GridToString(aGrid: TStringGrid; delimChar: string; aRow: integer;
+  aCol: integer): string;
 var
-  r,c: Integer;
+  r, c: integer;
   s: string;
   Buf: TStrings;
 begin
   Buf := TStringList.Create;
   try
-    for r := aRow to aGrid.RowCount - 1 do begin
+    for r := aRow to aGrid.RowCount - 1 do
+    begin
       s := '';
       for c := aCol to aGrid.ColCount - 1 do
         if c = aCol then
@@ -401,12 +436,13 @@ end;
 
 procedure SwitchTabByName(PC: TPageControl; const TabName: string);
 var
-  i: Integer;
+  i: integer;
 begin
   if TabName = '' then
     Exit; // =>
   for i := 0 to PC.PageCount - 1 do
-    if PC.Pages[i].Caption = TabName then begin
+    if PC.Pages[i].Caption = TabName then
+    begin
       PC.ActivePageIndex := i;
       break;
     end;
@@ -421,17 +457,20 @@ begin
   Result := GetAppConfigDir(False) + DirectorySeparator + Name + Ext;
 end;
 
-procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+procedure PropsSaveGridColumns(const Props: TCustomPropertyStorage;
+  const AGrid: TStringGrid);
 var
-  I: Integer;
+  I: integer;
 begin
   for I := 0 to AGrid.Columns.Count - 1 do
-    Props.WriteInteger(AGrid.Name + 'Col' + IntToStr(I + 1), AGrid.Columns.Items[I].Width);
+    Props.WriteInteger(AGrid.Name + 'Col' + IntToStr(I + 1),
+      AGrid.Columns.Items[I].Width);
 end;
 
-procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage; const AGrid: TStringGrid);
+procedure PropsRestoreGridColumns(const Props: TCustomPropertyStorage;
+  const AGrid: TStringGrid);
 var
-  Val, col: Integer;
+  Val, col: integer;
 begin
   for col := 1 to AGrid.ColCount do
   begin
@@ -446,7 +485,7 @@ var
   streamer: TJSONStreamer;
 begin
   Result := '';
-  streamer := TJSONStreamer.Create(Nil);
+  streamer := TJSONStreamer.Create(nil);
   try
     Result := streamer.ObjectToJSONString(Obj);
   finally
@@ -467,4 +506,3 @@ begin
 end;
 
 end.
-

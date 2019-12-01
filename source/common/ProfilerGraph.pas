@@ -12,12 +12,12 @@ const
   PROFILER_CONNECT = 'connect';
   PROFILER_REQUEST = 'request';
   PROFILER_HEADERS = 'headers';
-  PROFILER_BODY    = 'body';
-  PROFILER_TOTAL   = 'total';
+  PROFILER_BODY = 'body';
+  PROFILER_TOTAL = 'total';
 
 type
 
-  TTimeMSec = Int64;
+  TTimeMSec = int64;
 
   { TTimeCheckPoint }
 
@@ -55,7 +55,8 @@ type
     function Add: TTimeCheckPoint;
     function Add(const Name: string): TTimeCheckPoint; overload;
     function GetEnumerator: TTimeCheckPointEnumerator;
-    property CheckPoint[const Name: string]: TTimeCheckPoint read GetTimeCheckPoint; default;
+    property CheckPoint[const Name: string]: TTimeCheckPoint read GetTimeCheckPoint;
+      default;
   end;
 
   { TTimeProfiler }
@@ -172,8 +173,7 @@ end;
 
 { TTimeCheckPointList }
 
-function TTimeCheckPointList.GetTimeCheckPoint(const Name: string
-  ): TTimeCheckPoint;
+function TTimeCheckPointList.GetTimeCheckPoint(const Name: string): TTimeCheckPoint;
 var
   iter: TTimeCheckPoint;
 begin

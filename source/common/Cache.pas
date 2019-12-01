@@ -24,11 +24,13 @@ type
     procedure SetKeyValue(const Key, Value: string); virtual; abstract;
   public
     procedure Put(const Key, Value: string); virtual;
-    procedure Put(const Key, Value: string; const Expired: TDateTime); virtual; abstract; overload;
-    procedure Put(const Key, Value: string; const Minutes: Int64); virtual; overload;
-    function Delete(const Key: string): Boolean; virtual; abstract;
-    function Exists(const Key: string): Boolean; virtual; abstract;
-    property KeyValue[const Key: string]: string read GetKeyValue write SetKeyValue; default;
+    procedure Put(const Key, Value: string; const Expired: TDateTime);
+      virtual; abstract; overload;
+    procedure Put(const Key, Value: string; const Minutes: int64); virtual; overload;
+    function Delete(const Key: string): boolean; virtual; abstract;
+    function Exists(const Key: string): boolean; virtual; abstract;
+    property KeyValue[const Key: string]: string read GetKeyValue write SetKeyValue;
+      default;
   end;
 
   { TFileMeta }
@@ -49,9 +51,9 @@ type
     constructor Create(const AKey, ABaseDir: string);
     procedure Save;
     procedure Load;
-    function Delete: Boolean;
-    function Exists: Boolean;
-    function IsExpired: Boolean;
+    function Delete: boolean;
+    function Exists: boolean;
+    function IsExpired: boolean;
     property Key: string read FKey;
     property Hash: string read GetHash;
     property BaseDir: string read FBaseDir write FBaseDir;
@@ -79,9 +81,10 @@ type
   public
     constructor Create(const ACacheDir: string);
     destructor Destroy; override;
-    procedure Put(const Key, Value: string; const Expired: TDateTime); override; overload;
-    function Delete(const Key: string): Boolean; override;
-    function Exists(const Key: string): Boolean; override;
+    procedure Put(const Key, Value: string; const Expired: TDateTime);
+      override; overload;
+    function Delete(const Key: string): boolean; override;
+    function Exists(const Key: string): boolean; override;
     property CacheDir: string read FCacheDir write SetCacheDir;
   end;
 
@@ -115,7 +118,7 @@ begin
   Put(Key, Value, TDateTime(0));
 end;
 
-procedure TCacheAbstract.Put(const Key, Value: string; const Minutes: Int64);
+procedure TCacheAbstract.Put(const Key, Value: string; const Minutes: int64);
 begin
   Put(Key, Value, IncMinute(Now, Minutes));
 end;
@@ -157,7 +160,7 @@ procedure TFileMeta.Save;
 var
   Ini: TIniFile;
 begin
-  Ini := NIL;
+  Ini := nil;
   try
     Ini := TIniFile.Create(MetaFile);
     Ini.WriteString(ClassName, 'Key', FKey);
@@ -180,10 +183,11 @@ var
   Ini: TIniFile;
   Buf: string;
 begin
-  Ini := NIL;
+  Ini := nil;
   try
     if not Exists then
-      raise EFileNotFoundException.CreateFmt('Cache meta file not found: %s', [MetaFile]);
+      raise EFileNotFoundException.CreateFmt('Cache meta file not found: %s',
+        [MetaFile]);
     Ini := TIniFile.Create(MetaFile);
     Buf := Ini.ReadString(ClassName, 'Key', '');
     Buf := GenId(Buf);
@@ -201,17 +205,17 @@ begin
   end;
 end;
 
-function TFileMeta.Delete: Boolean;
+function TFileMeta.Delete: boolean;
 begin
   Result := DeleteFile(MetaFile);
 end;
 
-function TFileMeta.Exists: Boolean;
+function TFileMeta.Exists: boolean;
 begin
   Result := FileExists(MetaFile);
 end;
 
-function TFileMeta.IsExpired: Boolean;
+function TFileMeta.IsExpired: boolean;
 begin
   Result := (FExpired <> 0) and (Now > FExpired);
 end;
@@ -246,7 +250,7 @@ function TFileCache.LoadValue(const Key: string): string;
 var
   Meta: TFileMeta;
   Buf: string;
-  H, S: LongInt;
+  H, S: longint;
 begin
   Meta := CreateMeta(Key);
   try
@@ -254,7 +258,8 @@ begin
     if Meta.IsExpired then
       raise ECacheKeyNotFound.CreateFmt('Cache key "%s" is not exists.', [Key]);
     if not FileExists(Meta.DataFile) then
-      raise EFileNotFoundException.CreateFmt('Cache data file not found: %s', [Meta.DataFile]);
+      raise EFileNotFoundException.CreateFmt('Cache data file not found: %s',
+        [Meta.DataFile]);
     H := FileOpen(Meta.DataFile, fmOpenRead);
     if H = -1 then
       raise EInOutError.CreateFmt('Cannot open cache data: %s', [Meta.DataFile]);
@@ -283,7 +288,7 @@ end;
 procedure TFileCache.Put(const Key, Value: string; const Expired: TDateTime);
 var
   Meta: TFileMeta;
-  H, S: Longint;
+  H, S: longint;
 begin
   Meta := CreateMeta(Key);
   S := Length(Value);
@@ -298,7 +303,8 @@ begin
     begin
       Meta.Delete;
       DeleteFile(Meta.DataFile);
-      raise EInOutError.CreateFmt('Failed to write to cache data file: %s', [Meta.DataFile]);
+      raise EInOutError.CreateFmt('Failed to write to cache data file: %s',
+        [Meta.DataFile]);
     end;
     FileClose(H);
   finally
@@ -306,7 +312,7 @@ begin
   end;
 end;
 
-function TFileCache.Delete(const Key: string): Boolean;
+function TFileCache.Delete(const Key: string): boolean;
 var
   Meta: TFileMeta;
 begin
@@ -321,7 +327,7 @@ begin
   end;
 end;
 
-function TFileCache.Exists(const Key: string): Boolean;
+function TFileCache.Exists(const Key: string): boolean;
 var
   Meta: TFileMeta;
 begin
@@ -338,4 +344,3 @@ begin
 end;
 
 end.
-
