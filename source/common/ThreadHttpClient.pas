@@ -5,45 +5,9 @@ unit ThreadHttpClient;
 interface
 
 uses
-  Classes, SysUtils, httpclient, fgl, UrlUtils;
+  Classes, SysUtils, httpclient, fgl, UrlUtils, ProfilerGraph;
 
 type
-
-  TTimeMSec = Int64;
-
-  TTimeCheckPoint = record
-    CheckPoint: Integer;
-    Start: TDateTime;
-    Finish: TDateTime;
-    Duration: TTimeMSec;
-  end;
-
-  TTimeCheckPointList = specialize TFPGMap<string, TTimeCheckPoint>;
-
-  { TTimeProfiler }
-
-  TTimeProfiler = class
-  private
-    function GetCheckPoint(T: string): TTimeCheckPoint;
-    function GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
-  protected
-    type
-      TLabels = array of string;
-    protected var
-    FCheckPoints: TTimeCheckPointList;
-    FCurrentPoint: Integer;
-    function GetLabels: TLabels;
-  public
-    constructor Create; virtual;
-    destructor Destory; virtual;
-    procedure Reset;
-    procedure Start(Timer: string);
-    procedure Stop(Timer: string);
-    property CheckPoint[T: string]: TTimeCheckPoint read GetCheckPoint;
-    property Labels: TLabels read GetLabels;
-    property CheckPoints: TTimeCheckPointList read FCheckPoints;
-    property CheckPointIndex[AIndex: Integer]: TTimeCheckPoint read GetCheckPointByIndex;
-  end;
 
   { TCustomHttpClient }
 
@@ -71,7 +35,7 @@ type
 
   { TResponseInfo }
 
-  TResponseInfo = class
+  TResponseInfo = class(TPersistent)
   private
     FContent: TStringStream;
     FHttpVersion: string;
@@ -84,9 +48,11 @@ type
     FTimeCheckPoints: TTimeCheckPointList;
     FRequestLines: TStrings;
     FServerHttpVersion: string;
+    function GetContentText: string;
     function GetContentType: string;
     function GetLocation: string;
     function GetRequestTime: TTimeMSec;
+    procedure SetContentText(AValue: string);
   public
     constructor Create;
     destructor Destroy; override;
@@ -94,6 +60,10 @@ type
     // inStr  - a prefix for request headers.
     // outStr - a prefix for response headers.
     procedure ServerLog(Buffer: TStrings; inStr: string = '<'; outStr: string = '>');
+    property Location: string read GetLocation;
+    property ContentType: string read GetContentType;
+    property Content: TStringStream read FContent;
+  published
     property StatusCode: Integer read FStatusCode write FStatusCode;
     property StatusText: string read FStatusText write FStatusText;
     property HttpVersion: string read FHttpVersion write FHttpVersion;
@@ -103,16 +73,14 @@ type
     // by the http client see RequestLines property.
     property RequestHeaders: TStrings read FRequestHeaders;
     property ResponseHeaders: TStrings read FResponseHeaders;
-    property Content: TStringStream read FContent;
-    property ContentType: string read GetContentType;
     property TimeCheckPoints: TTimeCheckPointList read FTimeCheckPoints;
     property RequestTime: TTimeMSec read GetRequestTime;
-    property Location: string read GetLocation;
     // Request Lines are the lines that actually transmitted to the server.
     // These lines include the requested resource (the first lines) and
     // all the request headers.
     property RequestLines: TStrings read FRequestLines write FRequestLines;
     property ServerHttpVersion: string read FServerHttpVersion write FServerHttpVersion;
+    property ContentText: string read GetContentText write SetContentText;
   end;
 
   TOnRequestComplete = procedure(ResponseInfo: TResponseInfo) of object;
@@ -179,7 +147,7 @@ function UrlPath(Url: string): string;
 
 implementation
 
-uses dateutils, strutils, RtlConsts, base64, ValEdit, AppHelpers;
+uses strutils, base64, ValEdit, AppHelpers;
 
 const
   CRLF = #13#10;
@@ -322,73 +290,6 @@ begin
   Result := IfThen(DefExt <> '', Format('%s.%s', [basename, DefExt]), basename);
 end;
 
-{ TTimeProfiler }
-
-function TTimeProfiler.GetCheckPoint(T: string): TTimeCheckPoint;
-begin
-  Result := FCheckPoints[T];
-end;
-
-function TTimeProfiler.GetCheckPointByIndex(AIndex: Integer): TTimeCheckPoint;
-var
-  I: Integer;
-begin
-  for I := 0 to FCheckPoints.Count - 1 do
-    if FCheckPoints.Data[I].CheckPoint = AIndex then
-      Exit(FCheckPoints.Data[I]);
-  FCheckPoints.Error(SListIndexError, AIndex)
-end;
-
-function TTimeProfiler.GetLabels: TLabels;
-var
-  I: Integer;
-begin
-  SetLength(Result, FCheckPoints.Count);
-  for I := 0 to FCheckPoints.Count - 1 do
-    Result[I] := FCheckPoints.Keys[I];
-end;
-
-constructor TTimeProfiler.Create;
-begin
-  inherited;
-  FCurrentPoint := 0;
-  FCheckPoints := TTimeCheckPointList.Create;
-end;
-
-destructor TTimeProfiler.Destory;
-begin
-  FCheckPoints.Destroy;
-  inherited;
-end;
-
-procedure TTimeProfiler.Reset;
-begin
-  FCurrentPoint := 0;
-  FCheckPoints.Clear;
-end;
-
-procedure TTimeProfiler.Start(Timer: string);
-var
-  cp: TTimeCheckPoint;
-begin
-  cp.Start      := Now;
-  cp.Finish     := 0;
-  cp.CheckPoint := FCurrentPoint;
-  cp.Duration   := 0;
-  FCheckPoints.AddOrSetData(Timer, cp);
-  Inc(FCurrentPoint);
-end;
-
-procedure TTimeProfiler.Stop(Timer: string);
-var
-  cp: TTimeCheckPoint;
-begin
-  cp := FCheckPoints.KeyData[Timer];
-  cp.Finish := Now;
-  cp.Duration := MilliSecondsBetween(cp.Finish, cp.Start);
-  FCheckPoints.KeyData[Timer] := cp;
-end;
-
 { TResponseInfo }
 
 function TResponseInfo.GetLocation: string;
@@ -408,9 +309,20 @@ begin
   Result := ParseContentType(FResponseHeaders);
 end;
 
+function TResponseInfo.GetContentText: string;
+begin
+  Result := FContent.DataString;
+end;
+
 function TResponseInfo.GetRequestTime: TTimeMSec;
 begin
-  Result := FTimeCheckPoints.KeyData['Total'].Duration;
+  Result := FTimeCheckPoints[PROFILER_TOTAL].Duration;
+end;
+
+procedure TResponseInfo.SetContentText(AValue: string);
+begin
+  FContent.Position := 0;
+  FContent.WriteString(AValue);
 end;
 
 constructor TResponseInfo.Create;
@@ -462,41 +374,41 @@ procedure TCustomHttpClient.HTTPMethod(const AMethod, AURL: String;
   Stream: TStream; const AllowedResponseCodes: array of Integer);
 begin
   FTimeProfiler.Reset;
-  FTimeProfiler.Start('Total');
+  FTimeProfiler.Start(PROFILER_TOTAL);
   inherited HTTPMethod(AMethod, AURL, Stream, AllowedResponseCodes);
-  FTimeProfiler.Stop('Total');
+  FTimeProfiler.Stop(PROFILER_TOTAL);
 end;
 
 procedure TCustomHttpClient.ConnectToServer(const AHost: String;
   APort: Integer; UseSSL: Boolean);
 begin
-  FTimeProfiler.Start('Connect');
+  FTimeProfiler.Start(PROFILER_CONNECT);
   inherited;
-  FTimeProfiler.Stop('Connect');
+  FTimeProfiler.Stop(PROFILER_CONNECT);
 end;
 
 procedure TCustomHttpClient.SendRequest(const AMethod: String; URI: TURI);
 begin
-  FTimeProfiler.Start('Send request');
+  FTimeProfiler.Start(PROFILER_REQUEST);
   FreeAndNil(FSentCookies);
   FSentCookies := Cookies;
   inherited SendRequest(AMethod, URI);
-  FTimeProfiler.Stop('Send request');
+  FTimeProfiler.Stop(PROFILER_REQUEST);
 end;
 
 function TCustomHttpClient.ReadResponseHeaders: integer;
 begin
-  FTimeProfiler.Start('Response headers');
+  FTimeProfiler.Start(PROFILER_HEADERS);
   Result := inherited ReadResponseHeaders;
-  FTimeProfiler.Stop('Response headers');
+  FTimeProfiler.Stop(PROFILER_HEADERS);
 end;
 
 function TCustomHttpClient.ReadResponse(Stream: TStream;
   const AllowedResponseCodes: array of Integer; HeadersOnly: Boolean): Boolean;
 begin
-  FTimeProfiler.Start('Read response');
+  FTimeProfiler.Start(PROFILER_BODY);
   Result := inherited ReadResponse(Stream, AllowedResponseCodes, HeadersOnly);
-  FTimeProfiler.Stop('Read response');
+  FTimeProfiler.Stop(PROFILER_BODY);
 end;
 
 function TCustomHttpClient.CreateRequestLines(AMethod, AUrl: string): TStrings;
