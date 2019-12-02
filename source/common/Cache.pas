@@ -113,8 +113,11 @@ uses md5, IniFiles, dateutils;
 
 function AppCacheDir(const aDir: string; Create: boolean = false): string;
 begin
-  { TODO : How about Windows ? }
+  {$IFDEF WINDOWS}
+  Result := GetEnvironmentVariable('appdata');
+  {$ELSE}
   Result := GetEnvironmentVariable('XDG_CACHE_HOME');
+  {$ENDIF}
   if Result = '' then
     Result := IncludeTrailingPathDelimiter(GetUserDir + '.cache')
   else
