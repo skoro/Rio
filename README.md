@@ -1,6 +1,6 @@
-## HTTP request inspector
+## Rio
 
-A crossplatform desktop tool for inspecting http requests.
+RIO is a crossplatform desktop tool for inspecting http requests.
 The application allows you to send http requests GET, POST, PUT, etc and
 analyse its responses.
 
@@ -8,19 +8,19 @@ analyse its responses.
 
 Main window
 
-![Main window](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-xfce-json.png)
+![Main window](https://raw.githubusercontent.com/skoro/rio/master/docs/screenshots/Screenshot_0.4-xfce-json.png)
 
 Vertical layout and filtered JSON
 
-![Vertical layout](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-xfce-hor_layout_filtered.png)
+![Vertical layout](https://raw.githubusercontent.com/skoro/rio/master/docs/screenshots/Screenshot_0.4-xfce-hor_layout_filtered.png)
 
 Windows
 
-![Windows](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-win-json-tree.png)
+![Windows](https://raw.githubusercontent.com/skoro/rio/master/docs/screenshots/Screenshot_0.4-win-json-tree.png)
 
 Formatted JSON
 
-![Formatted JSON](https://raw.githubusercontent.com/skoro/http_inspector/master/docs/screenshots/Screenshot_0.4-win-json-formatted.png)
+![Formatted JSON](https://raw.githubusercontent.com/skoro/rio/master/docs/screenshots/Screenshot_0.4-win-json-formatted.png)
 
 ### Compile from sources
 
