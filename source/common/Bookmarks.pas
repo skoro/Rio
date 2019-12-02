@@ -409,7 +409,8 @@ begin
     Exit; // =>
   if IsFolderNode(sNode) then begin
     // Don't allow to delete root node.
-    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(sNode.Text) then begin
+    if (sNode.Parent <> NIL) and ConfirmDeleteFolder(GetNodePath(sNode)) then
+    begin
       BookmarkManager.DeleteFolderNode(sNode);
       if Assigned(FOnDeleteClick) then
         FOnDeleteClick(Self, NIL);
@@ -417,7 +418,8 @@ begin
   end
   else begin
     BM := NodeToBookmark(sNode);
-    if ConfirmDeleteBookmark(BM) then begin
+    if ConfirmDeleteBookmark(BM) then
+    begin
       if Assigned(FOnDeleteClick) then
         FOnDeleteClick(Self, BM);
       BookmarkManager.DeleteBookmark(BM);
@@ -456,12 +458,14 @@ end;
 
 function TBookmarkPopup.ConfirmDeleteFolder(FolderName: string): Boolean;
 begin
-  Result := ConfirmDlg('Delete folder ?', Format('Are you sure you want to delete folder "%s" and ALL its children ?', [FolderName])) = mrOK;
+  Result := ConfirmDlg('Delete folder ?',
+         Format('Are you sure you want to delete folder "%s" and ALL its children ?', [FolderName])) = mrOK;
 end;
 
 function TBookmarkPopup.ConfirmDeleteBookmark(BM: TBookmark): Boolean;
 begin
-  Result := ConfirmDlg('Delete bookmark ?', Format('Are you sure you want to delete "%s" ?', [BM.Name])) = mrOK;
+  Result := ConfirmDlg('Delete bookmark ?',
+         Format('Are you sure you want to delete:'+#13#10+'"%s" ?', [BM.Path])) = mrOK;
 end;
 
 constructor TBookmarkPopup.Create(AOwner: TComponent);
