@@ -844,6 +844,12 @@ begin
   // Environment manager initialization.
   FEnvManager := TEnvManager.Create;
   FEnvManager.LoadFromFile(ConfigFile('EnvVars'));
+  if FEnvManager.Count = 0 then
+  begin
+    // When no envs exist always start with predefined env.
+    FEnvManager.Add(TEnvironment.Create('Initial', nil));
+    FEnvManager.Current := FEnvManager.First;
+  end;
 
   // Response cache initialization.
   try
