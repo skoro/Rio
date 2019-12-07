@@ -52,7 +52,7 @@ type
     lblDesc: TLabel;
     miSep3: TMenuItem;
     miSep2: TMenuItem;
-    miBookmarks: TMenuItem;
+    miSidebar: TMenuItem;
     miLayoutVert: TMenuItem;
     miLayoutHor: TMenuItem;
     miTabSep: TMenuItem;
@@ -72,7 +72,7 @@ type
     pagesResponse: TPageControl;
     pagesRespView: TPageControl;
     AppSplitter: TPairSplitter;
-    BookmarkSide: TPairSplitterSide;
+    SideBarSide: TPairSplitterSide;
     btnEnv: TSpeedButton;
     WorkSide: TPairSplitterSide;
     panelRequest: TPanel;
@@ -194,7 +194,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
-    procedure miBookmarksClick(Sender: TObject);
+    procedure miSidebarClick(Sender: TObject);
     procedure miExportClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
     procedure miFindNextClick(Sender: TObject);
@@ -278,7 +278,7 @@ type
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
     procedure ToggleRequestSide(VisibleSide: Boolean);
-    procedure ToggleBookmarksSide(VisibleSide: Boolean);
+    procedure ToggleSidebarSide(VisibleSide: Boolean);
     procedure FinishRequest;
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
@@ -323,7 +323,7 @@ const
   BOOKMARK_IMG_SET = 5;
 
   // App states for splitters: bookmark and request-response.
-  STATE_BOOKMARK_SIDE = 'bookmarkSide';
+  STATE_SIDEBAR_SIDE = 'sidebarSide';
   STATE_SPLITTER_SIDE = 'splitterSideRequest';
 
 {$R *.lfm}
@@ -821,7 +821,7 @@ begin
   FAppTreeManager := TAppTreeManager.Create(Self);
   with FAppTreeManager do
   begin
-    Parent := BookmarkSide;
+    Parent := SideBarSide;
     FBookManager := BookmarkManager;
     TreeView.Images := toolbarIcons;
     TreeView.StateImages := RequestIcons;
@@ -923,10 +923,10 @@ begin
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
-  // OnResize callback should be after ToggleBookmarksSide otherwise
+  // OnResize callback should be after ToggleSidebarSide otherwise
   // bookmarks will be always opened despite on its status.
-  if not Assigned(BookmarkSide.OnResize) then
-    BookmarkSide.OnResize := @PairSplitterResize;
+  if not Assigned(SideBarSide.OnResize) then
+    SideBarSide.OnResize := @PairSplitterResize;
   // Select and show active visible tab.
   for I := 0 to pagesRequest.PageCount - 1 do
     if pagesRequest.Pages[I].TabVisible then begin
@@ -1055,10 +1055,10 @@ begin
   end;
 end;
 
-procedure TMainForm.miBookmarksClick(Sender: TObject);
+procedure TMainForm.miSidebarClick(Sender: TObject);
 begin
-  miBookmarks.Checked := not miBookmarks.Checked;
-  ToggleBookmarksSide(miBookmarks.Checked);
+  miSidebar.Checked := not miSidebar.Checked;
+  ToggleSidebarSide(miSidebar.Checked);
 end;
 
 procedure TMainForm.miExportClick(Sender: TObject);
@@ -1407,8 +1407,8 @@ begin
   if not (Sender is TPairSplitterSide) then
     Exit; // =>
   pss := TPairSplitterSide(Sender);
-  if (pss = BookmarkSide) then begin
-    miBookmarks.Checked := pss.Width > 1;
+  if (pss = SideBarSide) then begin
+    miSidebar.Checked := pss.Width > 1;
   end
   else if (pss = splitterSideRequest) then begin
     if (LayoutSplitter.SplitterType = pstVertical) then
@@ -1483,14 +1483,14 @@ begin
     miTabAuth.Checked := ReadBoolean('tabAuth', True);
     miTabNotes.Checked := ReadBoolean('tabNotes', True);
     miTabToggle.Checked := ReadBoolean('tabToggle', True);
-    miBookmarks.Checked := ReadBoolean('bookmarks', True);
+    miSidebar.Checked := ReadBoolean('sidebar', True);
     // Read splitter side sizes.
     IntVal := ReadInteger(STATE_SPLITTER_SIDE, 0);
     if IntVal > 0 then
       AppState.WriteInteger(STATE_SPLITTER_SIDE, IntVal);
-    IntVal := ReadInteger(STATE_BOOKMARK_SIDE, 0);
+    IntVal := ReadInteger(STATE_SIDEBAR_SIDE, 0);
     if IntVal > 0 then
-      AppState.WriteInteger(STATE_BOOKMARK_SIDE, IntVal);
+      AppState.WriteInteger(STATE_SIDEBAR_SIDE, IntVal);
   end;
 end;
 
@@ -1512,7 +1512,7 @@ begin
     WriteBoolean('tabAuth', miTabAuth.Checked);
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
-    WriteBoolean('bookmarks', miBookmarks.Checked);
+    WriteBoolean('sidebar', miSidebar.Checked);
     // Save the selected bookmark or the current request.
     with FBookManager do
       if CurrentBookmark = NIL then begin
@@ -1534,8 +1534,8 @@ begin
     // Save splitter side sizes before it has been hidden.
     if AppState.ReadInteger(STATE_SPLITTER_SIDE, 0) > 0 then
       WriteInteger(STATE_SPLITTER_SIDE, AppState.ReadInteger(STATE_SPLITTER_SIDE, 0));
-    if AppState.ReadInteger(STATE_BOOKMARK_SIDE, 0) > 0 then
-      WriteInteger(STATE_BOOKMARK_SIDE, AppState.ReadInteger(STATE_BOOKMARK_SIDE, 0));
+    if AppState.ReadInteger(STATE_SIDEBAR_SIDE, 0) > 0 then
+      WriteInteger(STATE_SIDEBAR_SIDE, AppState.ReadInteger(STATE_SIDEBAR_SIDE, 0));
   end;
 end;
 
@@ -2020,16 +2020,16 @@ begin
   end;
 end;
 
-procedure TMainForm.ToggleBookmarksSide(VisibleSide: Boolean);
+procedure TMainForm.ToggleSidebarSide(VisibleSide: Boolean);
 begin
   if VisibleSide then begin
-    BookmarkSide.Width := AppState.ReadInteger(STATE_BOOKMARK_SIDE, 150);
+    SideBarSide.Width := AppState.ReadInteger(STATE_SIDEBAR_SIDE, 150);
   end
   else begin
-    AppState.WriteInteger(STATE_BOOKMARK_SIDE, BookmarkSide.Width);
-    BookmarkSide.Width := 1;
+    AppState.WriteInteger(STATE_SIDEBAR_SIDE, SideBarSide.Width);
+    SideBarSide.Width := 1;
   end;
-  miBookmarks.Checked := VisibleSide;
+  miSidebar.Checked := VisibleSide;
 end;
 
 procedure TMainForm.FinishRequest;
@@ -2195,7 +2195,7 @@ begin
   miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
-  miBookmarks.ShortCut     := OptionsForm.GetShortCutValue(sciToggleBookmarks);
+  miSidebar.ShortCut       := OptionsForm.GetShortCutValue(sciToggleSidebar);
   miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 
