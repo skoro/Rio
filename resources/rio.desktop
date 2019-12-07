@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Rio
-Comment=Simple REST api client
+Comment=Rio is a cross-platform REST client.
 Icon=rio
 Exec=rio
 Terminal=false

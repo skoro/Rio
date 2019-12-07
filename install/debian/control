@@ -2,7 +2,7 @@ Package: rio
 Version: @version@
 Depends: @depends@
 Maintainer: Skorobogatko Alexei <skorobogatko.oleksii@gmail.com>
-Description: Simple REST Api client.
+Description: Rio is a cross-platform REST client, available for Windows and Linux.
 Section: net
 Priority: optional
 Architecture: @arch@
