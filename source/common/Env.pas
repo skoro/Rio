@@ -126,6 +126,10 @@ type
     // Loads the environments data from the file.
     // False - when file isn't existing.
     function LoadFromFile(const FileName: string): Boolean;
+    // Apply the current environment to the text.
+    function Apply(const Txt: string): string;
+    // Check whether the string has vars.
+    function HasVars(const Txt: string): Boolean;
     // Gets the array list of the env names.
     property EnvNames: TStringArray read GetEnvNames;
     // Gets the env by name.
@@ -474,6 +478,24 @@ begin
   finally
     FreeAndNil(FS);
   end;
+end;
+
+function TEnvManager.Apply(const Txt: string): string;
+begin
+  if not Assigned(FCurrent) then
+    Exit(Txt); // Nothing to apply.
+  Result := FCurrent.Apply(Txt);
+end;
+
+function TEnvManager.HasVars(const Txt: string): Boolean;
+var
+  p1, p2: integer;
+begin
+  p1 := PosEx('{{', Txt);
+  if p1 = 0 then
+    Exit(False); // =>
+  p2 := PosEx('}}', Txt, p1 + 2);
+  Result := p2 > p1;
 end;
 
 { EVariableNotFound }
