@@ -218,6 +218,7 @@ type
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
+    procedure OnMouseEnter(Sender: TObject);
     procedure pagesResponseChange(Sender: TObject);
     procedure PairSplitterResize(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
@@ -1393,6 +1394,18 @@ begin
   if EditGridRow(Grid) <> mrOK then
     Grid.DeleteRow(aRow);
   Grid.SetFocus;
+end;
+
+procedure TMainForm.OnMouseEnter(Sender: TObject);
+begin
+  if (Sender = cbUrl) then
+  begin
+    // Dynamic hint for url field.
+    if FEnvManager.HasVars(cbUrl.Text) then
+      cbUrl.Hint := FEnvManager.Apply(cbUrl.Text)
+    else
+      cbUrl.Hint := '';
+  end;
 end;
 
 procedure TMainForm.pagesResponseChange(Sender: TObject);
