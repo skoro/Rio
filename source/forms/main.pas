@@ -219,6 +219,7 @@ type
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
     procedure OnMouseEnter(Sender: TObject);
+    procedure OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure pagesResponseChange(Sender: TObject);
     procedure PairSplitterResize(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
@@ -1405,6 +1406,30 @@ begin
       cbUrl.Hint := FEnvManager.Apply(cbUrl.Text)
     else
       cbUrl.Hint := '';
+  end;
+end;
+
+procedure TMainForm.OnMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  sg: TStringGrid;
+  aCol, aRow: longint;
+  Str: string;
+begin
+  if Sender is TStringGrid then
+  begin
+    // Dynamic hint for grid. Converts the mouse coordinates to the grid cell
+    // and checks has that cell an env variable. Shows the var value in the hint.
+    sg := TStringGrid(Sender);
+    sg.Hint := '';
+    aCol := 0;
+    aRow := 0;
+    sg.MouseToCell(X, Y, aCol, aRow);
+    Str := sg.Cells[aCol, aRow];
+    if Str = '' then
+     Exit; // =>
+    if FEnvManager.HasVars(Str) then
+      sg.Hint := FEnvManager.Apply(Str);
   end;
 end;
 
