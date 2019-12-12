@@ -1398,15 +1398,21 @@ begin
 end;
 
 procedure TMainForm.OnMouseEnter(Sender: TObject);
+var
+  Str: string;
 begin
-  if (Sender = cbUrl) then
-  begin
-    // Dynamic hint for url field.
-    if FEnvManager.HasVars(cbUrl.Text) then
-      cbUrl.Hint := FEnvManager.Apply(cbUrl.Text)
-    else
-      cbUrl.Hint := '';
-  end;
+  // Dynamic hint for the text components.
+  Str := '';
+  (Sender as TWinControl).Hint := '';
+  if (Sender is TCustomComboBox) then
+    Str := TCustomComboBox(Sender).Text
+  else if (Sender is TCustomEdit) then
+    Str := TCustomEdit(Sender).Text;
+  if Str = '' then
+    Exit; // =>
+  if not FEnvManager.HasVars(Str) then
+    Exit; // =>
+  (Sender as TWinControl).Hint := FEnvManager.Apply(Str);
 end;
 
 procedure TMainForm.OnMouseMove(Sender: TObject; Shift: TShiftState; X,
