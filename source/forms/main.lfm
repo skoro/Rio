@@ -2445,10 +2445,10 @@ object MainForm: TMainForm
               Height = 212
               Top = 0
               Width = 421
-              ActivePage = tabHeaders
+              ActivePage = tabAuth
               Align = alClient
               Anchors = [akLeft, akRight, akBottom]
-              TabIndex = 0
+              TabIndex = 4
               TabOrder = 0
               object tabHeaders: TTabSheet
                 Caption = 'Headers'
@@ -3303,32 +3303,32 @@ object MainForm: TMainForm
                   Height = 151
                   Top = 26
                   Width = 415
-                  ActivePage = tabAuthBearer
+                  ActivePage = tabAuthBasic
                   Align = alClient
                   ShowTabs = False
-                  TabIndex = 1
+                  TabIndex = 0
                   TabOrder = 1
                   object tabAuthBasic: TTabSheet
                     Caption = 'Basic'
-                    ClientHeight = 147
-                    ClientWidth = 411
+                    ClientHeight = 145
+                    ClientWidth = 409
                     object ScrollBox1: TScrollBox
                       Left = 0
-                      Height = 151
+                      Height = 145
                       Top = 0
-                      Width = 513
+                      Width = 409
                       HorzScrollBar.Page = 232
                       VertScrollBar.Page = 133
                       Align = alClient
                       BorderStyle = bsNone
-                      ClientHeight = 151
-                      ClientWidth = 513
+                      ClientHeight = 145
+                      ClientWidth = 409
                       Color = clNone
                       ParentColor = False
                       TabOrder = 0
                       object editBasicLogin: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 24
                         Width = 224
                         EditLabel.AnchorSideLeft.Control = editBasicLogin
@@ -3341,11 +3341,14 @@ object MainForm: TMainForm
                         EditLabel.Width = 224
                         EditLabel.Caption = 'Login:'
                         EditLabel.ParentColor = False
+                        ParentShowHint = False
+                        ShowHint = True
                         TabOrder = 0
+                        OnMouseEnter = OnMouseEnter
                       end
                       object editBasicPassword: TLabeledEdit
                         Left = 8
-                        Height = 25
+                        Height = 27
                         Top = 80
                         Width = 224
                         EchoMode = emPassword
@@ -3359,14 +3362,17 @@ object MainForm: TMainForm
                         EditLabel.Width = 224
                         EditLabel.Caption = 'Password:'
                         EditLabel.ParentColor = False
+                        ParentShowHint = False
                         PasswordChar = '*'
+                        ShowHint = True
                         TabOrder = 1
+                        OnMouseEnter = OnMouseEnter
                       end
                       object cbBasicShowPassword: TCheckBox
                         Left = 8
-                        Height = 22
+                        Height = 21
                         Top = 112
-                        Width = 111
+                        Width = 110
                         Caption = 'Show password'
                         OnClick = cbBasicShowPasswordClick
                         TabOrder = 2
@@ -3375,15 +3381,15 @@ object MainForm: TMainForm
                   end
                   object tabAuthBearer: TTabSheet
                     Caption = 'tabAuthBearer'
-                    ClientHeight = 147
-                    ClientWidth = 411
+                    ClientHeight = 145
+                    ClientWidth = 409
                     object ScrollBox2: TScrollBox
                       Left = 0
                       Height = 145
                       Top = 0
                       Width = 409
                       HorzScrollBar.Page = 208
-                      VertScrollBar.Page = 105
+                      VertScrollBar.Page = 107
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 145
@@ -3407,7 +3413,10 @@ object MainForm: TMainForm
                         EditLabel.Width = 396
                         EditLabel.Caption = 'Token:'
                         EditLabel.ParentColor = False
+                        ParentShowHint = False
+                        ShowHint = True
                         TabOrder = 0
+                        OnMouseEnter = OnMouseEnter
                       end
                       object editBearerPrefix: TLabeledEdit
                         Left = 8
@@ -3424,8 +3433,11 @@ object MainForm: TMainForm
                         EditLabel.Width = 200
                         EditLabel.Caption = 'Prefix:'
                         EditLabel.ParentColor = False
+                        ParentShowHint = False
+                        ShowHint = True
                         TabOrder = 1
                         Text = 'Bearer'
+                        OnMouseEnter = OnMouseEnter
                       end
                     end
                   end
