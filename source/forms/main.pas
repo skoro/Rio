@@ -218,6 +218,8 @@ type
       const aRow: Integer);
     procedure OnGridNewRow(Sender: TObject; Grid: TStringGrid;
       const aRow: Integer);
+    procedure OnMouseEnter(Sender: TObject);
+    procedure OnMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure pagesResponseChange(Sender: TObject);
     procedure PairSplitterResize(Sender: TObject);
     procedure pmAuthTypeClick(Sender: TObject);
@@ -1393,6 +1395,48 @@ begin
   if EditGridRow(Grid) <> mrOK then
     Grid.DeleteRow(aRow);
   Grid.SetFocus;
+end;
+
+procedure TMainForm.OnMouseEnter(Sender: TObject);
+var
+  Str: string;
+begin
+  // Dynamic hint for the text components.
+  Str := '';
+  (Sender as TWinControl).Hint := '';
+  if (Sender is TCustomComboBox) then
+    Str := TCustomComboBox(Sender).Text
+  else if (Sender is TCustomEdit) then
+    Str := TCustomEdit(Sender).Text;
+  if Str = '' then
+    Exit; // =>
+  if not FEnvManager.HasVars(Str) then
+    Exit; // =>
+  (Sender as TWinControl).Hint := FEnvManager.Apply(Str);
+end;
+
+procedure TMainForm.OnMouseMove(Sender: TObject; Shift: TShiftState; X,
+  Y: Integer);
+var
+  sg: TStringGrid;
+  aCol, aRow: longint;
+  Str: string;
+begin
+  if Sender is TStringGrid then
+  begin
+    // Dynamic hint for grid. Converts the mouse coordinates to the grid cell
+    // and checks has that cell an env variable. Shows the var value in the hint.
+    sg := TStringGrid(Sender);
+    sg.Hint := '';
+    aCol := 0;
+    aRow := 0;
+    sg.MouseToCell(X, Y, aCol, aRow);
+    Str := sg.Cells[aCol, aRow];
+    if Str = '' then
+     Exit; // =>
+    if FEnvManager.HasVars(Str) then
+      sg.Hint := FEnvManager.Apply(Str);
+  end;
 end;
 
 procedure TMainForm.pagesResponseChange(Sender: TObject);
