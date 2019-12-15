@@ -17,7 +17,7 @@ type
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciBookmark,
-    sciToggleTabs, sciToggleBookmarks, sciEnv, sciQuit);
+    sciToggleTabs, sciToggleSidebar, sciEnv, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -510,8 +510,8 @@ begin
   SetShortCut(sciSubmit,        120, []); // F9
   SetShortCut(sciToggleTabs,    118, []); // F7
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
-  SetShortCut(sciBookmark,      68, [ssCtrl]); // T
-  SetShortCut(sciToggleBookmarks, 119, []); // F8
+  SetShortCut(sciBookmark,      68, [ssCtrl]); // D
+  SetShortCut(sciToggleSidebar, 119, []); // F8
   SetShortCut(sciEnv,           69, [ssCtrl, ssAlt]); // E
 end;
 
@@ -618,7 +618,7 @@ begin
     sciQuit:          Result := 'Quit';
     sciBookmark:      Result := 'Add/edit bookmark';
     sciEnv:           Result := 'Configure environments';
-    sciToggleBookmarks: Result := 'Toggle bookmarks pane';
+    sciToggleSidebar: Result := 'Toggle sidebar';
   end;
 end;
 
