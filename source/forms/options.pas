@@ -43,11 +43,11 @@ type
     cbJsonLines: TCheckBox;
     cbJsonFmtArray: TCheckBox;
     cbJsonSaveFmt: TCheckBox;
-    cboxBookmarkNodeStyle: TComboBox;
+    cboxRequestNodeStyle: TComboBox;
     cboxFontItem: TComboBox;
     dlgFont: TFontDialog;
     editIndentSize: TSpinEdit;
-    gbBookmarks: TGroupBox;
+    gbSavedRequests: TGroupBox;
     gbFonts: TGroupBox;
     gbLayout: TGroupBox;
     GroupBox1: TGroupBox;
@@ -91,7 +91,7 @@ type
     FKeyCatch: TPanel; // Panel for reading a new shortcut.
     FKeySet: TShortCutItem; // Current reading they shortcut item.
     FShortCuts: TShortCuts; // List of application shortcuts.
-    function GetBookmarkNodeStyle: TBookmarkNodeStyle;
+    function GetRequestNodeStyle: TRequestNodeStyle;
     function GetEditRequestMethods: Boolean;
     function GetFitImages: Boolean;
     function GetGridButtonsHidden: Boolean;
@@ -139,7 +139,7 @@ type
     property FitImages: Boolean read GetFitImages;
     property LayoutEnable: Boolean write SetLayoutEnable;
     property HideTabContent: Boolean read GetHideTabContent;
-    property BookmarkNodeStyle: TBookmarkNodeStyle read GetBookmarkNodeStyle;
+    property RequestNodeStyle: TRequestNodeStyle read GetRequestNodeStyle;
   end;
 
 var
@@ -345,9 +345,9 @@ begin
   Result := cbEditMethods.Checked;
 end;
 
-function TOptionsForm.GetBookmarkNodeStyle: TBookmarkNodeStyle;
+function TOptionsForm.GetRequestNodeStyle: TRequestNodeStyle;
 begin
-  Result := TBookmarkNodeStyle(cboxBookmarkNodeStyle.ItemIndex);
+  Result := TRequestNodeStyle(cboxRequestNodeStyle.ItemIndex);
 end;
 
 function TOptionsForm.GetFitImages: Boolean;

@@ -338,7 +338,9 @@
       <Unit24>
         <Filename Value="forms/options.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="OptionsForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit24>
       <Unit25>
         <Filename Value="common/AppTree.pas"/>

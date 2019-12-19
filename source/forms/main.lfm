@@ -2200,13 +2200,13 @@ object MainForm: TMainForm
       OnClick = btnSubmitClick
       TabOrder = 2
     end
-    object btnBookmark: TSpeedButton
+    object btnSaveRequest: TSpeedButton
       Left = 539
       Height = 27
       Top = 0
       Width = 32
       Align = alRight
-      OnClick = btnBookmarkClick
+      OnClick = btnSaveRequestClick
     end
   end
   object StatusPanel: TPanel
@@ -2516,7 +2516,7 @@ object MainForm: TMainForm
                   ShowNavButtons = True
                   object ToolButton1: TToolButton
                     Left = 146
-                    Height = 22
+                    Height = 5
                     Top = 0
                     Caption = 'ToolButton1'
                     Style = tbsDivider
@@ -2611,8 +2611,8 @@ object MainForm: TMainForm
                   TabOrder = 0
                   object tabBodyJson: TTabSheet
                     Caption = 'tabBodyJson'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     inline editJson: TSynEdit
                       Left = 0
                       Height = 151
@@ -3101,8 +3101,8 @@ object MainForm: TMainForm
                   end
                   object tabBodyForm: TTabSheet
                     Caption = 'tabBodyForm'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object gridForm: TStringGrid
                       Left = 0
                       Height = 145
@@ -3160,8 +3160,8 @@ object MainForm: TMainForm
                   end
                   object tabBodyOther: TTabSheet
                     Caption = 'tabBodyOther'
-                    ClientHeight = 145
-                    ClientWidth = 409
+                    ClientHeight = 147
+                    ClientWidth = 411
                     object editOther: TMemo
                       Left = 0
                       Height = 152
@@ -3328,7 +3328,7 @@ object MainForm: TMainForm
                       TabOrder = 0
                       object editBasicLogin: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 24
                         Width = 224
                         EditLabel.AnchorSideLeft.Control = editBasicLogin
@@ -3348,7 +3348,7 @@ object MainForm: TMainForm
                       end
                       object editBasicPassword: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 80
                         Width = 224
                         EchoMode = emPassword
@@ -3389,7 +3389,7 @@ object MainForm: TMainForm
                       Top = 0
                       Width = 409
                       HorzScrollBar.Page = 208
-                      VertScrollBar.Page = 107
+                      VertScrollBar.Page = 105
                       Align = alClient
                       BorderStyle = bsNone
                       ClientHeight = 145

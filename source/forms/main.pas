@@ -65,7 +65,7 @@ type
     miTabBody: TMenuItem;
     miTabCookie: TMenuItem;
     miView: TMenuItem;
-    btnBookmark: TSpeedButton;
+    btnSaveRequest: TSpeedButton;
     pagesAuth: TPageControl;
     pagesBody: TPageControl;
     pagesRequest: TPageControl;
@@ -170,7 +170,7 @@ type
     TimerRequest: TTimer;
     toolbarResponse: TToolBar;
     ToolButton1: TToolButton;
-    procedure btnBookmarkClick(Sender: TObject);
+    procedure btnSaveRequestClick(Sender: TObject);
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbEnvChange(Sender: TObject);
@@ -251,7 +251,7 @@ type
     FFindTextPos: Integer;
     FRequestSeconds: Integer;
     FProfilerGraph: TProfilerGraph;
-    FBookManager: TBookmarkManager;
+    FRequestManager: TRequestManager;
     FKeepResponseTab: string;
     FAppTreeManager: TAppTreeManager;
     FEnvManager: TEnvManager;
@@ -284,10 +284,10 @@ type
     procedure FinishRequest;
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
-    procedure BookmarkButtonIcon(Added: Boolean);
-    procedure BookmarkEditorShow(Sender: TObject; BM: TBookmark);
-    procedure OnChangeBookmark(Prev, Selected: TBookmark);
-    procedure OnDeleteBookmark(Sender: TObject; BM: TBookmark);
+    procedure SaveRequestButtonIcon(Added: Boolean);
+    procedure SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
+    procedure OnChangeRequest(Prev, Selected: TSavedRequest);
+    procedure OnDeleteRequest(Sender: TObject; SR: TSavedRequest);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -307,7 +307,7 @@ type
     function CreateRequestObject: TRequestObject;
     procedure SetRequestObject(RO: TRequestObject);
     procedure KeepCurrentResponseTab;
-    property BookmarkManager: TBookmarkManager read FBookManager;
+    property RequestManager: TRequestManager read FRequestManager;
   end;
 
 var
@@ -321,10 +321,10 @@ uses about, headers_editor, cookie_form,
 
 const
   MAX_URLS = 15; // How much urls we can store in url dropdown history.
-  BOOKMARK_IMG_UNSET = 4;
-  BOOKMARK_IMG_SET = 5;
+  REQUEST_IMG_UNSET = 4;
+  REQUEST_IMG_SET = 5;
 
-  // App states for splitters: bookmark and request-response.
+  // App states for splitters: side sidebar and request-response.
   STATE_SIDEBAR_SIDE = 'sidebarSide';
   STATE_SPLITTER_SIDE = 'splitterSideRequest';
 
@@ -341,12 +341,12 @@ begin
   if not btnSubmit.Enabled then
     Exit; // =>
 
-  // A different url will unbookmark the current bookmark.
+  // A different url will unset the current request.
   try
     RO := CreateRequestObject;
-    if not FBookManager.IsCurrentRequest(RO) then begin
-      BookmarkButtonIcon(False);
-      FBookManager.ResetCurrent;
+    if not FRequestManager.IsCurrentRequest(RO) then begin
+      SaveRequestButtonIcon(False);
+      FRequestManager.ResetCurrent;
     end;
   finally
     FreeAndNil(RO);
@@ -358,9 +358,9 @@ begin
     TimerRequest.Enabled := True;
 end;
 
-procedure TMainForm.btnBookmarkClick(Sender: TObject);
+procedure TMainForm.btnSaveRequestClick(Sender: TObject);
 begin
-  BookmarkEditorShow(Sender, FBookManager.CurrentBookmark);
+  SaveRequestEditorShow(Sender, FRequestManager.CurrentRequest);
 end;
 
 function TMainForm.SubmitRequest: Boolean;
@@ -457,7 +457,7 @@ begin
     FHttpClient.RequestBody := TStringStream.Create(formData);
 
   btnSubmit.Enabled := False;
-  btnBookmark.Enabled := False;
+  btnSaveRequest.Enabled := False;
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -743,13 +743,13 @@ end;
 
 procedure TMainForm.cbMethodChange(Sender: TObject);
 var
-  BM: TBookmark;
+  SR: TSavedRequest;
 begin
-  // Update the current bookmark node (icon or text).
-  with FBookManager do begin
-    BM := CurrentBookmark;
-    if Assigned(BM) and (not BM.Locked) then begin
-      BM.Request.Method := cbMethod.Text;
+  // Update the current request node (icon or text).
+  with FRequestManager do begin
+    SR := CurrentRequest;
+    if Assigned(SR) and (not SR.Locked) then begin
+      SR.Request.Method := cbMethod.Text;
       SetNodeStyle(CurrentNode);
     end;
   end;
@@ -819,21 +819,21 @@ begin
 
   KeyValueForm := TKeyValueForm.Create(Application);
 
-  // Bookmark manager initialization.
+  // Request manager initialization.
   FAppTreeManager := TAppTreeManager.Create(Self);
   with FAppTreeManager do
   begin
     Parent := SideBarSide;
-    FBookManager := BookmarkManager;
+    FRequestManager := RequestManager;
     TreeView.Images := toolbarIcons;
     TreeView.StateImages := RequestIcons;
-    BookmarkManager.ImageIndexFolder := 0;
-    BookmarkManager.ImageIndexRoot := 8;
-    BookmarkManager.ImageIndexSelected := 5;
-    BookmarkManager.OnChangeBookmark := @OnChangeBookmark;
-    with BookmarkPopup do begin
-      OnEditClick := @BookmarkEditorShow;
-      OnDeleteClick := @OnDeleteBookmark;
+    RequestManager.ImageIndexFolder := 0;
+    RequestManager.ImageIndexRoot := 8;
+    RequestManager.ImageIndexSelected := 5;
+    RequestManager.OnChangeRequest := @OnChangeRequest;
+    with RequestPopup do begin
+      OnEditClick := @SaveRequestEditorShow;
+      OnDeleteClick := @OnDeleteRequest;
       Images := toolbarIcons;
       Items[0].ImageIndex := 11; // open
       Items[1].ImageIndex := 10; // new folder
@@ -841,7 +841,7 @@ begin
       Items[3].ImageIndex := 8;  // delete
     end;
   end;
-  LoadAppBookmarks(FBookManager);
+  LoadAppRequests(FRequestManager);
 
   // Environment manager initialization.
   FEnvManager := TEnvManager.Create;
@@ -872,10 +872,10 @@ end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
-  // Save the current bookmark.
-  if Assigned(FBookManager.CurrentBookmark) then
-    FBookManager.CurrentBookmark.UpdateRequest(CreateRequestObject);
-  SaveAppBookmarks(FBookManager);
+  // Save the current request.
+  if Assigned(FRequestManager.CurrentRequest) then
+    FRequestManager.CurrentRequest.UpdateRequest(CreateRequestObject);
+  SaveAppRequests(FRequestManager);
 
   FreeAndNil(FResponseTabManager);
   FEnvManager.SaveToFile(ConfigFile('EnvVars'));
@@ -908,7 +908,7 @@ begin
     sciFocusUrl:    cbUrl.SetFocus;
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
-    sciBookmark:    btnBookmarkClick(Sender);
+    sciBookmark:    btnSaveRequestClick(Sender);
     sciEnv:         btnEnvClick(Sender);
     sciSwitchView: begin
       // Switch views in the response tab (list or text view).
@@ -932,7 +932,7 @@ begin
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
   // OnResize callback should be after ToggleSidebarSide otherwise
-  // bookmarks will be always opened despite on its status.
+  // sidebar will be always opened despite on its status.
   if not Assigned(SideBarSide.OnResize) then
     SideBarSide.OnResize := @PairSplitterResize;
   // Select and show active visible tab.
@@ -947,10 +947,10 @@ begin
   if Assigned(FEnvManager.Current) and FEnvManager.FindExt(FEnvManager.Current.Name, I) then
     cbEnv.ItemIndex := I;
 
-  // Open the previous selected bookmark or request.
-  StrVal := PSMAIN.ReadString('selBookmark', '');
+  // Open the previous selected request.
+  StrVal := PSMAIN.ReadString('selRequest', '');
   if StrVal <> '' then
-    FBookManager.OpenBookmarkPath(StrVal)
+    FRequestManager.OpenRequestPath(StrVal)
   else begin
     StrVal := PSMAIN.ReadString('currentRequest', '');
     if StrVal <> '' then begin
@@ -1506,12 +1506,12 @@ end;
 procedure TMainForm.PSMAINRestoreProperties(Sender: TObject);
 begin
   // Update Query tab and app title.
-  if Assigned(FBookManager.CurrentBookmark) then
-    SetAppCaption(FBookManager.CurrentBookmark.Name)
+  if Assigned(FRequestManager.CurrentRequest) then
+    SetAppCaption(FRequestManager.CurrentRequest.Name)
   else
     SetAppCaption(UrlPath(cbUrl.Text));
   SyncURLQueryParams;
-  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
+  FRequestManager.RequestNodeStyle := OptionsForm.RequestNodeStyle;
   EnableSubmitButton;
 end;
 
@@ -1563,10 +1563,10 @@ begin
     WriteBoolean('tabNotes', miTabNotes.Checked);
     WriteBoolean('tabToggle', miTabToggle.Checked);
     WriteBoolean('sidebar', miSidebar.Checked);
-    // Save the selected bookmark or the current request.
-    with FBookManager do
-      if CurrentBookmark = NIL then begin
-        WriteString('selBookmark', '');
+    // Save the selected request.
+    with FRequestManager do
+      if CurrentRequest = NIL then begin
+        WriteString('selRequest', '');
         if Trim(cbUrl.Text) <> '' then
         begin
           try
@@ -1578,7 +1578,7 @@ begin
         end;
       end
       else begin
-        WriteString('selBookmark', GetBookmarkPath(CurrentBookmark));
+        WriteString('selRequest', GetRequestPath(CurrentRequest));
         WriteString('currentRequest', '');
       end;
     // Save splitter side sizes before it has been hidden.
@@ -2100,18 +2100,18 @@ begin
   if Length(Trim(cbUrl.Text)) = 0 then
     isEmpty := True;
   btnSubmit.Enabled := not isEmpty;
-  btnBookmark.Enabled := not isEmpty;
+  btnSaveRequest.Enabled := not isEmpty;
 end;
 
-procedure TMainForm.BookmarkButtonIcon(Added: Boolean);
+procedure TMainForm.SaveRequestButtonIcon(Added: Boolean);
 begin
   if Added then
-    toolbarIcons.GetBitmap(BOOKMARK_IMG_SET, btnBookmark.Glyph)
+    toolbarIcons.GetBitmap(REQUEST_IMG_SET, btnSaveRequest.Glyph)
   else
-    toolbarIcons.GetBitmap(BOOKMARK_IMG_UNSET, btnBookmark.Glyph);
+    toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
 end;
 
-procedure TMainForm.BookmarkEditorShow(Sender: TObject; BM: TBookmark);
+procedure TMainForm.SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
 var
   RO: TRequestObject;
 begin
@@ -2119,29 +2119,29 @@ begin
   begin
     try
       RO := CreateRequestObject;
-      BookmarkManager := FBookManager;
-      SelectedSourceNode := FAppTreeManager.BookmarkSelected;
-      ConfirmDelete := @FAppTreeManager.BookmarkPopup.ConfirmDeleteBookmark;
-      case ShowModal(BM, RO) of
+      RequestManager := FRequestManager;
+      SelectedSourceNode := FAppTreeManager.RequestSelected;
+      ConfirmDelete := @FAppTreeManager.RequestPopup.ConfirmDeleteRequest;
+      case ShowModal(SR, RO) of
         mrAdded:   begin
-          BookmarkButtonIcon(True);
-          SetAppCaption(FBookManager.CurrentBookmark.Name);
+          SaveRequestButtonIcon(True);
+          SetAppCaption(FRequestManager.CurrentRequest.Name);
         end;
         mrDeleted: begin
-          if FBookManager.CurrentBookmark = NIL then
+          if FRequestManager.CurrentRequest = NIL then
           begin
-            BookmarkButtonIcon(False);
+            SaveRequestButtonIcon(False);
             SetAppCaption(UrlPath(RO.Url));
           end;
           FreeAndNil(RO);
         end;
         mrOk: begin
-          // Update url for the current bookmark.
-          if FBookManager.CurrentBookmark = BM then
+          // Update url for the current SavedRequest.
+          if FRequestManager.CurrentRequest = SR then
           begin
-            SetAppCaption(BM.Name);
-            if RO.Url <> Bookmark.Request.Url then
-              cbUrl.Text := Bookmark.Request.Url;
+            SetAppCaption(SR.Name);
+            if RO.Url <> SavedRequest.Request.Url then
+              cbUrl.Text := SavedRequest.Request.Url;
           end;
           FreeAndNil(RO);
           SyncGridQueryParams;
@@ -2159,14 +2159,14 @@ begin
   end;
 end;
 
-procedure TMainForm.OnChangeBookmark(Prev, Selected: TBookmark);
+procedure TMainForm.OnChangeRequest(Prev, Selected: TSavedRequest);
 var
   RI: TResponseInfo;
 begin
   if Assigned(Prev) then
     Prev.UpdateRequest(CreateRequestObject);
   StartNewRequest;
-  BookmarkButtonIcon(True);
+  SaveRequestButtonIcon(True);
   RI := NIL;
   if FCacheResponse.Exists(Selected.Path) then
   begin
@@ -2184,19 +2184,19 @@ begin
     end;
   end;
   btnSubmit.Enabled := True;
-  btnBookmark.Enabled := True;
+  btnSaveRequest.Enabled := True;
   SetAppCaption(Selected.Name);
 end;
 
-procedure TMainForm.OnDeleteBookmark(Sender: TObject; BM: TBookmark);
+procedure TMainForm.OnDeleteRequest(Sender: TObject; SR: TSavedRequest);
 var
-  Curr: TBookmark;
+  Curr: TSavedRequest;
 begin
-  Curr := FBookManager.CurrentBookmark;
-  if (Curr = BM) or (Curr = NIL) then
+  Curr := FRequestManager.CurrentRequest;
+  if (Curr = SR) or (Curr = NIL) then
   begin
-    BookmarkButtonIcon(False);
-    SetAppCaption(UrlPath(BM.Request.Url));
+    SaveRequestButtonIcon(False);
+    SetAppCaption(UrlPath(SR.Request.Url));
   end;
 end;
 
@@ -2249,8 +2249,8 @@ begin
   miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
 
-  // Change bookmarks node style.
-  FBookManager.BookmarkNodeStyle := OptionsForm.BookmarkNodeStyle;
+  // Change request node style.
+  FRequestManager.RequestNodeStyle := OptionsForm.RequestNodeStyle;
 end;
 
 procedure TMainForm.SwitchLayout;
@@ -2352,7 +2352,7 @@ begin
   else
     ShowMessage(E.Message);
   btnSubmit.Enabled := True;
-  btnBookmark.Enabled := True;
+  btnSaveRequest.Enabled := True;
   FinishRequest;
 end;
 
@@ -2396,8 +2396,8 @@ procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
 begin
   try
     DoRequestComplete(Info);
-    if Assigned(FBookManager.CurrentBookmark) then
-      FCacheResponse.Put(FBookManager.CurrentBookmark.Path, ObjToJsonStr(Info));
+    if Assigned(FRequestManager.CurrentRequest) then
+      FCacheResponse.Put(FRequestManager.CurrentRequest.Path, ObjToJsonStr(Info));
     FinishRequest;
   finally
     Info.Free;
@@ -2410,11 +2410,11 @@ var
   mime: TMimeType;
 begin
   btnSubmit.Enabled := True;
-  btnBookmark.Enabled := True;
+  btnSaveRequest.Enabled := True;
   TimerRequest.Enabled := False;
 
   // Update the app window caption.
-  if not Assigned(FBookManager.CurrentBookmark) then
+  if not Assigned(FRequestManager.CurrentRequest) then
     SetAppCaption(UrlPath(Info.Url));
 
   // Response headers.
@@ -2674,11 +2674,11 @@ begin
   SetAppCaption;
   UpdateStatusLine;
 
-  // Submit and Bookmark buttons state.
+  // Submit and SaveRequest buttons state.
   btnSubmit.Enabled := False;
-  btnBookmark.Enabled := False;
-  BookmarkButtonIcon(False);
-  FBookManager.ResetCurrent;
+  btnSaveRequest.Enabled := False;
+  SaveRequestButtonIcon(False);
+  FRequestManager.ResetCurrent;
 end;
 
 function TMainForm.SetJsonBody(jsonStr: string; var ErrMsg: string): Boolean;

@@ -14,15 +14,15 @@ type
   TAppTreeManager = class(TPanel)
   private
     FTreeView: TTreeView;
-    FBookmarkRoot: TTreeNode;
-    FBookmarkSelected: TTreeNode;
-    FBookmarkManager: TBookmarkManager;
-    FBookmarkPopup: TBookmarkPopup;
+    FRequestRoot: TTreeNode;
+    FRequestSelected: TTreeNode;
+    FRequestManager: TRequestManager;
+    FRequestPopup: TSavedRequestPopup;
   protected
     function CreateTreeView: TTreeView; virtual;
-    function CreateBookmarkNode: TTreeNode; virtual;
+    function CreateRequestNode: TTreeNode; virtual;
     procedure InitTree; virtual;
-    function IsBookmarkNode(ANode: TTreeNode): Boolean;
+    function IsRequestNode(ANode: TTreeNode): Boolean;
     procedure InternalTreeOnDblClick(Sender: TObject);
     procedure InternalTreeOnContextPopup(Sender: TObject; MousePos: TPoint; var Handled: Boolean);
     procedure InternalTreeOnSelectionChanged(Sender: TObject);
@@ -31,10 +31,10 @@ type
     constructor Create(TheOwner: TComponent); override;
     destructor Destroy; override;
     property TreeView: TTreeView read FTreeView;
-    property BookmarkManager: TBookmarkManager read FBookmarkManager;
-    property BookmarkRoot: TTreeNode read FBookmarkRoot;
-    property BookmarkSelected: TTreeNode read FBookmarkSelected;
-    property BookmarkPopup: TBookmarkPopup read FBookmarkPopup write FBookmarkPopup;
+    property RequestManager: TRequestManager read FRequestManager;
+    property RequestRoot: TTreeNode read FRequestRoot;
+    property RequestSelected: TTreeNode read FRequestSelected;
+    property RequestPopup: TSavedRequestPopup read FRequestPopup write FRequestPopup;
   end;
 
 implementation
@@ -58,10 +58,10 @@ begin
   Result.OnSelectionChanged := @InternalTreeOnSelectionChanged;
 end;
 
-function TAppTreeManager.CreateBookmarkNode: TTreeNode;
+function TAppTreeManager.CreateRequestNode: TTreeNode;
 begin
   with FTreeView.Items do begin
-    Result := Add(NIL, 'My bookmarks');
+    Result := Add(NIL, 'Saved requests');
     Result.Data := NIL;
     //FRootNode.StateIndex := FImgIdxRoot;
     Result.MakeVisible;
@@ -71,14 +71,14 @@ end;
 procedure TAppTreeManager.InitTree;
 begin
   FTreeView := CreateTreeView;
-  FBookmarkRoot := CreateBookmarkNode;
+  FRequestRoot := CreateRequestNode;
 end;
 
-function TAppTreeManager.IsBookmarkNode(ANode: TTreeNode): Boolean;
+function TAppTreeManager.IsRequestNode(ANode: TTreeNode): Boolean;
 begin
   while ANode.Parent <> NIL do
     ANode := ANode.Parent;
-  Result := (ANode = FBookmarkRoot);
+  Result := (ANode = FRequestRoot);
 end;
 
 procedure TAppTreeManager.InternalTreeOnDblClick(Sender: TObject);
@@ -88,8 +88,8 @@ begin
   aNode := FTreeView.Selected;
   if not Assigned(aNode) then
     Exit; // =>
-  if IsBookmarkNode(aNode) then
-    FBookmarkManager.OpenNode(aNode);
+  if IsRequestNode(aNode) then
+    FRequestManager.OpenNode(aNode);
 end;
 
 procedure TAppTreeManager.InternalTreeOnContextPopup(Sender: TObject;
@@ -100,9 +100,9 @@ begin
   aNode := FTreeView.GetNodeAt(MousePos.x, MousePos.y);
   if not Assigned(aNode) then
     Exit; // =>
-  if IsBookmarkNode(aNode) then
+  if IsRequestNode(aNode) then
   begin
-    FTreeView.PopupMenu := FBookmarkPopup;
+    FTreeView.PopupMenu := FRequestPopup;
     FTreeView.PopupMenu.OnClose := @InternalTreePopupOnClose;
   end;
 end;
@@ -112,14 +112,14 @@ var
   aNode: TTreeNode;
 begin
   aNode := FTreeView.Selected;
-  FBookmarkSelected := NIL;
+  FRequestSelected := NIL;
   if Assigned(aNode) then
   begin
-    if IsBookmarkNode(aNode) then
-      FBookmarkSelected := aNode;
+    if IsRequestNode(aNode) then
+      FRequestSelected := aNode;
   end;
-  if Assigned(FBookmarkPopup) then
-    FBookmarkPopup.SelectedNode := FBookmarkSelected;
+  if Assigned(FRequestPopup) then
+    FRequestPopup.SelectedNode := FRequestSelected;
 end;
 
 procedure TAppTreeManager.InternalTreePopupOnClose(Sender: TObject);
@@ -135,17 +135,17 @@ begin
   BevelOuter := bvNone;
   BorderSpacing.Left := 4;
   InitTree;
-  FBookmarkManager := TBookmarkManager.Create(FBookmarkRoot);
-  FBookmarkPopup := TBookmarkPopup.Create(Self);
-  FBookmarkPopup.BookmarkManager := FBookmarkManager;
-  FBookmarkPopup.RootNode := FBookmarkRoot;
+  FRequestManager := TRequestManager.Create(FRequestRoot);
+  FRequestPopup := TSavedRequestPopup.Create(Self);
+  FRequestPopup.RequestManager := FRequestManager;
+  FRequestPopup.RootNode := FRequestRoot;
 end;
 
 destructor TAppTreeManager.Destroy;
 begin
-  if Assigned(FBookmarkPopup) then
-    FreeAndNil(FBookmarkPopup);
-  FreeAndNil(FBookmarkManager);
+  if Assigned(FRequestPopup) then
+    FreeAndNil(FRequestPopup);
+  FreeAndNil(FRequestManager);
   FreeAndNil(FTreeView);
   inherited Destroy;
 end;

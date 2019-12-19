@@ -14,7 +14,7 @@ const
 
 type
 
-  TConfirmDeleteBookmark = function (BM: TBookmark): Boolean of object;
+  TConfirmDeleteRequest = function (BM: TSavedRequest): Boolean of object;
 
   { TBookmarkForm }
 
@@ -45,40 +45,40 @@ type
       Cancel: Boolean);
   private
     FIsNewNode: Boolean; // A new folder was added.
-    FBookmarkManager: TBookmarkManager;
+    FRequestManager: TRequestManager;
     FPrevPath: string; // Keep an original node path before editing node.
     FPrevName: string; // Keep an source node name before editing node.
     FRequestObject: TRequestObject;
-    FBookmark: TBookmark; // Edited bookmark.
+    FSavedRequest: TSavedRequest; // The edited request.
     FSelectedSourceNode: TTreeNode;
-    FConfirmDelete: TConfirmDeleteBookmark;
-    function GetBookmarkManager: TBookmarkManager;
-    function GetBookmarkName: string;
+    FConfirmDelete: TConfirmDeleteRequest;
+    function GetRequestManager: TRequestManager;
+    function GetRequestName: string;
     function GetDeleteEnabled: Boolean;
     function GetFolderPath: string;
-    function GetIsNewBookmark: Boolean;
+    function GetIsNewRequest: Boolean;
     function GetRequestObject: TRequestObject;
     procedure SetDeleteEnabled(AValue: Boolean);
     procedure SelectAndViewNode(aNode: TTreeNode);
     procedure SyncTreeNodes(Main, Local: TTreeNode);
   public
     function ShowModal: TModalResult; override;
-    function ShowModal(BM: TBookmark; RO: TRequestObject): TModalResult; overload;
+    function ShowModal(SR: TSavedRequest; RO: TRequestObject): TModalResult; overload;
     procedure PrepareEditForm; virtual;
     procedure PrepareAddForm; virtual;
-    procedure AddBookmark(RO: TRequestObject); virtual;
-    procedure UpdateBookmark; virtual;
-    procedure DeleteBookmark; virtual;
+    procedure AddRequest(RO: TRequestObject); virtual;
+    procedure UpdateRequest; virtual;
+    procedure DeleteRequest; virtual;
 
-    property Bookmark: TBookmark read FBookmark write FBookmark;
-    property BookmarkManager: TBookmarkManager read GetBookmarkManager write FBookmarkManager;
+    property SavedRequest: TSavedRequest read FSavedRequest write FSavedRequest;
+    property RequestManager: TRequestManager read GetRequestManager write FRequestManager;
     property RequestObject: TRequestObject read GetRequestObject write FRequestObject;
     property DeleteEnabled: Boolean read GetDeleteEnabled write SetDeleteEnabled;
     property FolderPath: string read GetFolderPath;
-    property BookmarkName: string read GetBookmarkName;
-    property IsNewBookmark: Boolean read GetIsNewBookmark;
+    property RequestName: string read GetRequestName;
+    property IsNewRequest: Boolean read GetIsNewRequest;
     property SelectedSourceNode: TTreeNode read FSelectedSourceNode write FSelectedSourceNode;
-    property ConfirmDelete: TConfirmDeleteBookmark read FConfirmDelete write FConfirmDelete;
+    property ConfirmDelete: TConfirmDeleteRequest read FConfirmDelete write FConfirmDelete;
   end;
 
 implementation
@@ -91,7 +91,7 @@ uses ThreadHttpClient, AppHelpers, sysutils;
 
 procedure TBookmarkForm.OKButtonClick(Sender: TObject);
 begin
-  // Don't allow to close form without a bookmark name.
+  // Don't allow to close form without a request name.
   if Trim(edName.Text) = '' then
   begin
     edName.SetFocus;
@@ -99,10 +99,10 @@ begin
   end;
 
   try
-    if IsNewBookmark then
-      AddBookmark(FRequestObject)
+    if IsNewRequest then
+      AddRequest(FRequestObject)
     else
-      UpdateBookmark;
+      UpdateRequest;
   except
     on E: Exception do begin
       ERRMsg('Error', E.Message);
@@ -141,7 +141,7 @@ begin
       Node.Delete
     else begin
       Node.Selected := True;
-      Added := BookmarkManager.AddFolder(Node.GetTextPath);
+      Added := RequestManager.AddFolder(Node.GetTextPath);
       if Added = NIL then begin
         ERRMsg('Error', 'Cannot add folder: ' + Node.Text);
         Node.Delete;
@@ -158,7 +158,7 @@ begin
       if Cancel or (Trim(Node.Text) = '') or (FPrevName = Node.Text) then
         Node.Text := FPrevName
       else
-        if not BookmarkManager.RenameFolder(FPrevPath, Node.Text) then begin
+        if not RequestManager.RenameFolder(FPrevPath, Node.Text) then begin
           ERRMsg('Error', 'Cannot rename folder to: ' + Node.Text);
           Node.Text := FPrevName;
         end;
@@ -179,9 +179,9 @@ begin
   Result := fNode.GetTextPath;
 end;
 
-function TBookmarkForm.GetIsNewBookmark: Boolean;
+function TBookmarkForm.GetIsNewRequest: Boolean;
 begin
-  Result := (not Assigned(FBookmark)) and Assigned(FRequestObject);
+  Result := (not Assigned(FSavedRequest)) and Assigned(FRequestObject);
 end;
 
 function TBookmarkForm.GetRequestObject: TRequestObject;
@@ -248,19 +248,19 @@ end;
 
 function TBookmarkForm.ShowModal: TModalResult;
 begin
-  if (not Assigned(FBookmark)) or (not Assigned(FRequestObject)) then
-    raise Exception.Create('Bookmark or request object is required.');
+  if (not Assigned(FSavedRequest)) or (not Assigned(FRequestObject)) then
+    raise Exception.Create('A saved request or request object is required.');
   Result := inherited ShowModal;
 end;
 
-function TBookmarkForm.GetBookmarkManager: TBookmarkManager;
+function TBookmarkForm.GetRequestManager: TRequestManager;
 begin
-  if not Assigned(FBookmarkManager) then
-    raise Exception.Create('Bookmark manager is required.');
-  Result := FBookmarkManager;
+  if not Assigned(FRequestManager) then
+    raise Exception.Create('A request manager is required.');
+  Result := FRequestManager;
 end;
 
-function TBookmarkForm.GetBookmarkName: string;
+function TBookmarkForm.GetRequestName: string;
 begin
   Result := edName.Text;
 end;
@@ -270,21 +270,21 @@ begin
   Result := ButtonPanel.CloseButton.Visible;
 end;
 
-function TBookmarkForm.ShowModal(BM: TBookmark; RO: TRequestObject
+function TBookmarkForm.ShowModal(SR: TSavedRequest; RO: TRequestObject
   ): TModalResult;
 begin
-  FBookmark := BM;
+  FSavedRequest := SR;
   FRequestObject := RO;
 
-  BookmarkManager.AttachFolderNodes(tvFolders);
+  RequestManager.AttachFolderNodes(tvFolders);
 
-  if IsNewBookmark then
+  if IsNewRequest then
     PrepareAddForm
   else
     PrepareEditForm;
 
   Result := inherited ShowModal;
-  if IsNewBookmark and (Result = mrOK) then
+  if IsNewRequest and (Result = mrOK) then
     Result := mrAdded;
 end;
 
@@ -295,16 +295,16 @@ var
 begin
   pInfo.Visible := True;
   DeleteEnabled := True;
-  edName.Text := FBookmark.Name;
-  edUrl.Text := FBookmark.Request.UrlPath;
-  cbLock.Checked := FBookmark.Locked;
+  edName.Text := FSavedRequest.Name;
+  edUrl.Text := FSavedRequest.Request.UrlPath;
+  cbLock.Checked := FSavedRequest.Locked;
   cbCopy.Visible := True;
-  // Select the bookmark node by default.
-  srcNode := FBookmarkManager.FindNode(FBookmark);
+  // Select the SavedRequest node by default.
+  srcNode := FRequestManager.FindNode(FSavedRequest);
   if not Assigned(srcNode) then
     { TODO : should be logged ? }
     Exit; // =>
-  path := FBookmarkManager.GetNodeFolderPath(srcNode);
+  path := FRequestManager.GetNodeFolderPath(srcNode);
   dstNode := tvFolders.Items.FindNodeWithTextPath(path);
   SelectAndViewNode(dstNode);
   { TODO : path not found. Should be logged ? }
@@ -325,25 +325,25 @@ begin
   // can be NILed.
   if Assigned(FSelectedSourceNode) then begin
     if not IsFolderNode(FSelectedSourceNode) then
-      FSelectedSourceNode := FSelectedSourceNode.Parent; // Bookmark selected, move up.
+      FSelectedSourceNode := FSelectedSourceNode.Parent; // SavedRequest selected, move up.
     if Assigned(FSelectedSourceNode) then
       SelDst := FindNodePath(tvFolders.Items.GetFirstNode, GetNodePath(FSelectedSourceNode));
     SelectAndViewNode(SelDst);
   end;
 end;
 
-procedure TBookmarkForm.AddBookmark(RO: TRequestObject);
+procedure TBookmarkForm.AddRequest(RO: TRequestObject);
 var
-  BM: TBookmark;
+  BM: TSavedRequest;
   NewNode: TTreeNode;
 begin
   try
-    BM := TBookmark.Create(BookmarkName);
+    BM := TSavedRequest.Create(RequestName);
     BM.Request := RO;
     BM.Locked := cbLock.Checked;
-    NewNode := BookmarkManager.AddBookmark(BM, FolderPath);
-    if not Assigned(BookmarkManager.CurrentBookmark) then
-      BookmarkManager.CurrentNode := NewNode;
+    NewNode := RequestManager.AddRequest(BM, FolderPath);
+    if not Assigned(RequestManager.CurrentRequest) then
+      RequestManager.CurrentNode := NewNode;
   except
     on E: Exception do begin
       BM.Request := NIL; // Don't let free the RequestObject !
@@ -353,32 +353,32 @@ begin
   end;
 end;
 
-procedure TBookmarkForm.UpdateBookmark;
+procedure TBookmarkForm.UpdateRequest;
 var
   RO: TRequestObject;
 begin
   if Length(Trim(edUrl.Text)) <> 0 then
-    FBookmark.Request.Url := edUrl.Text;
-  FBookmark.Locked := cbLock.Checked;
+    FSavedRequest.Request.Url := edUrl.Text;
+  FSavedRequest.Locked := cbLock.Checked;
   if cbCopy.Checked then
   begin
     RO := TRequestObject.Create;
-    // Copying the current bookmark.
-    if BookmarkManager.CurrentBookmark = FBookmark then
+    // Copying the current SavedRequest.
+    if RequestManager.CurrentRequest = FSavedRequest then
       // RequestObject will be deleted in main.pas (BookmarkEditorShow)
       // so we must copying the original one when adding a new node.
       RO.CopyFrom(RequestObject)
     else
-      RO.CopyFrom(FBookmark.Request);
-    AddBookmark(RO);
+      RO.CopyFrom(FSavedRequest.Request);
+    AddRequest(RO);
   end
   else
-    BookmarkManager.UpdateBookmark(FBookmark, BookmarkName, FolderPath);
+    RequestManager.UpdateRequest(FSavedRequest, RequestName, FolderPath);
 end;
 
-procedure TBookmarkForm.DeleteBookmark;
+procedure TBookmarkForm.DeleteRequest;
 begin
-  BookmarkManager.DeleteBookmark(FBookmark);
+  RequestManager.DeleteRequest(FSavedRequest);
 end;
 
 procedure TBookmarkForm.FormCreate(Sender: TObject);
@@ -410,9 +410,9 @@ end;
 procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
 begin
   ModalResult := mrNone;
-  if assigned(FConfirmDelete) and not FConfirmDelete(FBookmark) then
+  if assigned(FConfirmDelete) and not FConfirmDelete(FSavedRequest) then
     Exit; // =>
-  DeleteBookmark;
+  DeleteRequest;
   ModalResult := mrDeleted;
 end;
 
