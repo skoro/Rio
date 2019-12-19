@@ -66,8 +66,8 @@ object OptionsForm: TOptionsForm
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 27
-          ClientWidth = 286
+          ClientHeight = 23
+          ClientWidth = 282
           ParentColor = False
           TabOrder = 1
           object lTimeout: TLabel

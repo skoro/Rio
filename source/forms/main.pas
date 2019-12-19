@@ -908,7 +908,7 @@ begin
     sciFocusUrl:    cbUrl.SetFocus;
     sciFocusMethod: cbMethod.SetFocus;
     sciSubmit:      btnSubmitClick(Sender);
-    sciBookmark:    btnSaveRequestClick(Sender);
+    sciSaveRequest: btnSaveRequestClick(Sender);
     sciEnv:         btnEnvClick(Sender);
     sciSwitchView: begin
       // Switch views in the response tab (list or text view).
@@ -2242,7 +2242,7 @@ begin
   miNewWindow.ShortCut     := OptionsForm.GetShortCutValue(sciNewWindow);
   miNew.ShortCut           := OptionsForm.GetShortCutValue(sciNewRequest);
   miOpenRequest.ShortCut   := OptionsForm.GetShortCutValue(sciOpenRequest);
-  miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciSaveRequest);
+  miSaveRequest.ShortCut   := OptionsForm.GetShortCutValue(sciFileRequest);
   miSaveResponse.ShortCut  := OptionsForm.GetShortCutValue(sciSaveBody);
   miTabToggle.ShortCut     := OptionsForm.GetShortCutValue(sciToggleTabs);
   miSidebar.ShortCut       := OptionsForm.GetShortCutValue(sciToggleSidebar);

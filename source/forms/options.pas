@@ -14,9 +14,9 @@ type
   TUIFontItem = (fiGrids, fiEditor, fiJson, fiContent, fiValue, fiHelp);
 
   // Keyboard shortcut item.
-  TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciSaveRequest,
+  TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciFileRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
-    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciBookmark,
+    sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciSaveRequest,
     sciToggleTabs, sciToggleSidebar, sciEnv, sciQuit);
 
   // Keyboard shortcut code.
@@ -497,7 +497,7 @@ begin
   SetShortCut(sciFocusUrl,      76, [ssCtrl]); // L
   SetShortCut(sciFocusMethod,   80, [ssCtrl]); // P
   SetShortCut(sciManageHeaders, 73, [ssCtrl]); // I
-  SetShortCut(sciSaveRequest,   83, [ssCtrl]); // S
+  SetShortCut(sciFileRequest,   83, [ssCtrl, ssShift]); // S
   SetShortCut(sciOptions,       188, [ssCtrl]); // ,
   SetShortCut(sciNewRequest,    78, [ssCtrl]); // N
   SetShortCut(sciNewWindow,     78, [ssCtrl, ssShift]); // N
@@ -510,7 +510,7 @@ begin
   SetShortCut(sciSubmit,        120, []); // F9
   SetShortCut(sciToggleTabs,    118, []); // F7
   SetShortCut(sciQuit,          81, [ssCtrl]); // Q
-  SetShortCut(sciBookmark,      68, [ssCtrl]); // D
+  SetShortCut(sciSaveRequest,   83, [ssCtrl]); // S
   SetShortCut(sciToggleSidebar, 119, []); // F8
   SetShortCut(sciEnv,           69, [ssCtrl, ssAlt]); // E
 end;
@@ -603,7 +603,7 @@ begin
     sciFocusUrl:      Result := 'Go to URL field';
     sciFocusMethod:   Result := 'Go to methods list';
     sciManageHeaders: Result := 'Manage headers';
-    sciSaveRequest:   Result := 'Save request';
+    sciFileRequest:   Result := 'Save request to a file';
     sciOptions:       Result := 'Options';
     sciNewRequest:    Result := 'New request';
     sciNewWindow:     Result := 'New window';
@@ -616,7 +616,7 @@ begin
     sciSubmit:        Result := 'Submit the request';
     sciToggleTabs:    Result := 'Toggle request pane';
     sciQuit:          Result := 'Quit';
-    sciBookmark:      Result := 'Add/edit bookmark';
+    sciSaveRequest:   Result := 'Save/edit request';
     sciEnv:           Result := 'Configure environments';
     sciToggleSidebar: Result := 'Toggle sidebar';
   end;
