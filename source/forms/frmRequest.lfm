@@ -1,10 +1,10 @@
-object BookmarkForm: TBookmarkForm
+object SaveRequestForm: TSaveRequestForm
   Left = 451
   Height = 373
   Top = 236
   Width = 327
   BorderIcons = [biSystemMenu]
-  Caption = 'Bookmark'
+  Caption = 'Save request'
   ClientHeight = 373
   ClientWidth = 327
   Constraints.MinHeight = 300
@@ -37,14 +37,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pName: TPanel
     Left = 6
-    Height = 46
+    Height = 48
     Top = 6
     Width = 315
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 46
+    ClientHeight = 48
     ClientWidth = 315
     TabOrder = 1
     object lName: TLabel
@@ -60,7 +60,7 @@ object BookmarkForm: TBookmarkForm
     end
     object edName: TEdit
       Left = 0
-      Height = 25
+      Height = 27
       Top = 21
       Width = 315
       Align = alTop
@@ -69,14 +69,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pFolders: TPanel
     Left = 6
-    Height = 180
-    Top = 106
+    Height = 176
+    Top = 110
     Width = 315
     Align = alClient
     BorderSpacing.Around = 6
     BevelOuter = bvNone
     Caption = 'pFolders'
-    ClientHeight = 180
+    ClientHeight = 176
     ClientWidth = 315
     TabOrder = 3
     object lFolder: TLabel
@@ -91,7 +91,7 @@ object BookmarkForm: TBookmarkForm
     object pFolderBtn: TPanel
       Left = 0
       Height = 27
-      Top = 153
+      Top = 149
       Width = 315
       Align = alBottom
       AutoSize = True
@@ -150,7 +150,7 @@ object BookmarkForm: TBookmarkForm
     end
     object tvFolders: TTreeView
       Left = 0
-      Height = 132
+      Height = 128
       Top = 17
       Width = 315
       Align = alClient
@@ -195,14 +195,14 @@ object BookmarkForm: TBookmarkForm
   end
   object pInfo: TPanel
     Left = 6
-    Height = 42
-    Top = 58
+    Height = 44
+    Top = 60
     Width = 315
     Align = alTop
     AutoSize = True
     BorderSpacing.Around = 6
     BevelOuter = bvNone
-    ClientHeight = 42
+    ClientHeight = 44
     ClientWidth = 315
     TabOrder = 2
     Visible = False
@@ -217,7 +217,7 @@ object BookmarkForm: TBookmarkForm
     end
     object edUrl: TEdit
       Left = 0
-      Height = 25
+      Height = 27
       Top = 17
       Width = 315
       Align = alTop

@@ -294,7 +294,7 @@
       <Unit16>
         <Filename Value="forms/frmRequest.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="BookmarkForm"/>
+        <ComponentName Value="SaveRequestForm"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit16>

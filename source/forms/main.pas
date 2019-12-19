@@ -2115,7 +2115,7 @@ procedure TMainForm.SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
 var
   RO: TRequestObject;
 begin
-  with TBookmarkForm.Create(Self) do
+  with TSaveRequestForm.Create(Self) do
   begin
     try
       RO := CreateRequestObject;

@@ -9,16 +9,16 @@ uses
   ExtCtrls, StdCtrls, ComCtrls, Requests, RequestObject, Controls, Buttons;
 
 const
-  mrAdded = mrLast + 1; // A new bookmark was added.
+  mrAdded = mrLast + 1; // A new request was added.
   mrDeleted = mrLast + 2; // Modal result for delete operation.
 
 type
 
   TConfirmDeleteRequest = function (BM: TSavedRequest): Boolean of object;
 
-  { TBookmarkForm }
+  { TSaveRequestForm }
 
-  TBookmarkForm = class(TForm)
+  TSaveRequestForm = class(TForm)
     btnNewFolder: TBitBtn;
     ButtonPanel: TButtonPanel;
     cbLock: TCheckBox;
@@ -87,9 +87,9 @@ uses ThreadHttpClient, AppHelpers, sysutils;
 
 {$R *.lfm}
 
-{ TBookmarkForm }
+{ TSaveRequestForm }
 
-procedure TBookmarkForm.OKButtonClick(Sender: TObject);
+procedure TSaveRequestForm.OKButtonClick(Sender: TObject);
 begin
   // Don't allow to close form without a request name.
   if Trim(edName.Text) = '' then
@@ -114,7 +114,7 @@ begin
   ModalResult := mrOK;
 end;
 
-procedure TBookmarkForm.tvFoldersEditing(Sender: TObject; Node: TTreeNode;
+procedure TSaveRequestForm.tvFoldersEditing(Sender: TObject; Node: TTreeNode;
   var AllowEdit: Boolean);
 begin
   // Don't allow to edit the root node.
@@ -128,7 +128,7 @@ begin
   FIsNewNode := False;
 end;
 
-procedure TBookmarkForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
+procedure TSaveRequestForm.tvFoldersEditingEnd(Sender: TObject; Node: TTreeNode;
   Cancel: Boolean);
 var
   Added: TTreeNode;
@@ -167,7 +167,7 @@ begin
     end;
 end;
 
-function TBookmarkForm.GetFolderPath: string;
+function TSaveRequestForm.GetFolderPath: string;
 var
   fNode: TTreeNode;
 begin
@@ -179,24 +179,24 @@ begin
   Result := fNode.GetTextPath;
 end;
 
-function TBookmarkForm.GetIsNewRequest: Boolean;
+function TSaveRequestForm.GetIsNewRequest: Boolean;
 begin
   Result := (not Assigned(FSavedRequest)) and Assigned(FRequestObject);
 end;
 
-function TBookmarkForm.GetRequestObject: TRequestObject;
+function TSaveRequestForm.GetRequestObject: TRequestObject;
 begin
   if not Assigned(FRequestObject) then
     raise Exception.Create('Request object is required.');
   Result := FRequestObject;
 end;
 
-procedure TBookmarkForm.SetDeleteEnabled(AValue: Boolean);
+procedure TSaveRequestForm.SetDeleteEnabled(AValue: Boolean);
 begin
   ButtonPanel.CloseButton.Visible := AValue;
 end;
 
-procedure TBookmarkForm.SelectAndViewNode(aNode: TTreeNode);
+procedure TSaveRequestForm.SelectAndViewNode(aNode: TTreeNode);
 begin
   if Assigned(aNode) then
     with aNode do begin
@@ -205,7 +205,7 @@ begin
     end;
 end;
 
-procedure TBookmarkForm.SyncTreeNodes(Main, Local: TTreeNode);
+procedure TSaveRequestForm.SyncTreeNodes(Main, Local: TTreeNode);
 var
   p: SizeInt;
   Cur, Path: string;
@@ -246,31 +246,31 @@ begin
   NextNode.Selected := True;
 end;
 
-function TBookmarkForm.ShowModal: TModalResult;
+function TSaveRequestForm.ShowModal: TModalResult;
 begin
   if (not Assigned(FSavedRequest)) or (not Assigned(FRequestObject)) then
     raise Exception.Create('A saved request or request object is required.');
   Result := inherited ShowModal;
 end;
 
-function TBookmarkForm.GetRequestManager: TRequestManager;
+function TSaveRequestForm.GetRequestManager: TRequestManager;
 begin
   if not Assigned(FRequestManager) then
     raise Exception.Create('A request manager is required.');
   Result := FRequestManager;
 end;
 
-function TBookmarkForm.GetRequestName: string;
+function TSaveRequestForm.GetRequestName: string;
 begin
   Result := edName.Text;
 end;
 
-function TBookmarkForm.GetDeleteEnabled: Boolean;
+function TSaveRequestForm.GetDeleteEnabled: Boolean;
 begin
   Result := ButtonPanel.CloseButton.Visible;
 end;
 
-function TBookmarkForm.ShowModal(SR: TSavedRequest; RO: TRequestObject
+function TSaveRequestForm.ShowModal(SR: TSavedRequest; RO: TRequestObject
   ): TModalResult;
 begin
   FSavedRequest := SR;
@@ -288,7 +288,7 @@ begin
     Result := mrAdded;
 end;
 
-procedure TBookmarkForm.PrepareEditForm;
+procedure TSaveRequestForm.PrepareEditForm;
 var
   srcNode, dstNode: TTreeNode;
   path: string;
@@ -310,7 +310,7 @@ begin
   { TODO : path not found. Should be logged ? }
 end;
 
-procedure TBookmarkForm.PrepareAddForm;
+procedure TSaveRequestForm.PrepareAddForm;
 var
   SelDst: TTreeNode;
 begin
@@ -332,7 +332,7 @@ begin
   end;
 end;
 
-procedure TBookmarkForm.AddRequest(RO: TRequestObject);
+procedure TSaveRequestForm.AddRequest(RO: TRequestObject);
 var
   BM: TSavedRequest;
   NewNode: TTreeNode;
@@ -353,7 +353,7 @@ begin
   end;
 end;
 
-procedure TBookmarkForm.UpdateRequest;
+procedure TSaveRequestForm.UpdateRequest;
 var
   RO: TRequestObject;
 begin
@@ -376,23 +376,23 @@ begin
     RequestManager.UpdateRequest(FSavedRequest, RequestName, FolderPath);
 end;
 
-procedure TBookmarkForm.DeleteRequest;
+procedure TSaveRequestForm.DeleteRequest;
 begin
   RequestManager.DeleteRequest(FSavedRequest);
 end;
 
-procedure TBookmarkForm.FormCreate(Sender: TObject);
+procedure TSaveRequestForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   FIsNewNode := False;
 end;
 
-procedure TBookmarkForm.FormShow(Sender: TObject);
+procedure TSaveRequestForm.FormShow(Sender: TObject);
 begin
   edName.SetFocus;
 end;
 
-procedure TBookmarkForm.btnNewFolderClick(Sender: TObject);
+procedure TSaveRequestForm.btnNewFolderClick(Sender: TObject);
 var
   root: TTreeNode;
 begin
@@ -407,7 +407,7 @@ begin
   FIsNewNode := True;
 end;
 
-procedure TBookmarkForm.CloseButtonClick(Sender: TObject);
+procedure TSaveRequestForm.CloseButtonClick(Sender: TObject);
 begin
   ModalResult := mrNone;
   if assigned(FConfirmDelete) and not FConfirmDelete(FSavedRequest) then
