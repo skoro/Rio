@@ -54,10 +54,10 @@ end;
 
 procedure HandleCommandLine;
 const
-  LongOpts: array [1..9] of string = ('request:', 'header:', 'form:',
-            'cookie:', 'data:', 'json:', 'file:', 'new', 'bookmark:'
+  LongOpts: array [1..9] of string = ('method:', 'header:', 'form:',
+            'cookie:', 'data:', 'json:', 'file:', 'new', 'request:'
   );
-  ShortOpts: string = 'X:H:F:C:d:j:f:b:';
+  ShortOpts: string = 'X:H:F:C:d:j:f:r:';
 var
   ErrorMsg, ReqMethod, Value, FileName: string;
   I: Integer;
@@ -76,8 +76,8 @@ begin
   end;
   // A request method.
   ReqMethod := '';
-  if Application.HasOption('X', 'request') then
-    ReqMethod := Application.GetOptionValue('X', 'request');
+  if Application.HasOption('X', 'method') then
+    ReqMethod := Application.GetOptionValue('X', 'method');
   // Request headers.
   if Application.HasOption('H', 'header') then begin
     Values := Application.GetOptionValues('H', 'header');
@@ -126,12 +126,12 @@ begin
       raise Exception.Create('cannot read file: ' + FileName);
     MainForm.OpenRequestFile(Value);
   end;
-  // Load a bookmark.
-  if Application.HasOption('b', 'bookmark') then begin
-    Value := Trim(Application.GetOptionValue('b', 'bookmark'));
-    Value := MainForm.BookmarkManager.RootName + '/' + TrimLeftSet(Value, ['/']);
-    if MainForm.BookmarkManager.OpenBookmarkPath(Value) = NIL then
-      raise Exception.CreateFmt('Could not open bookmark: %s', [Value]);
+  // Load a request.
+  if Application.HasOption('r', 'request') then begin
+    Value := Trim(Application.GetOptionValue('r', 'request'));
+    Value := MainForm.RequestManager.RootName + '/' + TrimLeftSet(Value, ['/']);
+    if MainForm.RequestManager.OpenRequestPath(Value) = NIL then
+      raise Exception.CreateFmt('Could not open request: %s', [Value]);
   end;
   // Set request method.
   if ReqMethod <> '' then
