@@ -292,7 +292,7 @@
         <ResourceBaseClass Value="Form"/>
       </Unit15>
       <Unit16>
-        <Filename Value="forms/bookmark_form.pas"/>
+        <Filename Value="forms/frmRequest.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="BookmarkForm"/>
         <HasResources Value="True"/>
