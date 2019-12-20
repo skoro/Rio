@@ -829,7 +829,7 @@ begin
     TreeView.StateImages := RequestIcons;
     RequestManager.ImageIndexFolder := 0;
     RequestManager.ImageIndexRoot := 8;
-    RequestManager.ImageIndexSelected := 5;
+    RequestManager.ImageIndexSelected := 2;
     RequestManager.OnChangeRequest := @OnChangeRequest;
     with RequestPopup do begin
       OnEditClick := @SaveRequestEditorShow;
@@ -2106,9 +2106,15 @@ end;
 procedure TMainForm.SaveRequestButtonIcon(Added: Boolean);
 begin
   if Added then
-    toolbarIcons.GetBitmap(REQUEST_IMG_SET, btnSaveRequest.Glyph)
+  begin
+    toolbarIcons.GetBitmap(REQUEST_IMG_SET, btnSaveRequest.Glyph);
+    btnSaveRequest.Hint := 'Edit request';
+  end
   else
-    toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
+    begin
+      toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
+      btnSaveRequest.Hint := 'Save request';
+    end;
 end;
 
 procedure TMainForm.SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
