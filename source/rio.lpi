@@ -324,7 +324,7 @@
         <HasResources Value="True"/>
       </Unit21>
       <Unit22>
-        <Filename Value="forms/key_value.pas"/>
+        <Filename Value="forms/frmKeyValue.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit22>
@@ -338,7 +338,9 @@
       <Unit24>
         <Filename Value="forms/options.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="OptionsForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit24>
       <Unit25>
         <Filename Value="common/AppTree.pas"/>

@@ -11,7 +11,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids, ComCtrls,
-  PropertyStorage, key_value;
+  PropertyStorage, frmKeyValue;
 
 type
 

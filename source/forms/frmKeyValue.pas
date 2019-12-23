@@ -1,4 +1,4 @@
-unit key_value;
+unit frmKeyValue;
 
 {$mode objfpc}{$H+}
 

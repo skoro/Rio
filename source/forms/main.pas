@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
-  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
+  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, frmKeyValue,
   ProfilerGraph, Bookmarks, RequestObject, GridNavigator, SysUtils,
   JsonParserMod, AppTree, Env, Cache;
 
