@@ -55,9 +55,10 @@ procedure WarnMsg(Caption, Txt: string);
 function FormatJson(json: TJSONData): string;
 
 // Grid helpers
-function GetRowKV(const grid: TStringGrid; aRow: integer = -1): TKeyValue;
+function GetRowKV(const grid: TCustomStringGrid; aRow: integer = -1): TKeyValue;
 function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: integer = -1;
   isUnique: boolean = True): integer;
+function IsRowEnabled(const AGrid: TCustomStringGrid; aRow: integer = -1): boolean;
 
 // Converts a TStringGrid component to the string.
 // delimChar - a delimiter between columns
@@ -364,13 +365,14 @@ begin
   Result := json.FormatJSON(OptionsForm.JsonFormat, OptionsForm.JsonIndentSize);
 end;
 
-function GetRowKV(const grid: TStringGrid; aRow: integer): TKeyValue;
+function GetRowKV(const grid: TCustomStringGrid; aRow: integer): TKeyValue;
 var
   Offset: shortint;
 begin
   if aRow = -1 then
     aRow := grid.Row;
   // Grids with more two columns should have first column with checkboxes.
+  // TODO: refactoring with columns.buttonstyle.
   if grid.ColCount = 2 then
     Offset := 0
   else
@@ -382,6 +384,7 @@ begin
   Result.Value := grid.Cells[Offset + 1, aRow];
 end;
 
+// TODO: AGrid should be TCustomStringGrid.
 function SetRowKV(AGrid: TStringGrid; KV: TKeyValuePair; aRow: integer;
   isUnique: boolean): integer;
 var
@@ -405,6 +408,15 @@ begin
     Cells[Start + 1, ARow] := KV.Value;
   end;
   Result := ARow;
+end;
+
+function IsRowEnabled(const AGrid: TCustomStringGrid; aRow: integer): boolean;
+begin
+  if AGrid.Columns[0].ButtonStyle <> cbsCheckboxColumn then
+    Exit(False); // For grids without leading checkbox column always false.
+  if aRow = -1 then
+    aRow := AGrid.Row;
+  Result := AGrid.Cells[0, aRow] = '1';
 end;
 
 function GridToString(aGrid: TStringGrid; delimChar: string; aRow: integer;
