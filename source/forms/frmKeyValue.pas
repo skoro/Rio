@@ -15,7 +15,7 @@ type
   TKeyValue = record
     Key: string;
     Value: string;
-    Enabled: Boolean;
+    Enabled: boolean;
   end;
 
   { TKeyValueForm }
@@ -43,10 +43,10 @@ type
     property Key: string read GetKey write SetKey;
     property Value: string read GetValue write SetValue;
     function Edit(const AKey, AValue, title: string;
-                        AEnabled: Boolean = False;
-                        const FocusVal: Boolean = False): TKeyValue;
+      AEnabled: boolean = False;
+      const FocusVal: boolean = False): TKeyValue;
     function Edit(const KV: TKeyValue; const title: string;
-                        const FocusVal: Boolean = False): TKeyValue;
+      const FocusVal: boolean = False): TKeyValue;
     procedure View(const AKey, AValue, Title: string);
     procedure View(const KV: TKeyValue; const title: string);
   end;
@@ -104,8 +104,7 @@ begin
 end;
 
 function TKeyValueForm.Edit(const AKey, AValue, title: string;
-  AEnabled: Boolean = False;
-  const FocusVal: Boolean = False): TKeyValue;
+  AEnabled: boolean = False; const FocusVal: boolean = False): TKeyValue;
 begin
   SetKey(AKey);
   SetValue(AValue);
@@ -123,8 +122,8 @@ begin
     Result.Value := GetValue;
     Result.Enabled := cbEnabled.Checked;
     // Fix #146: don't allow to add empty rows.
-    if (Trim(AKey) = '') and (Trim(AValue) = '')
-       and (Trim(Result.Key) = '') and (Trim(Result.Value) = '') then
+    if (Trim(AKey) = '') and (Trim(AValue) = '') and
+      (Trim(Result.Key) = '') and (Trim(Result.Value) = '') then
       ModalResult := mrCancel;
   end
   else
@@ -135,7 +134,8 @@ begin
 end;
 
 function TKeyValueForm.Edit(const KV: TKeyValue; const title: string;
-  const FocusVal: Boolean): TKeyValue;
+  const FocusVal: boolean): TKeyValue;
+
 begin
   Result := Edit(KV.Key, KV.Value, title, KV.Enabled, FocusVal);
 end;
