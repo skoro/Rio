@@ -267,8 +267,7 @@ type
     procedure ShowResponseCookie(Headers: TStrings);
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
-    function EditGridRow(Grid: TStringGrid;
-      const ValueFocused: Boolean = False): TModalResult;
+    function EditGridRow(Grid: TStringGrid): TModalResult;
     procedure SetAppCaption(const AValue: String = '');
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
@@ -2741,16 +2740,12 @@ begin
     Result := nil;
 end;
 
-function TMainForm.EditGridRow(Grid: TStringGrid;
-  const ValueFocused: Boolean): TModalResult;
+function TMainForm.EditGridRow(Grid: TStringGrid): TModalResult;
 var
   kv: TKeyValue;
-  focus: Integer = FocusKey;
 begin
-  if ValueFocused then
-    focus := FocusVal;
   with Grid do begin
-    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', focus);
+    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', Grid.Col = 2);
     Result := KeyValueForm.ModalResult;
     if Result = mrOK then begin
       Cells[0, Row] := IfThen(kv.Enabled, '1', '0');
