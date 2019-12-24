@@ -34,6 +34,7 @@ object KeyValueForm: TKeyValueForm
       Top = 114
       Width = 249
       Align = alClient
+      OnChange = OnChangeValue
       ScrollBars = ssAutoBoth
       TabOrder = 1
     end
@@ -43,6 +44,7 @@ object KeyValueForm: TKeyValueForm
       Top = 66
       Width = 249
       Align = alTop
+      OnChange = OnChangeValue
       TabOrder = 0
     end
     object LabelName: TLabel
@@ -96,6 +98,15 @@ object KeyValueForm: TKeyValueForm
         Top = 0
         Caption = 'tbPrevRow'
         OnClick = OnNextPrevRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbSaveRow: TToolButton
+        Left = 47
+        Hint = 'Save'
+        Top = 0
+        Caption = 'tbSaveRow'
+        OnClick = tbSaveRowClick
         ParentShowHint = False
         ShowHint = True
       end

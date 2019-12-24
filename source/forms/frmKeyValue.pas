@@ -31,10 +31,13 @@ type
     tbGridControl: TToolBar;
     tbNextRow: TToolButton;
     tbPrevRow: TToolButton;
+    tbSaveRow: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
+    procedure OnChangeValue(Sender: TObject);
     procedure OnNextPrevRowClick(Sender: TObject);
+    procedure tbSaveRowClick(Sender: TObject);
   private
     FFocusedComponent: TWinControl;
     FGrid: TCustomStringGrid;
@@ -48,6 +51,7 @@ type
     procedure SetValue(AValue: string);
     function IsChanged: boolean;
     procedure UpdateGridNavButtons;
+    procedure GridSaveValue;
 
   public
     property Key: string read GetKey write SetKey;
@@ -69,7 +73,7 @@ var
 
 implementation
 
-uses Clipbrd, AppHelpers;
+uses Clipbrd, strutils, AppHelpers;
 
 {$R *.lfm}
 
@@ -81,14 +85,19 @@ begin
     FFocusedComponent.SetFocus;
 end;
 
+procedure TKeyValueForm.OnChangeValue(Sender: TObject);
+begin
+  tbSaveRow.Enabled := True;
+end;
+
 procedure TKeyValueForm.OnNextPrevRowClick(Sender: TObject);
 var
   KV: TKeyValue;
 begin
   if not Assigned(FGrid) then
     Exit; // =>
-  if IsChanged then
-    Exit; // =>
+  if IsChanged and (ConfirmDlg('Confirm', 'Value has been changed. Do you want to save it ?') = mrOK) then
+    GridSaveValue;
   if Sender = tbNextRow then
     FGrid.Row := FGrid.Row + 1;
   if Sender = tbPrevRow then
@@ -98,6 +107,11 @@ begin
   SetValue(KV.Value);
   SetValEnabled(IsRowEnabled(FGrid));
   UpdateGridNavButtons;
+end;
+
+procedure TKeyValueForm.tbSaveRowClick(Sender: TObject);
+begin
+  GridSaveValue;
 end;
 
 procedure TKeyValueForm.FormCreate(Sender: TObject);
@@ -152,7 +166,7 @@ end;
 function TKeyValueForm.IsChanged: boolean;
 begin
   Result := textValue.Modified or editName.Modified
-                               or cbEnabled.Checked <> FValEnabled;
+                               or (cbEnabled.Checked <> FValEnabled);
 end;
 
 procedure TKeyValueForm.UpdateGridNavButtons;
@@ -163,6 +177,23 @@ begin
     tbPrevRow.Enabled := False;
   if FGrid.Row >= FGrid.RowCount - 1 then
     tbNextRow.Enabled := False;
+  tbSaveRow.Enabled := IsChanged;
+end;
+
+procedure TKeyValueForm.GridSaveValue;
+begin
+  if not Assigned(FGrid) then
+    Exit; // =>
+  with FGrid do
+  begin
+    Cells[0, Row] := IfThen(ValEnabled, '1', '0');
+    Cells[1, Row] := Key;
+    Cells[2, Row] := Value;
+  end;
+  FValEnabled := cbEnabled.Checked;
+  editName.Modified := False;
+  textValue.Modified := False;
+  tbSaveRow.Enabled := False;
 end;
 
 function TKeyValueForm.Edit(const AKey, AValue, title: string;
@@ -173,7 +204,7 @@ begin
   SetValue(AValue);
   Caption := title;
   cbEnabled.Visible := True;
-  cbEnabled.Checked := AEnabled;
+  SetValEnabled(AEnabled);
   ButtonPanel.OKButton.Caption := '&OK';
   if FocusVal then
     FFocusedComponent := textValue
