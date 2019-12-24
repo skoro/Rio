@@ -42,6 +42,7 @@ type
     FFocusedComponent: TWinControl;
     FGrid: TCustomStringGrid;
     FValEnabled: boolean; // Initial enabled value (for IsChanged func).
+    FViewOnly: boolean;
 
     function GetKey: string;
     function GetValEnabled: boolean;
@@ -50,6 +51,7 @@ type
     procedure SetValEnabled(AValue: boolean);
     procedure SetValue(AValue: string);
     function IsChanged: boolean;
+    procedure SetViewOnly(AValue: boolean);
     procedure UpdateGridNavButtons;
     procedure GridSaveValue;
 
@@ -58,6 +60,7 @@ type
     property Value: string read GetValue write SetValue;
     property ValEnabled: boolean read GetValEnabled write SetValEnabled;
     property Grid: TCustomStringGrid read FGrid;
+    property ViewOnly: boolean read FViewOnly write SetViewOnly;
     function Edit(const AKey, AValue, title: string;
       AEnabled: boolean = False;
       const FocusVal: boolean = False): TKeyValue;
@@ -169,6 +172,20 @@ begin
                                or (cbEnabled.Checked <> FValEnabled);
 end;
 
+procedure TKeyValueForm.SetViewOnly(AValue: boolean);
+begin
+  if FViewOnly = AValue then
+    Exit; // =>
+  FViewOnly := AValue;
+  editName.ReadOnly := AValue;
+  textValue.ReadOnly := AValue;
+  cbEnabled.Enabled := not AValue;
+  if Assigned(FGrid) then
+  begin
+    tbSaveRow.Enabled := not AValue;
+  end;
+end;
+
 procedure TKeyValueForm.UpdateGridNavButtons;
 begin
   tbNextRow.Enabled := True;
@@ -202,6 +219,7 @@ begin
   tbGridControl.Visible := Assigned(FGrid);
   SetKey(AKey);
   SetValue(AValue);
+  ViewOnly := False;
   Caption := title;
   cbEnabled.Visible := True;
   SetValEnabled(AEnabled);
@@ -214,11 +232,14 @@ begin
   begin
     Result.Key := GetKey;
     Result.Value := GetValue;
-    Result.Enabled := cbEnabled.Checked;
+    Result.Enabled := GetValEnabled;
     // Fix #146: don't allow to add empty rows.
     if (Trim(AKey) = '') and (Trim(AValue) = '') and
       (Trim(Result.Key) = '') and (Trim(Result.Value) = '') then
       ModalResult := mrCancel;
+    // When a grid is attached save the changed value when closing the form.
+    if (ModalResult = mrOK) and Assigned(FGrid) and IsChanged then
+      GridSaveValue;
   end
   else
   begin
@@ -245,6 +266,7 @@ procedure TKeyValueForm.View(const AKey, AValue, Title: string);
 begin
   SetKey(AKey);
   SetValue(AValue);
+  ViewOnly := True;
   cbEnabled.Visible := False;
   Caption := title;
   ButtonPanel.OKButton.Caption := 'C&opy and Close';
