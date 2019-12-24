@@ -30,8 +30,8 @@ object KeyValueForm: TKeyValueForm
     TabOrder = 0
     object textValue: TMemo
       Left = 2
-      Height = 122
-      Top = 89
+      Height = 97
+      Top = 114
       Width = 249
       Align = alClient
       ScrollBars = ssAutoBoth
@@ -40,7 +40,7 @@ object KeyValueForm: TKeyValueForm
     object editName: TEdit
       Left = 2
       Height = 27
-      Top = 41
+      Top = 66
       Width = 249
       Align = alTop
       TabOrder = 0
@@ -48,7 +48,7 @@ object KeyValueForm: TKeyValueForm
     object LabelName: TLabel
       Left = 2
       Height = 17
-      Top = 24
+      Top = 49
       Width = 249
       Align = alTop
       Caption = 'Name'
@@ -57,7 +57,7 @@ object KeyValueForm: TKeyValueForm
     object LabelValue: TLabel
       Left = 2
       Height = 17
-      Top = 72
+      Top = 97
       Width = 249
       Align = alTop
       BorderSpacing.Top = 4
@@ -66,12 +66,39 @@ object KeyValueForm: TKeyValueForm
     end
     object cbEnabled: TCheckBox
       Left = 2
-      Height = 22
-      Top = 2
+      Height = 21
+      Top = 28
       Width = 249
       Align = alTop
       Caption = '&Enabled'
       TabOrder = 2
+    end
+    object tbGridControl: TToolBar
+      Left = 2
+      Height = 26
+      Top = 2
+      Width = 249
+      Caption = 'tbGridControl'
+      EdgeBorders = []
+      TabOrder = 3
+      object tbNextRow: TToolButton
+        Left = 1
+        Hint = 'Next value'
+        Top = 0
+        Caption = 'tbNextRow'
+        OnClick = OnNextPrevRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbPrevRow: TToolButton
+        Left = 24
+        Hint = 'Previous value'
+        Top = 0
+        Caption = 'tbPrevRow'
+        OnClick = OnNextPrevRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
     end
   end
   object ButtonPanel: TButtonPanel
