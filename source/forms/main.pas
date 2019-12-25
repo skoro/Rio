@@ -1000,10 +1000,11 @@ var
 begin
   if Sender is TStringGrid then begin
     grid := TStringGrid(Sender);
+    // The Response Grid doesn't allow editing rows.
     if grid = responseHeaders then
     begin
       if grid.RowCount > 1 then
-        KeyValueForm.View(GetRowKV(grid), 'View: ' + grid.Cells[0, grid.Row])
+        KeyValueForm.ViewGrid(grid, 'Response');
     end
     else
       EditGridRow(grid);
@@ -1222,7 +1223,7 @@ begin
     Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, FormatJson(JsonData)]));
 
   if MenuItem = miJsonView then
-    KeyValueForm.View(Key, Value, Key);
+    KeyValueForm.View(Key, Value, 'Json');
 
   if MenuItem = miJsonFilter then
     FResponseJsonTab.Filter(Node);
@@ -1381,8 +1382,14 @@ end;
 
 procedure TMainForm.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
   const aRow: Integer);
+var
+  Title: string;
 begin
-  EditGridRow(Grid);
+  if (Grid.Parent is TTabSheet) then
+    Title := TTabSheet(Grid.Parent).Caption
+  else
+    Title := 'Edit';
+  KeyValueForm.EditGrid(Grid, Title);
   Grid.SetFocus;
 end;
 
@@ -2743,9 +2750,15 @@ end;
 function TMainForm.EditGridRow(Grid: TStringGrid): TModalResult;
 var
   kv: TKeyValue;
+  Title: string;
 begin
+  KeyValueForm.Grid := NIL;
+  if (Grid.Parent is TTabSheet) then
+    Title := TTabSheet(Grid.Parent).Caption
+  else
+    Title := 'Edit';
   with Grid do begin
-    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', Grid.Col = 2);
+    kv := KeyValueForm.Edit(GetRowKV(Grid), Title, Grid.Col = 2);
     Result := KeyValueForm.ModalResult;
     if Result = mrOK then begin
       Cells[0, Row] := IfThen(kv.Enabled, '1', '0');
