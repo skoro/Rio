@@ -111,6 +111,15 @@ object KeyValueForm: TKeyValueForm
         ParentShowHint = False
         ShowHint = True
       end
+      object tbDeleteRow: TToolButton
+        Left = 70
+        Hint = 'Delete'
+        Top = 0
+        Caption = 'tbDeleteRow'
+        OnClick = tbDeleteRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
     end
   end
   object ButtonPanel: TButtonPanel

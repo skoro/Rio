@@ -32,11 +32,13 @@ type
     tbNextRow: TToolButton;
     tbPrevRow: TToolButton;
     tbSaveRow: TToolButton;
+    tbDeleteRow: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
     procedure OnChangeValue(Sender: TObject);
     procedure OnNextPrevRowClick(Sender: TObject);
+    procedure tbDeleteRowClick(Sender: TObject);
     procedure tbSaveRowClick(Sender: TObject);
   private
     FFocusedComponent: TWinControl;
@@ -54,12 +56,13 @@ type
     procedure SetViewOnly(AValue: boolean);
     procedure UpdateGridNavButtons;
     procedure GridSaveValue;
+    procedure GridMoveRow(const step: integer);
 
   public
     property Key: string read GetKey write SetKey;
     property Value: string read GetValue write SetValue;
     property ValEnabled: boolean read GetValEnabled write SetValEnabled;
-    property Grid: TCustomStringGrid read FGrid;
+    property Grid: TCustomStringGrid read FGrid write FGrid;
     property ViewOnly: boolean read FViewOnly write SetViewOnly;
     function Edit(const AKey, AValue, title: string;
       AEnabled: boolean = False;
@@ -95,22 +98,47 @@ begin
 end;
 
 procedure TKeyValueForm.OnNextPrevRowClick(Sender: TObject);
-var
-  KV: TKeyValue;
 begin
   if not Assigned(FGrid) then
     Exit; // =>
   if IsChanged and (ConfirmDlg('Confirm', 'Value has been changed. Do you want to save it ?') = mrOK) then
     GridSaveValue;
   if Sender = tbNextRow then
-    FGrid.Row := FGrid.Row + 1;
+    GridMoveRow(1);
   if Sender = tbPrevRow then
-    FGrid.Row := FGrid.Row - 1;
-  KV := GetRowKV(FGrid);
-  SetKey(KV.Key);
-  SetValue(KV.Value);
-  SetValEnabled(IsRowEnabled(FGrid));
-  UpdateGridNavButtons;
+    GridMoveRow(-1);
+end;
+
+procedure TKeyValueForm.tbDeleteRowClick(Sender: TObject);
+var
+  s, title: string;
+begin
+  s := FGrid.Cells[1, FGrid.Row];
+  if s = '' then
+    s := FGrid.Cells[2, FGrid.Row];
+  title := '';
+  if s <> '' then
+    title := 'Do you want to delete: ' + s;
+  if (title <> '') and (ConfirmDlg('Delete ?', title) <> mrOK) then
+    Exit; // =>
+  FGrid.DeleteRow(FGrid.Row);
+  if FGrid.RowCount > 1 then
+    GridMoveRow(0)
+  else
+    begin
+      // Last value is deleted.
+      SetKey('');
+      SetValue('');
+      SetValEnabled(False);
+      tbNextRow.Enabled := False;
+      tbPrevRow.Enabled := False;
+      tbSaveRow.Enabled := False;
+      tbDeleteRow.Enabled := False;
+      // Append an empty row, so we can insert a new value if the user
+      // is pressed OK form's button.
+      FGrid.RowCount := 2;
+      FGrid.Row := 1;
+    end
 end;
 
 procedure TKeyValueForm.tbSaveRowClick(Sender: TObject);
@@ -198,6 +226,7 @@ begin
   if FGrid.Row >= FGrid.RowCount - 1 then
     tbNextRow.Enabled := False;
   tbSaveRow.Enabled := IsChanged;
+  tbDeleteRow.Enabled := True;
 end;
 
 procedure TKeyValueForm.GridSaveValue;
@@ -214,6 +243,18 @@ begin
   editName.Modified := False;
   textValue.Modified := False;
   tbSaveRow.Enabled := False;
+end;
+
+procedure TKeyValueForm.GridMoveRow(const Step: integer);
+var
+  KV: TKeyValue;
+begin
+  FGrid.Row := FGrid.Row + Step;
+  KV := GetRowKV(FGrid);
+  SetKey(KV.Key);
+  SetValue(KV.Value);
+  SetValEnabled(IsRowEnabled(FGrid));
+  UpdateGridNavButtons;
 end;
 
 function TKeyValueForm.Edit(const AKey, AValue, title: string;
