@@ -301,7 +301,9 @@
       <Unit17>
         <Filename Value="forms/cookie_form.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="CookieForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit17>
       <Unit18>
         <Filename Value="forms/export_form.pas"/>
@@ -324,9 +326,11 @@
         <HasResources Value="True"/>
       </Unit21>
       <Unit22>
-        <Filename Value="forms/key_value.pas"/>
+        <Filename Value="forms/frmKeyValue.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="KeyValueForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit22>
       <Unit23>
         <Filename Value="forms/main.pas"/>

@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
-  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, key_value,
+  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, frmKeyValue,
   ProfilerGraph, Requests, RequestObject, GridNavigator, SysUtils,
   JsonParserMod, AppTree, Env, Cache;
 
@@ -267,8 +267,7 @@ type
     procedure ShowResponseCookie(Headers: TStrings);
     function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
-    function EditGridRow(Grid: TStringGrid;
-      const ValueFocused: Boolean = False): TModalResult;
+    function EditGridRow(Grid: TStringGrid): TModalResult;
     procedure SetAppCaption(const AValue: String = '');
     procedure SyncURLQueryParams;
     procedure SyncGridQueryParams;
@@ -1001,10 +1000,11 @@ var
 begin
   if Sender is TStringGrid then begin
     grid := TStringGrid(Sender);
+    // The Response Grid doesn't allow editing rows.
     if grid = responseHeaders then
     begin
       if grid.RowCount > 1 then
-        KeyValueForm.View(GetRowKV(grid), 'View: ' + grid.Cells[0, grid.Row])
+        KeyValueForm.ViewGrid(grid, 'Response');
     end
     else
       EditGridRow(grid);
@@ -1223,7 +1223,7 @@ begin
     Clipboard.AsText := IfThen(Key = '', Value, Format('"%s": %s', [Key, FormatJson(JsonData)]));
 
   if MenuItem = miJsonView then
-    KeyValueForm.View(Key, Value, Key);
+    KeyValueForm.View(Key, Value, 'Json');
 
   if MenuItem = miJsonFilter then
     FResponseJsonTab.Filter(Node);
@@ -1382,8 +1382,14 @@ end;
 
 procedure TMainForm.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
   const aRow: Integer);
+var
+  Title: string;
 begin
-  EditGridRow(Grid);
+  if (Grid.Parent is TTabSheet) then
+    Title := TTabSheet(Grid.Parent).Caption
+  else
+    Title := 'Edit';
+  KeyValueForm.EditGrid(Grid, Title);
   Grid.SetFocus;
 end;
 
@@ -2747,16 +2753,18 @@ begin
     Result := nil;
 end;
 
-function TMainForm.EditGridRow(Grid: TStringGrid;
-  const ValueFocused: Boolean): TModalResult;
+function TMainForm.EditGridRow(Grid: TStringGrid): TModalResult;
 var
   kv: TKeyValue;
-  focus: Integer = FocusKey;
+  Title: string;
 begin
-  if ValueFocused then
-    focus := FocusVal;
+  KeyValueForm.Grid := NIL;
+  if (Grid.Parent is TTabSheet) then
+    Title := TTabSheet(Grid.Parent).Caption
+  else
+    Title := 'Edit';
   with Grid do begin
-    kv := KeyValueForm.Edit(GetRowKV(Grid), 'Edit...', focus);
+    kv := KeyValueForm.Edit(GetRowKV(Grid), Title, Grid.Col = 2);
     Result := KeyValueForm.ModalResult;
     if Result = mrOK then begin
       Cells[0, Row] := IfThen(kv.Enabled, '1', '0');

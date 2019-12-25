@@ -30,25 +30,27 @@ object KeyValueForm: TKeyValueForm
     TabOrder = 0
     object textValue: TMemo
       Left = 2
-      Height = 122
-      Top = 89
+      Height = 97
+      Top = 114
       Width = 249
       Align = alClient
+      OnChange = OnChangeValue
       ScrollBars = ssAutoBoth
       TabOrder = 1
     end
     object editName: TEdit
       Left = 2
       Height = 27
-      Top = 41
+      Top = 66
       Width = 249
       Align = alTop
+      OnChange = OnChangeValue
       TabOrder = 0
     end
     object LabelName: TLabel
       Left = 2
       Height = 17
-      Top = 24
+      Top = 49
       Width = 249
       Align = alTop
       Caption = 'Name'
@@ -57,7 +59,7 @@ object KeyValueForm: TKeyValueForm
     object LabelValue: TLabel
       Left = 2
       Height = 17
-      Top = 72
+      Top = 97
       Width = 249
       Align = alTop
       BorderSpacing.Top = 4
@@ -66,12 +68,67 @@ object KeyValueForm: TKeyValueForm
     end
     object cbEnabled: TCheckBox
       Left = 2
-      Height = 22
-      Top = 2
+      Height = 21
+      Top = 28
       Width = 249
       Align = alTop
       Caption = '&Enabled'
+      OnChange = OnChangeValue
       TabOrder = 2
+    end
+    object tbGridControl: TToolBar
+      Left = 2
+      Height = 26
+      Top = 2
+      Width = 249
+      Caption = 'tbGridControl'
+      EdgeBorders = []
+      TabOrder = 3
+      object tbNextRow: TToolButton
+        Left = 1
+        Hint = 'Next value'
+        Top = 0
+        Caption = 'tbNextRow'
+        OnClick = OnNextPrevRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbPrevRow: TToolButton
+        Left = 24
+        Hint = 'Previous value'
+        Top = 0
+        Caption = 'tbPrevRow'
+        OnClick = OnNextPrevRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbSaveRow: TToolButton
+        Left = 70
+        Hint = 'Save'
+        Top = 0
+        Caption = 'tbSaveRow'
+        OnClick = tbSaveRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbDeleteRow: TToolButton
+        Left = 93
+        Hint = 'Delete'
+        Top = 0
+        Caption = 'tbDeleteRow'
+        OnClick = tbDeleteRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object tbInsertRow: TToolButton
+        Left = 47
+        Hint = 'New'
+        Top = 0
+        Caption = 'tbInsertRow'
+        OnClick = tbInsertRowClick
+        ParentShowHint = False
+        ShowHint = True
+      end
     end
   end
   object ButtonPanel: TButtonPanel
