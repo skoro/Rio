@@ -24,6 +24,7 @@ type
     ButtonPanel: TButtonPanel;
     cbEnabled: TCheckBox;
     editName: TEdit;
+    toolbarImages: TImageList;
     LabelName: TLabel;
     LabelValue: TLabel;
     textValue: TMemo;
