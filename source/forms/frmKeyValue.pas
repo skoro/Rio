@@ -45,6 +45,7 @@ type
     FGrid: TCustomStringGrid;
     FValEnabled: boolean; // Initial enabled value (for IsChanged func).
     FViewOnly: boolean;
+    FTitle: string;
 
     function GetKey: string;
     function GetValEnabled: boolean;
@@ -55,8 +56,10 @@ type
     function IsChanged: boolean;
     procedure SetViewOnly(AValue: boolean);
     procedure UpdateGridNavButtons;
+    procedure SetFormTitle;
     procedure GridSaveValue;
     procedure GridMoveRow(const step: integer);
+    procedure GridActionButtons;
 
   public
     property Key: string read GetKey write SetKey;
@@ -64,15 +67,15 @@ type
     property ValEnabled: boolean read GetValEnabled write SetValEnabled;
     property Grid: TCustomStringGrid read FGrid write FGrid;
     property ViewOnly: boolean read FViewOnly write SetViewOnly;
-    function Edit(const AKey, AValue, title: string;
+    function Edit(const AKey, AValue, ATitle: string;
       AEnabled: boolean = False;
       const FocusVal: boolean = False): TKeyValue;
-    function Edit(const KV: TKeyValue; const title: string;
+    function Edit(const KV: TKeyValue; const ATitle: string;
       const FocusVal: boolean = False): TKeyValue;
-    function EditGrid(const AGrid: TCustomStringGrid): TModalResult;
-    procedure View(const AKey, AValue, Title: string);
-    procedure View(const KV: TKeyValue; const title: string);
-    procedure ViewGrid(const AGrid: TCustomStringGrid);
+    function EditGrid(const AGrid: TCustomStringGrid; const ATitle: string): TModalResult;
+    procedure View(const AKey, AValue, ATitle: string);
+    procedure View(const KV: TKeyValue; const ATitle: string);
+    procedure ViewGrid(const AGrid: TCustomStringGrid; const ATitle: string);
   end;
 
 var
@@ -210,9 +213,7 @@ begin
   textValue.ReadOnly := AValue;
   cbEnabled.Enabled := not AValue;
   if Assigned(FGrid) then
-  begin
-    tbSaveRow.Enabled := not AValue;
-  end;
+    GridActionButtons;
 end;
 
 procedure TKeyValueForm.UpdateGridNavButtons;
@@ -225,8 +226,15 @@ begin
     tbPrevRow.Enabled := False;
   if FGrid.Row >= FGrid.RowCount - 1 then
     tbNextRow.Enabled := False;
-  tbSaveRow.Enabled := IsChanged;
-  tbDeleteRow.Enabled := True;
+  GridActionButtons;
+  SetFormTitle;
+end;
+
+procedure TKeyValueForm.SetFormTitle;
+begin
+  Caption := FTitle;
+  if GetKey <> '' then
+    Caption := Caption + ': ' + GetKey;
 end;
 
 procedure TKeyValueForm.GridSaveValue;
@@ -243,9 +251,10 @@ begin
   editName.Modified := False;
   textValue.Modified := False;
   tbSaveRow.Enabled := False;
+  tbDeleteRow.Enabled := True;
 end;
 
-procedure TKeyValueForm.GridMoveRow(const Step: integer);
+procedure TKeyValueForm.GridMoveRow(const step: integer);
 var
   KV: TKeyValue;
 begin
@@ -255,16 +264,31 @@ begin
   SetValue(KV.Value);
   SetValEnabled(IsRowEnabled(FGrid));
   UpdateGridNavButtons;
+  SetFormTitle;
 end;
 
-function TKeyValueForm.Edit(const AKey, AValue, title: string;
+procedure TKeyValueForm.GridActionButtons;
+begin
+  if ViewOnly then
+  begin
+    tbSaveRow.Enabled := False;
+    tbDeleteRow.Enabled := False;
+  end
+  else begin
+    tbSaveRow.Enabled := IsChanged;
+    tbDeleteRow.Enabled := True;
+  end;
+end;
+
+function TKeyValueForm.Edit(const AKey, AValue, ATitle: string;
   AEnabled: boolean = False; const FocusVal: boolean = False): TKeyValue;
 begin
   tbGridControl.Visible := Assigned(FGrid);
+  FTitle := ATitle;
   SetKey(AKey);
   SetValue(AValue);
+  SetFormTitle;
   ViewOnly := False;
-  Caption := title;
   cbEnabled.Visible := True;
   SetValEnabled(AEnabled);
   ButtonPanel.OKButton.Caption := '&OK';
@@ -290,47 +314,50 @@ begin
     Result.Key := akey;
     Result.Value := avalue;
   end;
+  FGrid := nil;
 end;
 
-function TKeyValueForm.Edit(const KV: TKeyValue; const title: string;
-  const FocusVal: boolean): TKeyValue;
+function TKeyValueForm.Edit(const KV: TKeyValue; const ATitle: string; const FocusVal: boolean): TKeyValue;
 begin
-  Result := Edit(KV.Key, KV.Value, title, KV.Enabled, FocusVal);
+  Result := Edit(KV.Key, KV.Value, ATitle, KV.Enabled, FocusVal);
 end;
 
-function TKeyValueForm.EditGrid(const AGrid: TCustomStringGrid): TModalResult;
+function TKeyValueForm.EditGrid(const AGrid: TCustomStringGrid; const ATitle: string): TModalResult;
 begin
   FGrid := AGrid;
   UpdateGridNavButtons;
-  Edit(GetRowKV(AGrid), 'Edit: ', AGrid.Col = 2);
+  Edit(GetRowKV(AGrid), ATitle, AGrid.Col = 2);
   Result := ModalResult;
 end;
 
-procedure TKeyValueForm.View(const AKey, AValue, Title: string);
+procedure TKeyValueForm.View(const AKey, AValue, ATitle: string);
 begin
+  tbGridControl.Visible := Assigned(FGrid);
+  FTitle := ATitle;
   SetKey(AKey);
   SetValue(AValue);
+  SetFormTitle;
   ViewOnly := True;
   cbEnabled.Visible := False;
-  Caption := title;
   ButtonPanel.OKButton.Caption := 'C&opy and Close';
   FFocusedComponent := textValue;
   if ShowModal = mrOk then
   begin
     Clipboard.AsText := textValue.Text;
   end;
+  FGrid := nil;
 end;
 
-procedure TKeyValueForm.View(const KV: TKeyValue; const title: string);
+procedure TKeyValueForm.View(const KV: TKeyValue; const ATitle: string);
 begin
-  View(KV.Key, KV.Value, title);
+  View(KV.Key, KV.Value, ATitle);
 end;
 
-procedure TKeyValueForm.ViewGrid(const AGrid: TCustomStringGrid);
+procedure TKeyValueForm.ViewGrid(const AGrid: TCustomStringGrid; const ATitle: string);
 begin
   FGrid := AGrid;
   UpdateGridNavButtons;
-  View(GetRowKV(AGrid), 'View:');
+  View(GetRowKV(AGrid), ATitle);
 end;
 
 end.
