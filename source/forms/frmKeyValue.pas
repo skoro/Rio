@@ -33,12 +33,14 @@ type
     tbPrevRow: TToolButton;
     tbSaveRow: TToolButton;
     tbDeleteRow: TToolButton;
+    tbInsertRow: TToolButton;
     procedure FormCreate(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
     procedure OnChangeValue(Sender: TObject);
     procedure OnNextPrevRowClick(Sender: TObject);
     procedure tbDeleteRowClick(Sender: TObject);
+    procedure tbInsertRowClick(Sender: TObject);
     procedure tbSaveRowClick(Sender: TObject);
   private
     FFocusedComponent: TWinControl;
@@ -58,6 +60,7 @@ type
     procedure UpdateGridNavButtons;
     procedure SetFormTitle;
     procedure GridSaveValue;
+    procedure GridConfirmSaveValue;
     procedure GridMoveRow(const step: integer);
     procedure GridActionButtons;
 
@@ -104,8 +107,7 @@ procedure TKeyValueForm.OnNextPrevRowClick(Sender: TObject);
 begin
   if not Assigned(FGrid) then
     Exit; // =>
-  if IsChanged and (ConfirmDlg('Confirm', 'Value has been changed. Do you want to save it ?') = mrOK) then
-    GridSaveValue;
+  GridConfirmSaveValue;
   if Sender = tbNextRow then
     GridMoveRow(1);
   if Sender = tbPrevRow then
@@ -142,6 +144,17 @@ begin
       FGrid.RowCount := 2;
       FGrid.Row := 1;
     end
+end;
+
+procedure TKeyValueForm.tbInsertRowClick(Sender: TObject);
+begin
+  GridConfirmSaveValue;
+  SetKey('');
+  SetValue('');
+  SetValEnabled(True);
+  FGrid.RowCount := FGrid.RowCount + 1;
+  FGrid.Row := FGrid.RowCount - 1;
+  UpdateGridNavButtons;
 end;
 
 procedure TKeyValueForm.tbSaveRowClick(Sender: TObject);
@@ -254,6 +267,12 @@ begin
   tbDeleteRow.Enabled := True;
 end;
 
+procedure TKeyValueForm.GridConfirmSaveValue;
+begin
+  if IsChanged and (ConfirmDlg('Confirm', 'Value has been changed. Do you want to save it ?') = mrOK) then
+    GridSaveValue;
+end;
+
 procedure TKeyValueForm.GridMoveRow(const step: integer);
 var
   KV: TKeyValue;
@@ -273,10 +292,12 @@ begin
   begin
     tbSaveRow.Enabled := False;
     tbDeleteRow.Enabled := False;
+    tbInsertRow.Enabled := False;
   end
   else begin
     tbSaveRow.Enabled := IsChanged;
     tbDeleteRow.Enabled := True;
+    tbInsertRow.Enabled := True;
   end;
 end;
 
