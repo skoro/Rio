@@ -69,6 +69,7 @@ type
     function EditGrid(const AGrid: TCustomStringGrid): TModalResult;
     procedure View(const AKey, AValue, Title: string);
     procedure View(const KV: TKeyValue; const title: string);
+    procedure ViewGrid(const AGrid: TCustomStringGrid);
   end;
 
 var
@@ -188,6 +189,8 @@ end;
 
 procedure TKeyValueForm.UpdateGridNavButtons;
 begin
+  if not Assigned(FGrid) then
+    Exit; // =>
   tbNextRow.Enabled := True;
   tbPrevRow.Enabled := True;
   if FGrid.Row <= 1 then
@@ -258,7 +261,7 @@ function TKeyValueForm.EditGrid(const AGrid: TCustomStringGrid): TModalResult;
 begin
   FGrid := AGrid;
   UpdateGridNavButtons;
-  Edit(GetRowKV(AGrid), '', AGrid.Col = 2);
+  Edit(GetRowKV(AGrid), 'Edit: ', AGrid.Col = 2);
   Result := ModalResult;
 end;
 
@@ -280,6 +283,13 @@ end;
 procedure TKeyValueForm.View(const KV: TKeyValue; const title: string);
 begin
   View(KV.Key, KV.Value, title);
+end;
+
+procedure TKeyValueForm.ViewGrid(const AGrid: TCustomStringGrid);
+begin
+  FGrid := AGrid;
+  UpdateGridNavButtons;
+  View(GetRowKV(AGrid), 'View:');
 end;
 
 end.
