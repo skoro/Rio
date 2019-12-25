@@ -73,6 +73,7 @@ object KeyValueForm: TKeyValueForm
       Width = 249
       Align = alTop
       Caption = '&Enabled'
+      OnChange = OnChangeValue
       TabOrder = 2
     end
     object tbGridControl: TToolBar
