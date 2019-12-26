@@ -283,14 +283,15 @@ procedure TKeyValueForm.GridActionButtons;
 begin
   if ViewOnly then
   begin
-    tbSaveRow.Enabled := False;
-    tbDeleteRow.Enabled := False;
-    tbInsertRow.Enabled := False;
+    tbSaveRow.Visible := False;
+    tbDeleteRow.Visible := False;
+    tbInsertRow.Visible := False;
   end
   else begin
+    tbSaveRow.Visible := True;
     tbSaveRow.Enabled := IsChanged;
-    tbDeleteRow.Enabled := True;
-    tbInsertRow.Enabled := True;
+    tbDeleteRow.Visible := True;
+    tbInsertRow.Visible := True;
   end;
 end;
 
