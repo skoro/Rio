@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ButtonPanel, ComCtrls, Grids, Classes;
+  StdCtrls, ButtonPanel, ComCtrls, Grids;
 
 type
 
@@ -318,6 +318,7 @@ begin
     FFocusedComponent := textValue
   else
     FFocusedComponent := editName;
+  UpdateGridNavButtons;
   if ShowModal = mrOk then
   begin
     Result.Key := GetKey;
@@ -347,7 +348,6 @@ end;
 function TKeyValueForm.EditGrid(const AGrid: TCustomStringGrid; const ATitle: string): TModalResult;
 begin
   FGrid := AGrid;
-  UpdateGridNavButtons;
   Edit(GetRowKV(AGrid), ATitle, AGrid.Col = 2);
   Result := ModalResult;
 end;
@@ -363,6 +363,7 @@ begin
   cbEnabled.Visible := False;
   ButtonPanel.OKButton.Caption := 'C&opy and Close';
   FFocusedComponent := textValue;
+  UpdateGridNavButtons;
   if ShowModal = mrOk then
   begin
     Clipboard.AsText := textValue.Text;
@@ -378,7 +379,6 @@ end;
 procedure TKeyValueForm.ViewGrid(const AGrid: TCustomStringGrid; const ATitle: string);
 begin
   FGrid := AGrid;
-  UpdateGridNavButtons;
   View(GetRowKV(AGrid), ATitle);
 end;
 
