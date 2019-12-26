@@ -7,7 +7,7 @@ interface
 uses
   Classes, Forms, Dialogs, StdCtrls, ComCtrls, ValEdit, ExtCtrls, Grids, Menus,
   fphttpclient, fpjson, Controls, JSONPropStorage, PairSplitter, Buttons,
-  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs, frmKeyValue,
+  SynEdit, SynHighlighterJScript, ThreadHttpClient, ResponseTabs,
   ProfilerGraph, Requests, RequestObject, GridNavigator, SysUtils,
   JsonParserMod, AppTree, Env, Cache;
 
@@ -315,7 +315,7 @@ var
 implementation
 
 uses about, headers_editor, cookie_form,
-  AppHelpers, strutils, help_form, cmdline, options,
+  AppHelpers, strutils, help_form, cmdline, options, frmKeyValue,
   import_form, export_form, frmRequest, frmEnv, State, Clipbrd;
 
 const

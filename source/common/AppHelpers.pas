@@ -11,9 +11,19 @@ interface
 
 uses
   Classes, SysUtils, fpjson, Controls, ValEdit, Dialogs, Forms, Grids, ComCtrls,
-  PropertyStorage, frmKeyValue;
+  PropertyStorage;
 
 type
+
+  { TKeyValue }
+
+  TKeyValue = record
+    Key: string;
+    Value: string;
+    Enabled: boolean;
+  end;
+
+  { TFindPos }
 
   TFindPos = record
     Pos: integer;

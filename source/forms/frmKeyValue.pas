@@ -6,17 +6,9 @@ interface
 
 uses
   SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ButtonPanel, ComCtrls, Grids;
+  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers;
 
 type
-
-  { TKeyValue }
-
-  TKeyValue = record
-    Key: string;
-    Value: string;
-    Enabled: boolean;
-  end;
 
   { TKeyValueForm }
 
@@ -87,7 +79,7 @@ var
 
 implementation
 
-uses Clipbrd, strutils, AppHelpers;
+uses Clipbrd, strutils;
 
 {$R *.lfm}
 
