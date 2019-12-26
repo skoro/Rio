@@ -1385,7 +1385,9 @@ procedure TMainForm.OnGridEditRow(Sender: TObject; Grid: TStringGrid;
 var
   Title: string;
 begin
-  if (Grid.Parent is TTabSheet) then
+  if (Grid = gridForm) then
+    Title := 'Form'
+  else if (Grid.Parent is TTabSheet) then
     Title := TTabSheet(Grid.Parent).Caption
   else
     Title := 'Edit';
