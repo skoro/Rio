@@ -6,7 +6,7 @@ interface
 
 uses
   SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers;
+  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers, main;
 
 type
 
@@ -16,7 +16,6 @@ type
     ButtonPanel: TButtonPanel;
     cbEnabled: TCheckBox;
     editName: TEdit;
-    toolbarImages: TImageList;
     LabelName: TLabel;
     LabelValue: TLabel;
     textValue: TMemo;
