@@ -17,7 +17,6 @@ type
     btnSave: TButton;
     ButtonPanel: TButtonPanel;
     cbParent: TComboBox;
-    dbMain: TDividerBevel;
     Props: TJSONPropStorage;
     labParent: TLabel;
     dbVars: TDividerBevel;
@@ -36,6 +35,7 @@ type
     tbEdit: TToolButton;
     tbDelete: TToolButton;
     tbEnv: TToolButton;
+    tbHelp: TToolButton;
     procedure btnSaveClick(Sender: TObject);
     procedure editNameChange(Sender: TObject);
     procedure editNameKeyPress(Sender: TObject; var Key: char);
@@ -52,6 +52,7 @@ type
     procedure tbAddClick(Sender: TObject);
     procedure tbDeleteClick(Sender: TObject);
     procedure tbEditClick(Sender: TObject);
+    procedure tbHelpClick(Sender: TObject);
   private
     type
     TOpState = (opNone, opAdd, opEdit);
@@ -78,7 +79,7 @@ type
 
 implementation
 
-uses SysUtils, Graphics, AppHelpers;
+uses SysUtils, Graphics, AppHelpers, help_form;
 
 {$R *.lfm}
 
@@ -314,6 +315,21 @@ begin
   FOpState := opEdit;
   tbAdd.Down := False;
   tbEdit.Down := True;
+end;
+
+procedure TEnvForm.tbHelpClick(Sender: TObject);
+begin
+  THelpForm.HelpModal(Self, 'Help',
+    'Environments let you replace some values by the variables.' + LineEnding +
+    'For example, suppose you have an API with the developing version' + LineEnding +
+    'http://dev.local and the testing one http://dev.testing.' + LineEnding +
+    'With environments you may create two environments DEV and TESTING and you may' + LineEnding +
+    'create a variable url in both of these environments with the appropriate url.' + LineEnding +
+    'Then, in the application you should replace the URL by the {{url}} variable.' + LineEnding +
+    'Choosing the environment in the dropdown list the variable {{url}} will be' + LineEnding +
+    'replaced by the URL which you defined in this window.' + LineEnding + LineEnding +
+    'The variables can be used in the application tabs Headers, Query, Body, Cookie, Auth.'
+  );
 end;
 
 function TEnvForm.CreateMenuItem(const EnvName: string): TMenuItem;

@@ -38,7 +38,7 @@ object EnvForm: TEnvForm
   object TBControls: TToolBar
     Left = 4
     Height = 22
-    Top = 21
+    Top = 4
     Width = 452
     AutoSize = True
     BorderSpacing.Left = 4
@@ -95,18 +95,25 @@ object EnvForm: TEnvForm
       ShowHint = True
       Style = tbsButtonDrop
     end
+    object tbHelp: TToolButton
+      Left = 211
+      Top = 0
+      Caption = '&Help'
+      ImageIndex = 19
+      OnClick = tbHelpClick
+    end
   end
   object panVars: TPanel
     Left = 4
-    Height = 191
-    Top = 140
+    Height = 208
+    Top = 123
     Width = 452
     Align = alClient
     BorderSpacing.Left = 4
     BorderSpacing.Top = 4
     BorderSpacing.Right = 4
     BevelOuter = bvNone
-    ClientHeight = 191
+    ClientHeight = 208
     ClientWidth = 452
     TabOrder = 2
     object dbVars: TDividerBevel
@@ -136,7 +143,7 @@ object EnvForm: TEnvForm
     end
     object gridVars: TStringGrid
       Left = 0
-      Height = 152
+      Height = 169
       Top = 39
       Width = 452
       Align = alClient
@@ -164,7 +171,7 @@ object EnvForm: TEnvForm
   object panEnv: TPanel
     Left = 4
     Height = 81
-    Top = 47
+    Top = 30
     Width = 452
     Align = alTop
     AutoSize = True
@@ -267,19 +274,6 @@ object EnvForm: TEnvForm
         ParentColor = False
       end
     end
-  end
-  object dbMain: TDividerBevel
-    Left = 4
-    Height = 17
-    Top = 0
-    Width = 452
-    Caption = 'Environment'
-    Align = alTop
-    BorderSpacing.Left = 4
-    BorderSpacing.Right = 4
-    Font.Style = [fsBold]
-    ParentFont = False
-    Style = gsButton
   end
   object menuEnv: TPopupMenu
     left = 288
