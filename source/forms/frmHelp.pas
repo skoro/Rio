@@ -1,4 +1,4 @@
-unit help_form;
+unit frmHelp;
 
 {$mode objfpc}{$H+}
 

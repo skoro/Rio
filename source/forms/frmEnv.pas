@@ -79,7 +79,7 @@ type
 
 implementation
 
-uses SysUtils, Graphics, AppHelpers, help_form;
+uses SysUtils, Graphics, AppHelpers, frmHelp;
 
 {$R *.lfm}
 

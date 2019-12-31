@@ -315,7 +315,7 @@ var
 implementation
 
 uses about, headers_editor, cookie_form,
-  AppHelpers, strutils, help_form, cmdline, options, frmKeyValue,
+  AppHelpers, strutils, frmHelp, cmdline, options, frmKeyValue,
   import_form, export_form, frmRequest, frmEnv, State, Clipbrd;
 
 const

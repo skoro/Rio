@@ -316,7 +316,7 @@
         <HasResources Value="True"/>
       </Unit19>
       <Unit20>
-        <Filename Value="forms/help_form.pas"/>
+        <Filename Value="forms/frmHelp.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit20>
