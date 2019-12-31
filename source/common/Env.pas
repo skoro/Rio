@@ -416,7 +416,7 @@ var
   Doc: TXMLDocument;
   RootNode, EnvNode, VarNode: TDOMNode;
   EnvName, ParentName: string;
-  EnvObj, ParentEnv: TEnvironment;
+  EnvObj: TEnvironment;
 begin
   try
     ReadXMLFile(Doc, AStream);

@@ -6,7 +6,8 @@ interface
 
 uses
   SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers, main;
+  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers,
+  main {don't delete main it's used for access to toolbar icons};
 
 type
 
