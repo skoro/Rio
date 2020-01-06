@@ -130,7 +130,7 @@ type
 
   { TViewPage }
 
-  TViewPage = (vpTree, vpFormatted);
+  TViewPage = (vpTree, vpFormatted, vpTable);
 
   { TOnJsonFormat }
 
@@ -152,9 +152,11 @@ type
     FBtnFilter: TToolButton;
     FBtnTree: TToolButton;
     FBtnFormatted: TToolButton;
+    FBtnTable: TToolButton;
     FPageControl: TPageControl;
     FTreeSheet: TTabSheet;
     FFormatSheet: TTabSheet;
+    FTableSheet: TTabSheet;
     FFilter: TInputButtons;
     FOnJsonFormat: TOnJsonFormat;
     FTreeExpanded: Boolean;
@@ -177,6 +179,7 @@ type
     procedure InternalOnSwitchFilter(Sender: TObject);
     procedure OnChangeTreeMode(Sender: TObject);
     procedure OnChangeFormatMode(Sender: TObject);
+    procedure OnChangeTableMode(Sender: TObject);
     procedure OnFilterClick(Sender: TObject);
     procedure OnFilterReset(Sender: TObject);
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -418,18 +421,26 @@ begin
       FPageControl.ActivePage := FTreeSheet;
       FBtnTree.Down := True;
       FBtnFormatted.Down := False;
+      FBtnTable.Down := False;
     end;
     vpFormatted: begin
       FPageControl.ActivePage := FFormatSheet;
       FBtnTree.Down := False;
       FBtnFormatted.Down := True;
+      FBtnTable.Down := False;
+    end;
+    vpTable: begin
+      FPageControl.ActivePage := FTableSheet;
+      FBtnTree.Down := False;
+      FBtnFormatted.Down := False;
+      FBtnTable.Down := True;
     end;
   end;
   // Force focus the control (this fixes focus lose on WIN).
   if TPageControl(FTabSheet.Parent).ActivePage = FTabSheet then
     if AValue = vpTree then
       FTreeView.SetFocus
-    else
+    else if AValue = vpFormatted then
       FSynEdit.SetFocus;
 end;
 
@@ -523,6 +534,13 @@ begin
   FBtnFormatted.Caption := 'Formatted';
   FBtnFormatted.OnClick := @OnChangeFormatMode;
 
+  FBtnTable := TToolButton.Create(FToolbar);
+  FBtnTable.Parent := FToolbar;
+  FBtnTable.Caption := 'Table';
+  FBtnTable.OnClick := @OnChangeTableMode;
+
+  { TODO : Should be a separator between view mode buttons and action buttons. }
+
   FBtnOptions := TToolButton.Create(FToolbar);
   FBtnOptions.Parent := FToolbar;
   FBtnOptions.Caption := 'Options';
@@ -592,6 +610,11 @@ end;
 procedure TResponseJsonTab.OnChangeFormatMode(Sender: TObject);
 begin
   SetViewPage(vpFormatted);
+end;
+
+procedure TResponseJsonTab.OnChangeTableMode(Sender: TObject);
+begin
+  SetViewPage(vpTable);
 end;
 
 procedure TResponseJsonTab.OnFilterClick(Sender: TObject);
@@ -682,11 +705,18 @@ begin
 end;
 
 function TResponseJsonTab.GetViewPage: TViewPage;
+var
+  aPage: TTabSheet;
 begin
-  if FPageControl.ActivePage = FTreeSheet then
+  aPage := FPageControl.ActivePage;
+  if aPage = FTreeSheet then
     Result := vpTree
+  else if aPage = FFormatSheet then
+    Result := vpFormatted
+  else if aPage = FTableSheet then
+    Result := vpTable
   else
-    Result := vpFormatted;
+    raise Exception.Create('TResponseJsonTab.GetViewPage: ActivePage');
 end;
 
 constructor TResponseJsonTab.Create;
@@ -741,6 +771,7 @@ begin
     Align := alClient;
     FTreeSheet := AddTabSheet;
     FFormatSheet := AddTabSheet;
+    FTableSheet := AddTabSheet;
     ShowTabs := False;
   end;
 
@@ -864,10 +895,17 @@ end;
 
 procedure TResponseJsonTab.ViewNextPage;
 begin
-  if ViewPage = vpFormatted then
-    ViewPage := vpTree
+  if ViewPage = vpTree then
+    ViewPage := vpFormatted
   else
-    ViewPage := vpFormatted;
+    if ViewPage = vpFormatted then
+    begin
+      // if canViewTable then viewPage := vpTable
+      ViewPage := vpTable;
+    end
+  else
+    if ViewPage = vpTable then
+      ViewPage := vpTree;
 end;
 
 procedure TResponseJsonTab.ExpandChildren(Node: TTreeNode; Collapse: Boolean = False);
