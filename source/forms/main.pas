@@ -1991,8 +1991,9 @@ begin
         Images := toolbarIcons;
         Buttons[0].ImageIndex := 13; // tree
         Buttons[1].ImageIndex := 1;  // formatted
-        Buttons[2].ImageIndex := 12; // options
-        Buttons[3].ImageIndex := 14; // filter
+        Buttons[2].ImageIndex := 0;  // table
+        Buttons[3].ImageIndex := 12; // options
+        Buttons[4].ImageIndex := 14; // filter
       end;
       TreeView.Images := jsImages;
       TreeView.PopupMenu := popupJsonTree;
