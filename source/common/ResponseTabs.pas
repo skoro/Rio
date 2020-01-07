@@ -7,7 +7,8 @@ interface
 
 uses
   Classes, SysUtils, fpjson, JsonParserMod, ComCtrls, ExtCtrls, Controls, Forms,
-  StdCtrls, Dialogs, SynEdit, SynEditTypes, ThreadHttpClient, inputbuttons;
+  StdCtrls, Dialogs, Grids, SynEdit, SynEditTypes, ThreadHttpClient,
+  inputbuttons;
 
 type
 
@@ -164,6 +165,7 @@ type
     FSearchNode: TTreeNode;
     FSearchNodePos: Integer;
     FToolbar: TToolbar;
+    FGrid: TStringGrid;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -175,6 +177,7 @@ type
     procedure CreateToolbar(Parent: TWinControl);
     procedure ApplyFilter;
     procedure BuildTree(JsonData: TJSONData);
+    procedure BuildTable(JsonData: TJSONData);
     procedure SetFormattedText(JsonData: TJSONData);
     procedure InternalOnSwitchFilter(Sender: TObject);
     procedure OnChangeTreeMode(Sender: TObject);
@@ -188,6 +191,7 @@ type
     procedure InitSearchParams; override;
     procedure ShowLineNumbers;
     function FindInNode(Node: TTreeNode): TTreeNode;
+    function CanEnableTable(Json: TJSONData): Boolean;
   public
     constructor Create;
     destructor Destroy; override;
@@ -569,6 +573,8 @@ begin
   if Assigned(Filtered) then begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
+    if CanEnableTable(Filtered) then
+      BuildTable(Filtered);
   end
   else begin
     FSynEdit.Text := '';
@@ -587,6 +593,36 @@ begin
     end;
   if FTreeExpanded then
     FTreeView.FullExpand;
+end;
+
+procedure TResponseJsonTab.BuildTable(JsonData: TJSONData);
+var
+  i, k: integer;
+  jsItem: TJSONData;
+  tblHeaders: TStringList;
+begin
+  tblHeaders := TStringList.Create;
+  try
+    with FGrid do
+      begin
+        FixedRows := 1; // Header.
+        RowCount := JsonData.Count + 1; // Total + Header.
+        for i := 0 to JsonData.Count - 1 do
+          begin
+            jsItem := JsonData.Items[i];
+            if (jsItem.JSONType = jtObject) then
+            begin
+              ColCount := jsItem.Count;
+              for k := 0 to jsItem.Count - 1 do
+              begin
+                Cells[k, Row] := jsItem.Items[k].AsString;
+              end;
+            end;
+          end;
+      end;
+  finally
+    FreeAndNil(tblHeaders);
+  end;
 end;
 
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
@@ -697,6 +733,11 @@ begin
   Result := nil;
 end;
 
+function TResponseJsonTab.CanEnableTable(Json: TJSONData): Boolean;
+begin
+  Result := Assigned(Json) and (Json.JSONType = jtArray);
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
@@ -797,6 +838,21 @@ begin
   FSynEdit.Gutter.Parts.Part[1].Visible := False;
   FSynEdit.Gutter.Parts.Part[2].Visible := False;
   FSynEdit.Gutter.Parts.Part[3].Visible := False;
+
+  FGrid := TStringGrid.Create(FTableSheet);
+  with FGrid do
+    begin
+      Parent := FTableSheet;
+      Align := alClient;
+      BorderStyle := bsNone;
+      TitleStyle := tsNative;
+      FixedCols := 0;
+      FixedRows := 1;
+      Options := [goColSizing, goRowHighlight, goTabs, goFixedVertLine,
+              goFixedHorzLine, goHorzLine, goVertLine, goSmoothScroll,
+              goDrawFocusSelected];
+      OnKeyDown := @InternalOnKeyDown;
+    end;
 
   ShowLineNumbers;
 end;
