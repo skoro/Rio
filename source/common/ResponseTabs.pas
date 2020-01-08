@@ -615,7 +615,7 @@ begin
               ColCount := jsItem.Count;
               for k := 0 to jsItem.Count - 1 do
               begin
-                Cells[k, Row] := jsItem.Items[k].AsString;
+                Cells[k, i + 1] := jsItem.Items[k].AsString;
               end;
             end;
           end;
