@@ -227,7 +227,7 @@ type
 
 implementation
 
-uses AppHelpers, options, strutils, SynHighlighterXML;
+uses AppHelpers, options, strutils, SynHighlighterXML, Graphics;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -600,26 +600,38 @@ var
   i, k: integer;
   jsItem: TJSONData;
   tblHeaders: TStringList;
+  header: string;
 begin
   tblHeaders := TStringList.Create;
   try
     with FGrid do
       begin
-        FixedRows := 1; // Header.
+        Columns.Clear;
         RowCount := JsonData.Count + 1; // Total + Header.
+        FixedRows := 1; // Header.
         for i := 0 to JsonData.Count - 1 do
+        begin
+          jsItem := JsonData.Items[i];
+          if (jsItem.JSONType = jtObject) then
           begin
-            jsItem := JsonData.Items[i];
-            if (jsItem.JSONType = jtObject) then
+            for k := 0 to jsItem.Count - 1 do
             begin
-              ColCount := jsItem.Count;
-              for k := 0 to jsItem.Count - 1 do
+              // Set grid headers from the first array item.
+              if i = 0 then
               begin
-                Cells[k, i + 1] := jsItem.Items[k].AsString;
+                header := TJSONObject(jsItem).Names[k];
+                with Columns.Add.Title do
+                begin
+                  Caption := header;
+                  Font.Style := [fsBold];
+                end;
               end;
-            end;
+              // Set the grid data cell.
+              Cells[k, i + 1] := jsItem.Items[k].AsString;
+            end; // for k
           end;
-      end;
+        end; // for i
+      end; // with FGrid
   finally
     FreeAndNil(tblHeaders);
   end;
