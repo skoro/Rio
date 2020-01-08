@@ -863,6 +863,7 @@ begin
       Options := [goColSizing, goRowHighlight, goTabs, goFixedVertLine,
               goFixedHorzLine, goHorzLine, goVertLine, goSmoothScroll,
               goDrawFocusSelected];
+      MouseWheelOption := mwGrid;
       OnKeyDown := @InternalOnKeyDown;
     end;
 
