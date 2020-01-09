@@ -174,6 +174,7 @@ type
     procedure SetViewPage(AValue: TViewPage);
     procedure ShowJsonData(AParent: TTreeNode; Data: TJSONData);
     procedure ClearJsonData;
+    procedure ClearTable;
     procedure CreateToolbar(Parent: TWinControl);
     procedure ApplyFilter;
     procedure BuildTree(JsonData: TJSONData);
@@ -520,6 +521,11 @@ begin
     FreeAndNil(FJsonParser);
 end;
 
+procedure TResponseJsonTab.ClearTable;
+begin
+  FGrid.Clear;
+end;
+
 procedure TResponseJsonTab.CreateToolbar(Parent: TWinControl);
 begin
   FToolbar := TToolBar.Create(Parent);
@@ -574,7 +580,17 @@ begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
     if CanEnableTable(Filtered) then
+    begin
       BuildTable(Filtered);
+      FBtnTable.Enabled := True;
+    end
+    else
+      begin
+        ClearTable;
+        if ViewPage = vpTable then
+          ViewPage := vpTree;
+        FBtnTable.Enabled := False;
+      end;
   end
   else begin
     FSynEdit.Text := '';
@@ -885,6 +901,7 @@ end;
 procedure TResponseJsonTab.FreeTab;
 begin
   ClearJsonData;
+  ClearTable;
   FreeAndNil(FTreeView);
   inherited;
 end;
