@@ -599,51 +599,45 @@ procedure TResponseJsonTab.BuildTable(JsonData: TJSONData);
 var
   i, k: integer;
   jsItem, jsData: TJSONData;
-  tblHeaders: TStringList;
   header, dataValue: string;
 begin
-  tblHeaders := TStringList.Create;
-  try
-    with FGrid do
+  with FGrid do
+  begin
+    Columns.Clear;
+    RowCount := JsonData.Count + 1; // Total + Header.
+    FixedRows := 1; // Header.
+    for i := 0 to JsonData.Count - 1 do
+    begin
+      jsItem := JsonData.Items[i];
+      if (jsItem.JSONType = jtObject) then
       begin
-        Columns.Clear;
-        RowCount := JsonData.Count + 1; // Total + Header.
-        FixedRows := 1; // Header.
-        for i := 0 to JsonData.Count - 1 do
+        for k := 0 to jsItem.Count - 1 do
         begin
-          jsItem := JsonData.Items[i];
-          if (jsItem.JSONType = jtObject) then
+          jsData := jsItem.Items[k];
+          // Set grid headers from the first array item.
+          if i = 0 then
           begin
-            for k := 0 to jsItem.Count - 1 do
+            header := TJSONObject(jsItem).Names[k];
+            with Columns.Add.Title do
             begin
-              jsData := jsItem.Items[k];
-              // Set grid headers from the first array item.
-              if i = 0 then
-              begin
-                header := TJSONObject(jsItem).Names[k];
-                with Columns.Add.Title do
-                begin
-                  Caption := header;
-                  Font.Style := [fsBold];
-                end;
-              end;
-              // Complex types cannot be converted to a string.
-              try
-                if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
-                  dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
-                else
-                  dataValue := jsData.AsString;
-              except
-                dataValue := 'Error';
-              end;
-              Cells[k, i + 1] := dataValue;
-            end; // for k
+              Caption := header;
+              Font.Style := [fsBold];
+            end;
           end;
-        end; // for i
-      end; // with FGrid
-  finally
-    FreeAndNil(tblHeaders);
-  end;
+          // Complex types cannot be converted to a string.
+          try
+            if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
+              dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
+            else
+              dataValue := jsData.AsString;
+          except
+            dataValue := 'Error';
+          end;
+          Cells[k, i + 1] := dataValue;
+        end; // for k
+      end;
+    end; // for i
+  end; // with FGrid
 end;
 
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
