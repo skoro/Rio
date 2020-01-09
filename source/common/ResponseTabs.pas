@@ -598,9 +598,9 @@ end;
 procedure TResponseJsonTab.BuildTable(JsonData: TJSONData);
 var
   i, k: integer;
-  jsItem: TJSONData;
+  jsItem, jsData: TJSONData;
   tblHeaders: TStringList;
-  header: string;
+  header, dataValue: string;
 begin
   tblHeaders := TStringList.Create;
   try
@@ -616,6 +616,7 @@ begin
           begin
             for k := 0 to jsItem.Count - 1 do
             begin
+              jsData := jsItem.Items[k];
               // Set grid headers from the first array item.
               if i = 0 then
               begin
@@ -626,8 +627,16 @@ begin
                   Font.Style := [fsBold];
                 end;
               end;
-              // Set the grid data cell.
-              Cells[k, i + 1] := jsItem.Items[k].AsString;
+              // Complex types cannot be converted to a string.
+              try
+                if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
+                  dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
+                else
+                  dataValue := jsData.AsString;
+              except
+                dataValue := 'Error';
+              end;
+              Cells[k, i + 1] := dataValue;
             end; // for k
           end;
         end; // for i
