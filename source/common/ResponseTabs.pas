@@ -166,6 +166,7 @@ type
     FSearchNodePos: Integer;
     FToolbar: TToolbar;
     FGrid: TStringGrid;
+    FTableDone: Boolean; // When the table is built and ready.
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -524,6 +525,7 @@ end;
 procedure TResponseJsonTab.ClearTable;
 begin
   FGrid.Clear;
+  FTableDone := False;
 end;
 
 procedure TResponseJsonTab.CreateToolbar(Parent: TWinControl);
@@ -579,14 +581,12 @@ begin
   if Assigned(Filtered) then begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
+    if FTableDone then
+      ClearTable;
     if CanEnableTable(Filtered) then
-    begin
-      BuildTable(Filtered);
-      FBtnTable.Enabled := True;
-    end
+      FBtnTable.Enabled := True
     else
       begin
-        ClearTable;
         if ViewPage = vpTable then
           ViewPage := vpTree;
         FBtnTable.Enabled := False;
@@ -654,6 +654,7 @@ begin
       end;
     end; // for i
   end; // with FGrid
+  FTableDone := True;
 end;
 
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
@@ -680,8 +681,25 @@ begin
 end;
 
 procedure TResponseJsonTab.OnChangeTableMode(Sender: TObject);
+var
+  jsParser: TJSONParser;
+  jsData: TJSONData;
 begin
   SetViewPage(vpTable);
+  // Build the table for the first click on the table view button.
+  if not FTableDone then
+  begin
+    jsData := nil;
+    jsParser := TJSONParser.Create(FSynEdit.Text);
+    try
+      jsData := jsParser.Parse;
+      BuildTable(jsData);
+    finally
+      FreeAndNil(jsParser);
+      if Assigned(jsData) then
+        FreeAndNil(jsData);
+    end;
+  end;
 end;
 
 procedure TResponseJsonTab.OnFilterClick(Sender: TObject);
@@ -801,6 +819,7 @@ begin
   FSearchOptions := [];
   FLineNumbers := False;
   FAutoCreate  := False;
+  FTableDone   := False;
   InitSearchParams;
 end;
 
