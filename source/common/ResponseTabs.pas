@@ -524,7 +524,8 @@ end;
 
 procedure TResponseJsonTab.ClearTable;
 begin
-  FGrid.Clear;
+  if Assigned(FGrid) then
+    FGrid.Clear;
   FTableDone := False;
 end;
 
@@ -921,6 +922,7 @@ procedure TResponseJsonTab.FreeTab;
 begin
   ClearJsonData;
   ClearTable;
+  FreeAndNil(FGrid);
   FreeAndNil(FTreeView);
   inherited;
 end;
