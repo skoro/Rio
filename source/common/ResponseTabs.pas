@@ -645,6 +645,8 @@ begin
           try
             if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
               dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
+            else if (jsData.JSONType = jtNull) then
+              dataValue := 'NULL'
             else
               dataValue := jsData.AsString;
           except
