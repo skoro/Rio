@@ -654,10 +654,31 @@ begin
           end;
           Cells[k, i + 1] := dataValue;
         end; // for k
+      end
+      else begin
+        try
+          case jsItem.JSONType of
+            jtArray: dataValue := jsItem.FormatJSON([foSingleLineArray, foSkipWhiteSpace]);
+            jtNull:  dataValue := 'NULL';
+            else     dataValue := jsItem.AsString;
+          end;
+        except
+          dataValue := 'Error';
+        end;
+        if header = '' then // Only one column on a primitive type.
+        begin
+          header := 'Value';
+          with Columns.Add.Title do
+          begin
+            Caption := header;
+            Font.Style := [fsBold];
+          end;
+        end;
+        Cells[0, i + 1] := dataValue;
       end;
     end; // for i
   end; // with FGrid
-  FTableDone := True;
+  FTableDone := True; // Table build is done.
 end;
 
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
