@@ -905,6 +905,7 @@ begin
               goFixedHorzLine, goHorzLine, goVertLine, goSmoothScroll,
               goDrawFocusSelected];
       MouseWheelOption := mwGrid;
+      ColumnClickSorts := True;
       OnKeyDown := @InternalOnKeyDown;
     end;
 
