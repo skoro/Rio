@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, fpjson, JsonParserMod, ComCtrls, ExtCtrls, Controls, Forms,
-  StdCtrls, Dialogs, Grids, SynEdit, SynEditTypes, ThreadHttpClient,
+  StdCtrls, Dialogs, Grids, SynEdit, SynEditTypes, ThreadHttpClient, AppHelpers,
   inputbuttons;
 
 type
@@ -116,6 +116,9 @@ type
     FSearchOptions: TSynSearchOptions;
     FSearchPos: TPoint;
     procedure InitSearchParams; virtual;
+    // Search a text in the source (it allows to search in a plain text,
+    // converting FSearchOptions to the TFindOptions).
+    function FindText(const SrcText, SearchText: string; FromPos: integer): TFindPos;
   public
     constructor Create;
     procedure CreateUI(ATabSheet: TTabSheet); override;
@@ -144,7 +147,13 @@ type
   { TResponseJsonTab }
 
   TResponseJsonTab = class(TResponseFormattedTab)
-  private
+  private type
+    TSearchTable = record
+      Col: Integer; // Cell column
+      Row: Integer; // Cell row
+      Pos: Integer; // Position in cell
+    end;
+  private var
     FLineNumbers: Boolean;
     FTreeView: TTreeView;
     FJsonRoot: TJSONData;
@@ -164,6 +173,7 @@ type
     FOnJsonData: TOnJsonData;
     FSearchNode: TTreeNode;
     FSearchNodePos: Integer;
+    FSearchTable: TSearchTable; // Current search position in the table.
     FToolbar: TToolbar;
     FGrid: TStringGrid;
     FTableDone: Boolean; // When the table is built and ready.
@@ -193,6 +203,7 @@ type
     procedure InitSearchParams; override;
     procedure ShowLineNumbers;
     function FindInNode(Node: TTreeNode): TTreeNode;
+    function FindInTable: TSearchTable;
     function CanEnableTable(Json: TJSONData): Boolean;
   public
     constructor Create;
@@ -229,7 +240,7 @@ type
 
 implementation
 
-uses AppHelpers, options, strutils, SynHighlighterXML, Graphics;
+uses options, strutils, SynHighlighterXML, LazUTF8, Graphics;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -259,6 +270,21 @@ begin
   end
   else
     FSearchPos := Point(0, 0);
+end;
+
+function TResponseFormattedTab.FindText(const SrcText, SearchText: string;
+  FromPos: integer): TFindPos;
+var
+    Opts: TFindOptions;
+begin
+  Opts := [];
+  if ssoMatchCase in FSearchOptions then
+    Include(Opts, frMatchCase);
+  if ssoWholeWord in FSearchOptions then
+    Include(Opts, frWholeWord);
+  if not (ssoBackwards in FSearchOptions) then
+    Include(Opts, frDown);
+  Result := FindInText(SrcText, SearchText, Opts, FromPos);
 end;
 
 constructor TResponseFormattedTab.Create;
@@ -760,6 +786,15 @@ begin
   inherited;
   FSearchNode := nil;
   FSearchNodePos := 0;
+  if Assigned(FGrid) then
+  begin
+    FSearchTable.Col := FGrid.FixedCols;
+    if ssoBackwards in FSearchOptions then
+      FSearchTable.Row := FGrid.RowCount - 1
+    else
+      FSearchTable.Row := FGrid.FixedRows;
+  end;
+  FSearchTable.Pos := 0;
 end;
 
 procedure TResponseJsonTab.ShowLineNumbers;
@@ -773,37 +808,102 @@ function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
 var
   Next: TTreeNode;
   fp: TFindPos;
-  Opts: TFindOptions;
+  //Opts: TFindOptions;
 begin
   if Node = nil then
     Exit(nil); //=>
-  Opts := [];
-  if ssoMatchCase in FSearchOptions then
-    Include(Opts, frMatchCase);
-  if ssoWholeWord in FSearchOptions then
-    Include(Opts, frWholeWord);
-  if not (ssoBackwards in FSearchOptions) then
-    Include(Opts, frDown);
-  fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
+  //Opts := [];
+  //if ssoMatchCase in FSearchOptions then
+  //  Include(Opts, frMatchCase);
+  //if ssoWholeWord in FSearchOptions then
+  //  Include(Opts, frWholeWord);
+  //if not (ssoBackwards in FSearchOptions) then
+  //  Include(Opts, frDown);
+  //fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
+  fp := FindText(Node.Text, FSearchText, FSearchNodePos);
   if fp.Pos > 0 then begin
-    if frDown in Opts then
-      FSearchNodePos := fp.Pos + fp.SelLength
-    else begin
+    //if frDown in Opts then
+    if ssoBackwards in FSearchOptions then
+    begin
       FSearchNodePos := fp.Pos - 1;
       // Don't reset search pos to 0 it will be looped.
       if FSearchNodePos = 0 then
         FSearchNodePos := 1;
-    end;
+    end
+    else
+      begin
+        FSearchNodePos := fp.Pos + fp.SelLength
+      end;
     Exit(Node);
   end;
   FSearchNodePos := 0;
-  if frDown in Opts then
-    Next := Node.GetNext
+  //if frDown in Opts then
+  //  Next := Node.GetNext
+  //else
+  //  Next := Node.GetPrev;
+  if ssoBackwards in FSearchOptions then
+    Next := Node.GetPrev
   else
-    Next := Node.GetPrev;
+    Next := Node.GetNext;
   if Next <> nil then
     Exit(FindInNode(Next)); //=>
   Result := nil;
+end;
+
+function TResponseJsonTab.FindInTable: TSearchTable;
+var
+  txt: String;
+  fp: TFindPos;
+  Advance: Boolean;
+begin
+  Advance := False;
+  while ((FSearchTable.Row > 0) and (FSearchTable.Row < FGrid.RowCount)) do
+  begin
+    txt := FGrid.Cells[FSearchTable.Col, FSearchTable.Row];
+    fp := FindText(txt, FSearchText, FSearchTable.Pos);
+    if (fp.Pos > 0) then
+    begin
+      if (ssoBackwards in FSearchOptions) then
+      begin
+        FSearchTable.Pos := fp.Pos - 1;
+      end
+      else
+        FSearchTable.Pos := fp.Pos + fp.SelLength;
+      Result.Row := FSearchTable.Row;
+      Result.Col := FSearchTable.Col;
+      Result.Pos := fp.Pos;
+      if (FSearchTable.Pos < 0) or (FSearchTable.Pos > UTF8Length(txt)) then
+        Advance := True // out of the cell, we need to advance a col/row and then exit.
+      else
+        Exit; // Match found =>
+    end;
+    with FSearchTable do
+    begin
+      Pos := 0;
+      if (ssoBackwards in FSearchOptions) then
+      begin
+        Dec(Col);
+        if (Col < 0) then
+        begin
+          Col := FGrid.ColCount - 1;
+          Dec(Row);
+        end;
+      end
+      else
+        begin
+          Inc(Col);
+          if (Col > FGrid.ColCount - 1) then
+          begin
+            Col := 0;
+            Inc(Row);
+          end;
+        end;
+    end;
+    if Advance then
+      Exit; // =>
+  end;
+  Result.Row := -1;
+  Result.Col := -1;
 end;
 
 function TResponseJsonTab.CanEnableTable(Json: TJSONData): Boolean;
@@ -1010,6 +1110,8 @@ begin
 end;
 
 function TResponseJsonTab.FindNext: Integer;
+var
+  tbl: TSearchTable;
 begin
   if (FSearchNode = nil) and (FTreeView.Items.Count > 0) then
     if ssoBackwards in FSearchOptions then begin
@@ -1024,6 +1126,16 @@ begin
   FSearchNode := FindInNode(FSearchNode);
   if FSearchNode <> nil then
     FSearchNode.Selected := True;
+  // Now try searching in the table.
+  if FTableDone then
+  begin
+    tbl := FindInTable;
+    if (tbl.Row <> -1) and (tbl.Col <> -1) then
+    begin
+      FGrid.Row := tbl.Row;
+      FGrid.Col := tbl.Col;
+    end;
+  end;
   Result := inherited;
 end;
 
