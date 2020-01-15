@@ -260,6 +260,7 @@ begin
 
     Result.Pos := -1;
     Result.SelStart := -1;
+    Result.SelLength := 0;
 
     if p = 0 then
       Exit;
