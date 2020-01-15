@@ -788,11 +788,16 @@ begin
   FSearchNodePos := 0;
   if Assigned(FGrid) then
   begin
-    FSearchTable.Col := FGrid.FixedCols;
     if ssoBackwards in FSearchOptions then
-      FSearchTable.Row := FGrid.RowCount - 1
+    begin
+      FSearchTable.Row := FGrid.RowCount - 1;
+      FSearchTable.Col := FGrid.ColCount - 1;
+    end
     else
-      FSearchTable.Row := FGrid.FixedRows;
+      begin
+        FSearchTable.Row := FGrid.FixedRows;
+        FSearchTable.Col := FGrid.FixedCols;
+      end;
   end;
   FSearchTable.Pos := 0;
 end;
@@ -872,7 +877,7 @@ begin
       Result.Row := FSearchTable.Row;
       Result.Col := FSearchTable.Col;
       Result.Pos := fp.Pos;
-      if (FSearchTable.Pos < 0) or (FSearchTable.Pos > UTF8Length(txt)) then
+      if (FSearchTable.Pos = 0) or (FSearchTable.Pos > UTF8Length(txt)) then
         Advance := True // out of the cell, we need to advance a col/row and then exit.
       else
         Exit; // Match found =>
