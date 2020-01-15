@@ -813,21 +813,11 @@ function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
 var
   Next: TTreeNode;
   fp: TFindPos;
-  //Opts: TFindOptions;
 begin
   if Node = nil then
     Exit(nil); //=>
-  //Opts := [];
-  //if ssoMatchCase in FSearchOptions then
-  //  Include(Opts, frMatchCase);
-  //if ssoWholeWord in FSearchOptions then
-  //  Include(Opts, frWholeWord);
-  //if not (ssoBackwards in FSearchOptions) then
-  //  Include(Opts, frDown);
-  //fp := FindInText(Node.Text, FSearchText, Opts, FSearchNodePos);
   fp := FindText(Node.Text, FSearchText, FSearchNodePos);
   if fp.Pos > 0 then begin
-    //if frDown in Opts then
     if ssoBackwards in FSearchOptions then
     begin
       FSearchNodePos := fp.Pos - 1;
@@ -842,10 +832,6 @@ begin
     Exit(Node);
   end;
   FSearchNodePos := 0;
-  //if frDown in Opts then
-  //  Next := Node.GetNext
-  //else
-  //  Next := Node.GetPrev;
   if ssoBackwards in FSearchOptions then
     Next := Node.GetPrev
   else
