@@ -198,6 +198,7 @@ type
     procedure OnFilterClick(Sender: TObject);
     procedure OnFilterReset(Sender: TObject);
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure InternalOnTableDblClick(Sender: TObject);
   protected
     procedure ToggleFilterPanel;
     procedure InitSearchParams; override;
@@ -240,7 +241,7 @@ type
 
 implementation
 
-uses options, strutils, SynHighlighterXML, LazUTF8, Graphics;
+uses options, frmKeyValue, strutils, SynHighlighterXML, LazUTF8, Graphics;
 
 const
   ImageTypeMap: array[TJSONtype] of Integer =
@@ -902,6 +903,22 @@ begin
   Result := Assigned(Json) and (Json.JSONType = jtArray);
 end;
 
+procedure TResponseJsonTab.InternalOnTableDblClick(Sender: TObject);
+var
+  CKey, CVal: string;
+begin
+  with FGrid do
+  begin
+    CKey := Columns[Col].Title.Caption;
+    CVal := Cells[Col, Row];
+  end;
+  with TKeyValueForm.Create(FTabSheet) do
+  begin
+    View(CKey, CVal, 'Json');
+    Free;
+  end;
+end;
+
 function TResponseJsonTab.GetTreeView: TTreeView;
 begin
   if not Assigned(FTreeView) then
@@ -1019,6 +1036,7 @@ begin
       MouseWheelOption := mwGrid;
       ColumnClickSorts := True;
       OnKeyDown := @InternalOnKeyDown;
+      OnDblClick := @InternalOnTableDblClick;
     end;
 
   ShowLineNumbers;
