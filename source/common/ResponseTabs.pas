@@ -190,6 +190,7 @@ type
     procedure ApplyFilter;
     procedure BuildTree(JsonData: TJSONData);
     procedure BuildTable(JsonData: TJSONData);
+    procedure AdjustTableColumns;
     procedure SetFormattedText(JsonData: TJSONData);
     procedure InternalOnSwitchFilter(Sender: TObject);
     procedure OnChangeTreeMode(Sender: TObject);
@@ -713,6 +714,20 @@ begin
   FTableDone := True; // Table build is done.
 end;
 
+procedure TResponseJsonTab.AdjustTableColumns;
+var
+  i: Integer;
+begin
+  with FGrid do
+  begin
+    AutoSizeColumns;
+    for i := 0 to ColCount - 1 do
+      { TODO : Maximum column width should be configurable ? }
+      if ColWidths[i] > 300 then
+        ColWidths[i] := 300;
+  end;
+end;
+
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
 begin
   if Assigned(FOnJsonFormat) then
@@ -750,6 +765,7 @@ begin
     try
       jsData := jsParser.Parse;
       BuildTable(jsData);
+      AdjustTableColumns;
     finally
       FreeAndNil(jsParser);
       if Assigned(jsData) then
