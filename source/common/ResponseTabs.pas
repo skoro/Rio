@@ -579,7 +579,12 @@ begin
   FBtnTable.Caption := 'Table';
   FBtnTable.OnClick := @OnChangeTableMode;
 
-  { TODO : Should be a separator between view mode buttons and action buttons. }
+  // Separator between view mode buttons and control buttons.
+  with TToolButton.Create(FToolbar) do
+  begin
+    Parent := FToolbar;
+    Style := tbsDivider;
+  end;
 
   FBtnOptions := TToolButton.Create(FToolbar);
   FBtnOptions.Parent := FToolbar;
