@@ -435,8 +435,14 @@ end;
 
 procedure TKeyValueForm.ViewNav(const ATitle: string);
 begin
+  if Assigned(FGrid) then
+    raise Exception.Create('Cannot use this method with Grid property.');
   if not Assigned(FOnGetKeyValue) then
     raise Exception.Create('Invoke this method only with OnGetKeyValue properties.');
+  tbGridControl.Visible := True;
+  FTitle := ATitle;
+  ViewOnly := True; // Initialize earlier for GridActionButtons.
+  GridActionButtons;
   ExternalKeyValue;
   ShowView;
 end;
