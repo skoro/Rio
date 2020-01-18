@@ -2002,6 +2002,7 @@ begin
       SynEdit.Highlighter := synJS;
       SynEdit.Font := OptionsForm.GetFontItem(fiEditor);
       ButtonOptions.OnClick := @OnJsonTabButtonOptionsClick;
+      TableFallback := OptionsForm.JsonTableFallback;
       ViewPage := OptionsForm.JsonView;
       LineNumbers := OptionsForm.JsonLines;
     end // with
