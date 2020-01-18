@@ -23,10 +23,10 @@ object OptionsForm: TOptionsForm
     Height = 337
     Top = 4
     Width = 312
-    ActivePage = tabAppearance
+    ActivePage = tabJson
     Align = alClient
     BorderSpacing.Around = 4
-    TabIndex = 1
+    TabIndex = 2
     TabOrder = 0
     Options = [nboKeyboardTabSwitch]
     object tabGeneral: TTabSheet
@@ -304,59 +304,59 @@ object OptionsForm: TOptionsForm
       ClientWidth = 306
       object GroupBox1: TGroupBox
         Left = 4
-        Height = 125
+        Height = 113
         Top = 2
-        Width = 294
+        Width = 298
         Align = alTop
         AutoSize = True
         Caption = 'Format options'
         ChildSizing.LeftRightSpacing = 4
         ChildSizing.TopBottomSpacing = 2
-        ClientHeight = 106
-        ClientWidth = 290
+        ClientHeight = 94
+        ClientWidth = 294
         TabOrder = 0
         object cbJsonFmtArray: TCheckBox
           Left = 4
-          Height = 23
-          Top = 36
-          Width = 284
+          Height = 21
+          Top = 29
+          Width = 286
           Align = alTop
           Caption = 'Single line &array'
           TabOrder = 0
         end
         object cbJsonLines: TCheckBox
           Left = 4
-          Height = 23
-          Top = 59
-          Width = 284
+          Height = 21
+          Top = 50
+          Width = 286
           Align = alTop
           Caption = '&Line numbers in formatted view'
           TabOrder = 1
         end
         object cbJsonSaveFmt: TCheckBox
           Left = 4
-          Height = 23
-          Top = 82
-          Width = 284
+          Height = 21
+          Top = 71
+          Width = 286
           Align = alTop
           Caption = '&Save formatted JSON'
           TabOrder = 2
         end
         object panIndentSize: TPanel
           Left = 4
-          Height = 34
+          Height = 27
           Top = 2
-          Width = 284
+          Width = 286
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 30
-          ClientWidth = 280
+          ClientHeight = 27
+          ClientWidth = 286
           ParentColor = False
           TabOrder = 3
           object Label1: TLabel
             Left = 0
-            Height = 34
+            Height = 27
             Top = 0
             Width = 64
             Align = alLeft
@@ -367,7 +367,7 @@ object OptionsForm: TOptionsForm
           end
           object editIndentSize: TSpinEdit
             Left = 68
-            Height = 34
+            Height = 27
             Top = 0
             Width = 90
             Align = alLeft
@@ -380,53 +380,83 @@ object OptionsForm: TOptionsForm
       end
       object GroupBox2: TGroupBox
         Left = 4
-        Height = 91
-        Top = 133
-        Width = 294
+        Height = 132
+        Top = 121
+        Width = 298
         Align = alTop
         AutoSize = True
         BorderSpacing.Top = 6
         Caption = 'Default view (*)'
         ChildSizing.LeftRightSpacing = 4
         ChildSizing.TopBottomSpacing = 2
-        ClientHeight = 72
-        ClientWidth = 290
+        ClientHeight = 113
+        ClientWidth = 294
         TabOrder = 1
         object rbJsonTree: TRadioButton
           Left = 4
-          Height = 23
+          Height = 21
           Top = 2
-          Width = 284
+          Width = 286
           Align = alTop
           Caption = '&Tree'
           Checked = True
+          OnClick = JsonViewClick
           TabOrder = 0
           TabStop = True
         end
         object rbJsonFormatted: TRadioButton
           Left = 4
-          Height = 23
-          Top = 25
-          Width = 284
+          Height = 21
+          Top = 44
+          Width = 286
           Align = alTop
           Caption = '&Formatted'
+          OnClick = JsonViewClick
           TabOrder = 1
         end
         object cbJsonExpanded: TCheckBox
-          Left = 4
-          Height = 23
-          Top = 48
-          Width = 284
+          Left = 20
+          Height = 21
+          Top = 23
+          Width = 270
           Align = alTop
+          BorderSpacing.Left = 20
           Caption = 'JSON tree &expanded (*)'
           TabOrder = 2
+        end
+        object rbJsonTable: TRadioButton
+          Left = 4
+          Height = 21
+          Top = 65
+          Width = 286
+          Align = alTop
+          Caption = 'Table, otherwise fallback to:'
+          OnClick = JsonViewClick
+          TabOrder = 3
+        end
+        object cbJsonTableFallback: TComboBox
+          Left = 20
+          Height = 25
+          Top = 86
+          Width = 270
+          Align = alTop
+          BorderSpacing.Left = 20
+          ItemHeight = 0
+          ItemIndex = 0
+          Items.Strings = (
+            'Tree'
+            'Formatted'
+          )
+          Style = csDropDownList
+          TabOrder = 4
+          Text = 'Tree'
         end
       end
       object Label2: TLabel
         Left = 4
         Height = 16
-        Top = 282
-        Width = 294
+        Top = 284
+        Width = 298
         Align = alBottom
         Caption = '(*) these options will be applied on next request.'
         Font.Height = -11

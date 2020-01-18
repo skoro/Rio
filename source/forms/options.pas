@@ -45,6 +45,7 @@ type
     cbJsonSaveFmt: TCheckBox;
     cboxRequestNodeStyle: TComboBox;
     cboxFontItem: TComboBox;
+    cbJsonTableFallback: TComboBox;
     dlgFont: TFontDialog;
     editIndentSize: TSpinEdit;
     gbSavedRequests: TGroupBox;
@@ -65,6 +66,7 @@ type
     panFonts: TPanel;
     panRestore: TPanel;
     Props: TJSONPropStorage;
+    rbJsonTable: TRadioButton;
     rbJsonTree: TRadioButton;
     rbJsonFormatted: TRadioButton;
     gridShortcuts: TStringGrid;
@@ -86,11 +88,13 @@ type
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
     procedure gridShortcutsButtonClick(Sender: TObject; aCol, aRow: Integer);
+    procedure JsonViewClick(Sender: TObject);
   private
     FFontItemList: TFontItemList;
     FKeyCatch: TPanel; // Panel for reading a new shortcut.
     FKeySet: TShortCutItem; // Current reading they shortcut item.
     FShortCuts: TShortCuts; // List of application shortcuts.
+    function GetJsonTableFallback: TViewPage;
     function GetRequestNodeStyle: TRequestNodeStyle;
     function GetEditRequestMethods: Boolean;
     function GetFitImages: Boolean;
@@ -118,6 +122,7 @@ type
     procedure OnPropsFontRestore(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsShortcutSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsShortcutRestore(Sender: TStoredValue; var Value: TStoredType);
+    procedure UpdateJsonViewOptions;
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -130,6 +135,7 @@ type
     property JsonSaveFormatted: Boolean read GetJsonSaveFmt;
     property JsonIndentSize: Integer read GetJsonIndentSize;
     property JsonView: TViewPage read GetJsonView;
+    property JsonTableFallback: TViewPage read GetJsonTableFallback;
     property JsonFormat: TFormatOptions read GetJsonFormatOptions;
     property JsonLines: Boolean read GetJsonLines;
     property PanelsLayout: TPairSplitterType read GetPanelsLayout write SetPanelsLayout;
@@ -235,6 +241,7 @@ end;
 procedure TOptionsForm.FormShow(Sender: TObject);
 begin
   SetFontDemo;
+  UpdateJsonViewOptions;
 end;
 
 procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
@@ -265,6 +272,11 @@ begin
     Font.Style := [fsBold];
     Caption := 'Press a key combination.';
   end;
+end;
+
+procedure TOptionsForm.JsonViewClick(Sender: TObject);
+begin
+  UpdateJsonViewOptions;
 end;
 
 function TOptionsForm.GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -350,6 +362,16 @@ begin
   Result := TRequestNodeStyle(cboxRequestNodeStyle.ItemIndex);
 end;
 
+function TOptionsForm.GetJsonTableFallback: TViewPage;
+begin
+  case cbJsonTableFallback.ItemIndex of
+    0: Result := vpTree;
+    1: Result := vpFormatted;
+    else
+      Result := vpTree; // Tree view is default in anyway.
+  end;
+end;
+
 function TOptionsForm.GetFitImages: Boolean;
 begin
   Result := cbFitImages.Checked;
@@ -387,7 +409,9 @@ begin
   if rbJsonTree.Checked then
     Result := vpTree
   else if rbJsonFormatted.Checked then
-    Result := vpFormatted;
+    Result := vpFormatted
+  else if rbJsonTable.Checked then
+    Result := vpTable;
 end;
 
 function TOptionsForm.GetPanelsLayout: TPairSplitterType;
@@ -686,6 +710,16 @@ begin
   finally
     // FIXME: log ?
   end;
+end;
+
+procedure TOptionsForm.UpdateJsonViewOptions;
+begin
+  cbJsonExpanded.Enabled := False;
+  cbJsonTableFallback.Enabled := False;
+  if rbJsonTree.Checked then
+    cbJsonExpanded.Enabled := True
+  else if rbJsonTable.Checked then
+    cbJsonTableFallback.Enabled := True;
 end;
 
 function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;
