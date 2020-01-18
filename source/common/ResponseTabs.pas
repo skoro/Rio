@@ -153,8 +153,6 @@ type
       Row: Integer; // Cell row
       Pos: Integer; // Position in cell
     end;
-  procedure InternalOnGetKeyValue(Sender: TObject; Increment: Integer;
-    var AKey, AValue: string; var ACurrent, ATotal: Integer);
   private var
     FLineNumbers: Boolean;
     FTreeView: TTreeView;
@@ -179,6 +177,7 @@ type
     FToolbar: TToolbar;
     FGrid: TStringGrid;
     FTableDone: Boolean; // When the table is built and ready.
+    FTableFallback: TViewPage;
     function GetTreeView: TTreeView;
     function GetViewPage: TViewPage;
     procedure LoadDocument(doc: string);
@@ -202,10 +201,13 @@ type
     procedure OnFilterReset(Sender: TObject);
     procedure InternalOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure InternalOnTableDblClick(Sender: TObject);
+    procedure InternalOnGetKeyValue(Sender: TObject; Increment: Integer;
+      var AKey, AValue: string; var ACurrent, ATotal: Integer);
   protected
     procedure ToggleFilterPanel;
     procedure InitSearchParams; override;
     procedure ShowLineNumbers;
+    procedure ActivateTable;
     function FindInNode(Node: TTreeNode): TTreeNode;
     function FindInTable: TSearchTable;
     function CanEnableTable(Json: TJSONData): Boolean;
@@ -231,6 +233,7 @@ type
     property OnJsonData: TOnJsonData read FOnJsonData write FOnJsonData;
     property LineNumbers: Boolean read FLineNumbers write SetLineNumbers;
     property Toolbar: TToolbar read FToolbar write FToolbar;
+    property TableFallback: TViewPage read FTableFallback write FTableFallback;
   end;
 
   { TResponseXMLTab }
@@ -478,6 +481,9 @@ begin
       FTreeView.SetFocus
     else if AValue = vpFormatted then
       FSynEdit.SetFocus;
+  // Build the table with current json.
+  if AValue = vpTable then
+    ActivateTable;
 end;
 
 procedure TResponseJsonTab.ShowJsonData(AParent: TTreeNode; Data: TJSONData);
@@ -622,11 +628,7 @@ begin
     if CanEnableTable(Filtered) then
       FBtnTable.Enabled := True
     else
-      begin
-        if ViewPage = vpTable then
-          ViewPage := vpTree;
         FBtnTable.Enabled := False;
-      end;
   end
   else begin
     FSynEdit.Text := '';
@@ -754,31 +756,15 @@ begin
 end;
 
 procedure TResponseJsonTab.OnChangeTableMode(Sender: TObject);
-var
-  jsParser: TJSONParser;
-  jsData: TJSONData;
 begin
   SetViewPage(vpTable);
-  // Build the table for the first click on the table view button.
-  if not FTableDone then
-  begin
-    jsData := nil;
-    jsParser := TJSONParser.Create(FSynEdit.Text);
-    try
-      jsData := jsParser.Parse;
-      BuildTable(jsData);
-      AdjustTableColumns;
-    finally
-      FreeAndNil(jsParser);
-      if Assigned(jsData) then
-        FreeAndNil(jsData);
-    end;
-  end;
 end;
 
 procedure TResponseJsonTab.OnFilterClick(Sender: TObject);
 begin
   ApplyFilter;
+  if ViewPage = vpTable then
+    ActivateTable;
 end;
 
 procedure TResponseJsonTab.OnFilterReset(Sender: TObject);
@@ -786,6 +772,8 @@ begin
   FFilter.Visible := False;
   FBtnFilter.Down := False;
   ApplyFilter;
+  if ViewPage = vpTable then
+    ActivateTable;
 end;
 
 procedure TResponseJsonTab.InternalOnKeyDown(Sender: TObject; var Key: Word;
@@ -831,6 +819,33 @@ begin
   if not Assigned(FSynEdit) then
     Exit; // =>
   FSynEdit.Gutter.Parts.Part[1].Visible := FLineNumbers;
+end;
+
+procedure TResponseJsonTab.ActivateTable;
+var
+  jsParser: TJSONParser;
+  jsData: TJSONData;
+begin
+  // Build the table for the first click on the table view button.
+  if not FTableDone then
+  begin
+    jsData := nil;
+    jsParser := TJSONParser.Create(FSynEdit.Text);
+    try
+      jsData := jsParser.Parse;
+      if CanEnableTable(jsData) then
+      begin
+        BuildTable(jsData);
+        AdjustTableColumns;
+      end
+      else
+        ViewPage := TableFallback;
+    finally
+      FreeAndNil(jsParser);
+      if Assigned(jsData) then
+        FreeAndNil(jsData);
+    end;
+  end;
 end;
 
 function TResponseJsonTab.FindInNode(Node: TTreeNode): TTreeNode;
