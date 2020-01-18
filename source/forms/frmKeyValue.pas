@@ -12,7 +12,7 @@ uses
 type
 
   TOnGetKeyValue =
-    procedure(Sender: TObject; var AKey, AValue: string;
+    procedure(Sender: TObject; Increment: Integer; var AKey, AValue: string;
       var ACurrent, ATotal: Integer) of object;
 
 type
@@ -63,7 +63,7 @@ type
     procedure GridConfirmSaveValue;
     procedure GridMoveRow(const step: integer);
     procedure GridActionButtons;
-    procedure ExternalKeyValue;
+    procedure ExternalKeyValue(Increment: integer);
     procedure ShowView;
 
   public
@@ -122,7 +122,13 @@ begin
   end
   else
     if Assigned(FOnGetKeyValue) then
-      ExternalKeyValue;
+    begin
+      if Sender = tbNextRow then
+        ExternalKeyValue(1)
+      else
+        if Sender = tbPrevRow then
+          ExternalKeyValue(-1);
+    end;
 end;
 
 procedure TKeyValueForm.tbDeleteRowClick(Sender: TObject);
@@ -314,12 +320,12 @@ begin
   end;
 end;
 
-procedure TKeyValueForm.ExternalKeyValue;
+procedure TKeyValueForm.ExternalKeyValue(Increment: integer);
 var
   AKey, AValue: string;
   ACurrent, ATotal: integer;
 begin
-  FOnGetKeyValue(Self, AKey, AValue, ACurrent, ATotal);
+  FOnGetKeyValue(Self, Increment, AKey, AValue, ACurrent, ATotal);
   SetKey(AKey);
   SetValue(AValue);
   SetFormTitle;
@@ -443,7 +449,7 @@ begin
   FTitle := ATitle;
   ViewOnly := True; // Initialize earlier for GridActionButtons.
   GridActionButtons;
-  ExternalKeyValue;
+  ExternalKeyValue(0);
   ShowView;
 end;
 
