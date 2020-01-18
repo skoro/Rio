@@ -153,6 +153,8 @@ type
       Row: Integer; // Cell row
       Pos: Integer; // Position in cell
     end;
+  procedure InternalOnGetKeyValue(Sender: TObject; Increment: Integer;
+    var AKey, AValue: string; var ACurrent, ATotal: Integer);
   private var
     FLineNumbers: Boolean;
     FTreeView: TTreeView;
@@ -925,18 +927,26 @@ begin
 end;
 
 procedure TResponseJsonTab.InternalOnTableDblClick(Sender: TObject);
-var
-  CKey, CVal: string;
+begin
+  with TKeyValueForm.Create(FTabSheet) do
+  begin
+    OnGetKeyValue := @InternalOnGetKeyValue;
+    ViewNav('Json');
+    Free;
+  end;
+end;
+
+procedure TResponseJsonTab.InternalOnGetKeyValue(Sender: TObject;
+  Increment: Integer; var AKey, AValue: string;
+  var ACurrent, ATotal: Integer);
 begin
   with FGrid do
   begin
-    CKey := Columns[Col].Title.Caption;
-    CVal := Cells[Col, Row];
-  end;
-  with TKeyValueForm.Create(FTabSheet) do
-  begin
-    View(CKey, CVal, 'Json');
-    Free;
+    Row      := Row + Increment;
+    ACurrent := Row - 1;
+    ATotal   := RowCount - FixedRows;
+    AKey     := Columns[Col].Title.Caption;
+    AValue   := Cells[Col, Row];
   end;
 end;
 
