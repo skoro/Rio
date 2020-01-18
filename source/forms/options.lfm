@@ -15,7 +15,7 @@ object OptionsForm: TOptionsForm
   OnKeyUp = FormKeyUp
   OnShow = FormShow
   Position = poMainFormCenter
-  SessionProperties = 'cbEditMethods.Checked;cbFitImages.Checked;cbHideGridButtons.Checked;cbHideTabContent.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;cboxRequestNodeStyle.ItemIndex'
+  SessionProperties = 'cbEditMethods.Checked;cbFitImages.Checked;cbHideGridButtons.Checked;cbHideTabContent.Checked;cbJsonExpanded.Checked;cbJsonFmtArray.Checked;cbJsonLines.Checked;cbJsonSaveFmt.Checked;cboxRequestNodeStyle.ItemIndex;editIndentSize.Value;Height;rbJsonFormatted.Checked;rbJsonTree.Checked;rbLayoutHor.Checked;rbLayoutVert.Checked;seTimeout.Value;Width;rbJsonTable.Checked;cbJsonTableFallback.ItemIndex'
   ShowInTaskBar = stNever
   LCLVersion = '1.8.4.0'
   object pagesOptions: TPageControl
