@@ -11,6 +11,7 @@ uses
 
 type
 
+  // Event for getting an external key-value (when the grid isn't attached).
   TOnGetKeyValue =
     procedure(Sender: TObject; Increment: Integer; var AKey, AValue: string;
       var ACurrent, ATotal: Integer) of object;
@@ -83,7 +84,9 @@ type
     function EditGrid(const AGrid: TCustomStringGrid; const ATitle: string): TModalResult;
     procedure View(const AKey, AValue, ATitle: string);
     procedure View(const KV: TKeyValue; const ATitle: string);
+    // Attach a grid and navigate among the values.
     procedure ViewGrid(const AGrid: TCustomStringGrid; const ATitle: string);
+    // View the external key-value data (grid must be detached!).
     procedure ViewNav(const ATitle: string);
     function IsGridControl: Boolean;
   end;
