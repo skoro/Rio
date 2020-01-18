@@ -51,12 +51,12 @@ type
     gbSavedRequests: TGroupBox;
     gbFonts: TGroupBox;
     gbLayout: TGroupBox;
-    GroupBox1: TGroupBox;
-    GroupBox2: TGroupBox;
+    gbFormatOptions: TGroupBox;
+    gbJsonView: TGroupBox;
     gboxRequest: TGroupBox;
     gboxResponse: TGroupBox;
-    Label1: TLabel;
-    Label2: TLabel;
+    lIndentSize: TLabel;
+    lViewHint: TLabel;
     lFontDemo: TLabel;
     lFonts: TLabel;
     lTimeout: TLabel;

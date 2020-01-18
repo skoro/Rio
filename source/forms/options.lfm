@@ -302,7 +302,7 @@ object OptionsForm: TOptionsForm
       ChildSizing.TopBottomSpacing = 2
       ClientHeight = 302
       ClientWidth = 306
-      object GroupBox1: TGroupBox
+      object gbFormatOptions: TGroupBox
         Left = 4
         Height = 113
         Top = 2
@@ -354,7 +354,7 @@ object OptionsForm: TOptionsForm
           ClientWidth = 286
           ParentColor = False
           TabOrder = 3
-          object Label1: TLabel
+          object lIndentSize: TLabel
             Left = 0
             Height = 27
             Top = 0
@@ -378,7 +378,7 @@ object OptionsForm: TOptionsForm
           end
         end
       end
-      object GroupBox2: TGroupBox
+      object gbJsonView: TGroupBox
         Left = 4
         Height = 132
         Top = 121
@@ -452,7 +452,7 @@ object OptionsForm: TOptionsForm
           Text = 'Tree'
         end
       end
-      object Label2: TLabel
+      object lViewHint: TLabel
         Left = 4
         Height = 16
         Top = 284
