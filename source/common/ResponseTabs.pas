@@ -625,10 +625,7 @@ begin
     BuildTree(Filtered);
     if FTableDone then
       ClearTable;
-    if CanEnableTable(Filtered) then
-      FBtnTable.Enabled := True
-    else
-        FBtnTable.Enabled := False;
+    FBtnTable.Enabled := CanEnableTable(Filtered);
   end
   else begin
     FSynEdit.Text := '';
@@ -714,6 +711,14 @@ begin
         Cells[0, i + 1] := dataValue;
       end;
     end; // for i
+    // Don't show empty columns and rows when no data to show.
+    if (RowCount - FixedRows) = 0 then
+    begin
+      FixedRows := 0;
+      ColCount  := 1;
+      RowCount  := 1;
+      Cells[0, 0] := 'No data';
+    end;
   end; // with FGrid
   FTableDone := True; // Table build is done.
 end;
