@@ -2516,6 +2516,7 @@ object MainForm: TMainForm
                   OnDeleteRow = OnGridDeleteRow
                   OnGridClear = OnGridClear
                   ShowNavButtons = True
+                  NavButtons = []
                   object ToolButton1: TToolButton
                     Left = 146
                     Height = 5
@@ -2595,6 +2596,7 @@ object MainForm: TMainForm
                   OnDeleteRow = OnGridDeleteRow
                   OnGridClear = OnGridClear
                   ShowNavButtons = True
+                  NavButtons = []
                 end
               end
               object tabBody: TTabSheet
@@ -3191,6 +3193,7 @@ object MainForm: TMainForm
                   OnDeleteRow = OnGridDeleteRow
                   OnGridClear = OnGridClear
                   ShowNavButtons = True
+                  NavButtons = []
                   object tbtnBodyType: TToolButton
                     Left = 146
                     Top = 0
@@ -3278,6 +3281,7 @@ object MainForm: TMainForm
                   OnDeleteRow = OnGridDeleteRow
                   OnGridClear = OnGridClear
                   ShowNavButtons = True
+                  NavButtons = []
                 end
               end
               object tabAuth: TTabSheet
@@ -3330,7 +3334,7 @@ object MainForm: TMainForm
                       TabOrder = 0
                       object editBasicLogin: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 24
                         Width = 224
                         EditLabel.AnchorSideLeft.Control = editBasicLogin
@@ -3350,7 +3354,7 @@ object MainForm: TMainForm
                       end
                       object editBasicPassword: TLabeledEdit
                         Left = 8
-                        Height = 27
+                        Height = 25
                         Top = 80
                         Width = 224
                         EchoMode = emPassword
