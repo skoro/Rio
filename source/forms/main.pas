@@ -174,7 +174,6 @@ type
     procedure btnSubmitClick(Sender: TObject);
     procedure cbBasicShowPasswordClick(Sender: TObject);
     procedure cbEnvChange(Sender: TObject);
-    procedure cbMethodChange(Sender: TObject);
     procedure cbUrlChange(Sender: TObject);
     procedure cbUrlKeyPress(Sender: TObject; var Key: char);
     procedure dlgFindFind(Sender: TObject);
@@ -738,20 +737,6 @@ procedure TMainForm.cbEnvChange(Sender: TObject);
 begin
   if cbEnv.ItemIndex > -1 then
     FEnvManager.Current := FEnvManager.Env[cbEnv.Items[cbEnv.ItemIndex]];
-end;
-
-procedure TMainForm.cbMethodChange(Sender: TObject);
-var
-  SR: TSavedRequest;
-begin
-  // Update the current request node (icon or text).
-  with FRequestManager do begin
-    SR := CurrentRequest;
-    if Assigned(SR) and (not SR.Locked) then begin
-      SR.Request.Method := cbMethod.Text;
-      SetNodeStyle(CurrentNode);
-    end;
-  end;
 end;
 
 procedure TMainForm.cbUrlChange(Sender: TObject);
@@ -2180,9 +2165,16 @@ end;
 procedure TMainForm.OnChangeRequest(Prev, Selected: TSavedRequest);
 var
   RI: TResponseInfo;
+  RO: TRequestObject;
 begin
   if Assigned(Prev) then
-    Prev.UpdateRequest(CreateRequestObject);
+  begin
+    RO := CreateRequestObject;
+    // Preserve of changing the request's method and url.
+    RO.Method := Prev.Request.Method;
+    RO.Url := Prev.Request.Url;
+    Prev.UpdateRequest(RO);
+  end;
   StartNewRequest;
   SaveRequestButtonIcon(True);
   RI := NIL;
@@ -2411,11 +2403,21 @@ begin
 end;
 
 procedure TMainForm.OnRequestComplete(Info: TResponseInfo);
+var
+  SR: TSavedRequest;
 begin
   try
     DoRequestComplete(Info);
     if Assigned(FRequestManager.CurrentRequest) then
-      FCacheResponse.Put(FRequestManager.CurrentRequest.Path, ObjToJsonStr(Info));
+    begin
+      SR := FRequestManager.CurrentRequest;
+      FCacheResponse.Put(SR.Path, ObjToJsonStr(Info));
+      if SR.Request.Method <> cbMethod.Text then
+      begin
+        SR.Request.Method := cbMethod.Text;
+        FRequestManager.SetNodeStyle(FRequestManager.CurrentNode);
+      end;
+    end;
     FinishRequest;
   finally
     Info.Free;
