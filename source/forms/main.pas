@@ -2007,13 +2007,17 @@ end;
 
 procedure TMainForm.OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
 begin
-  if Tab is TResponseJsonTab then begin
+  if Tab is TResponseJsonTab then
+  begin
     if OptionsForm.JsonSaveFormatted then
       FilePutContents(FileName, FormatJson(TResponseJsonTab(Tab).JsonRoot))
     else
-      responseRaw.Lines.SaveToFile(FileName)
+      // FIXME: saving the raw json is available only when Content tab is opened.
+      if tabContent.TabVisible then
+        responseRaw.Lines.SaveToFile(FileName)
+      else
+        TResponseJsonTab(Tab).SynEdit.Lines.SaveToFile(FileName);
   end
-
   else
     Tab.Save(FileName);
 end;

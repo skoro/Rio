@@ -66,8 +66,8 @@ object OptionsForm: TOptionsForm
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
-          ClientHeight = 23
-          ClientWidth = 282
+          ClientHeight = 27
+          ClientWidth = 286
           ParentColor = False
           TabOrder = 1
           object lTimeout: TLabel
@@ -126,6 +126,7 @@ object OptionsForm: TOptionsForm
           Align = alTop
           Caption = 'Don''t &show Content tab for Json, XML response'
           Checked = True
+          OnChange = cbHideTabContentChange
           State = cbChecked
           TabOrder = 1
         end
@@ -340,6 +341,7 @@ object OptionsForm: TOptionsForm
           Width = 286
           Align = alTop
           Caption = '&Save formatted JSON'
+          ParentShowHint = False
           TabOrder = 2
         end
         object panIndentSize: TPanel

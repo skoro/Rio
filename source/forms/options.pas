@@ -81,6 +81,7 @@ type
     procedure btnResetFontClick(Sender: TObject);
     procedure btnSCRestoreClick(Sender: TObject);
     procedure btnSelectFontClick(Sender: TObject);
+    procedure cbHideTabContentChange(Sender: TObject);
     procedure cboxFontItemChange(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -123,6 +124,7 @@ type
     procedure OnPropsShortcutSave(Sender: TStoredValue; var Value: TStoredType);
     procedure OnPropsShortcutRestore(Sender: TStoredValue; var Value: TStoredType);
     procedure UpdateJsonViewOptions;
+    procedure UpdateJsonSaveOptions;
   public
     function ShowModalPage(page: TOptionsPage): TModalResult;
     function GetFontItem(AFontItem: TUIFontItem): TFont;
@@ -242,6 +244,7 @@ procedure TOptionsForm.FormShow(Sender: TObject);
 begin
   SetFontDemo;
   UpdateJsonViewOptions;
+  UpdateJsonSaveOptions;
 end;
 
 procedure TOptionsForm.gridShortcutsButtonClick(Sender: TObject; aCol,
@@ -318,6 +321,11 @@ begin
     FFontItemList[cboxFontItem.ItemIndex].Assign(dlgFont.Font);
     SetFontDemo;
   end;
+end;
+
+procedure TOptionsForm.cbHideTabContentChange(Sender: TObject);
+begin
+  UpdateJsonSaveOptions;
 end;
 
 procedure TOptionsForm.btnResetFontClick(Sender: TObject);
@@ -720,6 +728,12 @@ begin
     cbJsonExpanded.Enabled := True
   else if rbJsonTable.Checked then
     cbJsonTableFallback.Enabled := True;
+end;
+
+procedure TOptionsForm.UpdateJsonSaveOptions;
+begin
+  // If "Don't show Content tab" is not checked formatted json will be always saved.
+  cbJsonSaveFmt.Visible := not cbHideTabContent.Checked;
 end;
 
 function TOptionsForm.ShowModalPage(page: TOptionsPage): TModalResult;
