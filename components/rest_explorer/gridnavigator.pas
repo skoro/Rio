@@ -96,7 +96,7 @@ end;
 procedure TGridNavigator.OnButtonDeleteClick(Sender: TObject);
 var
   Answer: TModalResult;
-  ColName: string;
+  ColName, ConfirmName: string;
   StartCol: integer;
 begin
   if Assigned(FGrid) then begin
@@ -108,10 +108,11 @@ begin
     else
       StartCol := 0;
     ColName := FGrid.Cells[StartCol, FGrid.Row]; // "Name" column.
-    if (ColName = '') and (FGrid.ColCount > 2) then // Column is empty, try the next column.
-      ColName := FGrid.Cells[StartCol + 1, FGrid.Row];
-    if ColName <> '' then begin
-      Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ColName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
+    ConfirmName := ColName;
+    if (ConfirmName = '') and (FGrid.ColCount > (1 + StartCol)) then // Column is empty, try the next column.
+      ConfirmName := FGrid.Cells[StartCol + 1, FGrid.Row];
+    if ConfirmName <> '' then begin
+      Answer := QuestionDlg('Delete ?', Format('Are you sure to delete "%s" ?', [ConfirmName]), mtConfirmation, [mrOK, 'Yes', mrCancel, 'No', 'IsDefault'], 0);
       if Answer = mrCancel then
         Exit; // =>
     end;
