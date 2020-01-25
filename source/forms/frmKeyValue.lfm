@@ -35,7 +35,10 @@ object KeyValueForm: TKeyValueForm
       Width = 249
       Align = alClient
       OnChange = OnChangeValue
+      OnMouseEnter = OnMouseEnter
+      ParentShowHint = False
       ScrollBars = ssAutoBoth
+      ShowHint = True
       TabOrder = 1
     end
     object editName: TEdit
@@ -45,6 +48,9 @@ object KeyValueForm: TKeyValueForm
       Width = 249
       Align = alTop
       OnChange = OnChangeValue
+      OnMouseEnter = OnMouseEnter
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
     end
     object LabelName: TLabel

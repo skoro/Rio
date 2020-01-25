@@ -6,8 +6,8 @@ interface
 
 uses
   SysUtils, Forms, Controls, ExtCtrls,
-  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers,
-  main {don't delete main it's used for access to toolbar icons};
+  StdCtrls, ButtonPanel, ComCtrls, Grids, AppHelpers, Env,
+  main {don't delete main it's used for access to toolbar icons}, Classes;
 
 type
 
@@ -38,6 +38,7 @@ type
     procedure FormKeyPress(Sender: TObject; var Key: char);
     procedure FormShow(Sender: TObject);
     procedure OnChangeValue(Sender: TObject);
+    procedure OnMouseEnter(Sender: TObject);
     procedure OnNextPrevRowClick(Sender: TObject);
     procedure tbDeleteRowClick(Sender: TObject);
     procedure tbInsertRowClick(Sender: TObject);
@@ -49,6 +50,7 @@ type
     FViewOnly: boolean;
     FTitle: string;
     FOnGetKeyValue: TOnGetKeyValue;
+    FEnvironment: TEnvironment;
 
     function GetKey: string;
     function GetValEnabled: boolean;
@@ -74,6 +76,7 @@ type
     property Grid: TCustomStringGrid read FGrid write FGrid;
     property ViewOnly: boolean read FViewOnly write SetViewOnly;
     property OnGetKeyValue: TOnGetKeyValue read FOnGetKeyValue write FOnGetKeyValue;
+    property Environment: TEnvironment read FEnvironment write FEnvironment;
 
   public
     function Edit(const AKey, AValue, ATitle: string;
@@ -111,6 +114,24 @@ end;
 procedure TKeyValueForm.OnChangeValue(Sender: TObject);
 begin
   tbSaveRow.Enabled := True;
+end;
+
+procedure TKeyValueForm.OnMouseEnter(Sender: TObject);
+var
+  ed: TCustomEdit;
+  vhint: string;
+begin
+  if not Assigned(FEnvironment) then
+    Exit; // =>
+  if (not (Sender is TCustomEdit)) then
+    Exit;
+  ed := (Sender as TCustomEdit);
+  if Trim(ed.Text) = '' then
+    Exit; // =>
+  vhint := FEnvironment.Apply(ed.Text);
+  ed.ShowHint := vhint <> ed.Text;
+  if ed.ShowHint then
+    ed.Hint := vhint;
 end;
 
 procedure TKeyValueForm.OnNextPrevRowClick(Sender: TObject);

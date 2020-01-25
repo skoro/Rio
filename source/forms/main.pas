@@ -1391,7 +1391,9 @@ begin
     Title := TTabSheet(Grid.Parent).Caption
   else
     Title := 'Edit';
+  KeyValueForm.Environment := FEnvManager.Current;
   KeyValueForm.EditGrid(Grid, Title);
+  KeyValueForm.Environment := nil;
   Grid.SetFocus;
 end;
 
@@ -2763,6 +2765,7 @@ var
   Title: string;
 begin
   KeyValueForm.Grid := NIL;
+  KeyValueForm.Environment := FEnvManager.Current;
   if (Grid.Parent is TTabSheet) then
     Title := TTabSheet(Grid.Parent).Caption
   else
@@ -2779,6 +2782,7 @@ begin
         SyncGridQueryParams;
     end;
   end;
+  KeyValueForm.Environment := nil; // don't use the env in view modals.
 end;
 
 procedure TMainForm.SetAppCaption(const AValue: String);
