@@ -172,6 +172,8 @@ procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const Co
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // =>
+  if Trim(ColName) = '' then
+    Exit; // =>
   FCurrentEnv.DeleteVar(ColName);
   // Force to update parent variables.
   FillEnvVars;
