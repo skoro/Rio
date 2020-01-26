@@ -74,6 +74,7 @@ type
     AppSplitter: TPairSplitter;
     SideBarSide: TPairSplitterSide;
     btnEnv: TSpeedButton;
+    btnNewRequest: TSpeedButton;
     WorkSide: TPairSplitterSide;
     panelRequest: TPanel;
     panelResponse: TPanel;
@@ -782,6 +783,8 @@ begin
   StatusTextSize.Caption := '';
   StatusTextInfo.Caption := '';
   miSaveResponse.Enabled := False;
+  toolbarIcons.GetBitmap(20, btnNewRequest.Glyph);
+  btnNewRequest.OnClick := @miNewClick;
 
   HeadersEditorForm := THeadersEditorForm.Create(Application);
 
