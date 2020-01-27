@@ -311,7 +311,7 @@
         <HasResources Value="True"/>
       </Unit18>
       <Unit19>
-        <Filename Value="forms/headers_editor.pas"/>
+        <Filename Value="forms/frmHeaders.pas"/>
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit19>

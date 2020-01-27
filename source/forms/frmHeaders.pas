@@ -1,4 +1,4 @@
-unit headers_editor;
+unit frmHeaders;
 
 {$mode objfpc}{$H+}
 
