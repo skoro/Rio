@@ -6,7 +6,9 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls,
-  ExtCtrls, Grids, ComCtrls, JSONPropStorage;
+  ExtCtrls, Grids, ComCtrls, JSONPropStorage,
+  main {don't delete main it's used for access to toolbar icons}
+  ;
 
 type
 
@@ -16,7 +18,6 @@ type
     BtnClose: TButton;
     btnInsert: TButton;
     btnRestore: TButton;
-    ImageList1: TImageList;
     Props: TJSONPropStorage;
     PanClient: TPanel;
     panButtons: TPanel;
