@@ -19,18 +19,18 @@ object HeadersEditorForm: THeadersEditorForm
   LCLVersion = '1.8.4.0'
   object PanClient: TPanel
     Left = 0
-    Height = 253
+    Height = 265
     Top = 0
     Width = 416
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 4
-    ClientHeight = 253
+    ClientHeight = 265
     ClientWidth = 416
     TabOrder = 0
     object gridHeaders: TStringGrid
       Left = 4
-      Height = 219
+      Height = 231
       Top = 30
       Width = 408
       Align = alClient
@@ -59,12 +59,12 @@ object HeadersEditorForm: THeadersEditorForm
         204
       )
     end
-    object ToolBar1: TToolBar
+    object tbActions: TToolBar
       Left = 4
       Height = 26
       Top = 4
       Width = 408
-      Caption = 'ToolBar1'
+      Caption = 'tbActions'
       EdgeBorders = []
       EdgeInner = esNone
       EdgeOuter = esNone
@@ -88,11 +88,11 @@ object HeadersEditorForm: THeadersEditorForm
         ImageIndex = 8
         OnClick = btnRemoveRowClick
       end
-      object ToolButton3: TToolButton
+      object btnSep: TToolButton
         Left = 47
         Height = 22
         Top = 0
-        Caption = 'ToolButton3'
+        Caption = 'btnSep'
         Style = tbsSeparator
       end
       object btnMoveUp: TToolButton
@@ -114,25 +114,24 @@ object HeadersEditorForm: THeadersEditorForm
     end
   end
   object panButtons: TPanel
-    Left = 0
-    Height = 47
-    Top = 253
-    Width = 416
+    Left = 2
+    Height = 31
+    Top = 267
+    Width = 412
     Align = alBottom
     AutoSize = True
+    BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 47
-    ClientWidth = 416
+    ClientHeight = 31
+    ClientWidth = 412
     TabOrder = 1
     object BtnClose: TButton
-      Left = 63
-      Height = 43
+      Left = 353
+      Height = 27
       Top = 2
       Width = 57
-      Align = alLeft
-      AutoSize = True
-      BorderSpacing.InnerBorder = 8
+      Align = alRight
       Caption = '&Close'
       ModalResult = 11
       ParentShowHint = False
@@ -141,13 +140,10 @@ object HeadersEditorForm: THeadersEditorForm
     end
     object btnInsert: TButton
       Left = 2
-      Height = 43
+      Height = 27
       Top = 2
-      Width = 59
+      Width = 43
       Align = alLeft
-      AutoSize = True
-      BorderSpacing.Right = 2
-      BorderSpacing.InnerBorder = 8
       Caption = '&Insert'
       ModalResult = 1
       ParentShowHint = False
@@ -155,11 +151,11 @@ object HeadersEditorForm: THeadersEditorForm
       TabOrder = 1
     end
     object btnRestore: TButton
-      Left = 313
-      Height = 43
+      Left = 45
+      Height = 27
       Top = 2
       Width = 101
-      Align = alRight
+      Align = alLeft
       AutoSize = True
       Caption = '&Restore defaults'
       OnClick = btnRestoreClick

@@ -22,10 +22,10 @@ type
     PanClient: TPanel;
     panButtons: TPanel;
     gridHeaders: TStringGrid;
-    ToolBar1: TToolBar;
+    tbActions: TToolBar;
     btnAddRow: TToolButton;
     btnRemoveRow: TToolButton;
-    ToolButton3: TToolButton;
+    btnSep: TToolButton;
     btnMoveUp: TToolButton;
     btnMoveDown: TToolButton;
     procedure btnAddRowClick(Sender: TObject);

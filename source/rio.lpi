@@ -313,7 +313,9 @@
       <Unit19>
         <Filename Value="forms/frmHeaders.pas"/>
         <IsPartOfProject Value="True"/>
+        <ComponentName Value="HeadersEditorForm"/>
         <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit19>
       <Unit20>
         <Filename Value="forms/frmHelp.pas"/>
