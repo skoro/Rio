@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, StdCtrls,
   ExtCtrls, Grids, ComCtrls, JSONPropStorage,
-  main {don't delete main it's used for access to toolbar icons}
+  GridNavigator
   ;
 
 type
@@ -18,20 +18,15 @@ type
     BtnClose: TButton;
     btnInsert: TButton;
     btnRestore: TButton;
+    nav: TGridNavigator;
     Props: TJSONPropStorage;
     PanClient: TPanel;
     panButtons: TPanel;
     gridHeaders: TStringGrid;
-    tbActions: TToolBar;
-    btnAddRow: TToolButton;
-    btnRemoveRow: TToolButton;
-    btnSep: TToolButton;
     btnMoveUp: TToolButton;
     btnMoveDown: TToolButton;
-    procedure btnAddRowClick(Sender: TObject);
     procedure btnMoveDownClick(Sender: TObject);
     procedure btnMoveUpClick(Sender: TObject);
-    procedure btnRemoveRowClick(Sender: TObject);
     procedure btnRestoreClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -75,12 +70,6 @@ const DEFAULT_HEADERS : array [1..15, 1..2] of string = (
       ('X-Requested-With', 'XMLHttpRequest')
 );
 
-procedure THeadersEditorForm.btnAddRowClick(Sender: TObject);
-begin
-  with gridHeaders do
-    InsertRowWithValues(RowCount, ['', '']);
-end;
-
 procedure THeadersEditorForm.btnMoveDownClick(Sender: TObject);
 begin
   with gridHeaders do
@@ -91,12 +80,6 @@ procedure THeadersEditorForm.btnMoveUpClick(Sender: TObject);
 begin
   with gridHeaders do
     if Row > 1 then MoveColRow(False, Row, Row - 1);
-end;
-
-procedure THeadersEditorForm.btnRemoveRowClick(Sender: TObject);
-begin
-  with gridHeaders do
-    if RowCount > 1 then DeleteRow(Row);
 end;
 
 procedure THeadersEditorForm.btnRestoreClick(Sender: TObject);
@@ -122,8 +105,6 @@ var
 begin
   if Shift = [ssCtrl] then
     case Key of
-      // Control-D
-      68: btnRemoveRowClick(Sender);
       // Control-Up
       38: begin
         oldRow := gridHeaders.Row; // restore selected row after moving.

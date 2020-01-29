@@ -59,56 +59,28 @@ object HeadersEditorForm: THeadersEditorForm
         204
       )
     end
-    object tbActions: TToolBar
+    object nav: TGridNavigator
       Left = 4
       Height = 26
       Top = 4
       Width = 408
-      Caption = 'tbActions'
+      Caption = 'nav'
       EdgeBorders = []
-      EdgeInner = esNone
-      EdgeOuter = esNone
-      Images = MainForm.toolbarIcons
-      ParentShowHint = False
-      ShowHint = True
+      ShowCaptions = True
       TabOrder = 1
-      object btnAddRow: TToolButton
-        Left = 1
-        Hint = 'Insert new row'
-        Top = 0
-        Caption = 'btnAddRow'
-        ImageIndex = 18
-        OnClick = btnAddRowClick
-      end
-      object btnRemoveRow: TToolButton
-        Left = 24
-        Hint = 'Delete selected row (Ctrl-D)'
-        Top = 0
-        Caption = 'btnRemoveRow'
-        ImageIndex = 8
-        OnClick = btnRemoveRowClick
-      end
-      object btnSep: TToolButton
-        Left = 47
-        Height = 22
-        Top = 0
-        Caption = 'btnSep'
-        Style = tbsSeparator
-      end
+      Grid = gridHeaders
+      ShowNavButtons = True
+      NavButtons = [nbNew, nbDelete]
       object btnMoveUp: TToolButton
-        Left = 55
-        Hint = 'Move row up (Ctrl-Up)'
+        Left = 146
         Top = 0
-        Caption = 'btnMoveUp'
-        ImageIndex = 16
+        Caption = 'Move Up'
         OnClick = btnMoveUpClick
       end
       object btnMoveDown: TToolButton
-        Left = 78
-        Hint = 'Move row down (Ctrl-Down)'
+        Left = 204
         Top = 0
-        Caption = 'btnMoveDown'
-        ImageIndex = 17
+        Caption = 'Move Down'
         OnClick = btnMoveDownClick
       end
     end
