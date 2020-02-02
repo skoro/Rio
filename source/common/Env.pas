@@ -368,6 +368,7 @@ var
   Doc: TXMLDocument;
   XmlRoot, EnvElem, VarElem: TDOMNode;
   EnvIter: TEnvironment;
+  EnvOwnVars: TVarList;
   VarIter: TVariable;
 begin
   try
@@ -382,13 +383,15 @@ begin
         TDOMElement(EnvElem).SetAttribute('current', '1');
       if Assigned(EnvIter.Parent) then
         TDOMElement(EnvElem).SetAttribute('parent', EnvIter.Parent.Name);
-      for VarIter in EnvIter.OwnVars do
+      EnvOwnVars := EnvIter.OwnVars;
+      for VarIter in EnvOwnVars do
       begin
         VarElem := Doc.CreateElement('Var');
         TDOMElement(VarElem).SetAttribute('name', VarIter.Name);
         TDOMElement(VarElem).SetAttribute('value', VarIter.Value);
         EnvElem.AppendChild(VarElem);
       end;
+      FreeAndNil(EnvOwnVars);
       XmlRoot.AppendChild(EnvElem);
     end;
     WriteXML(Doc, AStream);
