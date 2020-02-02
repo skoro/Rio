@@ -19,18 +19,18 @@ object HeadersEditorForm: THeadersEditorForm
   LCLVersion = '1.8.4.0'
   object PanClient: TPanel
     Left = 0
-    Height = 265
+    Height = 267
     Top = 0
     Width = 416
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 4
-    ClientHeight = 265
+    ClientHeight = 267
     ClientWidth = 416
     TabOrder = 0
     object gridHeaders: TStringGrid
       Left = 4
-      Height = 231
+      Height = 233
       Top = 30
       Width = 408
       Align = alClient
@@ -49,6 +49,7 @@ object HeadersEditorForm: THeadersEditorForm
           Width = 204
         end>
       FixedCols = 0
+      MouseWheelOption = mwGrid
       Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goEditing, goAutoAddRows, goTabs, goAlwaysShowEditor, goSmoothScroll, goRowHighlight]
       RangeSelectMode = rsmMulti
       RowCount = 1
@@ -72,13 +73,13 @@ object HeadersEditorForm: THeadersEditorForm
       ShowNavButtons = True
       NavButtons = [nbNew, nbDelete]
       object btnMoveUp: TToolButton
-        Left = 146
+        Left = 137
         Top = 0
         Caption = 'Move Up'
         OnClick = btnMoveUpClick
       end
       object btnMoveDown: TToolButton
-        Left = 204
+        Left = 193
         Top = 0
         Caption = 'Move Down'
         OnClick = btnMoveDownClick
@@ -87,20 +88,20 @@ object HeadersEditorForm: THeadersEditorForm
   end
   object panButtons: TPanel
     Left = 2
-    Height = 31
-    Top = 267
+    Height = 29
+    Top = 269
     Width = 412
     Align = alBottom
     AutoSize = True
     BorderSpacing.Around = 2
     BevelOuter = bvNone
     BorderWidth = 2
-    ClientHeight = 31
+    ClientHeight = 29
     ClientWidth = 412
     TabOrder = 1
     object BtnClose: TButton
       Left = 353
-      Height = 27
+      Height = 25
       Top = 2
       Width = 57
       Align = alRight
@@ -112,7 +113,7 @@ object HeadersEditorForm: THeadersEditorForm
     end
     object btnInsert: TButton
       Left = 2
-      Height = 27
+      Height = 25
       Top = 2
       Width = 43
       Align = alLeft
@@ -124,9 +125,9 @@ object HeadersEditorForm: THeadersEditorForm
     end
     object btnRestore: TButton
       Left = 45
-      Height = 27
+      Height = 25
       Top = 2
-      Width = 101
+      Width = 110
       Align = alLeft
       AutoSize = True
       Caption = '&Restore defaults'
