@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Rio"
-#define MyAppVersion "0.6"
+#define MyAppVersion "1.0"
 #define MyAppPublisher "Skorobogatko Alexei"
 #define MyAppURL "https://github.com/skoro/rio"
 #define MyAppExeName "rio.exe"
