@@ -949,6 +949,13 @@ begin
       end;
     end;
   end;
+
+  // Set the proper components alignment on Windows (comboboxes are higher
+  // than buttons and we must manual set spacing to align combos and buttons).
+  {$IFDEF WINDOWS}
+  cbMethod.BorderSpacing.Top := 1;
+  cbUrl.BorderSpacing.Top := 1;
+  {$ENDIF}
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
