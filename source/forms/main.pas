@@ -2117,15 +2117,9 @@ end;
 procedure TMainForm.SaveRequestButtonIcon(Added: Boolean);
 begin
   if Added then
-  begin
-    toolbarIcons.GetBitmap(REQUEST_IMG_SET, btnSaveRequest.Glyph);
-    btnSaveRequest.Hint := 'Edit request';
-  end
+    toolbarIcons.GetBitmap(REQUEST_IMG_SET, btnSaveRequest.Glyph)
   else
-    begin
-      toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
-      btnSaveRequest.Hint := 'Save request';
-    end;
+    toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
 end;
 
 procedure TMainForm.SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
