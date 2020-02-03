@@ -64,11 +64,11 @@ type
   public
     function ShowModal: TModalResult; override;
     function ShowModal(SR: TSavedRequest; RO: TRequestObject): TModalResult; overload;
-    procedure PrepareEditForm; virtual;
-    procedure PrepareAddForm; virtual;
-    procedure AddRequest(RO: TRequestObject); virtual;
-    procedure UpdateRequest; virtual;
-    procedure DeleteRequest; virtual;
+    procedure PrepareEditForm;
+    procedure PrepareAddForm;
+    procedure AddRequest(RO: TRequestObject);
+    procedure UpdateRequest;
+    procedure DeleteRequest;
 
     property SavedRequest: TSavedRequest read FSavedRequest write FSavedRequest;
     property RequestManager: TRequestManager read GetRequestManager write FRequestManager;
