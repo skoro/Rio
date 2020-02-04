@@ -17,6 +17,8 @@ type
   TOnChangeRequest = procedure (Previous, Selected: TSavedRequest) of object;
   // When the request menu item was selected in the popup menu.
   TOnRequestClick = procedure (Sender: TObject; SR: TSavedRequest) of object;
+  // When the request is deleted.
+  TOnDeleteRequest = procedure (const ARequest: TSavedRequest) of object;
 
   { ENodeException }
 
@@ -71,6 +73,7 @@ type
     FRootNode: TTreeNode;
     FCurrentNode: TTreeNode;
     FOnChangeRequest: TOnChangeRequest;
+    FOnDeleteRequest: TOnDeleteRequest;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
     FImgIdxRoot: Integer;
@@ -153,6 +156,7 @@ type
     property CurrentNode: TTreeNode read FCurrentNode write SetCurrentNode;
     property CurrentRequest: TSavedRequest read GetCurrentRequest;
     property OnChangeRequest: TOnChangeRequest read FOnChangeRequest write FOnChangeRequest;
+    property OnDeleteRequest: TOnDeleteRequest read FOnDeleteRequest write FOnDeleteRequest;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
     property ImageIndexRoot: Integer read FImgIdxRoot write SetImgIdxRoot;
@@ -841,6 +845,7 @@ end;
 
 destructor TRequestManager.Destroy;
 begin
+  FOnDeleteRequest := nil; // Don't emit the event on the component destroy.
   DeleteFolderNode(FRootNode);
   inherited Destroy;
 end;
@@ -993,9 +998,10 @@ begin
   bNode := FindNode(SR);
   if not Assigned(bNode) then
     Exit(False); // =>
-  if bNode = FCurrentNode then begin
+  if bNode = FCurrentNode then
     ResetCurrent;
-  end;
+  if Assigned(FOnDeleteRequest) then
+    FOnDeleteRequest(SR);
   FreeAndNil(SR);
   bNode.Delete;
   Result := True;
@@ -1014,13 +1020,20 @@ end;
 function TRequestManager.DeleteFolderNode(FolderNode: TTreeNode): Boolean;
   // Recursive node delete.
   procedure DeleteNode(aNode: TTreeNode);
+  var
+    SR: TSavedRequest;
   begin
     if aNode = FCurrentNode then
       ResetCurrent;
     while aNode.HasChildren do
       DeleteNode(aNode.GetLastChild);
     if Assigned(aNode.Data) then
-      TSavedRequest(aNode.Data).Free;
+    begin
+      SR := TSavedRequest(aNode.Data);
+      if Assigned(FOnDeleteRequest) then
+        FOnDeleteRequest(SR);
+      FreeAndNil(SR);
+    end;
     aNode.Delete;
   end;
 

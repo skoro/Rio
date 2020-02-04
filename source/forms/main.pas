@@ -286,7 +286,7 @@ type
     procedure SaveRequestButtonIcon(Added: Boolean);
     procedure SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
     procedure OnChangeRequest(Prev, Selected: TSavedRequest);
-    procedure OnDeleteRequest(Sender: TObject; SR: TSavedRequest);
+    procedure OnDeleteRequest(const SR: TSavedRequest);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -818,9 +818,9 @@ begin
     RequestManager.ImageIndexRoot := 8;
     RequestManager.ImageIndexSelected := 2;
     RequestManager.OnChangeRequest := @OnChangeRequest;
+    RequestManager.OnDeleteRequest := @OnDeleteRequest;
     with RequestPopup do begin
       OnEditClick := @SaveRequestEditorShow;
-      OnDeleteClick := @OnDeleteRequest;
       Images := toolbarIcons;
       Items[0].ImageIndex := 11; // open
       Items[1].ImageIndex := 10; // new folder
@@ -2206,7 +2206,7 @@ begin
   SetAppCaption(Selected.Name);
 end;
 
-procedure TMainForm.OnDeleteRequest(Sender: TObject; SR: TSavedRequest);
+procedure TMainForm.OnDeleteRequest(const SR: TSavedRequest);
 var
   Curr: TSavedRequest;
 begin
@@ -2216,6 +2216,8 @@ begin
     SaveRequestButtonIcon(False);
     SetAppCaption(UrlPath(SR.Request.Url));
   end;
+  if FCacheResponse.Exists(SR.Path) then
+    FCacheResponse.Delete(SR.Path);
 end;
 
 procedure TMainForm.ApplyOptions;
