@@ -954,7 +954,7 @@ end;
 
 function TRequestManager.UpdateRequest(SR: TSavedRequest; ANewName, FolderPath: string): Boolean;
 var
-  bNode: TTreeNode;
+  bNode, newNode: TTreeNode;
   isCurrent: Boolean;
   oldPath: string;
 begin
@@ -970,9 +970,11 @@ begin
   // Move to another folder.
   if (FolderPath <> '') and (GetNodeFolderPath(bNode) <> FolderPath) then begin
     isCurrent := (bNode = FCurrentNode);
+    newNode := AddRequest(SR, FolderPath);
     FRootNode.TreeNodes.Delete(bNode);
-    bNode := AddRequest(SR, FolderPath);
-    if isCurrent then begin
+    bNode := newNode;
+    if isCurrent then
+    begin
       CurrentNode := bNode;
       SetNodeSelectedImage(bNode);
     end;
