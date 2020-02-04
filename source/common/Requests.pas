@@ -19,6 +19,8 @@ type
   TOnRequestClick = procedure (Sender: TObject; SR: TSavedRequest) of object;
   // When the request is deleted.
   TOnDeleteRequest = procedure (const ARequest: TSavedRequest) of object;
+  // When the request is renamed or moved to another tree node.
+  TOnMoveRequest = procedure (const SR: TSavedRequest; const OldPath: string) of object;
 
   { ENodeException }
 
@@ -74,6 +76,7 @@ type
     FCurrentNode: TTreeNode;
     FOnChangeRequest: TOnChangeRequest;
     FOnDeleteRequest: TOnDeleteRequest;
+    FOnMoveRequest: TOnMoveRequest;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
     FImgIdxRoot: Integer;
@@ -157,6 +160,7 @@ type
     property CurrentRequest: TSavedRequest read GetCurrentRequest;
     property OnChangeRequest: TOnChangeRequest read FOnChangeRequest write FOnChangeRequest;
     property OnDeleteRequest: TOnDeleteRequest read FOnDeleteRequest write FOnDeleteRequest;
+    property OnMoveRequest: TOnMoveRequest read FOnMoveRequest write FOnMoveRequest;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
     property ImageIndexRoot: Integer read FImgIdxRoot write SetImgIdxRoot;
@@ -952,10 +956,12 @@ function TRequestManager.UpdateRequest(SR: TSavedRequest; ANewName, FolderPath: 
 var
   bNode: TTreeNode;
   isCurrent: Boolean;
+  oldPath: string;
 begin
   bNode := FindNode(SR);
   if not Assigned(bNode) then
     Exit(False); // =>
+  oldPath := SR.Path;
   // Rename.
   if (ANewName <> '') and (SR.Name <> ANewName) then begin
     SR.Name := ANewName;
@@ -971,6 +977,8 @@ begin
       SetNodeSelectedImage(bNode);
     end;
   end;
+  if (oldPath <> SR.Path) and (Assigned(FOnMoveRequest)) then
+    FOnMoveRequest(SR, OldPath);
 end;
 
 function TRequestManager.IsCurrentRequest(RO: TRequestObject): Boolean;
