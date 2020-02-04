@@ -2152,7 +2152,11 @@ begin
           begin
             SetAppCaption(SR.Name);
             if RO.Url <> SavedRequest.Request.Url then
+            begin
               cbUrl.Text := SavedRequest.Request.Url;
+              if FCacheResponse.Exists(SavedRequest.Path) then
+                FCacheResponse.Delete(SavedRequest.Path);
+            end;
           end;
           FreeAndNil(RO);
           SyncGridQueryParams;
