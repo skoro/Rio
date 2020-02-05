@@ -2229,6 +2229,8 @@ end;
 procedure TMainForm.OnMoveRequest(const SR: TSavedRequest; const OldPath: string
   );
 begin
+  // When the request or/and folder is renamed
+  // move the request's cache data too.
   try
     if FCacheResponse.Exists(OldPath) then
       FCacheResponse.Move(OldPath, SR.Path);

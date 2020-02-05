@@ -927,7 +927,30 @@ function TRequestManager.RenameFolder(FolderPath, NewName: string): Boolean;
 var
   Folder: TTreeNode;
   p: SizeInt;
-  newPath: string;
+  newPath, OldPath: string;
+  // Iterate over the folder's child nodes and call OnMove event
+  // for the request nodes.
+  procedure MoveNodes(AFolder: TTreeNode);
+  var
+    Child: TTreeNode;
+    SR: TSavedRequest;
+    NodeOldPath: string;
+  begin
+    Child := AFolder.GetFirstChild;
+    while Child <> NIL do
+    begin
+      if IsFolderNode(Child) then
+        MoveNodes(Child)
+      else
+        begin
+          SR := NodeToRequest(Child);
+          NodeOldPath := ReplaceStr(SR.Path, NewPath, OldPath);
+          FOnMoveRequest(SR, NodeOldPath);
+        end;
+      Child := Child.GetNextSibling;
+    end;
+  end;
+
 begin
   if Length(Trim(NewName)) = 0 then // is empty name ?
     Exit(False); // =>
@@ -940,7 +963,11 @@ begin
   Folder := FindFolder(FolderPath);
   if Folder = NIL then
     Exit(False); // =>
+  OldPath := GetNodeFolderPath(Folder);
   Folder.Text := NewName;
+  // Request nodes are moved too. So expose the move event on them.
+  if Assigned(FOnMoveRequest) then
+    MoveNodes(Folder);
   Result := True;
 end;
 
