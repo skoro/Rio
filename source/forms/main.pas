@@ -287,6 +287,7 @@ type
     procedure SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
     procedure OnChangeRequest(Prev, Selected: TSavedRequest);
     procedure OnDeleteRequest(const SR: TSavedRequest);
+    procedure OnMoveRequest(const SR: TSavedRequest; const OldPath: string);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -819,6 +820,7 @@ begin
     RequestManager.ImageIndexSelected := 2;
     RequestManager.OnChangeRequest := @OnChangeRequest;
     RequestManager.OnDeleteRequest := @OnDeleteRequest;
+    RequestManager.OnMoveRequest   := @OnMoveRequest;
     with RequestPopup do begin
       OnEditClick := @SaveRequestEditorShow;
       Images := toolbarIcons;
@@ -2222,6 +2224,17 @@ begin
   end;
   if FCacheResponse.Exists(SR.Path) then
     FCacheResponse.Delete(SR.Path);
+end;
+
+procedure TMainForm.OnMoveRequest(const SR: TSavedRequest; const OldPath: string
+  );
+begin
+  try
+    if FCacheResponse.Exists(OldPath) then
+      FCacheResponse.Move(OldPath, SR.Path);
+  finally
+    // Ignore any exceptions.
+  end;
 end;
 
 procedure TMainForm.ApplyOptions;

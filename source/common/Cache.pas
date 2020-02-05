@@ -17,7 +17,6 @@ type
   { TCacheAbstract }
 
   TCacheAbstract = class
-  private
   protected
     function GetKeyValue(const Key: string): string; virtual; abstract;
     procedure SetKeyValue(const Key, Value: string); virtual; abstract;
@@ -28,6 +27,7 @@ type
     procedure Put(const Key, Value: string; const Minutes: int64); virtual; overload;
     function Delete(const Key: string): boolean; virtual; abstract;
     function Exists(const Key: string): boolean; virtual; abstract;
+    procedure Move(const Key, NewKey: string); virtual;
     property KeyValue[const Key: string]: string read GetKeyValue write SetKeyValue;
       default;
   end;
@@ -64,7 +64,10 @@ type
 
   { ECacheKeyNotFound }
 
-  ECacheKeyNotFound = class(Exception);
+  ECacheKeyNotFound = class(Exception)
+  public
+    constructor CreateKey(const Key: string);
+  end;
 
   { TFileCache }
 
@@ -84,6 +87,7 @@ type
       override; overload;
     function Delete(const Key: string): boolean; override;
     function Exists(const Key: string): boolean; override;
+    procedure Move(const Key, NewKey: string); override;
     property CacheDir: string read FCacheDir write SetCacheDir;
   end;
 
@@ -133,6 +137,13 @@ begin
   end;
 end;
 
+{ ECacheKeyNotFound }
+
+constructor ECacheKeyNotFound.CreateKey(const Key: string);
+begin
+  inherited Create(Format('Cache key "%s" is not found.', [Key]));
+end;
+
 { TNullCache }
 
 function TNullCache.GetKeyValue(const Key: string): string;
@@ -170,6 +181,11 @@ end;
 procedure TCacheAbstract.Put(const Key, Value: string; const Minutes: int64);
 begin
   Put(Key, Value, IncMinute(Now, Minutes));
+end;
+
+procedure TCacheAbstract.Move(const Key, NewKey: string);
+begin
+  // Stub
 end;
 
 { TFileMeta }
@@ -305,7 +321,7 @@ begin
   try
     Meta.Load;
     if Meta.IsExpired then
-      raise ECacheKeyNotFound.CreateFmt('Cache key "%s" is not exists.', [Key]);
+      raise ECacheKeyNotFound.CreateKey(Key);
     if not FileExists(Meta.DataFile) then
       raise EFileNotFoundException.CreateFmt('Cache data file not found: %s',
         [Meta.DataFile]);
@@ -389,6 +405,37 @@ begin
       Result := Meta.Exists and FileExists(Meta.DataFile);
   finally
     FreeAndNil(Meta);
+  end;
+end;
+
+procedure TFileCache.Move(const Key, NewKey: string);
+var
+  Meta, NewMeta: TFileMeta;
+begin
+  inherited Move(Key, NewKey);
+  if not Exists(Key) then
+    raise ECacheKeyNotFound.CreateKey(Key);
+  if Exists(NewKey) and (not Delete(NewKey)) then
+    raise EInOutError.Create('Cannot delete cache data: ' + NewKey);
+  Meta := CreateMeta(Key);
+  NewMeta := CreateMeta(NewKey);
+  try
+    Meta.Load;
+    NewMeta.Expired := Meta.Expired;
+    NewMeta.DataSize := Meta.DataSize;
+    NewMeta.Save;
+    { TODO : There is must be a lock to preventing an overlapped move. }
+    if not RenameFile(Meta.DataFile, NewMeta.DataFile) then
+    begin
+      NewMeta.Delete;
+      raise EInOutError.CreateFmt('Cannot move cache data from "%s" to "%s"', [
+        Meta.DataFile, NewMeta.DataFile
+      ]);
+    end;
+    Meta.Delete;
+  finally
+    FreeAndNil(Meta);
+    FreeAndNil(NewMeta);
   end;
 end;
 
