@@ -2313,6 +2313,7 @@ begin
   else
     begin
       Result.ContentText := '';
+      { TODO : It seems that it's impossible to save a binary data like images. }
       tab := FResponseTabManager.CanFind;
       if (Assigned(tab)) and (tab is TResponseFormattedTab) then
         Result.ContentText := TResponseFormattedTab(tab).SynEdit.Text;
