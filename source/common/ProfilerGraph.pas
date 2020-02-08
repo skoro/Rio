@@ -207,10 +207,19 @@ end;
 { TProfilerGraph }
 
 procedure TProfilerGraph.SetTimeCheckPoints(AValue: TTimeCheckPointList);
+var
+  CP: TTimeCheckPoint;
 begin
   if FTimeCheckPoints = AValue then
     Exit;
-  FTimeCheckPoints := AValue;
+  FTimeCheckPoints.Clear;
+  for CP in AValue do
+    with FTimeCheckPoints.Add do
+    begin
+      Name   := CP.Name;
+      Start  := CP.Start;
+      Finish := CP.Finish;
+    end;
   SetProfilerData;
 end;
 
@@ -295,12 +304,14 @@ end;
 constructor TProfilerGraph.Create(AParent: TWinControl);
 begin
   inherited Create;
+  FTimeCheckPoints := TTimeCheckPointList.Create;
   CreateChart(AParent);
 end;
 
 destructor TProfilerGraph.Destroy;
 begin
   FreeAndNil(FChart);
+  FreeAndNil(FTimeCheckPoints);
   inherited;
 end;
 
