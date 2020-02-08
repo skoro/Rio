@@ -21,6 +21,8 @@ type
   TOnDeleteRequest = procedure (const ARequest: TSavedRequest) of object;
   // When the request is renamed or moved to another tree node.
   TOnMoveRequest = procedure (const SR: TSavedRequest; const OldPath: string) of object;
+  // When the new request is added.
+  TOnAddRequest = procedure (const SR: TSavedRequest; const FolderPath: string) of object;
 
   { ENodeException }
 
@@ -77,6 +79,7 @@ type
     FOnChangeRequest: TOnChangeRequest;
     FOnDeleteRequest: TOnDeleteRequest;
     FOnMoveRequest: TOnMoveRequest;
+    FOnAddRequest: TOnAddRequest;
     FImgIdxFolder: Integer;
     FImgIdxSelected: Integer;
     FImgIdxRoot: Integer;
@@ -161,6 +164,7 @@ type
     property OnChangeRequest: TOnChangeRequest read FOnChangeRequest write FOnChangeRequest;
     property OnDeleteRequest: TOnDeleteRequest read FOnDeleteRequest write FOnDeleteRequest;
     property OnMoveRequest: TOnMoveRequest read FOnMoveRequest write FOnMoveRequest;
+    property OnAddRequest: TOnAddRequest read FOnAddRequest write FOnAddRequest;
     property ImageIndexFolder: Integer read FImgIdxFolder write FImgIdxFolder;
     property ImageIndexSelected: Integer read FImgIdxSelected write FImgIdxSelected;
     property ImageIndexRoot: Integer read FImgIdxRoot write SetImgIdxRoot;
@@ -870,6 +874,8 @@ begin
   SR.TreeNode := Result;
   SetNodeStyle(Result);
   SortNodes(FolderNode);
+  if Assigned(FOnAddRequest) then
+    FOnAddRequest(SR, FolderPath);
 end;
 
 procedure TRequestManager.AttachFolderNodes(CustomTree: TCustomTreeView);
