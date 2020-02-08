@@ -288,6 +288,8 @@ type
     procedure OnChangeRequest(Prev, Selected: TSavedRequest);
     procedure OnDeleteRequest(const SR: TSavedRequest);
     procedure OnMoveRequest(const SR: TSavedRequest; const OldPath: string);
+    procedure OnAddRequest(const SR: TSavedRequest; const FolderPath: string);
+    function CreateResponseInfo: TResponseInfo;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -831,6 +833,9 @@ begin
     end;
   end;
   LoadAppRequests(FRequestManager);
+  // It must be after LoadAppRequest() otherwise OnAddRequest will be invoked
+  // on every new request.
+  RequestManager.OnAddRequest := @OnAddRequest;
 
   // Environment manager initialization.
   FEnvManager := TEnvManager.Create;
@@ -2237,6 +2242,81 @@ begin
   finally
     // Ignore any exceptions.
   end;
+end;
+
+procedure TMainForm.OnAddRequest(const SR: TSavedRequest;
+  const FolderPath: string);
+var
+  RI: TResponseInfo;
+begin
+  RI := CreateResponseInfo;
+  try
+    if RI <> NIL then
+      FCacheResponse.Put(SR.Path, ObjToJsonStr(RI));
+  finally
+    FreeAndNil(RI);
+  end;
+end;
+
+function TMainForm.CreateResponseInfo: TResponseInfo;
+var
+  buf, dir: string;
+  p, s: integer;
+  tab: TResponseTab;
+  CheckPoint: TTimeCheckPoint;
+begin
+  if textResp.Lines.Count = 0 then
+    Exit(NIL); // =>
+  buf := Copy(StatusTextMain.Caption, 6); // Skip "HTTP/" substring.
+  Result := TResponseInfo.Create;
+  Result.Url := cbUrl.Text;
+  Result.Method := cbMethod.Text;
+  s := 1;
+  p := Pos(' ', buf);
+  if p > 0 then
+  begin
+    Result.HttpVersion := Copy(buf, s, p - s);
+    Result.ServerHttpVersion := Result.HttpVersion; // ???
+    s := p + 1;
+  end;
+  p := PosEx(' ', buf, s);
+  if p > s then
+  begin
+    Result.StatusCode := StrToInt(Copy(buf, s, p - s));
+    s := p + 1;
+  end;
+  Result.StatusText := Copy(buf, s);
+  Result.RequestLines := TStringList.Create;
+  for p := 0 to textResp.Lines.Count - 1 do
+  begin
+    dir := LeftStr(textResp.Lines[p], 1);
+    buf := Trim(Copy(textResp.Lines[p], 2));
+    if Length(buf) = 0 then
+      Continue;
+    case dir of
+      '<' : Result.RequestLines.Add(buf);
+      '>' : begin
+        if Pos(':', buf) > 0 then
+          Result.ResponseHeaders.Add(buf);
+      end;
+    end;
+  end;
+  for CheckPoint in FProfilerGraph.TimeCheckPoints do
+    with Result.TimeCheckPoints.Add do
+    begin
+      Name   := CheckPoint.Name;
+      Start  := CheckPoint.Start;
+      Finish := CheckPoint.Finish;
+    end;
+  if tabContent.TabVisible then
+    Result.ContentText := responseRaw.Text
+  else
+    begin
+      Result.ContentText := '';
+      tab := FResponseTabManager.CanFind;
+      if (Assigned(tab)) and (tab is TResponseFormattedTab) then
+        Result.ContentText := TResponseFormattedTab(tab).SynEdit.Text;
+    end;
 end;
 
 procedure TMainForm.ApplyOptions;
