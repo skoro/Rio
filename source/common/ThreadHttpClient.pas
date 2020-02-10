@@ -227,7 +227,8 @@ begin
     raise Exception.Create('Url is empty');
   if not AnsiStartsText('http://', Url) then
     if not AnsiStartsText('https://', Url) then
-      Result := 'http://' + Result;
+      if not AnsiStartsText('{{', Url) then // An environment variable.
+        Result := 'http://' + Result;
 end;
 
 function ParseContentType(Headers: TStrings): string;
@@ -258,7 +259,7 @@ begin
   Result := '';
   if uri.Protocol <> '' then
     Result := uri.Protocol + '://';
-  Result := Format('%s%s%s%s', [
+  Result := Result + Format('%s%s%s%s', [
     uri.Host,
     IfThen(uri.Port <> 0, ':' + IntToStr(uri.Port), ''),
     uri.Path,
