@@ -932,8 +932,8 @@ end;
 function TRequestManager.RenameFolder(FolderPath, NewName: string): Boolean;
 var
   Folder: TTreeNode;
-  p: SizeInt;
-  newPath, OldPath: string;
+  p, posCount: SizeInt;
+  newPath, OldName: string;
   // Iterate over the folder's child nodes and call OnMove event
   // for the request nodes.
   procedure MoveNodes(AFolder: TTreeNode);
@@ -950,7 +950,7 @@ var
       else
         begin
           SR := NodeToRequest(Child);
-          NodeOldPath := ReplaceStr(SR.Path, NewPath, OldPath);
+          NodeOldPath := LeftStr(SR.Path, p) + OldName + Copy(SR.Path, posCount);
           FOnMoveRequest(SR, NodeOldPath);
         end;
       Child := Child.GetNextSibling;
@@ -963,13 +963,17 @@ begin
   if system.Pos('/', NewName) <> 0 then // no slashes in the new name.
     Exit(False); // =>
   p := RPos('/', FolderPath);
-  newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
+  if p = 0 then
+    NewPath := NewName // It's a root node.
+  else
+    newPath := LeftStr(FolderPath, p - 1) + '/' + NewName;
+  posCount := p + Length(NewName) + 1;
   if FindNodePath(FRootNode, newPath) <> NIL then
     Exit(False);
   Folder := FindFolder(FolderPath);
   if Folder = NIL then
     Exit(False); // =>
-  OldPath := GetNodeFolderPath(Folder);
+  OldName := Folder.Text;
   Folder.Text := NewName;
   // Request nodes are moved too. So expose the move event on them.
   if Assigned(FOnMoveRequest) then
