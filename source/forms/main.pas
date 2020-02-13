@@ -946,6 +946,8 @@ begin
   if StrVal <> '' then
     FRequestManager.OpenRequestPath(StrVal)
   else begin
+    // Just expand the requests tree (without child nodes).
+    FAppTreeManager.RequestRoot.Expand(False);
     StrVal := PSMAIN.ReadString('currentRequest', '');
     if StrVal <> '' then begin
       try
