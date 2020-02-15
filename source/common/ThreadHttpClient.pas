@@ -60,6 +60,8 @@ type
     // inStr  - a prefix for request headers.
     // outStr - a prefix for response headers.
     procedure ServerLog(Buffer: TStrings; inStr: string = '<'; outStr: string = '>');
+    // Detect that a content type is binary.
+    function IsBinary: Boolean;
     property Location: string read GetLocation;
     property ContentType: string read GetContentType;
     property Content: TStringStream read FContent;
@@ -367,6 +369,31 @@ begin
   with ResponseHeaders do
     for I := 0 to Count - 1 do
       Buffer.Add('%s %s: %s', [outStr, Names[I], ValueFromIndex[I]]);
+end;
+
+function TResponseInfo.IsBinary: Boolean;
+var
+  CT, mainType, subType: string;
+  p: integer;
+begin
+  CT := ContentType;
+  p := Pos('/', CT);
+  if p = 0 then
+    raise Exception.CreateFmt('Invalid content type: %s', [CT]);
+  mainType := LowerCase(LeftStr(CT, p - 1));
+  subType := LowerCase(Copy(CT, p + 1));
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+  case mainType of
+    'application': begin
+      Exit(
+           not (AnsiContainsStr(subType, 'script') // *script types: javascript, ecmascript, etc.
+               or AnsiContainsStr(subType, 'json')
+               or AnsiContainsStr(subType, 'xml'))
+      ); // =>
+    end;
+    'text': Exit(False); // =>
+  end;
+  Result := True;
 end;
 
 { TCustomHttpClient }
