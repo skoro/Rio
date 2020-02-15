@@ -290,6 +290,7 @@ type
     procedure OnMoveRequest(const SR: TSavedRequest; const OldPath: string);
     procedure OnAddRequest(const SR: TSavedRequest; const FolderPath: string);
     function CreateResponseInfo: TResponseInfo;
+    procedure CacheRequest(const SR: TSavedRequest; const RespInfo: TResponseInfo);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -2253,8 +2254,7 @@ var
 begin
   RI := CreateResponseInfo;
   try
-    if RI <> NIL then
-      FCacheResponse.Put(SR.Path, ObjToJsonStr(RI));
+    CacheRequest(SR, RI);
   finally
     FreeAndNil(RI);
   end;
@@ -2320,6 +2320,13 @@ begin
       if (Assigned(tab)) and (tab is TResponseFormattedTab) then
         Result.ContentText := TResponseFormattedTab(tab).SynEdit.Text;
     end;
+end;
+
+procedure TMainForm.CacheRequest(const SR: TSavedRequest;
+  const RespInfo: TResponseInfo);
+begin
+  if (Assigned(RespInfo) and (not RespInfo.IsBinary)) then
+    FCacheResponse.Put(SR.Path, ObjToJsonStr(RespInfo));
 end;
 
 procedure TMainForm.ApplyOptions;
@@ -2523,7 +2530,7 @@ begin
     if Assigned(FRequestManager.CurrentRequest) then
     begin
       SR := FRequestManager.CurrentRequest;
-      FCacheResponse.Put(SR.Path, ObjToJsonStr(Info));
+      CacheRequest(SR, Info);
       if SR.Request.Method <> cbMethod.Text then
       begin
         SR.Request.Method := cbMethod.Text;
