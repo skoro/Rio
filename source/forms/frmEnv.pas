@@ -42,11 +42,16 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure gridVarsAfterSelection(Sender: TObject; aCol, aRow: Integer);
     procedure gridVarsDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; aState: TGridDrawState);
     procedure gridVarsEditingDone(Sender: TObject);
+    procedure gridVarsSelectCell(Sender: TObject; aCol, aRow: Integer;
+      var CanSelect: Boolean);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
+    procedure navVarsNewRow(Sender: TObject; Grid: TStringGrid;
+      const aRow: Integer);
     procedure PropsRestoringProperties(Sender: TObject);
     procedure PropsSavingProperties(Sender: TObject);
     procedure tbAddClick(Sender: TObject);
@@ -69,6 +74,7 @@ type
     procedure PrepareEditEnv;
     procedure DisableIfEnvEmpty;
     procedure FillEnvVars;
+    procedure UpdateDeleteVarState;
   public
     procedure ShowPanelEnv;
     procedure HidePanelEnv;
@@ -89,6 +95,8 @@ procedure TEnvForm.FormCreate(Sender: TObject);
 begin
   tbEnv.Font.Style := [fsBold];
   navVars.NavButtons := [nbNew, nbDelete, nbClear];
+  navVars.DeleteButton.ShowHint := True;
+  navVars.DeleteButton.Hint := '';
   Props.JSONFileName := ConfigFile('Env');
   Props.Active := True;
 end;
@@ -129,6 +137,11 @@ begin
   gridVars.SetFocus;
 end;
 
+procedure TEnvForm.gridVarsAfterSelection(Sender: TObject; aCol, aRow: Integer);
+begin
+  UpdateDeleteVarState;
+end;
+
 procedure TEnvForm.gridVarsDrawCell(Sender: TObject; aCol, aRow: Integer;
   aRect: TRect; aState: TGridDrawState);
 var
@@ -165,7 +178,16 @@ begin
   if Assigned(V) then
      V.Value := VarVal
   else
+    begin
      FCurrentEnv.Add(VarName, VarVal);
+     UpdateDeleteVarState;
+    end;
+end;
+
+procedure TEnvForm.gridVarsSelectCell(Sender: TObject; aCol, aRow: Integer;
+  var CanSelect: Boolean);
+begin
+  //UpdateDeleteVarState;
 end;
 
 procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
@@ -191,6 +213,12 @@ begin
     // Force to update parent variables.
     FillEnvVars;
   end;
+end;
+
+procedure TEnvForm.navVarsNewRow(Sender: TObject; Grid: TStringGrid;
+  const aRow: Integer);
+begin
+  UpdateDeleteVarState;
 end;
 
 procedure TEnvForm.PropsRestoringProperties(Sender: TObject);
@@ -449,6 +477,29 @@ begin
       gridVars.InsertRowWithValues(R + 1, [VL[R].Name, VL[R].Value]);
   finally
     FreeAndNil(VL);
+  end;
+end;
+
+procedure TEnvForm.UpdateDeleteVarState;
+var
+  VarName: string;
+  btnState: boolean;
+begin
+  VarName := Trim(gridVars.Cells[0, gridVars.Row]);
+  if VarName = '' then
+    btnState := True
+  else
+    if Assigned(FCurrentEnv) then
+      btnState := (FCurrentEnv.FindVar(VarName) <> NIL)
+    else
+      btnState := True;
+  with navVars.DeleteButton do
+  begin
+    if btnState then
+      Hint := ''
+    else
+      Hint := 'The variable belongs to the parent environment.';
+    Enabled := btnState;
   end;
 end;
 
