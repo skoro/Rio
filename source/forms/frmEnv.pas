@@ -174,7 +174,11 @@ begin
     Exit; // =>
   if Trim(ColName) = '' then
     Exit; // =>
-  FCurrentEnv.DeleteVar(ColName);
+  try
+    FCurrentEnv.DeleteVar(ColName);
+  except
+    { TODO : Should be logged ? }
+  end;
   // Force to update parent variables.
   FillEnvVars;
 end;
