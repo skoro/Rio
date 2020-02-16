@@ -165,7 +165,7 @@ procedure TEnvForm.gridVarsEditingDone(Sender: TObject);
 var
   R: integer;
   VarName, VarVal: string;
-  V: TVariable;
+  V, ParVar: TVariable;
 begin
   if not Assigned(FCurrentEnv) then
     Exit; // =>
@@ -179,8 +179,17 @@ begin
      V.Value := VarVal
   else
     begin
-     FCurrentEnv.Add(VarName, VarVal);
-     UpdateDeleteVarState;
+      try
+        // Before adding a new variable we must sure that the new var
+        // doesn't exist in the parent env and has the same value.
+        // Only if the value is differ then the new var will be added.
+        ParVar := FCurrentEnv.Variable[VarName];
+        if ParVar.Value <> VarVal then
+          FCurrentEnv.Add(VarName, VarVal);
+      except on E: EVariableNotFound do
+        FCurrentEnv.Add(VarName, VarVal);
+      end;
+      UpdateDeleteVarState;
     end;
 end;
 
