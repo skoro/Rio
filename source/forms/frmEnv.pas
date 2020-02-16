@@ -203,6 +203,7 @@ begin
   end;
   // Force to update parent variables.
   FillEnvVars;
+  UpdateDeleteVarState;
 end;
 
 procedure TEnvForm.navVarsGridClear(Sender: TObject; Grid: TStringGrid);
@@ -402,6 +403,7 @@ begin
   if FOpState = opEdit then
     PrepareEditEnv;
   FillEnvVars;
+  UpdateDeleteVarState;
 end;
 
 procedure TEnvForm.SetEnvManager(AValue: TEnvManager);
@@ -485,6 +487,11 @@ var
   VarName: string;
   btnState: boolean;
 begin
+  if gridVars.RowCount = 1 then
+  begin
+    navVars.DeleteButton.Enabled := False;
+    Exit; // =>
+  end;
   VarName := Trim(gridVars.Cells[0, gridVars.Row]);
   if VarName = '' then
     btnState := True
