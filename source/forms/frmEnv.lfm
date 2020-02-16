@@ -169,7 +169,6 @@ object EnvForm: TEnvForm
       OnAfterSelection = gridVarsAfterSelection
       OnDrawCell = gridVarsDrawCell
       OnEditingDone = gridVarsEditingDone
-      OnSelectCell = gridVarsSelectCell
     end
   end
   object panEnv: TPanel
