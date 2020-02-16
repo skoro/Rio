@@ -1,7 +1,7 @@
 object MainForm: TMainForm
-  Left = 327
+  Left = 324
   Height = 614
-  Top = 109
+  Top = 70
   Width = 579
   Caption = 'Rio'
   ClientHeight = 594
@@ -2443,18 +2443,19 @@ object MainForm: TMainForm
           OnResize = PairSplitterResize
           object panelRequest: TPanel
             Left = 4
-            Height = 212
-            Top = 4
+            Height = 220
+            Top = 0
             Width = 417
             Align = alClient
-            BorderSpacing.Around = 4
+            BorderSpacing.Left = 4
+            BorderSpacing.Right = 4
             BevelOuter = bvNone
-            ClientHeight = 212
+            ClientHeight = 220
             ClientWidth = 417
             TabOrder = 0
             object pagesRequest: TPageControl
               Left = 0
-              Height = 212
+              Height = 220
               Top = 0
               Width = 417
               ActivePage = tabReqCookie
@@ -3233,11 +3234,11 @@ object MainForm: TMainForm
               end
               object tabReqCookie: TTabSheet
                 Caption = 'Cookie'
-                ClientHeight = 184
+                ClientHeight = 192
                 ClientWidth = 409
                 object gridReqCookie: TStringGrid
                   Left = 0
-                  Height = 158
+                  Height = 166
                   Top = 26
                   Width = 409
                   Align = alClient
@@ -3495,18 +3496,19 @@ object MainForm: TMainForm
           ClientHeight = 306
           object panelResponse: TPanel
             Left = 4
-            Height = 298
-            Top = 4
+            Height = 306
+            Top = 0
             Width = 417
             Align = alClient
-            BorderSpacing.Around = 4
+            BorderSpacing.Left = 4
+            BorderSpacing.Right = 4
             BevelOuter = bvNone
-            ClientHeight = 298
+            ClientHeight = 306
             ClientWidth = 417
             TabOrder = 0
             object pagesResponse: TPageControl
               Left = 0
-              Height = 298
+              Height = 306
               Top = 0
               Width = 417
               ActivePage = tabResponse
@@ -3516,7 +3518,7 @@ object MainForm: TMainForm
               OnChange = pagesResponseChange
               object tabResponse: TTabSheet
                 Caption = 'Response'
-                ClientHeight = 270
+                ClientHeight = 278
                 ClientWidth = 409
                 object toolbarResponse: TToolBar
                   Left = 0
@@ -3565,7 +3567,7 @@ object MainForm: TMainForm
                 end
                 object pagesRespView: TPageControl
                   Left = 0
-                  Height = 248
+                  Height = 256
                   Top = 22
                   Width = 409
                   ActivePage = tabRespList
@@ -3575,11 +3577,11 @@ object MainForm: TMainForm
                   TabOrder = 1
                   object tabRespList: TTabSheet
                     Caption = 'tabRespList'
-                    ClientHeight = 240
+                    ClientHeight = 248
                     ClientWidth = 401
                     object responseHeaders: TStringGrid
                       Left = 0
-                      Height = 240
+                      Height = 248
                       Top = 0
                       Width = 401
                       Align = alClient
