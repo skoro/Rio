@@ -965,6 +965,8 @@ begin
   {$IFDEF WINDOWS}
   cbMethod.BorderSpacing.Top := 1;
   cbUrl.BorderSpacing.Top := 1;
+  cbEnv.BorderSpacing.Top := 1;
+  cbEnv.BorderSpacing.Bottom := 1;
   {$ENDIF}
 end;
 

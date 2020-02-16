@@ -133,7 +133,6 @@ begin
   Align := alClient;
   Caption := '';
   BevelOuter := bvNone;
-  BorderSpacing.Left := 4;
   InitTree;
   FRequestManager := TRequestManager.Create(FRequestRoot);
   FRequestPopup := TSavedRequestPopup.Create(Self);
