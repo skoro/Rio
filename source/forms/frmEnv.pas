@@ -46,8 +46,6 @@ type
     procedure gridVarsDrawCell(Sender: TObject; aCol, aRow: Integer;
       aRect: TRect; aState: TGridDrawState);
     procedure gridVarsEditingDone(Sender: TObject);
-    procedure gridVarsSelectCell(Sender: TObject; aCol, aRow: Integer;
-      var CanSelect: Boolean);
     procedure navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
     procedure navVarsGridClear(Sender: TObject; Grid: TStringGrid);
     procedure navVarsNewRow(Sender: TObject; Grid: TStringGrid;
@@ -191,12 +189,6 @@ begin
       end;
       UpdateDeleteVarState;
     end;
-end;
-
-procedure TEnvForm.gridVarsSelectCell(Sender: TObject; aCol, aRow: Integer;
-  var CanSelect: Boolean);
-begin
-  //UpdateDeleteVarState;
 end;
 
 procedure TEnvForm.navVarsDeleteRow(Sender: TObject; Grid: TStringGrid; const ColName: string);
