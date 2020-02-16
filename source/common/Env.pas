@@ -513,15 +513,18 @@ end;
 function TEnvironment.GetVars: TVarList;
 var
   V: TVariable;
+  ParVL: TVarList;
   EnvParent: TEnvironment;
 begin
   Result := GetOwnVars;
   EnvParent := FParent;
   while Assigned(EnvParent) do
   begin
-    for V in EnvParent.Vars do
+    ParVL := EnvParent.Vars;
+    for V in ParVL do
       if FindVar(V.Name) = nil then
         Result.Add(V);
+    FreeAndNil(ParVL);
     EnvParent := EnvParent.Parent;
   end;
 end;
