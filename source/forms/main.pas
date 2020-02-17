@@ -339,6 +339,13 @@ procedure TMainForm.btnSubmitClick(Sender: TObject);
 var
   RO: TRequestObject;
 begin
+  // https://github.com/skoro/Rio/issues/30
+  // Query parameters can accidentally disappear when the keyboard focus
+  // is in the params grid and Submit shortcut key is pressed.
+  // Event will be restored later.
+  gridParams.OnEditingDone := NIL;
+  gridParams.EditingDone;
+
   // Don't submit a request when the current request is in progress by pressing
   // shortcut key.
   if not btnSubmit.Enabled then
@@ -359,6 +366,8 @@ begin
   FRequestSeconds := 0;
   if SubmitRequest then
     TimerRequest.Enabled := True;
+
+  gridParams.OnEditingDone := @gridParamsEditingDone;
 end;
 
 procedure TMainForm.btnSaveRequestClick(Sender: TObject);
