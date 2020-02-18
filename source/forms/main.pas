@@ -338,13 +338,19 @@ const
 procedure TMainForm.btnSubmitClick(Sender: TObject);
 var
   RO: TRequestObject;
+  GQRow: integer; // preserve the current row in gridParams.
 begin
   // https://github.com/skoro/Rio/issues/30
   // Query parameters can accidentally disappear when the keyboard focus
   // is in the params grid and Submit shortcut key is pressed.
   // Event will be restored later.
-  gridParams.OnEditingDone := NIL;
-  gridParams.EditingDone;
+  if tabQuery.TabVisible then
+    with gridParams do
+    begin
+      GQRow := Row;
+      OnEditingDone := NIL;
+      EditingDone;
+    end;
 
   // Don't submit a request when the current request is in progress by pressing
   // shortcut key.
@@ -367,7 +373,12 @@ begin
   if SubmitRequest then
     TimerRequest.Enabled := True;
 
-  gridParams.OnEditingDone := @gridParamsEditingDone;
+  if tabQuery.TabVisible then
+    with gridParams do
+    begin
+      OnEditingDone := @gridParamsEditingDone;
+      Row := GQRow;
+    end;
 end;
 
 procedure TMainForm.btnSaveRequestClick(Sender: TObject);
