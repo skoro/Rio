@@ -2154,6 +2154,7 @@ begin
       RequestManager := FRequestManager;
       SelectedSourceNode := FAppTreeManager.RequestSelected;
       ConfirmDelete := @FAppTreeManager.RequestPopup.ConfirmDeleteRequest;
+      Environment := FEnvManager.Current;
       case ShowModal(SR, RO) of
         mrAdded:   begin
           SaveRequestButtonIcon(True);

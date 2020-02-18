@@ -221,6 +221,9 @@ object SaveRequestForm: TSaveRequestForm
       Top = 17
       Width = 315
       Align = alTop
+      OnMouseEnter = edUrlMouseEnter
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
     end
   end

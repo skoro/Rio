@@ -6,7 +6,7 @@ interface
 
 uses
   Forms, ButtonPanel,
-  ExtCtrls, StdCtrls, ComCtrls, Requests, RequestObject, Controls, Buttons;
+  ExtCtrls, StdCtrls, ComCtrls, Requests, RequestObject, Env, Controls, Buttons, Classes;
 
 const
   mrAdded = mrLast + 1; // A new request was added.
@@ -36,6 +36,7 @@ type
     tvFolders: TTreeView;
     procedure btnNewFolderClick(Sender: TObject);
     procedure CloseButtonClick(Sender: TObject);
+    procedure edUrlMouseEnter(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure OKButtonClick(Sender: TObject);
@@ -52,6 +53,7 @@ type
     FSavedRequest: TSavedRequest; // The edited request.
     FSelectedSourceNode: TTreeNode;
     FConfirmDelete: TConfirmDeleteRequest;
+    FEnvironment: TEnvironment;
     function GetRequestManager: TRequestManager;
     function GetRequestName: string;
     function GetDeleteEnabled: Boolean;
@@ -79,6 +81,7 @@ type
     property IsNewRequest: Boolean read GetIsNewRequest;
     property SelectedSourceNode: TTreeNode read FSelectedSourceNode write FSelectedSourceNode;
     property ConfirmDelete: TConfirmDeleteRequest read FConfirmDelete write FConfirmDelete;
+    property Environment: TEnvironment read FEnvironment write FEnvironment;
   end;
 
 implementation
@@ -385,6 +388,8 @@ procedure TSaveRequestForm.FormCreate(Sender: TObject);
 begin
   ButtonPanel.OKButton.ModalResult := mrNone;
   FIsNewNode := False;
+  FEnvironment := NIL;
+  edUrl.Hint := '';
 end;
 
 procedure TSaveRequestForm.FormShow(Sender: TObject);
@@ -414,6 +419,19 @@ begin
     Exit; // =>
   DeleteRequest;
   ModalResult := mrDeleted;
+end;
+
+procedure TSaveRequestForm.edUrlMouseEnter(Sender: TObject);
+var
+  Str: string;
+begin
+  if Assigned(FEnvironment) then
+  begin
+    edUrl.Hint := '';
+    Str := FEnvironment.Apply(edUrl.Text);
+    if Str <> edUrl.Text then
+      edUrl.Hint := Str;
+  end;
 end;
 
 end.
