@@ -837,7 +837,12 @@ begin
     jsData := nil;
     jsParser := TJSONParser.Create(FSynEdit.Text);
     try
-      jsData := jsParser.Parse;
+      try
+        jsData := jsParser.Parse;
+      except
+        on E: EJSONParser do
+          jsData := nil;
+      end;
       if CanEnableTable(jsData) then
       begin
         BuildTable(jsData);
