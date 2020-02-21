@@ -275,6 +275,7 @@ type
     procedure DoGridOperation(Grid: TStringGrid; const op: TGridOperation);
     procedure OnOpenResponseTab(Tab: TResponseTab; ResponseInfo: TResponseInfo);
     procedure OnSaveResponseTab(const FileName: string; Tab: TResponseTab);
+    procedure OnEditSavedRequestClick(Sender: TObject; SR: TSavedRequest);
     procedure OnJsonTabButtonOptionsClick(Sender: TObject);
     procedure JsonTab_OnJsonFormat(JsonData: TJSONData; Editor: TSynEdit);
     procedure FindStart(Search: Boolean = True);
@@ -284,7 +285,7 @@ type
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
     procedure SaveRequestButtonIcon(Added: Boolean);
-    procedure SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
+    function  SaveRequestEditorShow(SR: TSavedRequest): TModalResult;
     procedure OnChangeRequest(Prev, Selected: TSavedRequest);
     procedure OnDeleteRequest(const SR: TSavedRequest);
     procedure OnMoveRequest(const SR: TSavedRequest; const OldPath: string);
@@ -383,7 +384,7 @@ end;
 
 procedure TMainForm.btnSaveRequestClick(Sender: TObject);
 begin
-  SaveRequestEditorShow(Sender, FRequestManager.CurrentRequest);
+  SaveRequestEditorShow(FRequestManager.CurrentRequest);
 end;
 
 function TMainForm.SubmitRequest: Boolean;
@@ -845,7 +846,7 @@ begin
     RequestManager.OnDeleteRequest := @OnDeleteRequest;
     RequestManager.OnMoveRequest   := @OnMoveRequest;
     with RequestPopup do begin
-      OnEditClick := @SaveRequestEditorShow;
+      OnEditClick := @OnEditSavedRequestClick;
       Images := toolbarIcons;
       Items[0].ImageIndex := 11; // open
       Items[1].ImageIndex := 10; // new folder
@@ -1294,11 +1295,32 @@ begin
 end;
 
 procedure TMainForm.miNewClick(Sender: TObject);
+var
+  RO: TRequestObject;
+  Existing: Boolean;
+  SR: TSavedRequest;
+  Url: string;
 begin
-  if PromptNewRequest('Are you sure you want to start a new request ?') then begin
-    StartNewRequest;
-    cbUrl.SetFocus;
-  end;
+  Url := Trim(cbUrl.Text);
+  SR := FRequestManager.CurrentRequest;
+  Existing := Assigned(SR);
+  if Existing and (not SR.Locked) then
+  begin
+    if Url = '' then
+      Url := SR.Request.Url;
+    RO := CreateRequestObject;
+    SR.UpdateRequest(RO);
+  end
+  else
+    if (Url <> '') and (not Existing)
+         and PromptNewRequest('Do you want to save request ?')
+    then
+    begin
+      if SaveRequestEditorShow(NIL) = mrCancel then
+        Exit; // =>
+    end;
+  StartNewRequest;
+  cbUrl.SetFocus;
 end;
 
 procedure TMainForm.miNewWindowClick(Sender: TObject);
@@ -2064,6 +2086,11 @@ begin
     Tab.Save(FileName);
 end;
 
+procedure TMainForm.OnEditSavedRequestClick(Sender: TObject; SR: TSavedRequest);
+begin
+  SaveRequestEditorShow(SR);
+end;
+
 procedure TMainForm.OnJsonTabButtonOptionsClick(Sender: TObject);
 begin
   if OptionsForm.ShowModalPage(opJson) = mrOK then
@@ -2154,7 +2181,7 @@ begin
     toolbarIcons.GetBitmap(REQUEST_IMG_UNSET, btnSaveRequest.Glyph);
 end;
 
-procedure TMainForm.SaveRequestEditorShow(Sender: TObject; SR: TSavedRequest);
+function TMainForm.SaveRequestEditorShow(SR: TSavedRequest): TModalResult;
 var
   RO: TRequestObject;
 begin
@@ -2166,7 +2193,8 @@ begin
       SelectedSourceNode := FAppTreeManager.RequestSelected;
       ConfirmDelete := @FAppTreeManager.RequestPopup.ConfirmDeleteRequest;
       Environment := FEnvManager.Current;
-      case ShowModal(SR, RO) of
+      Result := ShowModal(SR, RO);
+      case Result of
         mrAdded:   begin
           SaveRequestButtonIcon(True);
           SetAppCaption(FRequestManager.CurrentRequest.Name);
