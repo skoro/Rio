@@ -292,6 +292,7 @@ type
     procedure OnAddRequest(const SR: TSavedRequest; const FolderPath: string);
     function CreateResponseInfo: TResponseInfo;
     procedure CacheRequest(const SR: TSavedRequest; const RespInfo: TResponseInfo);
+    procedure UpdateRequest(RO: TRequestObject; SR: TSavedRequest);
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -889,8 +890,7 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   // Save the current request.
-  if Assigned(FRequestManager.CurrentRequest) then
-    FRequestManager.CurrentRequest.UpdateRequest(CreateRequestObject);
+  UpdateRequest(nil, nil);
   SaveAppRequests(FRequestManager);
 
   FreeAndNil(FResponseTabManager);
@@ -1296,7 +1296,6 @@ end;
 
 procedure TMainForm.miNewClick(Sender: TObject);
 var
-  RO: TRequestObject;
   Existing: Boolean;
   SR: TSavedRequest;
   Url: string;
@@ -1308,8 +1307,7 @@ begin
   begin
     if Url = '' then
       cbUrl.Text := SR.Request.Url;
-    RO := CreateRequestObject;
-    SR.UpdateRequest(RO);
+    UpdateRequest(nil, SR);
   end
   else
     if (Url <> '') and (not Existing)
@@ -2246,7 +2244,7 @@ begin
     // Preserve of changing the request's method and url.
     RO.Method := Prev.Request.Method;
     RO.Url := Prev.Request.Url;
-    Prev.UpdateRequest(RO);
+    UpdateRequest(RO, Prev);
   end;
   StartNewRequest;
   SaveRequestButtonIcon(True);
@@ -2268,6 +2266,8 @@ begin
   end;
   btnSubmit.Enabled := True;
   btnSaveRequest.Enabled := True;
+  SwitchTabByName(pagesRequest, Selected.TabRequest);
+  SwitchTabByName(pagesResponse, Selected.TabResponse);
   SetAppCaption(Selected.Name);
 end;
 
@@ -2378,6 +2378,22 @@ procedure TMainForm.CacheRequest(const SR: TSavedRequest;
 begin
   if (Assigned(RespInfo) and (not RespInfo.IsBinary)) then
     FCacheResponse.Put(SR.Path, ObjToJsonStr(RespInfo));
+end;
+
+procedure TMainForm.UpdateRequest(RO: TRequestObject; SR: TSavedRequest);
+begin
+  if SR = NIL then
+    SR := FRequestManager.CurrentRequest;
+  if not Assigned(SR) then
+    Exit; // =>
+  if RO = NIL then
+    RO := CreateRequestObject;
+  with SR do
+  begin
+    UpdateRequest(RO);
+    TabRequest := pagesRequest.ActivePage.Caption;
+    TabResponse := pagesResponse.ActivePage.Caption;
+  end;
 end;
 
 procedure TMainForm.ApplyOptions;
@@ -2643,6 +2659,7 @@ begin
   end;
 
   // Show/hide 'Content' response tab.
+  { TODO : Info has IsBinary method. }
   if (mime.MimeType = 'text') or
        ((mime.MimeType = 'application') and (mime.Subtype <> 'octet-stream')) then
     tabContent.TabVisible := not (OptionsForm.HideTabContent and (FResponseTabManager.OpenedTabs.Count > 0))
