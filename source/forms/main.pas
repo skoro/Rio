@@ -1307,7 +1307,7 @@ begin
   if Existing and (not SR.Locked) then
   begin
     if Url = '' then
-      Url := SR.Request.Url;
+      cbUrl.Text := SR.Request.Url;
     RO := CreateRequestObject;
     SR.UpdateRequest(RO);
   end
