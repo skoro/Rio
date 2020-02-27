@@ -52,6 +52,8 @@ type
     FRequest: TRequestObject;
     FTreeNode: TTreeNode;
     FLocked: Boolean;
+    FTabRequest: string;
+    FTabResponse: string;
     function GetPath: string;
     procedure SetName(AValue: string);
     procedure SetTreeNode(AValue: TTreeNode);
@@ -64,6 +66,8 @@ type
     property Name: string read FName write SetName;
     property Path: string read GetPath;
     property Locked: Boolean read FLocked write FLocked;
+    property TabRequest: string read FTabRequest write FTabRequest;
+    property TabResponse: string read FTabResponse write FTabResponse;
   end;
 
   { TNodeView }
@@ -648,6 +652,8 @@ begin
       with TDOMElement(XmlNode) do begin
         SetAttribute('name', SR.Name);
         SetAttribute('locked', IfThen(SR.Locked, '1', '0'));
+        SetAttribute('tabRequest', SR.TabRequest);
+        SetAttribute('tabResponse', SR.TabResponse);
       end;
       XmlNode.AppendChild(Doc.CreateCDATASection(SR.Request.ToJson));
       XmlRoot.AppendChild(XmlNode);
@@ -683,6 +689,8 @@ begin
         SR := TSavedRequest.Create(Elem.GetAttribute('name'));
         SR.Locked := Elem.GetAttribute('locked') = '1';
         SR.Request := TRequestObject.CreateFromJson(Child.TextContent);
+        SR.TabRequest := Elem.GetAttribute('tabRequest');
+        SR.TabResponse := Elem.GetAttribute('tabResponse');
         fNode := AddRequest(SR, NodePath);
         // preserve the request parent folder collapsed/expanded state
         fNode.Parent.Expanded := ExpandedState;
