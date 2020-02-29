@@ -17,7 +17,7 @@ type
   TShortCutItem = (sciNone, sciFocusUrl, sciFocusMethod, sciManageHeaders, sciFileRequest,
     sciOptions, sciNewRequest, sciNewWindow, sciOpenRequest, sciFind, sciFindNext,
     sciJsonFilter, sciSaveBody, sciSwitchView, sciSubmit, sciSaveRequest,
-    sciToggleTabs, sciToggleSidebar, sciEnv, sciQuit);
+    sciToggleTabs, sciToggleSidebar, sciEnv, sciFocusMode, sciQuit);
 
   // Keyboard shortcut code.
   TShortCuts = array of Classes.TShortCut;
@@ -545,6 +545,7 @@ begin
   SetShortCut(sciSaveRequest,   83, [ssCtrl]); // S
   SetShortCut(sciToggleSidebar, 119, []); // F8
   SetShortCut(sciEnv,           69, [ssCtrl, ssAlt]); // E
+  SetShortCut(sciFocusMode,     123, []); // F12
 end;
 
 procedure TOptionsForm.SetLayoutEnable(AValue: Boolean);
@@ -651,6 +652,7 @@ begin
     sciSaveRequest:   Result := 'Save/edit request';
     sciEnv:           Result := 'Configure environments';
     sciToggleSidebar: Result := 'Toggle sidebar';
+    sciFocusMode:     Result := 'Focus mode';
   end;
 end;
 

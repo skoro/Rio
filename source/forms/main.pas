@@ -2463,6 +2463,7 @@ begin
   miSidebar.ShortCut       := OptionsForm.GetShortCutValue(sciToggleSidebar);
   miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
+  miFocus.ShortCut         := OptionsForm.GetShortCutValue(sciFocusMode);
 
   // Change request node style.
   FRequestManager.RequestNodeStyle := OptionsForm.RequestNodeStyle;
