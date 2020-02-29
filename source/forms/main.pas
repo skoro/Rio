@@ -46,6 +46,7 @@ type
     gridReqCookie: TStringGrid;
     gridRespCookie: TStringGrid;
     EnvPanel: TPanel;
+    miFocus: TMenuItem;
     miEnv: TMenuItem;
     RequestIcons: TImageList;
     LayoutSplitter: TPairSplitter;
@@ -194,6 +195,7 @@ type
       aState: TCheckboxState);
     procedure gridParamsEditingDone(Sender: TObject);
     procedure gridRespCookieDblClick(Sender: TObject);
+    procedure miFocusClick(Sender: TObject);
     procedure miSidebarClick(Sender: TObject);
     procedure miExportClick(Sender: TObject);
     procedure miFindClick(Sender: TObject);
@@ -293,6 +295,7 @@ type
     function CreateResponseInfo: TResponseInfo;
     procedure CacheRequest(const SR: TSavedRequest; const RespInfo: TResponseInfo);
     procedure UpdateRequest(RO: TRequestObject; SR: TSavedRequest);
+    procedure FocusModeCheck;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -1091,6 +1094,15 @@ begin
   end;
 end;
 
+procedure TMainForm.miFocusClick(Sender: TObject);
+var
+  OldVal: Boolean;
+begin
+  OldVal := miFocus.Checked;
+  ToggleRequestSide(OldVal);
+  ToggleSidebarSide(OldVal);
+end;
+
 procedure TMainForm.miSidebarClick(Sender: TObject);
 begin
   miSidebar.Checked := not miSidebar.Checked;
@@ -1525,6 +1537,7 @@ begin
     miTabToggle.Checked := splSize > 1;
     ViewToggleTabsMenu(miTabToggle.Checked);
   end;
+  FocusModeCheck;
 end;
 
 procedure TMainForm.pmAuthTypeClick(Sender: TObject);
@@ -2397,6 +2410,11 @@ begin
   end;
 end;
 
+procedure TMainForm.FocusModeCheck;
+begin
+  miFocus.Checked := not (miSidebar.Checked or miTabToggle.Checked);
+end;
+
 procedure TMainForm.ApplyOptions;
 begin
   editJson.TabWidth := OptionsForm.JsonIndentSize;
@@ -2445,6 +2463,7 @@ begin
   miSidebar.ShortCut       := OptionsForm.GetShortCutValue(sciToggleSidebar);
   miEnv.ShortCut           := OptionsForm.GetShortCutValue(sciEnv);
   miQuit.ShortCut          := OptionsForm.GetShortCutValue(sciQuit);
+  miFocus.ShortCut         := OptionsForm.GetShortCutValue(sciFocusMode);
 
   // Change request node style.
   FRequestManager.RequestNodeStyle := OptionsForm.RequestNodeStyle;
