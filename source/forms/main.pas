@@ -1327,7 +1327,7 @@ begin
       if (Url <> '') and (not Existing) then
       begin
         mrSave := QuestionDlg('Save request ?', 'Do you want to save request ?', mtConfirmation,
-               [mrCancel, 'Cancel', 'IsDefault', mrYes, 'Save', mrNo, 'Don''t save'], 0);
+               [mrCancel, '&Cancel', 'IsDefault', mrYes, '&Save', mrNo, '&Don''t save'], 0);
         if (mrSave = mrYes) and (SaveRequestEditorShow(NIL) = mrCancel) then
           Exit; // =>
         if (mrSave = mrCancel) then
