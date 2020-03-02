@@ -1311,6 +1311,7 @@ var
   Existing: Boolean;
   SR: TSavedRequest;
   Url: string;
+  mrSave: TModalResult;
 begin
   Url := Trim(cbUrl.Text);
   SR := FRequestManager.CurrentRequest;
@@ -1322,12 +1323,16 @@ begin
     UpdateRequest(nil, SR);
   end
   else
-    if (Url <> '') and (not Existing)
-         and PromptNewRequest('Do you want to save request ?')
-    then
     begin
-      if SaveRequestEditorShow(NIL) = mrCancel then
-        Exit; // =>
+      if (Url <> '') and (not Existing) then
+      begin
+        mrSave := QuestionDlg('Save request ?', 'Do you want to save request ?', mtConfirmation,
+               [mrCancel, 'Cancel', 'IsDefault', mrYes, 'Save', mrNo, 'Don''t save'], 0);
+        if (mrSave = mrYes) and (SaveRequestEditorShow(NIL) = mrCancel) then
+          Exit; // =>
+        if (mrSave = mrCancel) then
+          Exit; // =>
+      end;
     end;
   StartNewRequest;
   cbUrl.SetFocus;
