@@ -2912,6 +2912,7 @@ begin
 
   // Submit and SaveRequest buttons state.
   SetSubmitEnabled(False);
+  btnNewRequest.Enabled := True;
   SaveRequestButtonIcon(False);
   FRequestManager.ResetCurrent;
 end;
