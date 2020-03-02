@@ -286,6 +286,7 @@ type
     procedure FinishRequest;
     procedure ResetFindTextPos;
     procedure EnableSubmitButton;
+    procedure SetSubmitEnabled(const aNewState: Boolean);
     procedure SaveRequestButtonIcon(Added: Boolean);
     function  SaveRequestEditorShow(SR: TSavedRequest): TModalResult;
     procedure OnChangeRequest(Prev, Selected: TSavedRequest);
@@ -484,8 +485,7 @@ begin
   if (method <> 'GET') and (Length(formData) > 0) then
     FHttpClient.RequestBody := TStringStream.Create(formData);
 
-  btnSubmit.Enabled := False;
-  btnSaveRequest.Enabled := False;
+  SetSubmitEnabled(False);
 
   // Assign request headers to the client.
   for i:=1 to requestHeaders.RowCount-1 do
@@ -2185,6 +2185,13 @@ begin
   btnSaveRequest.Enabled := not isEmpty;
 end;
 
+procedure TMainForm.SetSubmitEnabled(const aNewState: Boolean);
+begin
+  btnSubmit.Enabled := aNewState;
+  btnSaveRequest.Enabled := aNewState;
+  btnNewRequest.Enabled := aNewState;
+end;
+
 procedure TMainForm.SaveRequestButtonIcon(Added: Boolean);
 begin
   if Added then
@@ -2278,8 +2285,7 @@ begin
       Selected.Request.ResponseInfo := NIL;
     end;
   end;
-  btnSubmit.Enabled := True;
-  btnSaveRequest.Enabled := True;
+  SetSubmitEnabled(True);
   SwitchTabByName(pagesRequest, Selected.TabRequest);
   SwitchTabByName(pagesResponse, Selected.TabResponse);
   SetAppCaption(Selected.Name);
@@ -2567,8 +2573,7 @@ begin
     ShowMessage('Request is timeout.')
   else
     ShowMessage(E.Message);
-  btnSubmit.Enabled := True;
-  btnSaveRequest.Enabled := True;
+  SetSubmitEnabled(True);
   FinishRequest;
 end;
 
@@ -2635,8 +2640,7 @@ var
   i: integer;
   mime: TMimeType;
 begin
-  btnSubmit.Enabled := True;
-  btnSaveRequest.Enabled := True;
+  SetSubmitEnabled(True);
   TimerRequest.Enabled := False;
 
   // Update the app window caption.
@@ -2902,8 +2906,7 @@ begin
   UpdateStatusLine;
 
   // Submit and SaveRequest buttons state.
-  btnSubmit.Enabled := False;
-  btnSaveRequest.Enabled := False;
+  SetSubmitEnabled(False);
   SaveRequestButtonIcon(False);
   FRequestManager.ResetCurrent;
 end;
