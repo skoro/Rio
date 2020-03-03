@@ -267,7 +267,6 @@ type
     procedure UpdateStatusLine(Main: string = '');
     procedure UpdateStatusLine(Info: TResponseInfo);
     procedure ShowResponseCookie(Headers: TStrings);
-    function PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
     function GetPopupSenderAsStringGrid(Sender: TObject): TStringGrid;
     function EditGridRow(Grid: TStringGrid): TModalResult;
     procedure SetAppCaption(const AValue: String = '');
@@ -1347,7 +1346,9 @@ procedure TMainForm.miOpenRequestClick(Sender: TObject);
 var
   jsonStr: string;
 begin
-  if not PromptNewRequest('Do you want to open a request file ?', 'Open request file') then Exit;
+  if Length(Trim(cbUrl.Text)) > 0 then
+    if ConfirmDlg('Open request file', 'Do you want to open a request file ?') = mrCancel then
+      Exit; // =>
 
   dlgOpen.DefaultExt := 'json';
   if dlgOpen.Execute then begin
@@ -2821,42 +2822,6 @@ begin
 
   if Row > 1 then tabRespCookie.TabVisible := True
     else tabRespCookie.TabVisible := False;
-end;
-
-function TMainForm.PromptNewRequest(const prompt: string; const promptTitle: string = 'New request'): Boolean;
-var
-  Need: Boolean = False;
-
-  function IsEmpty(Grid: TStringGrid): Boolean;
-  var
-    I: Integer;
-  begin
-    for I := 1 to Grid.RowCount - 1 do
-      if (Grid.Cells[1, I] <> '') or (Grid.Cells[2, I] <> '') then
-        Exit(False);
-    Result := True;
-  end;
-
-begin
-  Need := Length(cbUrl.Text) > 0;
-  if not Need then
-    Need := not IsEmpty(requestHeaders);
-  if not Need then
-    Need := not IsEmpty(gridReqCookie);
-  if not Need then
-    Need := not IsEmpty(gridForm);
-  if not Need then
-    Need := not IsEmpty(gridParams);
-  if not Need then
-    Need := GetSelectedAuthTab <> atNone;
-  if not Need then
-    Need := Length(editOther.Text) > 0;
-  if not Need then
-    Need := Length(Trim(editJson.Text)) > 0;
-
-  if Need and (ConfirmDlg(promptTitle, prompt) <> mrOK) then
-    Exit(False); // =>
-  Result := True;
 end;
 
 procedure TMainForm.StartNewRequest;
