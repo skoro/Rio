@@ -2,7 +2,7 @@
 include ./source/version.inc
 PROJECT=source/rio.lpr
 LAZBUILD?=lazbuild
-LINUXDEPLOY?=linuxdeploy-x86_64.AppImage
+LINUXDEPLOY?=./tools/linuxdeploy-x86_64
 APP=rio
 APPDIR=AppDir
 WIDGET=gtk
