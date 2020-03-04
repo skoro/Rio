@@ -14,7 +14,7 @@ type
   TSavedRequestPopup = class;
 
   // When a request is changed (opened).
-  TOnChangeRequest = procedure (Previous, Selected: TSavedRequest) of object;
+  TOnChangeRequest = procedure (const Previous: TSavedRequest; var Selected: TSavedRequest) of object;
   // When the request menu item was selected in the popup menu.
   TOnRequestClick = procedure (Sender: TObject; SR: TSavedRequest) of object;
   // When the request is deleted.
@@ -1135,12 +1135,15 @@ begin
   if Selected = FCurrentNode then
     Exit; // =>
   Prev := GetCurrentRequest;
-  CurrentNode := Selected;
-  if Assigned(FOnChangeRequest) then begin
-    FOnChangeRequest(Prev, GetCurrentRequest);
-    CurrentNode := Selected; // Preserve selected node after user callback.
+  if Assigned(FOnChangeRequest) then
+    FOnChangeRequest(Prev, SR);
+  // SR can be NILed by event callback so we must ensure that it's existed
+  // before to set it as selected.
+  if Assigned(SR) then
+  begin
+    CurrentNode := Selected;
+    CurrentNode.Selected := True;
   end;
-  CurrentNode.Selected := True;
 end;
 
 function TRequestManager.OpenRequestPath(Path: string): TSavedRequest;

@@ -288,7 +288,7 @@ type
     procedure SetSubmitEnabled(const aNewState: Boolean);
     procedure SaveRequestButtonIcon(Added: Boolean);
     function  SaveRequestEditorShow(SR: TSavedRequest): TModalResult;
-    procedure OnChangeRequest(Prev, Selected: TSavedRequest);
+    procedure OnChangeRequest(const Prev: TSavedRequest; var Selected: TSavedRequest);
     procedure OnDeleteRequest(const SR: TSavedRequest);
     procedure OnMoveRequest(const SR: TSavedRequest; const OldPath: string);
     procedure OnAddRequest(const SR: TSavedRequest; const FolderPath: string);
@@ -296,6 +296,7 @@ type
     procedure CacheRequest(const SR: TSavedRequest; const RespInfo: TResponseInfo);
     procedure UpdateRequest(RO: TRequestObject; SR: TSavedRequest);
     procedure FocusModeCheck;
+    function ConfirmNewRequest(const Current: TSavedRequest): Boolean;
   public
     procedure ApplyOptions;
     procedure SwitchLayout;
@@ -336,7 +337,22 @@ const
   STATE_SIDEBAR_SIDE = 'sidebarSide';
   STATE_SPLITTER_SIDE = 'splitterSideRequest';
 
+  // Form states (don't be confused with form's state property).
+  STATE_FORM_CREATE = 1;  // Form is created.
+  STATE_FORM_SHOW   = 2;  // Form begins showing.
+  STATE_FORM_OK     = 99; // Form is ready to use.
+
 {$R *.lfm}
+
+procedure SetFormState(state: integer);
+begin
+  AppState.WriteInteger('main_form', state);
+end;
+
+function GetFormState: integer;
+begin
+  Result := AppState.ReadInteger('main_form');
+end;
 
 { TMainForm }
 
@@ -791,6 +807,8 @@ var
 begin
   inherited;
 
+  SetFormState(STATE_FORM_CREATE);
+
   // Earlier options initialization. We need options during
   // main form creation.
   OptionsForm := TOptionsForm.Create(Self);
@@ -946,6 +964,8 @@ var
   StrVal: string;
   RO: TRequestObject;
 begin
+  SetFormState(STATE_FORM_SHOW);
+
   // Restore tabs visibility.
   ViewSwitchTabs(nil);
   ViewToggleTabs(nil);
@@ -991,6 +1011,8 @@ begin
   cbEnv.BorderSpacing.Top := 1;
   cbEnv.BorderSpacing.Bottom := 1;
   {$ENDIF}
+
+  SetFormState(STATE_FORM_OK);
 end;
 
 procedure TMainForm.gaClearRowsClick(Sender: TObject);
@@ -1306,33 +1328,9 @@ begin
 end;
 
 procedure TMainForm.miNewClick(Sender: TObject);
-var
-  Existing: Boolean;
-  SR: TSavedRequest;
-  Url: string;
-  mrSave: TModalResult;
 begin
-  Url := Trim(cbUrl.Text);
-  SR := FRequestManager.CurrentRequest;
-  Existing := Assigned(SR);
-  if Existing and (not SR.Locked) then
-  begin
-    if Url = '' then
-      cbUrl.Text := SR.Request.Url;
-    UpdateRequest(nil, SR);
-  end
-  else
-    begin
-      if (Url <> '') and (not Existing) then
-      begin
-        mrSave := QuestionDlg('Save request ?', 'Do you want to save request ?', mtConfirmation,
-               [mrCancel, '&Cancel', 'IsDefault', mrYes, '&Save', mrNo, '&Don''t save'], 0);
-        if (mrSave = mrYes) and (SaveRequestEditorShow(NIL) = mrCancel) then
-          Exit; // =>
-        if (mrSave = mrCancel) then
-          Exit; // =>
-      end;
-    end;
+  if not ConfirmNewRequest(FRequestManager.CurrentRequest) then
+    Exit; // =>
   StartNewRequest;
   cbUrl.SetFocus;
 end;
@@ -2260,7 +2258,7 @@ begin
   end;
 end;
 
-procedure TMainForm.OnChangeRequest(Prev, Selected: TSavedRequest);
+procedure TMainForm.OnChangeRequest(const Prev: TSavedRequest; var Selected: TSavedRequest);
 var
   RI: TResponseInfo;
   RO: TRequestObject;
@@ -2272,7 +2270,15 @@ begin
     RO.Method := Prev.Request.Method;
     RO.Url := Prev.Request.Url;
     UpdateRequest(RO, Prev);
-  end;
+  end
+  else
+    // We must prevent the confirmation dialog when the form is not ready yet
+    // in such cases when we read the request from the configuration.
+    if (GetFormState = STATE_FORM_OK) and (not ConfirmNewRequest(nil)) then
+    begin
+      Selected := nil;
+      Exit; // =>
+    end;
   StartNewRequest;
   SaveRequestButtonIcon(True);
   RI := NIL;
@@ -2425,6 +2431,35 @@ end;
 procedure TMainForm.FocusModeCheck;
 begin
   miFocus.Checked := not (miSidebar.Checked or miTabToggle.Checked);
+end;
+
+function TMainForm.ConfirmNewRequest(const Current: TSavedRequest): Boolean;
+var
+  Existing: Boolean;
+  Url: string;
+  mrSave: TModalResult;
+begin
+  Url := Trim(cbUrl.Text);
+  Existing := Assigned(Current);
+  if Existing and (not Current.Locked) then
+  begin
+    if Url = '' then
+      cbUrl.Text := Current.Request.Url;
+    UpdateRequest(nil, Current);
+  end
+  else
+    begin
+      if (Url <> '') and (not Existing) then
+      begin
+        mrSave := QuestionDlg('Save request ?', 'Do you want to save request ?', mtConfirmation,
+               [mrCancel, '&Cancel', 'IsDefault', mrYes, '&Save', mrNo, '&Don''t save'], 0);
+        if (mrSave = mrYes) and (SaveRequestEditorShow(NIL) = mrCancel) then
+          Exit(False); // =>
+        if (mrSave = mrCancel) then
+          Exit(False); // =>
+      end;
+    end;
+  Result := True;
 end;
 
 procedure TMainForm.ApplyOptions;
