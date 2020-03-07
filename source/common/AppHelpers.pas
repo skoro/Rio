@@ -93,6 +93,10 @@ function ObjToJsonStr(Obj: TObject): string;
 // Unserialize a json string to the object.
 procedure JsonStrToObj(json: string; Obj: TObject);
 
+// Busy cursor.
+procedure AppBusyCursor;
+procedure AppResetCursor;
+
 implementation
 
 uses process, fpjsonrtti, LazUTF8, SynEditTypes, options, strutils;
@@ -526,6 +530,16 @@ begin
   finally
     streamer.Free;
   end;
+end;
+
+procedure AppBusyCursor;
+begin
+  Screen.Cursor := crHourGlass;
+end;
+
+procedure AppResetCursor;
+begin
+  Screen.Cursor := crDefault;
 end;
 
 end.

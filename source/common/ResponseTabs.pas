@@ -620,7 +620,8 @@ begin
   if Assigned(FOnJsonData) then
     FOnJsonData(FJsonRoot, Filtered);
 
-  if Assigned(Filtered) then begin
+  if Assigned(Filtered) then
+  begin
     SetFormattedText(Filtered);
     BuildTree(Filtered);
     if FTableDone then
@@ -663,6 +664,7 @@ begin
       FixedRows := 1; // Header.
       for i := 0 to JsonData.Count - 1 do
       begin
+        Application.ProcessMessages;
         jsItem := JsonData.Items[i];
         if (jsItem.JSONType = jtObject) then
         begin
@@ -751,10 +753,12 @@ end;
 
 procedure TResponseJsonTab.SetFormattedText(JsonData: TJSONData);
 begin
+  FSynEdit.BeginUpdate;
   if Assigned(FOnJsonFormat) then
     FOnJsonFormat(JsonData, FSynEdit)
   else
     FSynEdit.Text := JsonData.FormatJSON;
+  FSynEdit.EndUpdate;
 end;
 
 procedure TResponseJsonTab.InternalOnSwitchFilter(Sender: TObject);
@@ -788,7 +792,9 @@ procedure TResponseJsonTab.OnFilterReset(Sender: TObject);
 begin
   FFilter.Visible := False;
   FBtnFilter.Down := False;
+  AppBusyCursor;
   ApplyFilter;
+  AppResetCursor;
   if ViewPage = vpTable then
     ActivateTable;
 end;
@@ -846,6 +852,7 @@ begin
   // Build the table for the first click on the table view button.
   if not FTableDone then
   begin
+    AppBusyCursor;
     jsData := nil;
     jsParser := TJSONParser.Create(FSynEdit.Text);
     try
@@ -866,6 +873,7 @@ begin
       FreeAndNil(jsParser);
       if Assigned(jsData) then
         FreeAndNil(jsData);
+      AppResetCursor;
     end;
   end;
 end;
@@ -1136,12 +1144,15 @@ var
   Key: string;
 begin
 
+  AppBusyCursor;
   FilterList := TStringList.Create;
   FilterList.LineBreak := '';
 
   // Find out a node path.
   try
-    while Assigned(Node.Parent) do begin
+    while Assigned(Node.Parent) do
+    begin
+      Application.ProcessMessages;
       childJson  := TJSONData(Node.Data);
       parentJson := TJSONData(Node.Parent.Data);
       Key := '';
@@ -1177,6 +1188,7 @@ begin
     end;
 
   finally
+    AppResetCursor;
     FilterList.Free;
   end;
 end;

@@ -426,7 +426,7 @@ begin
     Exit; // =>
   end;
 
-  Screen.Cursor:=crHourGlass;
+  AppBusyCursor;
   FContentType := '';
   formData := '';
   contentType := '';
@@ -2536,7 +2536,7 @@ begin
   // The reason is TMemo component (filled with the text).
   // This hack clears text before switching and then fills the text back.
   {$IfDef WINDOWS}
-    Screen.Cursor := crHourGlass;
+    AppBusyCursor;
     s := responseRaw.Text;
     responseRaw.Clear;
   {$EndIf}
