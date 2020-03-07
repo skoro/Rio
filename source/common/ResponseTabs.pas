@@ -648,79 +648,91 @@ end;
 
 procedure TResponseJsonTab.BuildTable(JsonData: TJSONData);
 var
-  i, k: integer;
+  i, k, colPos: integer;
   jsItem, jsData: TJSONData;
   header, dataValue: string;
+  columnNames: TStringList;
 begin
-  with FGrid do
-  begin
-    Columns.Clear;
-    RowCount := JsonData.Count + 1; // Total + Header.
-    FixedRows := 1; // Header.
-    for i := 0 to JsonData.Count - 1 do
+  columnNames := TStringList.Create;
+  try
+    with FGrid do
     begin
-      jsItem := JsonData.Items[i];
-      if (jsItem.JSONType = jtObject) then
+      BeginUpdate;
+      Columns.Clear;
+      RowCount := JsonData.Count + 1; // Total + Header.
+      FixedRows := 1; // Header.
+      for i := 0 to JsonData.Count - 1 do
       begin
-        for k := 0 to jsItem.Count - 1 do
+        jsItem := JsonData.Items[i];
+        if (jsItem.JSONType = jtObject) then
         begin
-          jsData := jsItem.Items[k];
-          // Set grid headers from the first array item.
-          if i = 0 then
+          for k := 0 to jsItem.Count - 1 do // iterate over object.
           begin
+            jsData := jsItem.Items[k];
+            // Check column headers: add new ones dynamically.
             header := TJSONObject(jsItem).Names[k];
+            colPos := columnNames.IndexOf(header); // data column index.
+            if colPos = -1 then // new column.
+            begin
+              columnNames.Insert(k, header);
+              colPos := k;
+              with TGridColumn(Columns.Insert(k)).Title do
+              begin
+                Caption := header;
+                Font.Style := [fsBold];
+              end;
+            end;
+            // Complex types cannot be converted to a string.
+            try
+              if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
+                dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
+              else if (jsData.JSONType = jtNull) then
+                dataValue := 'NULL'
+              else
+                dataValue := jsData.AsString;
+            except
+              dataValue := 'Error';
+            end;
+            // insert data into a cell.
+            Cells[colPos, i + 1] := dataValue;
+          end; // for k
+        end
+        else begin
+          try
+            case jsItem.JSONType of
+              jtArray: dataValue := jsItem.FormatJSON([foSingleLineArray, foSkipWhiteSpace]);
+              jtNull:  dataValue := 'NULL';
+              else     dataValue := jsItem.AsString;
+            end;
+          except
+            dataValue := 'Error';
+          end;
+          if header = '' then // Only one column on a primitive type.
+          begin
+            header := 'Value';
             with Columns.Add.Title do
             begin
               Caption := header;
               Font.Style := [fsBold];
             end;
           end;
-          // Complex types cannot be converted to a string.
-          try
-            if (jsData.JSONType = jtObject) or (jsData.JSONType = jtArray) then
-              dataValue := jsData.FormatJSON([foSingleLineArray, foSingleLineObject, foSkipWhiteSpace])
-            else if (jsData.JSONType = jtNull) then
-              dataValue := 'NULL'
-            else
-              dataValue := jsData.AsString;
-          except
-            dataValue := 'Error';
-          end;
-          Cells[k, i + 1] := dataValue;
-        end; // for k
-      end
-      else begin
-        try
-          case jsItem.JSONType of
-            jtArray: dataValue := jsItem.FormatJSON([foSingleLineArray, foSkipWhiteSpace]);
-            jtNull:  dataValue := 'NULL';
-            else     dataValue := jsItem.AsString;
-          end;
-        except
-          dataValue := 'Error';
+          Cells[0, i + 1] := dataValue;
         end;
-        if header = '' then // Only one column on a primitive type.
-        begin
-          header := 'Value';
-          with Columns.Add.Title do
-          begin
-            Caption := header;
-            Font.Style := [fsBold];
-          end;
-        end;
-        Cells[0, i + 1] := dataValue;
+      end; // for i
+      // Don't show empty columns and rows when no data to show.
+      if (RowCount - FixedRows) = 0 then
+      begin
+        FixedRows := 0;
+        ColCount  := 1;
+        RowCount  := 1;
+        Cells[0, 0] := 'No data';
       end;
-    end; // for i
-    // Don't show empty columns and rows when no data to show.
-    if (RowCount - FixedRows) = 0 then
-    begin
-      FixedRows := 0;
-      ColCount  := 1;
-      RowCount  := 1;
-      Cells[0, 0] := 'No data';
-    end;
-  end; // with FGrid
-  FTableDone := True; // Table build is done.
+      EndUpdate;
+    end; // with FGrid
+    FTableDone := True; // Table build is done.
+  finally
+    FreeAndNil(columnNames);
+  end;
 end;
 
 procedure TResponseJsonTab.AdjustTableColumns;
